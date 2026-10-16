@@ -3,6 +3,7 @@ import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/glow_button.dart';
 import 'package:exhale/core/widgets/number_stepper.dart';
 import 'package:exhale/core/widgets/pill_segmented_control.dart';
@@ -36,9 +37,7 @@ class SetupPage extends ConsumerWidget {
 
     ref.listen(setupFormProvider.select((s) => s.errorMessage), (_, message) {
       if (message == null) return;
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(message)));
+      showAppSnackBar(context, message: message, tone: SnackTone.danger);
     });
 
     Future<void> submit() async {
