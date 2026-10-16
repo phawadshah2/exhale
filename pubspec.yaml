@@ -12,6 +12,7 @@ dependencies:
   flutter_riverpod: ^3.4.3
   get_it: ^9.3.0
   material_symbols_icons: ^4.2960.0
+  meta: ^1.19.0
 
 dev_dependencies:
   flutter_test:
