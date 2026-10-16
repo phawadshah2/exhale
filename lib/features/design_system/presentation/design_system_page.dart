@@ -1,10 +1,8 @@
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/exhale_colors.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/core/widgets/pill_segmented_control.dart';
-import 'package:exhale/features/settings/presentation/providers/theme_mode_provider.dart';
+import 'package:exhale/features/settings/presentation/widgets/theme_preference_control.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Living style guide: every token and themed component in one scroll.
@@ -60,25 +58,12 @@ class _Section extends StatelessWidget {
   }
 }
 
-class _ThemeModeSection extends ConsumerWidget {
+class _ThemeModeSection extends StatelessWidget {
   const _ThemeModeSection();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(themeModeProvider);
-
-    return _Section(
-      title: 'Theme',
-      child: PillSegmentedControl<ThemeMode>(
-        selected: mode,
-        onChanged: ref.read(themeModeProvider.notifier).select,
-        segments: const [
-          PillSegment(value: ThemeMode.light, label: 'Light'),
-          PillSegment(value: ThemeMode.dark, label: 'Dark'),
-          PillSegment(value: ThemeMode.system, label: 'System'),
-        ],
-      ),
-    );
+  Widget build(BuildContext context) {
+    return const _Section(title: 'Theme', child: ThemePreferenceControl());
   }
 }
 
