@@ -20,6 +20,17 @@ void main() {
       expect(LogicalDay(2026, 3, 7).toString(), '2026-03-07');
     });
 
+    test('parse round-trips toString', () {
+      expect(LogicalDay.parse('2026-03-07'), LogicalDay(2026, 3, 7));
+      expect(LogicalDay.parse('2028-02-29'), LogicalDay(2028, 2, 29));
+    });
+
+    test('parse rejects malformed and impossible dates', () {
+      expect(() => LogicalDay.parse('2026-3-7'), throwsFormatException);
+      expect(() => LogicalDay.parse('07/03/2026'), throwsFormatException);
+      expect(() => LogicalDay.parse('2026-02-30'), throwsFormatException);
+    });
+
     test('addDays crosses month, year and leap-day boundaries', () {
       expect(LogicalDay(2026, 10, 31).addDays(1), LogicalDay(2026, 11, 1));
       expect(LogicalDay(2026, 12, 31).addDays(1), LogicalDay(2027, 1, 1));

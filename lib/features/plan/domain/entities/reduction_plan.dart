@@ -44,6 +44,10 @@ class ReductionPlan {
   /// First day on which the limit equals [targetLimit].
   LogicalDay get targetDay => startDay.addDays(totalDays);
 
+  /// Cigarettes not smoked by the target day if every stage limit is kept,
+  /// compared with staying at [startLimit].
+  int get plannedReduction => stepDays * stageCount * (stageCount - 1) ~/ 2;
+
   List<PlanStage> get stages =>
       List.unmodifiable(List.generate(stageCount, _stageAt));
 
