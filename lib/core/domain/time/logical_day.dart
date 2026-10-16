@@ -12,6 +12,25 @@ class LogicalDay implements Comparable<LogicalDay> {
   factory LogicalDay.fromDate(DateTime date) =>
       LogicalDay(date.year, date.month, date.day);
 
+  /// Parses the `yyyy-mm-dd` form produced by [toString].
+  factory LogicalDay.parse(String value) {
+    final match = _isoDate.firstMatch(value);
+    if (match == null) {
+      throw FormatException('Expected yyyy-mm-dd', value);
+    }
+    final day = LogicalDay(
+      int.parse(match[1]!),
+      int.parse(match[2]!),
+      int.parse(match[3]!),
+    );
+    if (day.toString() != value) {
+      throw FormatException('Not a real calendar date', value);
+    }
+    return day;
+  }
+
+  static final _isoDate = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$');
+
   final DateTime _utc;
 
   int get year => _utc.year;

@@ -81,6 +81,11 @@ void main() {
       expect(stages.last.endDay, LogicalDay(2026, 12, 16));
     });
 
+    test('planned reduction matches the designed projection', () {
+      expect(plan.plannedReduction, 252);
+      expect(ReductionPlan(startDay: start, startLimit: 1).plannedReduction, 0);
+    });
+
     test('stages are read-only', () {
       expect(() => plan.stages.add(plan.stages.first), throwsUnsupportedError);
     });
