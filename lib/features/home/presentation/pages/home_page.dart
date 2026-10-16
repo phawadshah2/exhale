@@ -4,6 +4,7 @@ import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/presentation/providers/clock_providers.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/glow_button.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
@@ -21,21 +22,20 @@ class HomePage extends ConsumerWidget {
   Future<void> _logSmoke(BuildContext context, WidgetRef ref) async {
     final result = await ref.read(logSmokeProvider)(const LogSmokeInput());
     if (!context.mounted) return;
-    final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
     switch (result) {
       case Success(value: final SmokeLog log):
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text('Logged at ${AppFormat.time(log.loggedAt)}'),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () => ref.read(deleteSmokeLogProvider)(log.id),
-            ),
-          ),
+        showAppSnackBar(
+          context,
+          message: 'Logged at ${AppFormat.time(log.loggedAt)}',
+          actionLabel: 'Undo',
+          onAction: () => ref.read(deleteSmokeLogProvider)(log.id),
+          duration: const Duration(seconds: 2),
         );
       case FailureResult(:final failure):
-        messenger.showSnackBar(
-          SnackBar(content: Text(failureMessage(failure))),
+        showAppSnackBar(
+          context,
+          message: failureMessage(failure),
+          tone: SnackTone.danger,
         );
     }
   }

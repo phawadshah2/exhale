@@ -1,6 +1,7 @@
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/exhale_colors.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/features/settings/presentation/widgets/theme_preference_control.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -468,11 +469,11 @@ class _Feedback extends StatelessWidget {
       children: [
         Expanded(
           child: OutlinedButton(
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Logged at 3:42 PM'),
-                action: SnackBarAction(label: 'Undo', onPressed: () {}),
-              ),
+            onPressed: () => showAppSnackBar(
+              context,
+              message: 'Logged at 3:42 PM',
+              actionLabel: 'Undo',
+              onAction: () {},
             ),
             child: const Text('Snackbar'),
           ),

@@ -66,13 +66,14 @@ void main() {
     expect(find.text('Limit reached. You can still log.'), findsOneWidget);
 
     await tester.tap(find.text('Log a smoke'));
-    await tester.pumpAndSettle();
+    await tester.pumpInSteps(const Duration(milliseconds: 900));
     expect(todayCount('3 / 2'), findsOneWidget);
     expect(find.text("1 over today's limit"), findsOneWidget);
 
     await tester.tap(find.text('Undo'));
     await tester.pumpAndSettle();
     expect(todayCount('2 / 2'), findsOneWidget);
+    expect(find.text('Undo'), findsNothing);
 
     await tester.disposeApp();
   });

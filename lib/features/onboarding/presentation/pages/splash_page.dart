@@ -2,10 +2,7 @@ import 'dart:async';
 
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/domain/result/result.dart';
-import 'package:exhale/core/theme/app_spacing.dart';
-import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/core/widgets/app_logo.dart';
-import 'package:exhale/core/widgets/pulsing_dots.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/splash_scene.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +12,10 @@ import 'package:go_router/go_router.dart';
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
-  static const minimumDuration = Duration(milliseconds: 1400);
+  static const introDuration = Duration(milliseconds: 1800);
+
+  /// Pause after the intro finishes before leaving the splash.
+  static const holdDuration = Duration(milliseconds: 700);
 
   @override
   ConsumerState<SplashPage> createState() => _SplashPageState();
@@ -25,23 +25,70 @@ class _SplashPageState extends ConsumerState<SplashPage>
     with SingleTickerProviderStateMixin {
   late final AnimationController _intro = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 900),
-  )..forward();
+    duration: SplashPage.introDuration,
+  );
+
+  String? _destination;
+  bool _introFinished = false;
+  bool _navigated = false;
+  bool _started = false;
+  int _playId = 0;
+
+  bool get _reduceMotion => MediaQuery.disableAnimationsOf(context);
 
   @override
   void initState() {
     super.initState();
-    unawaited(_route());
+    unawaited(_resolveDestination());
   }
 
-  Future<void> _route() async {
-    final (history, _) = await (
-      ref.read(planRepositoryProvider).getHistory(),
-      Future<void>.delayed(SplashPage.minimumDuration),
-    ).wait;
-    if (!mounted) return;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    unawaited(_playIntro());
+  }
+
+  Future<void> _resolveDestination() async {
+    final history = await ref.read(planRepositoryProvider).getHistory();
     final hasPlan = history is Success<PlanHistory?> && history.value != null;
-    context.go(hasPlan ? AppRoutes.home : AppRoutes.setup);
+    _destination = hasPlan ? AppRoutes.home : AppRoutes.setup;
+    _maybeNavigate();
+  }
+
+  /// Plays the entrance from the start. Navigation waits for the latest
+  /// play to finish, so a replay tap postpones leaving.
+  Future<void> _playIntro() async {
+    final id = ++_playId;
+    _introFinished = false;
+    if (_reduceMotion) {
+      _intro.value = 1;
+    } else {
+      try {
+        await _intro.forward(from: 0).orCancel;
+      } on TickerCanceled {
+        return;
+      }
+    }
+    await Future<void>.delayed(SplashPage.holdDuration);
+    if (!mounted || id != _playId) return;
+    _introFinished = true;
+    _maybeNavigate();
+  }
+
+  void _maybeNavigate() {
+    final destination = _destination;
+    if (!mounted || _navigated || !_introFinished || destination == null) {
+      return;
+    }
+    _navigated = true;
+    context.go(destination);
+  }
+
+  void _replay() {
+    if (_navigated) return;
+    unawaited(_playIntro());
   }
 
   @override
@@ -52,51 +99,11 @@ class _SplashPageState extends ConsumerState<SplashPage>
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final text = context.textTheme;
-    final fade = CurvedAnimation(parent: _intro, curve: Curves.easeOutCubic);
-
     return Scaffold(
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            radius: 0.9,
-            colors: [
-              colors.primaryContainer.withValues(alpha: 0.16),
-              colors.surface,
-            ],
-          ),
-        ),
-        child: Center(
-          child: FadeTransition(
-            opacity: fade,
-            child: ScaleTransition(
-              scale: Tween<double>(begin: 0.92, end: 1).animate(fade),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const AppLogo(size: 220),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Exhale',
-                    style: text.displayMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'Breathe easier, one day at a time',
-                    style: text.bodyLarge?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  const PulsingDots(),
-                ],
-              ),
-            ),
-          ),
-        ),
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _replay,
+        child: SplashScene(intro: _intro, animate: !_reduceMotion),
       ),
     );
   }

@@ -20,20 +20,28 @@ final settingsProvider = StreamProvider<AppSettings>(
   (ref) => ref.watch(settingsRepositoryProvider).watch(),
 );
 
-final themeModeProvider = Provider<ThemeMode>((ref) {
-  final preference =
-      ref.watch(settingsProvider).value?.themePreference ??
-      ThemePreference.dark;
-  return switch (preference) {
+/// Settings read before the first frame (overridden in main), so theme and
+/// day boundary are right before the stream's first value arrives.
+final initialSettingsProvider = Provider<AppSettings>(
+  (ref) => const AppSettings(),
+);
+
+/// Latest stored settings, falling back to [initialSettingsProvider].
+final currentSettingsProvider = Provider<AppSettings>(
+  (ref) =>
+      ref.watch(settingsProvider).value ?? ref.watch(initialSettingsProvider),
+);
+
+final themeModeProvider = Provider<ThemeMode>(
+  (ref) => switch (ref.watch(currentSettingsProvider).themePreference) {
     ThemePreference.light => ThemeMode.light,
     ThemePreference.dark => ThemeMode.dark,
     ThemePreference.system => ThemeMode.system,
-  };
-});
+  },
+);
 
 final dayBoundaryProvider = Provider<DayBoundary>(
-  (ref) =>
-      ref.watch(settingsProvider).value?.dayBoundary ?? const DayBoundary(),
+  (ref) => ref.watch(currentSettingsProvider).dayBoundary,
 );
 
 final settingsActionsProvider = Provider<SettingsActions>(SettingsActions.new);
