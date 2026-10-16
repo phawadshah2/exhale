@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Exhale - Sanctuary Tracker</title>
+<!-- Google Fonts: Manrope & Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-tint": "#3cddc7",
+            "tertiary-fixed-dim": "#ffb95f",
+            "surface-variant": "#2f353f",
+            "outline": "#859490",
+            "inverse-surface": "#dde2f0",
+            "on-tertiary-fixed": "#2a1700",
+            "on-primary-fixed-variant": "#005047",
+            "surface-bright": "#343944",
+            "surface-container": "#1a2029",
+            "error": "#ffb4ab",
+            "surface-container-high": "#242a34",
+            "on-surface-variant": "#bacac5",
+            "on-tertiary-container": "#6d4400",
+            "on-tertiary-fixed-variant": "#653e00",
+            "on-primary-fixed": "#00201c",
+            "primary-fixed-dim": "#3cddc7",
+            "on-primary": "#003731",
+            "surface-container-lowest": "#080e17",
+            "error-container": "#93000a",
+            "primary-fixed": "#62fae3",
+            "secondary-fixed": "#6ffbbe",
+            "tertiary-container": "#ffad3a",
+            "surface": "#0e141d",
+            "inverse-primary": "#006b5f",
+            "tertiary-fixed": "#ffddb8",
+            "outline-variant": "#3c4a46",
+            "on-tertiary": "#472a00",
+            "on-error-container": "#ffdad6",
+            "on-secondary-container": "#00311f",
+            "primary": "#57f1db",
+            "on-background": "#dde2f0",
+            "surface-container-highest": "#2f353f",
+            "surface-dim": "#0e141d",
+            "background": "#0e141d",
+            "on-secondary": "#003824",
+            "primary-container": "#2dd4bf",
+            "on-secondary-fixed-variant": "#005236",
+            "on-error": "#690005",
+            "secondary-container": "#00a572",
+            "tertiary": "#ffd29f",
+            "on-surface": "#dde2f0",
+            "on-primary-container": "#00574d",
+            "inverse-on-surface": "#2b313b",
+            "secondary": "#4edea3",
+            "on-secondary-fixed": "#002113",
+            "surface-container-low": "#161c25",
+            "secondary-fixed-dim": "#4edea3"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "gutter": "1rem",
+            "margin": "1.25rem",
+            "space-xs": "0.25rem",
+            "margin-lg": "1.5rem",
+            "gutter-sm": "0.75rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "title-md": ["Plus Jakarta Sans"],
+            "title-lg": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "display-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    /* Ambient diffuse eucalyptus glow */
+    .glow-eucalyptus {
+      box-shadow: 0px 0px 24px -2px rgba(45, 212, 191, 0.25);
+    }
+    .glow-subtle {
+      box-shadow: 0px 12px 32px -4px rgba(0, 0, 0, 0.45);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex justify-center">
+<!-- Mobile Frame (390px simulated container with safe areas) -->
+<div class="w-full max-w-[390px] min-h-screen bg-surface flex flex-col relative pb-28">
+<!-- Shared Component: TopAppBar -->
+<header class="flex justify-between items-center w-full px-margin py-space-sm bg-surface sticky top-0 z-40">
+<!-- Leading: Avatar -->
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-full ring-1 ring-outline-variant overflow-hidden flex items-center justify-center bg-surface-container-high">
+<img alt="Profile photo of user" class="w-full h-full object-cover" data-alt="A gentle portrait of a mindful young adult illuminated by the soft cyan twilight glow of evening, styled with clean minimalism and tranquil serene expression in a dark ambient obsidian setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_puLI22TgFxkj6bLNAwvymK1aM2C2bUGcvxcGWDRZW8Gw9uwyVh1xWtA1-YGCsGu0UEdG-8LPVmtBHE1NOe_B33RaLJeJvX_0tmyezx_oeGOi_X9uASrYajLnz3wE7bA42lx2tSdVRHh_2qNBx4jxpS4MZlwaIQuPDv0A7LtQkFE56dzdo0VJtaK7DFj-ttmamrmPzYRhE50K3-bSVvo_wr3UshQPWNQ5JtrWQzbb0G0EgTD6KW5J"/>
+</div>
+<div class="flex flex-col">
+<span class="text-headline-sm font-headline-sm font-semibold text-primary">Exhale</span>
+</div>
+</div>
+<!-- Trailing: Notification Action -->
+<button class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 px-margin flex flex-col gap-space-md">
+<!-- Greeting & Top Banner Cluster -->
+<section class="flex flex-col gap-space-xs pt-space-xs">
+<div class="flex items-baseline justify-between">
+<h1 class="text-headline-sm font-headline-sm text-on-surface">Good morning, Alex</h1>
+<span class="text-label-md font-label-md text-on-surface-variant">Monday, Oct 15</span>
+</div>
+<p class="text-body-sm font-body-sm text-primary flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+          Day 1 of your journey
+        </p>
+<!-- Current Target Capsule Banner -->
+<div class="mt-space-xs bg-surface-container-low border border-outline-variant/40 rounded-DEFAULT px-space-md py-space-xs flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-base" data-icon="flag">flag</span>
+<span class="text-body-sm font-body-sm text-on-surface">Week 1 · Daily limit: 9</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant bg-surface-container-high px-space-xs py-0.5 rounded-full">Stage 1</span>
+</div>
+</section>
+<!-- Hero Progress Ring Card (Empty State: Day 1 Baseline) -->
+<section class="bg-surface-container-low border border-outline-variant/30 rounded-lg p-space-md flex flex-col items-center text-center relative overflow-hidden glow-subtle">
+<!-- Soft decorative background ambient aura -->
+<div class="absolute -top-16 -right-16 w-36 h-36 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+<!-- Serene Circular Progress Ring -->
+<div class="relative w-48 h-48 my-space-xs flex items-center justify-center">
+<svg class="w-full h-full -rotate-90 transform" viewbox="0 0 160 160">
+<!-- Background Inactive Track with gentle dashed cadence -->
+<circle cx="80" cy="80" fill="none" r="66" stroke="#1a2029" stroke-dasharray="3 4" stroke-width="10"></circle>
+<!-- Soft serene resting halo circle -->
+<circle cx="80" cy="80" fill="none" r="66" stroke="#2dd4bf" stroke-opacity="0.18" stroke-width="10"></circle>
+<!-- Active Progress (0% on Day 1 empty state) -->
+<circle class="transition-all duration-1000 ease-out" cx="80" cy="80" fill="none" r="66" stroke="#2dd4bf" stroke-dasharray="414.69" stroke-dashoffset="414.69" stroke-linecap="round" stroke-width="10"></circle>
+</svg>
+<!-- Inside Ring Metrics -->
+<div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+<span class="text-display-lg-mobile font-display-lg-mobile text-on-surface font-bold tracking-tight">0 <span class="text-headline-sm font-headline-sm text-on-surface-variant font-normal">/ 9</span></span>
+<span class="text-label-md font-label-md text-primary font-medium mt-[-2px]">9 left today</span>
+</div>
+</div>
+<!-- Mindful Empty State Status Capsule -->
+<div class="inline-flex items-center gap-1.5 bg-surface-container px-space-md py-space-xs rounded-full border border-outline-variant/20 mb-space-sm">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="text-label-md font-label-md text-on-surface">No smokes logged today. Nice start.</span>
+</div>
+<!-- Time Counter Subtext -->
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-space-md flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>
+          Time since last: Plan started today
+        </p>
+<!-- Big Primary CTA: Log a smoke -->
+<button class="w-full bg-primary-container text-on-primary-container font-label-lg text-label-lg font-bold py-space-sm px-space-lg rounded-full flex items-center justify-center gap-2 glow-eucalyptus active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-xl" data-icon="add_circle">add_circle</span>
+          Log a smoke
+        </button>
+</section>
+<!-- Month Chart View Card -->
+<section class="bg-surface-container-low border border-outline-variant/30 rounded-lg p-space-md flex flex-col gap-space-sm">
+<!-- Header & Segmented Pill Switcher -->
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<h2 class="text-title-md font-title-md text-on-surface">Monthly Horizon</h2>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Gradual reduction plan</span>
+</div>
+<!-- Segmented Buttons: Week vs Month (Month Selected) -->
+<div class="bg-surface-container p-0.5 rounded-full flex items-center border border-outline-variant/30">
+<button class="px-3 py-1 rounded-full text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors">
+              Week
+            </button>
+<button class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-label-sm font-label-sm font-semibold shadow-sm transition-all">
+              Month
+            </button>
+</div>
+</div>
+<!-- Stepped Target Limit & 30-Day Grid Graphic -->
+<div class="mt-space-xs relative bg-surface-container rounded-DEFAULT p-space-sm pt-space-md border border-outline-variant/20">
+<!-- Stepped Threshold Guideline Line Overlay -->
+<div class="relative w-full h-24 mb-1">
+<!-- Stepped limit horizontal segments overlay with dashed style -->
+<!-- Week 1: 9 limit (top ~85% height) -->
+<div class="absolute left-0 w-1/4 top-1 border-t-2 border-dashed border-primary/70 flex items-center">
+<span class="text-[9px] font-label-sm text-primary -mt-3.5 pl-0.5">Limit 9</span>
+</div>
+<!-- Week 2: 8 limit (slightly lower) -->
+<div class="absolute left-1/4 w-1/4 top-3 border-t-2 border-dashed border-primary/50 flex items-center">
+<span class="text-[9px] font-label-sm text-on-surface-variant -mt-3.5 pl-0.5">8</span>
+</div>
+<!-- Week 3: 7 limit -->
+<div class="absolute left-2/4 w-1/4 top-6 border-t-2 border-dashed border-primary/40 flex items-center">
+<span class="text-[9px] font-label-sm text-on-surface-variant -mt-3.5 pl-0.5">7</span>
+</div>
+<!-- Week 4: 6 limit -->
+<div class="absolute left-3/4 w-1/4 top-9 border-t-2 border-dashed border-primary/30 flex items-center">
+<span class="text-[9px] font-label-sm text-on-surface-variant -mt-3.5 pl-0.5">6</span>
+</div>
+<!-- ~30 Thin Daily Columns Container -->
+<div class="absolute inset-x-0 bottom-0 h-full flex items-end justify-between gap-[2px] pt-4">
+<!-- Day 1: Starting day (Active indicator, zero logged) -->
+<div class="flex-1 flex flex-col items-center h-full justify-end group">
+<div class="w-full bg-primary/20 rounded-t-sm h-1.5 ring-1 ring-primary/40"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary mt-1"></div>
+</div>
+<!-- Days 2 to 30: Unreached / Future days (clean muted slots) -->
+<!-- Repeating future days placeholders -->
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/60 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/60 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/60 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/60 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/60 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/60 rounded-t-sm h-0.5"></div></div>
+<!-- Week 2 start -->
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/40 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/40 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/40 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/40 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/40 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/40 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/40 rounded-t-sm h-0.5"></div></div>
+<!-- Week 3 start -->
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/30 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/30 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/30 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/30 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/30 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/30 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/30 rounded-t-sm h-0.5"></div></div>
+<!-- Week 4 start -->
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/20 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/20 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/20 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/20 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/20 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/20 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/20 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/20 rounded-t-sm h-0.5"></div></div>
+<div class="flex-1 flex flex-col items-center h-full justify-end"><div class="w-full bg-surface-container-high/20 rounded-t-sm h-0.5"></div></div>
+</div>
+</div>
+<!-- Bottom axis labels -->
+<div class="flex justify-between items-center text-label-sm font-label-sm text-on-surface-variant/70 pt-1 border-t border-outline-variant/20">
+<span class="text-primary font-semibold">Day 1</span>
+<span>W2</span>
+<span>W3</span>
+<span>W4</span>
+<span>Day 30</span>
+</div>
+</div>
+<!-- Legend / State Descriptor -->
+<div class="flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant pt-space-xs">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary/60"></span>
+<span>New cycle begins</span>
+</div>
+<span class="bg-surface-container-high px-2 py-0.5 rounded-full text-label-sm font-label-sm text-on-surface">0 days over</span>
+</div>
+</section>
+<!-- Quick Stats Bento Grid (Day 1 Baseline) -->
+<section class="grid grid-cols-2 gap-space-sm">
+<!-- Streak Card -->
+<div class="bg-surface-container-low border border-outline-variant/30 rounded-DEFAULT p-space-md flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Streak</span>
+<span class="material-symbols-outlined text-base text-primary" data-icon="local_fire_department">local_fire_department</span>
+</div>
+<span class="text-title-lg font-title-lg text-on-surface font-bold">Day 1</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant mt-auto">Target: 0 by Dec</span>
+</div>
+<!-- Target Metric -->
+<div class="bg-surface-container-low border border-outline-variant/30 rounded-DEFAULT p-space-md flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Target</span>
+<span class="material-symbols-outlined text-base text-secondary" data-icon="crisis_alert">crisis_alert</span>
+</div>
+<span class="text-title-lg font-title-lg text-on-surface font-bold">0 by Dec</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant mt-auto">Steady taper</span>
+</div>
+<!-- Money Saved Card -->
+<div class="bg-surface-container-low border border-outline-variant/30 rounded-DEFAULT p-space-md flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Money saved</span>
+<span class="material-symbols-outlined text-base text-primary" data-icon="savings">savings</span>
+</div>
+<span class="text-title-lg font-title-lg text-on-surface font-bold">$0.00</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant mt-auto">$12.50/pack base</span>
+</div>
+<!-- Avoided Count Card -->
+<div class="bg-surface-container-low border border-outline-variant/30 rounded-DEFAULT p-space-md flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Avoided</span>
+<span class="material-symbols-outlined text-base text-secondary" data-icon="shield">shield</span>
+</div>
+<span class="text-title-lg font-title-lg text-on-surface font-bold">0</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant mt-auto">Baseline ready</span>
+</div>
+</section>
+<!-- Sanctuary Quote Pill -->
+<section class="bg-surface-container-lowest/60 border border-outline-variant/20 rounded-DEFAULT p-space-sm flex items-center gap-space-sm mb-space-sm">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="spa">spa</span>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+          "Every breath is a fresh decision. You are starting with clarity."
+        </p>
+</section>
+</main>
+<!-- Shared Component: BottomNavBar -->
+<!-- JSON Schema Execution: Destination Count 2, Labels: ["Home", "Settings"], Icons: ["spa", "settings"] -->
+<!-- Active State: 'Home' mapped to 'spa' with style_active_navigation -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin py-space-xs backdrop-blur-md bg-surface-container-low dark:bg-surface-container-low shadow-md">
+<!-- Destination 1: Home (Active) -->
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container dark:bg-primary-container dark:text-on-primary-container rounded-full px-space-md py-space-xs font-label-md text-label-md active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-xl" data-icon="spa" style="font-variation-settings: 'FILL' 1;">spa</span>
+<span>Home</span>
+</button>
+<!-- Destination 2: Settings (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-space-md py-space-xs font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-container-high hover:text-on-surface dark:hover:text-on-surface active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-xl" data-icon="settings">settings</span>
+<span>Settings</span>
+</button>
+</nav>
+</div>
+</body></html>

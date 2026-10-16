@@ -1,0 +1,20 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - ios/**
+    - design/**
+    - "**/*.g.dart"
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    # Dart 3.13 suggests the new `const new(...)` constructor syntax.
+    # Keep the classic `const ClassName(...)` form for now.
+    unnecessary_type_name_in_constructor: false
+    public_member_api_docs: false
+    flutter_style_todos: true

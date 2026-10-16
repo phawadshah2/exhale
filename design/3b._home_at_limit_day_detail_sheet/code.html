@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Exhale - Day Detail</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-tint": "#3cddc7",
+            "tertiary-fixed-dim": "#ffb95f",
+            "surface-variant": "#2f353f",
+            "outline": "#859490",
+            "inverse-surface": "#dde2f0",
+            "on-tertiary-fixed": "#2a1700",
+            "on-primary-fixed-variant": "#005047",
+            "surface-bright": "#343944",
+            "surface-container": "#1a2029",
+            "error": "#ffb4ab",
+            "surface-container-high": "#242a34",
+            "on-surface-variant": "#bacac5",
+            "on-tertiary-container": "#6d4400",
+            "on-tertiary-fixed-variant": "#653e00",
+            "on-primary-fixed": "#00201c",
+            "primary-fixed-dim": "#3cddc7",
+            "on-primary": "#003731",
+            "surface-container-lowest": "#080e17",
+            "error-container": "#93000a",
+            "primary-fixed": "#62fae3",
+            "secondary-fixed": "#6ffbbe",
+            "tertiary-container": "#ffad3a",
+            "surface": "#0e141d",
+            "inverse-primary": "#006b5f",
+            "tertiary-fixed": "#ffddb8",
+            "outline-variant": "#3c4a46",
+            "on-tertiary": "#472a00",
+            "on-error-container": "#ffdad6",
+            "on-secondary-container": "#00311f",
+            "primary": "#57f1db",
+            "on-background": "#dde2f0",
+            "surface-container-highest": "#2f353f",
+            "surface-dim": "#0e141d",
+            "background": "#0e141d",
+            "on-secondary": "#003824",
+            "primary-container": "#2dd4bf",
+            "on-secondary-fixed-variant": "#005236",
+            "on-error": "#690005",
+            "secondary-container": "#00a572",
+            "tertiary": "#ffd29f",
+            "on-surface": "#dde2f0",
+            "on-primary-container": "#00574d",
+            "inverse-on-surface": "#2b313b",
+            "secondary": "#4edea3",
+            "on-secondary-fixed": "#002113",
+            "surface-container-low": "#161c25",
+            "secondary-fixed-dim": "#4edea3"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "gutter": "1rem",
+            "margin": "1.25rem",
+            "space-xs": "0.25rem",
+            "margin-lg": "1.5rem",
+            "gutter-sm": "0.75rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "title-md": ["Plus Jakarta Sans"],
+            "title-lg": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "display-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen flex items-center justify-center p-0 md:p-6 antialiased selection:bg-tertiary-container selection:text-on-tertiary-container">
+<!-- Mobile Simulator Container (390x844 Frame) -->
+<div class="relative w-full max-w-[390px] h-[844px] bg-surface overflow-hidden shadow-2xl flex flex-col justify-between select-none md:rounded-3xl border border-surface-container-high/40">
+<!-- Top Status Bar Area (Aesthetic Mobile Frame) -->
+<div class="w-full flex justify-between items-center px-margin pt-3 pb-1 text-on-surface-variant font-label-sm text-label-sm z-10">
+<span class="font-semibold text-on-surface tracking-tight">9:41</span>
+<div class="flex items-center space-x-1.5 opacity-80">
+<span class="material-symbols-outlined text-[14px]">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-[14px]">wifi</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+</div>
+</div>
+<!-- SHARED COMPONENT: TopAppBar (JSON Sourced) -->
+<header class="bg-surface dark:bg-surface flex justify-between items-center w-full px-margin py-space-sm max-w-md mx-auto z-10">
+<div class="flex items-center gap-3">
+<div class="relative w-9 h-9 rounded-full ring-1 ring-outline-variant/60 overflow-hidden bg-surface-container flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="A tranquil, softly lit portrait of a mindful person looking peacefully forward against a dark slate studio backdrop, gentle teal ambient rim light, photorealistic, premium editorial portrait style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7cvI9xTi8MGEfBlQ3B4yAGefRdPL9Qp-T03dMkWjQ1-Oz2GI9CKZQOxrIrUxW1kCRRpn4f5mYJFiIGdJb85R6cbk_hCJiqqjAwR5solJBfZaBlQ584ByMmSLhIQd6zog8yKRud7MHzkrn5I1dSpBynQHRwDx-IwLjFHVNplErN4SdhGBt9K6RauO_sstbsHCd-qUVQXc_K5G7pRzL6tI8tUcJyXKXNss6cNmrs3RCo72eEA3dgJVP"/>
+</div>
+<div>
+<span class="text-headline-sm font-headline-sm font-semibold text-primary dark:text-primary tracking-tight">Exhale</span>
+</div>
+</div>
+<button class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container dark:hover:bg-surface-container hover:text-on-surface text-on-surface-variant active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+</button>
+</header>
+<!-- Background Content: State B (Exactly At Limit - Dimmed Underlay Canvas) -->
+<main class="flex-1 px-margin pt-space-xs pb-space-lg flex flex-col items-center justify-start overflow-hidden relative">
+<!-- Serene Atmospheric Glow behind Hero -->
+<div class="absolute top-8 w-60 h-60 rounded-full bg-tertiary-container/10 blur-[80px] pointer-events-none"></div>
+<!-- State B: Hero Progress Ring Card -->
+<section class="w-full bg-surface-container-low rounded-lg p-space-md border border-surface-container-high/60 flex flex-col items-center shadow-lg relative mt-1">
+<!-- Golden Amber Warning Indicator Pill -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container/20 border border-tertiary-container/40 mb-3">
+<span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span>
+<span class="text-tertiary font-label-md text-label-md font-semibold">Limit reached. You can still log.</span>
+</div>
+<!-- 100% Full Amber Ring Gauge -->
+<div class="relative w-44 h-44 flex items-center justify-center my-1">
+<svg class="w-full h-full -rotate-90 transform" viewbox="0 0 160 160">
+<!-- Background Track -->
+<circle cx="80" cy="80" fill="transparent" r="66" stroke="#242a34" stroke-width="10"></circle>
+<!-- Active 100% Progress Ring in Warm Amber -->
+<circle class="drop-shadow-[0_0_12px_rgba(255,173,58,0.35)]" cx="80" cy="80" fill="transparent" r="66" stroke="#ffad3a" stroke-dasharray="414.69" stroke-dashoffset="0" stroke-linecap="round" stroke-width="10"></circle>
+</svg>
+<!-- Inside Ring Content -->
+<div class="absolute flex flex-col items-center justify-center text-center">
+<span class="font-display-lg-mobile text-display-lg-mobile text-on-surface font-extrabold tracking-tight">9 / 9</span>
+<span class="font-label-md text-label-md text-tertiary font-semibold uppercase tracking-wider mt-0.5">0 left today</span>
+</div>
+</div>
+<!-- Metric Info Sub-Row -->
+<div class="w-full grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-surface-container-high/50 text-center">
+<div class="flex flex-col items-center">
+<span class="text-on-surface-variant font-label-sm text-label-sm">Time since last</span>
+<span class="text-on-surface font-title-md text-title-md font-semibold mt-0.5">45m</span>
+</div>
+<div class="flex flex-col items-center border-l border-surface-container-high/60">
+<span class="text-on-surface-variant font-label-sm text-label-sm">Cadence update</span>
+<span class="text-on-surface font-title-md text-title-md font-semibold mt-0.5">Next drop in 3d</span>
+</div>
+</div>
+<!-- Always-Active Log Action Thumb Button -->
+<button class="w-full mt-4 bg-primary text-on-primary font-label-lg text-label-lg py-3 px-6 rounded-full font-bold flex items-center justify-center gap-2 shadow-[0_0_20px_-2px_rgba(45,212,191,0.35)] active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>Log a smoke</span>
+</button>
+</section>
+<!-- Gentle Mindful Quote Card (Background Depth) -->
+<div class="w-full mt-3 bg-surface-container-low/60 rounded-DEFAULT p-3 border border-surface-container-high/30 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-surface-tint text-[18px]">self_improvement</span>
+<span class="text-on-surface-variant font-body-sm text-body-sm">Observing without guilt fuels change.</span>
+</div>
+</div>
+</main>
+<!-- Semi-Translucent Backdrop Overlay -->
+<div class="absolute inset-0 bg-surface-container-lowest/70 backdrop-blur-[2.5px] z-20 pointer-events-none transition-opacity"></div>
+<!-- DAY DETAIL BOTTOM SHEET (Overlaid, Anchored from Bottom) -->
+<section class="absolute bottom-0 inset-x-0 h-[68%] bg-surface-container-low rounded-t-xl border-t border-surface-container-highest shadow-[0_-12px_40px_rgba(0,0,0,0.7)] z-30 flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-300">
+<!-- Sheet Drag Handle Bar -->
+<div class="w-full pt-3 pb-1 flex justify-center items-center cursor-grab active:cursor-grabbing">
+<div class="w-10 h-1 rounded-full bg-outline-variant/80"></div>
+</div>
+<!-- Sheet Header & Summary Strip -->
+<div class="px-margin pt-1 pb-3 border-b border-surface-container-high/60 flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="text-title-lg font-title-lg text-on-surface font-bold tracking-tight">Day Detail</h2>
+<p class="text-label-md font-label-md text-on-surface-variant">Wednesday, Oct 18</p>
+</div>
+<button class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Top summary row -->
+<div class="flex items-center justify-between bg-surface-container rounded-DEFAULT px-3 py-2 border border-surface-container-high/40">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[18px]" data-weight="fill" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="text-body-md font-body-md font-semibold text-on-surface">9 of 9 logged</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-tertiary-container/20 border border-tertiary-container/50 text-tertiary font-label-sm text-label-sm font-bold">At Limit</span>
+</div>
+</div>
+<!-- Timeline Feed: All 9 entries -->
+<div class="flex-1 overflow-y-auto px-margin py-2.5 space-y-2 divide-y divide-transparent">
+<!-- Entry 1 -->
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container/50 hover:bg-surface-container border border-surface-container-high/30 group transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary-container shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-title-md font-title-md text-on-surface font-semibold">8:15 AM</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant font-medium">· Morning coffee</span>
+</div>
+<span class="inline-block mt-0.5 px-2 py-0.2 bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm rounded-full">Coffee</span>
+</div>
+</div>
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary text-on-surface-variant" title="Edit entry">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+<button class="p-1 hover:text-error text-on-surface-variant" title="Delete entry">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Entry 2 -->
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container/50 hover:bg-surface-container border border-surface-container-high/30 group transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary-container shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-title-md font-title-md text-on-surface font-semibold">10:30 AM</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant font-medium">· Work break</span>
+</div>
+<span class="inline-block mt-0.5 px-2 py-0.2 bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm rounded-full">Stress</span>
+</div>
+</div>
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+<button class="p-1 hover:text-error text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Entry 3 -->
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container/50 hover:bg-surface-container border border-surface-container-high/30 group transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary-container shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-title-md font-title-md text-on-surface font-semibold">12:45 PM</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant font-medium">· After lunch</span>
+</div>
+<span class="inline-block mt-0.5 px-2 py-0.2 bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm rounded-full">After meal</span>
+</div>
+</div>
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+<button class="p-1 hover:text-error text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Entry 4 -->
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container/50 hover:bg-surface-container border border-surface-container-high/30 group transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary-container shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-title-md font-title-md text-on-surface font-semibold">2:15 PM</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant font-medium">· Quick walk</span>
+</div>
+<span class="inline-block mt-0.5 px-2 py-0.2 bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm rounded-full">Habit</span>
+</div>
+</div>
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+<button class="p-1 hover:text-error text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Entry 5 -->
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container/50 hover:bg-surface-container border border-surface-container-high/30 group transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary-container shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-title-md font-title-md text-on-surface font-semibold">4:00 PM</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant font-medium">· Afternoon lull</span>
+</div>
+<span class="inline-block mt-0.5 px-2 py-0.2 bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm rounded-full">Boredom</span>
+</div>
+</div>
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+<button class="p-1 hover:text-error text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Entry 6 -->
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container/50 hover:bg-surface-container border border-surface-container-high/30 group transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary-container shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-title-md font-title-md text-on-surface font-semibold">5:45 PM</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant font-medium">· Commute home</span>
+</div>
+<span class="inline-block mt-0.5 px-2 py-0.2 bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm rounded-full">Habit</span>
+</div>
+</div>
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+<button class="p-1 hover:text-error text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Entry 7 -->
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container/50 hover:bg-surface-container border border-surface-container-high/30 group transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary-container shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-title-md font-title-md text-on-surface font-semibold">7:30 PM</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant font-medium">· After dinner</span>
+</div>
+<span class="inline-block mt-0.5 px-2 py-0.2 bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm rounded-full">After meal</span>
+</div>
+</div>
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+<button class="p-1 hover:text-error text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Entry 8 -->
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container/50 hover:bg-surface-container border border-surface-container-high/30 group transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary-container shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-title-md font-title-md text-on-surface font-semibold">9:10 PM</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant font-medium">· Phone call</span>
+</div>
+<span class="inline-block mt-0.5 px-2 py-0.2 bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm rounded-full">Social</span>
+</div>
+</div>
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+<button class="p-1 hover:text-error text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Entry 9 -->
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container/50 hover:bg-surface-container border border-surface-container-high/30 group transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary-container shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-title-md font-title-md text-on-surface font-semibold">10:45 PM</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant font-medium">· Night wind-down</span>
+</div>
+<span class="inline-block mt-0.5 px-2 py-0.2 bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm rounded-full">Habit</span>
+</div>
+</div>
+<div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+<button class="p-1 hover:text-error text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Action Button Docked at Bottom of Sheet -->
+<div class="px-margin py-3 bg-surface-container-low border-t border-surface-container-high/70">
+<button class="w-full py-2.5 px-4 rounded-full bg-surface-container-high hover:bg-surface-variant text-on-surface border border-outline-variant/50 font-label-md text-label-md font-semibold flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px] text-surface-tint">schedule</span>
+<span>+ Add missed log</span>
+</button>
+</div>
+</section>
+<!-- SHARED COMPONENT: BottomNavBar (Visible behind/under docked overlay) -->
+<nav class="bg-surface-container-low dark:bg-surface-container-low shadow-md fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin py-space-xs backdrop-blur-md rounded-t-DEFAULT">
+<!-- Item 1: Home (ACTIVE - Direct Match) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container dark:bg-primary-container dark:text-on-primary-container rounded-full px-space-md py-space-xs font-label-md text-label-md active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="spa" data-weight="fill" style="font-variation-settings: 'FILL' 1;">spa</span>
+<span>Home</span>
+</a>
+<!-- Item 2: Settings (INACTIVE) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-space-md py-space-xs font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-container-high hover:text-on-surface dark:hover:text-on-surface active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+</div>
+</body></html>

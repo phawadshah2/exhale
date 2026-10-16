@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Exhale - Home</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-tint": "#3cddc7",
+            "tertiary-fixed-dim": "#ffb95f",
+            "surface-variant": "#2f353f",
+            "outline": "#859490",
+            "inverse-surface": "#dde2f0",
+            "on-tertiary-fixed": "#2a1700",
+            "on-primary-fixed-variant": "#005047",
+            "surface-bright": "#343944",
+            "surface-container": "#1a2029",
+            "error": "#ffb4ab",
+            "surface-container-high": "#242a34",
+            "on-surface-variant": "#bacac5",
+            "on-tertiary-container": "#6d4400",
+            "on-tertiary-fixed-variant": "#653e00",
+            "on-primary-fixed": "#00201c",
+            "primary-fixed-dim": "#3cddc7",
+            "on-primary": "#003731",
+            "surface-container-lowest": "#080e17",
+            "error-container": "#93000a",
+            "primary-fixed": "#62fae3",
+            "secondary-fixed": "#6ffbbe",
+            "tertiary-container": "#ffad3a",
+            "surface": "#0e141d",
+            "inverse-primary": "#006b5f",
+            "tertiary-fixed": "#ffddb8",
+            "outline-variant": "#3c4a46",
+            "on-tertiary": "#472a00",
+            "on-error-container": "#ffdad6",
+            "on-secondary-container": "#00311f",
+            "primary": "#57f1db",
+            "on-background": "#dde2f0",
+            "surface-container-highest": "#2f353f",
+            "surface-dim": "#0e141d",
+            "background": "#0e141d",
+            "on-secondary": "#003824",
+            "primary-container": "#2dd4bf",
+            "on-secondary-fixed-variant": "#005236",
+            "on-error": "#690005",
+            "secondary-container": "#00a572",
+            "tertiary": "#ffd29f",
+            "on-surface": "#dde2f0",
+            "on-primary-container": "#00574d",
+            "inverse-on-surface": "#2b313b",
+            "secondary": "#4edea3",
+            "on-secondary-fixed": "#002113",
+            "surface-container-low": "#161c25",
+            "secondary-fixed-dim": "#4edea3"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "gutter": "1rem",
+            "margin": "1.25rem",
+            "space-xs": "0.25rem",
+            "margin-lg": "1.5rem",
+            "gutter-sm": "0.75rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "title-md": ["Plus Jakarta Sans"],
+            "title-lg": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "display-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #080e17;
+      color: #dde2f0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .eucalyptus-glow {
+      box-shadow: 0px 0px 28px -2px rgba(45, 212, 191, 0.22);
+    }
+    .stepped-grid-pattern {
+      background-image: linear-gradient(to right, rgba(45, 212, 191, 0.05) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(45, 212, 191, 0.05) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex justify-center min-h-screen bg-surface-container-lowest antialiased select-none font-body-md text-body-md text-on-surface">
+<!-- Mobile Viewport Shell (390x844 simulated frame) -->
+<div class="relative w-full max-w-[390px] min-h-[844px] bg-surface flex flex-col shadow-2xl overflow-x-hidden pb-[136px]">
+<!-- Top Bar Component -->
+<header class="flex justify-between items-center w-full px-margin py-space-sm max-w-md mx-auto bg-surface dark:bg-surface sticky top-0 z-40 backdrop-blur-md bg-opacity-90">
+<div class="flex items-center space-x-3">
+<!-- Leading Avatar with Day Badge Indicator -->
+<div class="relative cursor-pointer active:scale-95 transition-transform duration-200">
+<img class="w-10 h-10 rounded-full object-cover border-2 border-outline-variant/60" data-alt="Close-up serene profile portrait of a person in quiet contemplative mindfulness in low atmospheric soft cyan and obsidian lighting. High aesthetic quality, sharp focus, soothing editorial portrait." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtXOgsLofn3XowCv3iEjr7V3SKPFCbC8uVRSaMjToZblKSqz-IO43cPg1wIEKKSMVoLEnf0cBy7muGwj-wkgmKrGpKCWLYe3mAhVDL0zpS9EXP_seFOgBbErZ26UEZ8-Z_H0cMoZgXdqb25dmG0jGY7NN5lSowIzumAbst5U9E1pDS8reg5qVMRxW5q0dWDm9rZEJAqqzN5Ccfd7yOOebi5IFUhkN4hlyseRdy-KxPwOZZlX25j4qa"/>
+<span class="absolute -bottom-1 -right-1 bg-surface-container-high border border-outline-variant text-primary px-1.5 py-0.2 rounded-full font-label-sm text-label-sm leading-tight flex items-center shadow-sm">
+            D4
+          </span>
+</div>
+<div>
+<span class="text-label-md font-label-md text-on-surface-variant block leading-none">Wednesday, Oct 18</span>
+<h1 class="text-title-lg font-title-lg text-on-surface font-semibold tracking-tight mt-0.5">Good afternoon, Alex</h1>
+</div>
+</div>
+<button aria-label="Notifications" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-[22px]" data-icon="notifications">notifications</span>
+</button>
+</header>
+<!-- Main Content Stream -->
+<main class="px-margin pt-space-xs space-y-space-md flex-1">
+<!-- Day Banner Pill -->
+<div class="w-full bg-surface-container-low border border-outline-variant/40 rounded-full px-4 py-2 flex items-center justify-between shadow-sm">
+<div class="flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Week 1 of 9 · Daily limit: 9</span>
+</div>
+<div class="flex items-center text-primary-fixed-dim font-label-sm text-label-sm font-semibold tracking-wide bg-surface-container-high px-2 py-0.5 rounded-full border border-outline-variant/30">
+          STAGE 1
+        </div>
+</div>
+<!-- Hero Progress Ring Card (State A - Under Limit) -->
+<section class="relative bg-surface-container-low border border-outline-variant/50 rounded-lg p-space-md shadow-xl overflow-hidden eucalyptus-glow">
+<!-- Ambient Radial Background Wash -->
+<div class="absolute -top-16 -right-16 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-16 -left-16 w-48 h-48 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Card Header: Title & Status Chip -->
+<div class="flex items-center justify-between mb-space-sm relative z-10">
+<div class="flex items-center space-x-1.5">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="spa">spa</span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Today's Consumption</span>
+</div>
+<!-- Status Chip: On track -->
+<div class="inline-flex items-center space-x-1.5 bg-primary/15 border border-primary/30 text-primary px-2.5 py-1 rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="font-label-sm text-label-sm font-bold tracking-wide">On track</span>
+</div>
+</div>
+<!-- Big Circular SVG Progress Ring (44% filled for 4 of 9) -->
+<div class="relative flex items-center justify-center my-2 py-1">
+<!-- Size: 220px, Stroke: 12px, Radius: 90 => Circumference ~ 565.48. 44% filled => stroke-dashoffset: ~316.6 -->
+<svg class="w-52 h-52 transform -rotate-90" viewbox="0 0 200 200">
+<defs>
+<lineargradient id="ringGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#4edea3"></stop>
+<stop offset="100%" stop-color="#2dd4bf"></stop>
+</lineargradient>
+</defs>
+<!-- Background Track -->
+<circle class="stroke-surface-container" cx="100" cy="100" fill="none" r="84" stroke="#1a2029" stroke-width="12"></circle>
+<!-- Active Progress Track -->
+<circle class="transition-all duration-1000 ease-out" cx="100" cy="100" fill="none" r="84" stroke="url(#ringGradient)" stroke-dasharray="527.78" stroke-dashoffset="295.5" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<!-- Inside Ring Content -->
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<div class="flex items-baseline space-x-1">
+<span class="font-display-lg-mobile text-display-lg-mobile font-bold text-on-surface tracking-tight">4</span>
+<span class="font-headline-sm text-headline-sm font-medium text-on-surface-variant">/ 9</span>
+</div>
+<p class="font-headline-sm text-headline-sm font-bold text-primary tracking-tight mt-0.5">5 left today</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">44% of daily limit</span>
+</div>
+</div>
+<!-- Info Row Beneath Ring -->
+<div class="grid grid-cols-2 gap-2 pt-space-xs mt-space-xs border-t border-outline-variant/30 text-on-surface-variant">
+<div class="flex items-center space-x-2 bg-surface-container/60 rounded-DEFAULT p-2">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="schedule">schedule</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Time since last</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface">1h 42m</span>
+</div>
+</div>
+<div class="flex items-center space-x-2 bg-surface-container/60 rounded-DEFAULT p-2">
+<span class="material-symbols-outlined text-primary-fixed-dim text-[18px]" data-icon="trending_down">trending_down</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Next target</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface">Drops to 8 in 3d</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Action Area: Primary Button -->
+<section class="space-y-space-sm pt-0.5">
+<button class="w-full bg-primary-container text-on-primary-container hover:brightness-105 active:scale-[0.98] transition-all duration-150 py-3.5 px-6 rounded-full font-label-lg text-label-lg font-bold flex items-center justify-center space-x-2 shadow-lg shadow-primary-container/20 eucalyptus-glow">
+<span class="material-symbols-outlined text-[20px]" data-icon="local_fire_department" data-weight="fill" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span>Log a smoke</span>
+</button>
+<!-- Floating SnackBar Preview -->
+<div class="relative w-full bg-surface-container-high/95 border border-outline-variant/60 rounded-full px-4 py-2.5 flex items-center justify-between shadow-md backdrop-blur-md">
+<div class="flex items-center space-x-2.5">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-ping"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Logged at 3:42 PM</span>
+<span class="text-outline-variant">·</span>
+<button class="font-label-md text-label-md font-bold text-primary hover:underline">Undo</button>
+</div>
+<div class="w-12 h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary/70 w-3/4 rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- Weekly Stepped Bar Chart Card -->
+<section class="bg-surface-container-low border border-outline-variant/40 rounded-lg p-space-md shadow-md space-y-space-md">
+<!-- Header with Segmented Control -->
+<div class="flex items-center justify-between">
+<div>
+<h2 class="font-title-lg text-title-lg text-on-surface font-semibold tracking-tight">Smoking History</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Paced tapering progress</p>
+</div>
+<!-- Segmented Control [Week (selected) | Month] -->
+<div class="flex p-0.5 bg-surface-container rounded-full border border-outline-variant/40">
+<button class="px-3 py-1 bg-primary-container text-on-primary-container rounded-full font-label-sm text-label-sm font-bold shadow-sm">
+              Week
+            </button>
+<button class="px-3 py-1 text-on-surface-variant hover:text-on-surface rounded-full font-label-sm text-label-sm font-medium transition-colors">
+              Month
+            </button>
+</div>
+</div>
+<!-- Stepped Bar Chart Visual Container -->
+<div class="relative pt-6 pb-2 stepped-grid-pattern rounded-DEFAULT border border-outline-variant/20 px-2 bg-surface-container-lowest/50">
+<!-- Stepped Daily Limit Line at 9 -->
+<div class="absolute top-7 left-0 right-0 flex items-center px-2 z-10 pointer-events-none">
+<div class="w-full border-t border-dashed border-primary/50"></div>
+<span class="ml-2 font-label-sm text-[10px] text-primary bg-surface-container-high px-1.5 py-0.5 rounded border border-primary/30 whitespace-nowrap shadow-sm">
+              Limit: 9
+            </span>
+</div>
+<!-- 7 Bars (Mon - Sun) -->
+<div class="grid grid-cols-7 gap-2 items-end h-36 pt-6 px-1">
+<!-- Mon: 7 -->
+<div class="flex flex-col items-center h-full justify-end group">
+<span class="font-label-sm text-label-sm text-on-surface-variant group-hover:text-primary mb-1">7</span>
+<div class="w-full max-w-[24px] h-[58%] bg-primary-container/80 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-2">M</span>
+</div>
+<!-- Tue: 6 -->
+<div class="flex flex-col items-center h-full justify-end group">
+<span class="font-label-sm text-label-sm text-on-surface-variant group-hover:text-primary mb-1">6</span>
+<div class="w-full max-w-[24px] h-[50%] bg-primary-container/80 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-2">T</span>
+</div>
+<!-- Wed (Today): 4 Active with indicator -->
+<div class="flex flex-col items-center h-full justify-end relative">
+<div class="absolute -top-3 w-1.5 h-1.5 rounded-full bg-primary ring-2 ring-primary/30 animate-pulse"></div>
+<span class="font-label-sm text-label-sm text-primary font-bold mb-1">4</span>
+<div class="w-full max-w-[24px] h-[33%] bg-primary-container rounded-t-sm shadow-sm ring-1 ring-primary eucalyptus-glow"></div>
+<span class="font-label-sm text-label-sm text-primary font-bold mt-2">W</span>
+</div>
+<!-- Thu (Future) -->
+<div class="flex flex-col items-center h-full justify-end">
+<div class="w-full max-w-[24px] h-[15%] border border-dashed border-outline-variant/60 rounded-t-sm bg-surface-container/20"></div>
+<span class="font-label-sm text-label-sm text-outline-variant mt-2">T</span>
+</div>
+<!-- Fri (Future) -->
+<div class="flex flex-col items-center h-full justify-end">
+<div class="w-full max-w-[24px] h-[15%] border border-dashed border-outline-variant/60 rounded-t-sm bg-surface-container/20"></div>
+<span class="font-label-sm text-label-sm text-outline-variant mt-2">F</span>
+</div>
+<!-- Sat (Future) -->
+<div class="flex flex-col items-center h-full justify-end">
+<div class="w-full max-w-[24px] h-[15%] border border-dashed border-outline-variant/60 rounded-t-sm bg-surface-container/20"></div>
+<span class="font-label-sm text-label-sm text-outline-variant mt-2">S</span>
+</div>
+<!-- Sun (Future) -->
+<div class="flex flex-col items-center h-full justify-end">
+<div class="w-full max-w-[24px] h-[15%] border border-dashed border-outline-variant/60 rounded-t-sm bg-surface-container/20"></div>
+<span class="font-label-sm text-label-sm text-outline-variant mt-2">S</span>
+</div>
+</div>
+</div>
+<!-- Legend & Summary Row -->
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm pt-1 border-t border-outline-variant/30">
+<div class="flex items-center space-x-1">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span>Avg 5.7/day</span>
+</div>
+<span>0 days over</span>
+<div class="flex items-center text-secondary font-semibold">
+<span class="material-symbols-outlined text-[14px] mr-0.5" data-icon="check_circle">check_circle</span>
+<span>3 days within limit</span>
+</div>
+</div>
+</section>
+<!-- Stats Row (2x2 Grid) -->
+<section class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<!-- Stat 1: Streak -->
+<div class="bg-surface-container-low border border-outline-variant/40 rounded-DEFAULT p-3.5 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Streak</span>
+<span class="text-base">🔥</span>
+</div>
+<div class="mt-2">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface tracking-tight block">4 Days</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium">within limit</span>
+</div>
+</div>
+<!-- Stat 2: This Week vs Baseline -->
+<div class="bg-surface-container-low border border-outline-variant/40 rounded-DEFAULT p-3.5 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Vs Baseline</span>
+<span class="text-base">📉</span>
+</div>
+<div class="mt-2">
+<div class="flex items-baseline space-x-1">
+<span class="font-headline-sm text-headline-sm font-bold text-primary tracking-tight">↓ 33%</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">From 14/day start</span>
+</div>
+</div>
+<!-- Stat 3: Money Saved -->
+<div class="bg-surface-container-low border border-outline-variant/40 rounded-DEFAULT p-3.5 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Money saved</span>
+<span class="text-base">💰</span>
+</div>
+<div class="mt-2">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface tracking-tight block">$18.85</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium">Since Day 1</span>
+</div>
+</div>
+<!-- Stat 4: Smokes Avoided -->
+<div class="bg-surface-container-low border border-outline-variant/40 rounded-DEFAULT p-3.5 flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Avoided</span>
+<span class="text-base">🫁</span>
+</div>
+<div class="mt-2">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface tracking-tight block">26 smokes</span>
+<span class="font-label-sm text-label-sm text-primary-fixed-dim font-medium">Lungs recovering</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Fixed docked full-width) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin py-space-xs backdrop-blur-md bg-surface-container-low dark:bg-surface-container-low rounded-t-DEFAULT shadow-md max-w-[390px] mx-auto right-0">
+<!-- Home Destination (Active Teal Pill) -->
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container dark:bg-primary-container dark:text-on-primary-container rounded-full px-space-md py-space-xs font-label-md text-label-md active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-[20px]" data-icon="spa">spa</span>
+<span class="font-label-md text-label-md font-semibold mt-0.5">Home</span>
+</button>
+<!-- Settings Destination (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-space-md py-space-xs font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-container-high hover:text-on-surface dark:hover:text-on-surface rounded-full active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md mt-0.5">Settings</span>
+</button>
+</nav>
+</div>
+</body></html>

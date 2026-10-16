@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Exhale - Splash</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-tint": "#3cddc7",
+            "tertiary-fixed-dim": "#ffb95f",
+            "surface-variant": "#2f353f",
+            "outline": "#859490",
+            "inverse-surface": "#dde2f0",
+            "on-tertiary-fixed": "#2a1700",
+            "on-primary-fixed-variant": "#005047",
+            "surface-bright": "#343944",
+            "surface-container": "#1a2029",
+            "error": "#ffb4ab",
+            "surface-container-high": "#242a34",
+            "on-surface-variant": "#bacac5",
+            "on-tertiary-container": "#6d4400",
+            "on-tertiary-fixed-variant": "#653e00",
+            "on-primary-fixed": "#00201c",
+            "primary-fixed-dim": "#3cddc7",
+            "on-primary": "#003731",
+            "surface-container-lowest": "#080e17",
+            "error-container": "#93000a",
+            "primary-fixed": "#62fae3",
+            "secondary-fixed": "#6ffbbe",
+            "tertiary-container": "#ffad3a",
+            "surface": "#0e141d",
+            "inverse-primary": "#006b5f",
+            "tertiary-fixed": "#ffddb8",
+            "outline-variant": "#3c4a46",
+            "on-tertiary": "#472a00",
+            "on-error-container": "#ffdad6",
+            "on-secondary-container": "#00311f",
+            "primary": "#57f1db",
+            "on-background": "#dde2f0",
+            "surface-container-highest": "#2f353f",
+            "surface-dim": "#0e141d",
+            "background": "#0e141d",
+            "on-secondary": "#003824",
+            "primary-container": "#2dd4bf",
+            "on-secondary-fixed-variant": "#005236",
+            "on-error": "#690005",
+            "secondary-container": "#00a572",
+            "tertiary": "#ffd29f",
+            "on-surface": "#dde2f0",
+            "on-primary-container": "#00574d",
+            "inverse-on-surface": "#2b313b",
+            "secondary": "#4edea3",
+            "on-secondary-fixed": "#002113",
+            "surface-container-low": "#161c25",
+            "secondary-fixed-dim": "#4edea3"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "gutter": "1rem",
+            "margin": "1.25rem",
+            "space-xs": "0.25rem",
+            "margin-lg": "1.5rem",
+            "gutter-sm": "0.75rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "title-md": ["Plus Jakarta Sans"],
+            "title-lg": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "display-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    @keyframes breathePulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.85;
+      }
+      50% {
+        transform: scale(1.045);
+        opacity: 1;
+      }
+    }
+
+    @keyframes auraFloat {
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(0.95);
+        opacity: 0.28;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0.42;
+      }
+    }
+
+    .pulse-breath {
+      animation: breathePulse 5.5s ease-in-out infinite;
+    }
+
+    .aura-glow {
+      animation: auraFloat 7s ease-in-out infinite;
+    }
+
+    .eucalyptus-shadow {
+      filter: drop-shadow(0 0 24px rgba(45, 212, 191, 0.35)) drop-shadow(0 0 60px rgba(16, 185, 129, 0.15));
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-surface min-h-screen flex items-center justify-center p-0 m-0 overflow-hidden font-body-md select-none">
+<!-- Mobile Screen Container (iOS & Android standard 390x844 canvas ratio) -->
+<main class="relative w-full max-w-[390px] h-screen max-h-[844px] bg-[#0B111A] overflow-hidden flex flex-col justify-between items-center px-margin py-space-xl sm:rounded-[40px] sm:border sm:border-outline-variant/30 sm:shadow-2xl">
+<!-- Ambient Botanical Gradient Atmosphere Layers -->
+<div class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+<!-- Centered Teal/Eucalyptus Core Aura -->
+<div class="aura-glow absolute top-1/2 left-1/2 w-80 h-80 rounded-full bg-primary-container blur-[100px] pointer-events-none"></div>
+<!-- Top Subtle Obsidian Drift -->
+<div class="absolute -top-24 -right-16 w-64 h-64 rounded-full bg-secondary-container/20 blur-[85px] pointer-events-none"></div>
+<!-- Bottom Calming Shade -->
+<div class="absolute -bottom-20 -left-16 w-72 h-72 rounded-full bg-primary-fixed-dim/15 blur-[90px] pointer-events-none"></div>
+<!-- Subtle organic botanical radial contour -->
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#0B111A_85%)]"></div>
+</div>
+<!-- Top Safe Area / Status Bar Clearance -->
+<header class="w-full relative z-10 flex justify-between items-center pt-space-xs opacity-75">
+<!-- Minimalist Time Simulation / Brand Dot -->
+<div class="flex items-center space-x-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider">CALM MODE</span>
+</div>
+<div class="flex items-center space-x-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">wifi</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+</div>
+</header>
+<!-- Center Composition: Breath Waves Logo Mark + Refined Wordmark + Subtitle -->
+<div class="relative z-10 flex flex-col items-center justify-center -mt-6 w-full text-center">
+<!-- Iconic Breath & Gentle Wave Concentric Vector Emblem -->
+<div class="relative flex items-center justify-center mb-space-lg pulse-breath">
+<!-- Ambient outer subtle ring -->
+<div class="absolute w-44 h-44 rounded-full border border-primary-container/20 scale-105"></div>
+<div class="absolute w-56 h-56 rounded-full border border-primary-container/10"></div>
+<!-- SVG Vector Emblem: Tapering Concentric Breath Wave Curves -->
+<div class="relative w-36 h-36 flex items-center justify-center eucalyptus-shadow">
+<svg class="w-full h-full" fill="none" viewbox="0 0 144 144" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient gradientunits="userSpaceOnUse" id="eucalyptusGrad1" x1="18" x2="126" y1="20" y2="124">
+<stop offset="0%" stop-color="#57f1db"></stop>
+<stop offset="50%" stop-color="#2dd4bf"></stop>
+<stop offset="100%" stop-color="#10b981"></stop>
+</lineargradient>
+<lineargradient gradientunits="userSpaceOnUse" id="eucalyptusGrad2" x1="36" x2="108" y1="36" y2="108">
+<stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.9"></stop>
+<stop offset="100%" stop-color="#00a572" stop-opacity="0.4"></stop>
+</lineargradient>
+<radialgradient cx="50%" cy="50%" id="centerSanctuary" r="50%">
+<stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.25"></stop>
+<stop offset="100%" stop-color="#0e141d" stop-opacity="0"></stop>
+</radialgradient>
+</defs>
+<!-- Inner ambient sanctuary bloom -->
+<circle cx="72" cy="72" fill="url(#centerSanctuary)" r="48"></circle>
+<!-- Outermost Inhale Wave Arc (Organic Tapering Arc) -->
+<path d="M 72 14 A 58 58 0 1 1 20 98" stroke="url(#eucalyptusGrad1)" stroke-linecap="round" stroke-width="5.5"></path>
+<!-- Intersecting Secondary Exhale Wave Arc -->
+<path d="M 124 46 A 58 58 0 0 1 72 130 A 58 58 0 0 1 30 114" stroke="url(#eucalyptusGrad1)" stroke-linecap="round" stroke-opacity="0.75" stroke-width="4"></path>
+<!-- Mid Breath Harmonic Wave -->
+<path d="M 44 48 C 54 36, 90 36, 100 48 C 110 60, 110 84, 100 96 C 90 108, 54 108, 44 96" stroke="url(#eucalyptusGrad2)" stroke-linecap="round" stroke-width="3.5"></path>
+<!-- Concentric Core Airflow Spiral (Symbol of steady lung capacity recovery) -->
+<path d="M 64 62 C 67 58, 77 58, 80 62 C 84 66, 84 78, 80 82 C 76 86, 68 86, 64 82 C 60 78, 60 70, 68 68 C 74 66, 76 72, 74 76" stroke="#57f1db" stroke-linecap="round" stroke-width="3"></path>
+<!-- Center Vitality Core Node -->
+<circle cx="72" cy="72" fill="#ffffff" r="3"></circle>
+</svg>
+</div>
+</div>
+<!-- Typography Section -->
+<div class="space-y-space-xs">
+<!-- Wordmark with pristine spacing & geometry -->
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-surface font-extrabold tracking-tight">
+          Exhale
+        </h1>
+<!-- Peaceful Subtitle -->
+<p class="font-title-md text-title-md text-on-surface-variant max-w-[260px] mx-auto font-normal leading-relaxed opacity-90">
+          Breathe easier, one day at a time
+        </p>
+</div>
+<!-- Mindful Pulse Wave Dots indicator -->
+<div class="mt-space-lg flex items-center justify-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-primary/40"></span>
+<span class="w-2 h-2 rounded-full bg-primary/80 animate-pulse"></span>
+<span class="w-2 h-2 rounded-full bg-primary/40"></span>
+</div>
+</div>
+<!-- Bottom Anchor & Version Badge -->
+<footer class="relative z-10 w-full flex flex-col items-center pb-space-sm space-y-space-sm">
+<!-- Pill Badge: Version & Architecture Info -->
+<div class="inline-flex items-center gap-1.5 px-space-md py-1.5 rounded-full bg-surface-container-high/60 border border-outline-variant/35 backdrop-blur-md">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span>
+<span class="font-label-md text-label-md text-on-surface-variant font-medium tracking-wide">
+          v1.0 · Designed for Flutter
+        </span>
+</div>
+<!-- iOS / Modern Android Home Indicator Bar -->
+<div class="w-32 h-1 bg-surface-variant/70 rounded-full mt-space-xs"></div>
+</footer>
+</main>
+</body></html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Exhale - Settings &amp; Profile</title>
+<!-- Material Symbols Outlined font -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Manrope & Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-tint": "#3cddc7",
+            "tertiary-fixed-dim": "#ffb95f",
+            "surface-variant": "#2f353f",
+            "outline": "#859490",
+            "inverse-surface": "#dde2f0",
+            "on-tertiary-fixed": "#2a1700",
+            "on-primary-fixed-variant": "#005047",
+            "surface-bright": "#343944",
+            "surface-container": "#1a2029",
+            "error": "#ffb4ab",
+            "surface-container-high": "#242a34",
+            "on-surface-variant": "#bacac5",
+            "on-tertiary-container": "#6d4400",
+            "on-tertiary-fixed-variant": "#653e00",
+            "on-primary-fixed": "#00201c",
+            "primary-fixed-dim": "#3cddc7",
+            "on-primary": "#003731",
+            "surface-container-lowest": "#080e17",
+            "error-container": "#93000a",
+            "primary-fixed": "#62fae3",
+            "secondary-fixed": "#6ffbbe",
+            "tertiary-container": "#ffad3a",
+            "surface": "#0e141d",
+            "inverse-primary": "#006b5f",
+            "tertiary-fixed": "#ffddb8",
+            "outline-variant": "#3c4a46",
+            "on-tertiary": "#472a00",
+            "on-error-container": "#ffdad6",
+            "on-secondary-container": "#00311f",
+            "primary": "#57f1db",
+            "on-background": "#dde2f0",
+            "surface-container-highest": "#2f353f",
+            "surface-dim": "#0e141d",
+            "background": "#0e141d",
+            "on-secondary": "#003824",
+            "primary-container": "#2dd4bf",
+            "on-secondary-fixed-variant": "#005236",
+            "on-error": "#690005",
+            "secondary-container": "#00a572",
+            "tertiary": "#ffd29f",
+            "on-surface": "#dde2f0",
+            "on-primary-container": "#00574d",
+            "inverse-on-surface": "#2b313b",
+            "secondary": "#4edea3",
+            "on-secondary-fixed": "#002113",
+            "surface-container-low": "#161c25",
+            "secondary-fixed-dim": "#4edea3"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "gutter": "1rem",
+            "margin": "1.25rem",
+            "space-xs": "0.25rem",
+            "margin-lg": "1.5rem",
+            "gutter-sm": "0.75rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2rem"
+          },
+          "fontFamily": {
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "display-lg-mobile": ["Manrope"],
+            "title-md": ["Plus Jakarta Sans"],
+            "title-lg": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "display-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    /* Smooth toggle animation styles */
+    .toggle-checkbox:checked {
+      right: 0;
+      background-color: #003731;
+    }
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #2dd4bf;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased font-body-md text-body-md min-h-screen flex justify-center selection:bg-primary-container selection:text-on-primary-container">
+<!-- Mobile Viewport Frame (390x844 simulated layout) -->
+<main class="w-full max-w-[390px] min-h-screen flex flex-col bg-surface relative pb-28">
+<!-- TopAppBar from Shared Components JSON -->
+<header class="bg-surface dark:bg-surface flex justify-between items-center w-full px-margin py-space-sm max-w-md mx-auto sticky top-0 z-40 backdrop-blur-md bg-opacity-90">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-headline-sm text-headline-sm text-primary font-semibold shadow-inner">
+          AX
+        </div>
+<span class="text-headline-sm font-headline-sm font-semibold text-primary dark:text-primary tracking-tight">Exhale</span>
+</div>
+<button class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-surface-container dark:hover:bg-surface-container hover:text-on-surface dark:hover:text-on-surface active:scale-95 transition-transform duration-200 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<div class="px-margin flex flex-col gap-space-lg pt-space-xs">
+<!-- Profile Header Module -->
+<section class="bg-surface-container-low border border-outline-variant rounded-DEFAULT p-space-md flex flex-col gap-space-md relative overflow-hidden">
+<div class="flex items-center gap-space-md">
+<div class="relative">
+<div class="w-16 h-16 rounded-full bg-gradient-to-tr from-surface-container-high to-surface-container-highest border-2 border-primary-container/40 flex items-center justify-center shadow-lg">
+<span class="font-headline-md text-headline-md text-primary font-bold">AX</span>
+</div>
+<span class="absolute bottom-0 right-0 w-4 h-4 bg-primary-container rounded-full ring-2 ring-surface-container-low"></span>
+</div>
+<div class="flex flex-col">
+<h1 class="font-title-lg text-title-lg text-on-surface font-semibold">Alex Chen</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Day 18 of your plan</p>
+</div>
+</div>
+<!-- Limit Pill Badge -->
+<div class="inline-flex items-center gap-2 self-start bg-surface-container-high border border-outline-variant px-space-md py-1.5 rounded-full shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container shadow-[0_0_8px_rgba(45,212,191,0.6)]"></span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Current limit: 7 / day</span>
+</div>
+</section>
+<!-- Section 1: My Plan -->
+<section class="flex flex-col gap-space-xs">
+<h2 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider px-1">My Plan</h2>
+<div class="bg-surface-container-low border border-outline-variant rounded-DEFAULT divide-y divide-outline-variant/60 overflow-hidden shadow-sm">
+<!-- Stepper Tile: Current limit -->
+<div class="p-space-md flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface">Current limit</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Daily allowed smoke units</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-high border border-outline-variant rounded-full px-2 py-1">
+<button aria-label="Decrease limit" class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]" data-icon="remove">remove</span>
+</button>
+<span class="font-title-md text-title-md text-primary font-bold px-1">7 / day</span>
+<button aria-label="Increase limit" class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+</button>
+</div>
+</div>
+<!-- Plan detail items -->
+<div class="p-space-md flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface">Reduction pace</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Drops by 1 every 7 days</span>
+</div>
+<div class="p-space-md flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface">Target goal</span>
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-lg text-label-lg text-on-surface">0 (Complete quit)</span>
+</div>
+</div>
+<div class="p-space-md flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface">Start date</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Oct 1, 2026</span>
+</div>
+<div class="p-space-md flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface">Pack economics</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant font-medium">$14.50 / pack · 20 cigs</span>
+</div>
+<!-- Navigation Tile -->
+<button class="w-full p-space-md flex items-center justify-between hover:bg-surface-container transition-colors text-left group">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="calendar_month">calendar_month</span>
+<span class="font-title-md text-title-md text-primary font-medium">View Reduction Schedule</span>
+</div>
+<span class="material-symbols-outlined text-primary text-[20px] group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- Section 2: Appearance -->
+<section class="flex flex-col gap-space-xs">
+<h2 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider px-1">Appearance</h2>
+<div class="bg-surface-container-low border border-outline-variant rounded-DEFAULT p-space-md flex flex-col gap-space-md shadow-sm">
+<!-- Theme segmented control -->
+<div class="flex flex-col gap-2">
+<label class="font-title-md text-title-md text-on-surface">Theme</label>
+<div class="grid grid-cols-3 p-1 bg-surface-container-high rounded-full border border-outline-variant">
+<button class="py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface text-center transition-all">Light</button>
+<button class="py-1.5 rounded-full font-label-md text-label-md bg-primary-container text-on-primary-container font-semibold text-center shadow-md transition-all">Dark</button>
+<button class="py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface text-center transition-all">System</button>
+</div>
+</div>
+<!-- Accent color swatches -->
+<div class="flex flex-col gap-2.5 pt-1">
+<div class="flex justify-between items-center">
+<label class="font-title-md text-title-md text-on-surface">Accent Color</label>
+<span class="font-label-sm text-label-sm text-primary">Eucalyptus Teal</span>
+</div>
+<div class="flex items-center justify-between px-1">
+<!-- Swatch 1 (Active) -->
+<button aria-label="Eucalyptus Teal" class="w-9 h-9 rounded-full bg-[#2DD4BF] flex items-center justify-center ring-2 ring-primary ring-offset-2 ring-offset-surface-container-low transition-transform active:scale-95">
+<span class="material-symbols-outlined text-[#0B111A] text-[18px] font-bold" data-icon="check">check</span>
+</button>
+<!-- Swatch 2 -->
+<button aria-label="Blue" class="w-8 h-8 rounded-full bg-[#3B82F6] flex items-center justify-center hover:opacity-90 active:scale-95 transition-transform"></button>
+<!-- Swatch 3 -->
+<button aria-label="Purple" class="w-8 h-8 rounded-full bg-[#8B5CF6] flex items-center justify-center hover:opacity-90 active:scale-95 transition-transform"></button>
+<!-- Swatch 4 -->
+<button aria-label="Pink" class="w-8 h-8 rounded-full bg-[#EC4899] flex items-center justify-center hover:opacity-90 active:scale-95 transition-transform"></button>
+<!-- Swatch 5 -->
+<button aria-label="Emerald" class="w-8 h-8 rounded-full bg-[#10B981] flex items-center justify-center hover:opacity-90 active:scale-95 transition-transform"></button>
+<!-- Swatch 6 -->
+<button aria-label="Amber" class="w-8 h-8 rounded-full bg-[#F59E0B] flex items-center justify-center hover:opacity-90 active:scale-95 transition-transform"></button>
+</div>
+</div>
+<!-- App Icon Picker Grid (3x2) -->
+<div class="flex flex-col gap-2.5 pt-1">
+<label class="font-title-md text-title-md text-on-surface">App Icon</label>
+<div class="grid grid-cols-3 gap-2.5">
+<!-- Icon 1: Leaf -->
+<button class="flex flex-col items-center gap-1.5 p-2 rounded-DEFAULT bg-surface-container border border-outline-variant hover:border-primary/50 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary border border-outline-variant shadow-inner">
+<span class="material-symbols-outlined text-[26px]" data-icon="eco">eco</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Leaf</span>
+</button>
+<!-- Icon 2: Wave/Breath (Active) -->
+<button class="flex flex-col items-center gap-1.5 p-2 rounded-DEFAULT bg-surface-container border-2 border-primary-container relative shadow-sm">
+<span class="absolute -top-1.5 -right-1.5 bg-primary-container text-on-primary-container rounded-full w-4 h-4 flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[12px] font-bold" data-icon="check">check</span>
+</span>
+<div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary-container border border-primary-container/30">
+<span class="material-symbols-outlined text-[26px]" data-icon="air">air</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold">Breath</span>
+</button>
+<!-- Icon 3: Fading Ember -->
+<button class="flex flex-col items-center gap-1.5 p-2 rounded-DEFAULT bg-surface-container border border-outline-variant hover:border-primary/50 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-tertiary border border-outline-variant shadow-inner">
+<span class="material-symbols-outlined text-[26px]" data-icon="local_fire_department">local_fire_department</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Ember</span>
+</button>
+<!-- Icon 4: Minimal Ring -->
+<button class="flex flex-col items-center gap-1.5 p-2 rounded-DEFAULT bg-surface-container border border-outline-variant hover:border-primary/50 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface-variant border border-outline-variant shadow-inner">
+<span class="material-symbols-outlined text-[26px]" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Ring</span>
+</button>
+<!-- Icon 5: Monochrome -->
+<button class="flex flex-col items-center gap-1.5 p-2 rounded-DEFAULT bg-surface-container border border-outline-variant hover:border-primary/50 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-surface-bright flex items-center justify-center text-inverse-surface border border-outline-variant">
+<span class="material-symbols-outlined text-[26px]" data-icon="contrast">contrast</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Mono</span>
+</button>
+<!-- Icon 6: Gradient -->
+<button class="flex flex-col items-center gap-1.5 p-2 rounded-DEFAULT bg-surface-container border border-outline-variant hover:border-primary/50 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary via-secondary-container to-surface-bright flex items-center justify-center text-on-primary-fixed border border-outline-variant shadow-sm">
+<span class="material-symbols-outlined text-[26px]" data-icon="palette">palette</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Gradient</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Notifications -->
+<section class="flex flex-col gap-space-xs">
+<h2 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider px-1">Notifications</h2>
+<div class="bg-surface-container-low border border-outline-variant rounded-DEFAULT divide-y divide-outline-variant/60 overflow-hidden shadow-sm">
+<!-- Notification 1 -->
+<div class="p-space-md flex items-center justify-between">
+<div class="flex flex-col pr-4">
+<span class="font-body-md text-body-md text-on-surface font-medium">Daily summary</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Scheduled for 9:00 PM</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-background after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container peer-checked:after:bg-on-primary-container"></div>
+</label>
+</div>
+<!-- Notification 2 -->
+<div class="p-space-md flex items-center justify-between">
+<div class="flex flex-col pr-4">
+<span class="font-body-md text-body-md text-on-surface font-medium">Heads-up before limit drops</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">1 day prior</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-background after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container peer-checked:after:bg-on-primary-container"></div>
+</label>
+</div>
+<!-- Notification 3 -->
+<div class="p-space-md flex items-center justify-between">
+<div class="flex flex-col pr-4">
+<span class="font-body-md text-body-md text-on-surface font-medium">Approaching limit alert</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">When 1 smoke left</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-background after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container peer-checked:after:bg-on-primary-container"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- Section 4: Data & Privacy -->
+<section class="flex flex-col gap-space-xs">
+<h2 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider px-1">Data &amp; Privacy</h2>
+<div class="bg-surface-container-low border border-outline-variant rounded-DEFAULT divide-y divide-outline-variant/60 overflow-hidden shadow-sm">
+<!-- Export Data -->
+<button class="w-full p-space-md flex items-center justify-between hover:bg-surface-container transition-colors text-left">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="file_download">file_download</span>
+<span class="font-body-md text-body-md text-on-surface">Export data (CSV)</span>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="chevron_right">chevron_right</span>
+</button>
+<!-- Reset Plan -->
+<button class="w-full p-space-md flex items-center justify-between hover:bg-surface-container transition-colors text-left">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary-container text-[20px]" data-icon="restart_alt">restart_alt</span>
+<span class="font-body-md text-body-md text-on-surface">Reset plan</span>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="chevron_right">chevron_right</span>
+</button>
+<!-- Delete All Data (Destructive) -->
+<button class="w-full p-space-md flex items-center justify-between hover:bg-error-container/20 transition-colors text-left group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error text-[20px]" data-icon="delete_forever">delete_forever</span>
+<span class="font-body-md text-body-md text-error font-medium">Delete all data</span>
+</div>
+<span class="material-symbols-outlined text-error text-[18px] group-hover:scale-110 transition-transform" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Section 5: About -->
+<section class="flex flex-col gap-space-xs">
+<h2 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider px-1">About</h2>
+<div class="bg-surface-container-low border border-outline-variant rounded-DEFAULT p-space-md flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface font-medium">Version</span>
+<span class="font-label-md text-label-md text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full border border-outline-variant">Exhale v1.0.4 (Flutter 3.x)</span>
+</div>
+<div class="pt-2 border-t border-outline-variant/60">
+<div class="bg-surface-container p-3 rounded-DEFAULT flex items-start gap-2.5 border border-outline-variant/50">
+<span class="text-base leading-none select-none">🔒</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                100% Offline. All health &amp; habit data stays private on your device.
+              </p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- BottomNavBar from Shared Components JSON (Active: Settings) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin py-space-xs backdrop-blur-md bg-surface-container-low/90 dark:bg-surface-container-low/90 shadow-md rounded-t-DEFAULT">
+<!-- Destination 1: Home (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-space-md py-space-xs font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-container-high hover:text-on-surface dark:hover:text-on-surface active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="spa">spa</span>
+<span>Home</span>
+</a>
+<!-- Destination 2: Settings (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container dark:bg-primary-container dark:text-on-primary-container rounded-full px-space-md py-space-xs font-label-md text-label-md active:scale-95 transition-transform duration-150 shadow-sm" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+</main>
+</body></html>

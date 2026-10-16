@@ -1,0 +1,52 @@
+name: exhale
+description: "Exhale — gradual smoking reduction tracker"
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  material_symbols_icons: ^4.2960.0
+  riverpod_annotation: ^4.0.7
+
+dev_dependencies:
+  build_runner: ^2.16.2
+  flutter_test:
+    sdk: flutter
+  riverpod_generator: ^4.0.9
+  very_good_analysis: ^11.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Static instances cut from the Google Fonts variable files (OFL, licenses
+  # alongside). Static files let plain FontWeight pick the right weight.
+  fonts:
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Manrope-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Manrope-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Manrope-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Manrope-ExtraBold.ttf
+          weight: 800
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/PlusJakartaSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PlusJakartaSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/PlusJakartaSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/PlusJakartaSans-ExtraBold.ttf
+          weight: 800
