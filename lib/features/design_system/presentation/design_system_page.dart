@@ -60,20 +60,18 @@ class _Section extends StatelessWidget {
   }
 }
 
-/// ConsumerWidget = a StatelessWidget that also receives a [WidgetRef].
 class _ThemeModeSection extends ConsumerWidget {
   const _ThemeModeSection();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(themeModeControllerProvider);
+    final mode = ref.watch(themeModeProvider);
 
     return _Section(
       title: 'Theme',
       child: PillSegmentedControl<ThemeMode>(
         selected: mode,
-        // read (not watch) inside callbacks: we act once, we don't listen.
-        onChanged: ref.read(themeModeControllerProvider.notifier).select,
+        onChanged: ref.read(themeModeProvider.notifier).select,
         segments: const [
           PillSegment(value: ThemeMode.light, label: 'Light'),
           PillSegment(value: ThemeMode.dark, label: 'Dark'),

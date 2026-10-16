@@ -9,8 +9,7 @@ class ExhaleApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // watch = rebuild this widget whenever the theme mode changes.
-    final themeMode = ref.watch(themeModeControllerProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
       title: 'Exhale',
