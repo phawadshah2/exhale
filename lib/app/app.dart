@@ -1,5 +1,6 @@
 import 'package:exhale/app/router/app_router.dart';
 import 'package:exhale/core/theme/app_theme.dart';
+import 'package:exhale/core/widgets/glass_surface.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +17,10 @@ class ExhaleApp extends ConsumerWidget {
       darkTheme: AppTheme.dark,
       themeMode: ref.watch(themeModeProvider),
       routerConfig: ref.watch(routerProvider),
+      builder: (context, child) => GlassMode(
+        enabled: ref.watch(currentSettingsProvider).glassEffects,
+        child: child!,
+      ),
     );
   }
 }

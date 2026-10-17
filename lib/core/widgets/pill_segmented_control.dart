@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class PillSegment<T> {
   const PillSegment({required this.value, required this.label});
@@ -90,7 +93,12 @@ class _SegmentLabel<T> extends StatelessWidget {
       selected: isSelected,
       child: InkWell(
         customBorder: const StadiumBorder(),
-        onTap: isSelected ? null : () => parent.onChanged(segment.value),
+        onTap: isSelected
+            ? null
+            : () {
+                unawaited(HapticFeedback.selectionClick());
+                parent.onChanged(segment.value);
+              },
         child: Center(
           child: AnimatedDefaultTextStyle(
             duration: PillSegmentedControl._duration,

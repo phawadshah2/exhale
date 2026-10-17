@@ -14,6 +14,7 @@ class AppSettings {
     this.packPriceCents,
     this.cigarettesPerPack = defaultCigarettesPerPack,
     this.currencySymbol = defaultCurrencySymbol,
+    this.glassEffects = true,
   });
 
   static const int defaultCigarettesPerPack = 20;
@@ -27,6 +28,9 @@ class AppSettings {
   final int? packPriceCents;
   final int cigarettesPerPack;
   final String currencySymbol;
+
+  /// Translucent blurred surfaces (tab bar, sheets, status bar).
+  final bool glassEffects;
 
   DayBoundary get dayBoundary => DayBoundary(resetHour: dayResetHour);
 
@@ -43,6 +47,7 @@ class AppSettings {
     int? Function()? packPriceCents,
     int? cigarettesPerPack,
     String? currencySymbol,
+    bool? glassEffects,
   }) => AppSettings(
     userName: userName != null ? userName() : this.userName,
     dayResetHour: dayResetHour ?? this.dayResetHour,
@@ -54,6 +59,7 @@ class AppSettings {
         : this.packPriceCents,
     cigarettesPerPack: cigarettesPerPack ?? this.cigarettesPerPack,
     currencySymbol: currencySymbol ?? this.currencySymbol,
+    glassEffects: glassEffects ?? this.glassEffects,
   );
 
   @override
@@ -66,7 +72,8 @@ class AppSettings {
       other.appIcon == appIcon &&
       other.packPriceCents == packPriceCents &&
       other.cigarettesPerPack == cigarettesPerPack &&
-      other.currencySymbol == currencySymbol;
+      other.currencySymbol == currencySymbol &&
+      other.glassEffects == glassEffects;
 
   @override
   int get hashCode => Object.hash(
@@ -78,5 +85,6 @@ class AppSettings {
     packPriceCents,
     cigarettesPerPack,
     currencySymbol,
+    glassEffects,
   );
 }

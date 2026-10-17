@@ -200,9 +200,9 @@ class _SplashSceneState extends State<SplashScene>
                 boxShadow: [
                   BoxShadow(
                     color: colors.primaryContainer.withValues(
-                      alpha: (0.12 + 0.16 * b) * logoIn,
+                      alpha: (0.05 + 0.07 * b) * logoIn,
                     ),
-                    blurRadius: 70,
+                    blurRadius: 50,
                     spreadRadius: 4,
                   ),
                 ],

@@ -27,7 +27,7 @@ class DriftingParticles extends StatelessWidget {
         swayLaps: 1 + random.nextInt(3),
         twinkleLaps: 2 + random.nextInt(4),
         radius: 1 + random.nextDouble() * 1.8,
-        alpha: 0.2 + random.nextDouble() * 0.45,
+        alpha: 0.12 + random.nextDouble() * 0.28,
         phase: random.nextDouble() * 2 * math.pi,
       ),
     );

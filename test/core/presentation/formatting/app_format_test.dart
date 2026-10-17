@@ -56,4 +56,17 @@ void main() {
     expect(AppFormat.greeting(DateTime(2026, 10, 16, 21)), 'Good evening');
     expect(AppFormat.greeting(DateTime(2026, 10, 16, 2)), 'Good evening');
   });
+
+  test('elapsed', () {
+    expect(AppFormat.elapsed(const Duration(seconds: 30)), 'Just now');
+    expect(AppFormat.elapsed(const Duration(minutes: 12)), '12m');
+    expect(AppFormat.elapsed(const Duration(hours: 1, minutes: 42)), '1h 42m');
+    expect(AppFormat.elapsed(const Duration(hours: 3)), '3h');
+    expect(AppFormat.elapsed(const Duration(days: 2, hours: 3)), '2d 3h');
+    expect(AppFormat.elapsed(const Duration(days: 4)), '4d');
+  });
+
+  test('weekday initial', () {
+    expect(AppFormat.weekdayInitial(oct16), 'F');
+  });
 }
