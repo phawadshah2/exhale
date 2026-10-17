@@ -3,15 +3,22 @@ import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/presentation/providers/clock_providers.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
-import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/glow_button.dart';
+import 'package:exhale/features/home/presentation/providers/home_providers.dart';
+import 'package:exhale/features/home/presentation/widgets/history_card.dart';
+import 'package:exhale/features/home/presentation/widgets/home_header.dart';
+import 'package:exhale/features/home/presentation/widgets/quote_card.dart';
+import 'package:exhale/features/home/presentation/widgets/stage_pill.dart';
+import 'package:exhale/features/home/presentation/widgets/stats_grid.dart';
+import 'package:exhale/features/home/presentation/widgets/today_card.dart';
+import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
-import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
-import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
 import 'package:exhale/features/tracking/domain/usecases/log_smoke.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
+import 'package:exhale/features/tracking/presentation/widgets/day_detail_sheet.dart';
+import 'package:exhale/features/tracking/presentation/widgets/trigger_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -24,6 +31,13 @@ class HomePage extends ConsumerWidget {
     if (!context.mounted) return;
     switch (result) {
       case Success(value: final SmokeLog log):
+        final trigger = await showTriggerSheet(context);
+        if (trigger != null) {
+          await ref.read(updateSmokeLogProvider)(
+            log.copyWith(trigger: () => trigger),
+          );
+        }
+        if (!context.mounted) return;
         showAppSnackBar(
           context,
           message: 'Logged at ${AppFormat.time(log.loggedAt)}',
@@ -42,85 +56,60 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progress = ref.watch(todayProgressProvider).value;
-    final name = ref.watch(settingsProvider).value?.userName;
-    final now = ref.watch(nowProvider).value ?? ref.watch(clockProvider).now();
     final today = ref.watch(todayProvider);
-    final text = context.textTheme;
-    final colors = context.colors;
+    final now = ref.watch(nowProvider).value ?? ref.watch(clockProvider).now();
+    final settings = ref.watch(currentSettingsProvider);
+    final history = ref.watch(planHistoryProvider).value;
+    final progress = ref.watch(todayProgressProvider).value;
+    final latestLog = ref.watch(latestLogProvider).value;
+    final stats = ref.watch(homeStatsProvider).value;
 
     return SafeArea(
       child: ListView(
-        padding: AppSpacing.page.copyWith(top: AppSpacing.md),
+        padding: AppSpacing.page.copyWith(
+          top: AppSpacing.md,
+          bottom: AppSpacing.xl,
+        ),
         children: [
-          Text(
-            AppFormat.weekdayDate(today),
-            style: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+          HomeHeader(
+            today: today,
+            now: now,
+            name: settings.userName,
+            dayNumber: stats?.dayNumber,
           ),
-          Text(
-            name == null
-                ? AppFormat.greeting(now)
-                : '${AppFormat.greeting(now)}, $name',
-            style: text.headlineMedium,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: progress == null
-                  ? const SizedBox(
-                      height: 120,
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : _TodaySummary(progress: progress),
+          const SizedBox(height: AppSpacing.md),
+          if (history != null) StagePill(plan: history.current, today: today),
+          const SizedBox(height: AppSpacing.md),
+          if (progress == null || history == null)
+            const SizedBox(
+              height: 360,
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else
+            TodayCard(
+              progress: progress,
+              plan: history.planOn(today),
+              today: today,
+              now: now,
+              latestLog: latestLog,
+              isFirstDay: today == history.firstDay,
             ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.md),
           GlowButton(
             label: 'Log a smoke',
             icon: Symbols.local_fire_department,
             onPressed: progress == null ? null : () => _logSmoke(context, ref),
           ),
+          const SizedBox(height: AppSpacing.lg),
+          HistoryCard(onDayTap: (day) => showDayDetailSheet(context, day)),
+          if (stats != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            StatsGrid(stats: stats, currencySymbol: settings.currencySymbol),
+            const SizedBox(height: AppSpacing.md),
+            QuoteCard(dayNumber: stats.dayNumber),
+          ],
         ],
       ),
-    );
-  }
-}
-
-class _TodaySummary extends StatelessWidget {
-  const _TodaySummary({required this.progress});
-
-  final DailyProgress progress;
-
-  @override
-  Widget build(BuildContext context) {
-    final text = context.textTheme;
-    final status = context.exhale;
-    final (message, color) = switch (progress.status) {
-      LimitStatus.under => (
-        '${progress.remaining} left today',
-        context.colors.primary,
-      ),
-      LimitStatus.at => (
-        'Limit reached. You can still log.',
-        status.warning.foreground,
-      ),
-      LimitStatus.over => (
-        "${progress.overBy} over today's limit",
-        status.danger.foreground,
-      ),
-    };
-
-    return Column(
-      children: [
-        Text(
-          '${progress.count} / ${progress.limit}',
-          key: const Key('today-count'),
-          style: text.displayLarge,
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(message, style: text.headlineSmall?.copyWith(color: color)),
-      ],
     );
   }
 }

@@ -27,8 +27,15 @@ void main() {
     (widget) =>
         widget is Text &&
         widget.key == const Key('today-count') &&
-        widget.data == value,
+        widget.textSpan?.toPlainText() == value,
   );
+
+  Future<void> logAndSkipTrigger(WidgetTester tester) async {
+    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Skip'));
+    await tester.pumpInSteps(const Duration(milliseconds: 900));
+  }
 
   testWidgets('first launch goes from splash to setup to home', (tester) async {
     await tester.pumpAppPastSplash();
@@ -53,22 +60,19 @@ void main() {
       PlanDraft(startDay: LogicalDay(2026, 10, 16), startLimit: 2),
     );
 
-    await tester.pumpAppPastSplash();
+    await tester.pumpAppPastSplash(height: 2400);
     expect(todayCount('0 / 2'), findsOneWidget);
 
-    await tester.tap(find.text('Log a smoke'));
-    await tester.pumpAndSettle();
+    await logAndSkipTrigger(tester);
     expect(todayCount('1 / 2'), findsOneWidget);
     expect(find.text('Logged at 3:42 PM'), findsOneWidget);
 
-    await tester.tap(find.text('Log a smoke'));
-    await tester.pumpAndSettle();
-    expect(find.text('Limit reached. You can still log.'), findsOneWidget);
+    await logAndSkipTrigger(tester);
+    expect(find.text('Limit reached'), findsOneWidget);
 
-    await tester.tap(find.text('Log a smoke'));
-    await tester.pumpInSteps(const Duration(milliseconds: 900));
+    await logAndSkipTrigger(tester);
     expect(todayCount('3 / 2'), findsOneWidget);
-    expect(find.text("1 over today's limit"), findsOneWidget);
+    expect(find.text('1 over limit'), findsOneWidget);
 
     await tester.tap(find.text('Undo'));
     await tester.pumpAndSettle();

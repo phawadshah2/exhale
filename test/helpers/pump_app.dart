@@ -27,9 +27,10 @@ void mockPackageInfo() => PackageInfo.setMockInitialValues(
 
 extension PumpApp on WidgetTester {
   /// Launches the app and waits past the splash screen.
-  Future<void> pumpAppPastSplash() async {
+  /// [height] is in logical pixels; tall views avoid lazy list disposal.
+  Future<void> pumpAppPastSplash({double height = 844}) async {
     view
-      ..physicalSize = const Size(1170, 2532)
+      ..physicalSize = Size(1170, height * 3)
       ..devicePixelRatio = 3;
     addTearDown(view.reset);
     mockPackageInfo();

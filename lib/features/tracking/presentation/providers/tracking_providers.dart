@@ -33,7 +33,7 @@ final todayProvider = Provider<LogicalDay>((ref) {
 });
 
 final StreamProviderFamily<List<SmokeLog>, LogicalDay> logsForDayProvider =
-    StreamProvider.family<List<SmokeLog>, LogicalDay>((ref, day) {
+    StreamProvider.autoDispose.family<List<SmokeLog>, LogicalDay>((ref, day) {
       final boundary = ref.watch(dayBoundaryProvider);
       return ref
           .watch(smokeLogRepositoryProvider)

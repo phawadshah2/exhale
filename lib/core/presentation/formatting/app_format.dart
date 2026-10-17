@@ -62,6 +62,24 @@ abstract final class AppFormat {
     return (value * 100).round();
   }
 
+  /// Just now / 12m / 1h 42m / 2d 3h
+  static String elapsed(Duration duration) {
+    if (duration.inMinutes < 1) return 'Just now';
+    if (duration.inHours < 1) return '${duration.inMinutes}m';
+    if (duration.inDays < 1) {
+      final minutes = duration.inMinutes % 60;
+      return minutes == 0
+          ? '${duration.inHours}h'
+          : '${duration.inHours}h ${minutes}m';
+    }
+    final hours = duration.inHours % 24;
+    return hours == 0 ? '${duration.inDays}d' : '${duration.inDays}d ${hours}h';
+  }
+
+  /// One-letter weekday: M T W T F S S
+  static String weekdayInitial(LogicalDay day) =>
+      _weekdays[day.weekday - 1].substring(0, 1);
+
   /// Good morning / afternoon / evening.
   static String greeting(DateTime now) {
     if (now.hour >= 4 && now.hour < 12) return 'Good morning';

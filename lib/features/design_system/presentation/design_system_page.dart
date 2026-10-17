@@ -1,7 +1,7 @@
 import 'package:exhale/core/theme/app_spacing.dart';
-import 'package:exhale/core/theme/exhale_colors.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
+import 'package:exhale/core/widgets/status_badge.dart';
 import 'package:exhale/features/settings/presentation/widgets/theme_preference_control.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -293,9 +293,9 @@ class _LimitStates extends StatelessWidget {
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
               children: [
-                _StatusBadge(label: 'On track', colors: s.success),
-                _StatusBadge(label: 'At limit', colors: s.warning),
-                _StatusBadge(label: '2 over', colors: s.danger),
+                StatusBadge(label: 'On track', colors: s.success),
+                StatusBadge(label: 'At limit', colors: s.warning),
+                StatusBadge(label: '2 over', colors: s.danger),
               ],
             ),
             const SizedBox(height: AppSpacing.md),
@@ -339,47 +339,6 @@ class _LimitStates extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({required this.label, required this.colors});
-
-  final String label;
-  final StatusColors colors;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.gutterSm,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: ShapeDecoration(
-        color: colors.soft,
-        shape: StadiumBorder(side: BorderSide(color: colors.foreground)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: AppSpacing.xs + 2,
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: colors.foreground,
-              shape: BoxShape.circle,
-            ),
-          ),
-          Text(
-            label,
-            style: context.textTheme.labelMedium?.copyWith(
-              color: colors.foreground,
-            ),
-          ),
-        ],
       ),
     );
   }
