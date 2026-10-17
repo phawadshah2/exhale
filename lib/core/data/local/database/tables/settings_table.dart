@@ -17,6 +17,8 @@ class Settings extends Table {
       integer().named('pack_price_cents').nullable()();
   IntColumn get cigarettesPerPack =>
       integer().named('cigarettes_per_pack').withDefault(const Constant(20))();
+  BoolColumn get glassEffects =>
+      boolean().named('glass_effects').withDefault(const Constant(true))();
   TextColumn get currencySymbol =>
       text().named('currency_symbol').withDefault(const Constant(r'$'))();
 

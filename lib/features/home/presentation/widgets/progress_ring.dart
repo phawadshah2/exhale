@@ -104,7 +104,12 @@ class _RingPainter extends CustomPainter {
         endAngle: math.max(sweep, 0.01),
         transform: const GradientRotation(_start),
       ).createShader(rect);
+      // Faint halo: the arc blurred and drawn at low opacity.
       canvas
+        ..saveLayer(
+          rect.inflate(strokeWidth * 2),
+          Paint()..color = const Color(0x2E000000),
+        )
         ..drawArc(
           rect,
           _start,
@@ -112,9 +117,9 @@ class _RingPainter extends CustomPainter {
           false,
           stroke()
             ..shader = shader
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8)
-            ..color = Colors.white.withValues(alpha: 0.35),
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
         )
+        ..restore()
         ..drawArc(rect, _start, sweep, false, stroke()..shader = shader);
     }
 

@@ -1,4 +1,5 @@
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/pill_segmented_control.dart';
@@ -8,7 +9,6 @@ import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/period_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 class HistoryCard extends ConsumerWidget {
   const HistoryCard({required this.onDayTap, super.key});
@@ -69,7 +69,9 @@ class HistoryCard extends ConsumerWidget {
                 child: summary == null
                     ? const SizedBox(
                         height: HistoryChart.chartHeight + 26,
-                        child: Center(child: CircularProgressIndicator()),
+                        child: Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        ),
                       )
                     : HistoryChart(
                         key: ValueKey(summary.range),
@@ -139,7 +141,7 @@ class _Legend extends StatelessWidget {
           spacing: 4,
           children: [
             Icon(
-              Symbols.check_circle,
+              AppIcons.checkCircle,
               size: 16,
               color: context.exhale.success.foreground,
             ),

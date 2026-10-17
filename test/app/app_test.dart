@@ -88,7 +88,7 @@ void main() {
     );
     await tester.pumpAppPastSplash();
 
-    await tester.tap(find.text('Settings'));
+    await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Light'));
     await tester.pumpAndSettle();

@@ -16,6 +16,7 @@ extension SettingsRowMapper on SettingsRow {
     packPriceCents: packPriceCents,
     cigarettesPerPack: cigarettesPerPack,
     currencySymbol: currencySymbol,
+    glassEffects: glassEffects,
   );
 }
 
@@ -30,5 +31,6 @@ extension AppSettingsMapper on AppSettings {
     packPriceCents: Value(packPriceCents),
     cigarettesPerPack: Value(cigarettesPerPack),
     currencySymbol: Value(currencySymbol),
+    glassEffects: Value(glassEffects),
   );
 }

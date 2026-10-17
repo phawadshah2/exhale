@@ -1,15 +1,14 @@
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
 import 'package:exhale/features/tracking/presentation/widgets/trigger_picker.dart';
 import 'package:flutter/material.dart';
 
 /// Asks what triggered a smoke. Returns the choice, or null when skipped.
 Future<SmokeTrigger?> showTriggerSheet(BuildContext context) =>
-    showModalBottomSheet<SmokeTrigger>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
+    showAppSheet<SmokeTrigger>(
+      context,
       builder: (context) => const _TriggerSheet(),
     );
 

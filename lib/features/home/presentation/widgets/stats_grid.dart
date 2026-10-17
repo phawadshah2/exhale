@@ -1,9 +1,9 @@
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/tracking/domain/entities/home_stats.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 class StatsGrid extends StatelessWidget {
   const StatsGrid({
@@ -25,7 +25,7 @@ class StatsGrid extends StatelessWidget {
     final changeTile = change == null
         ? _StatTile(
             label: 'Vs baseline',
-            icon: Symbols.trending_down,
+            icon: AppIcons.trendDown,
             iconColor: success,
             value: '—',
             caption: 'After your first full day',
@@ -33,7 +33,7 @@ class StatsGrid extends StatelessWidget {
           )
         : _StatTile(
             label: 'Vs baseline',
-            icon: change <= 0 ? Symbols.trending_down : Symbols.trending_up,
+            icon: change <= 0 ? AppIcons.trendDown : AppIcons.trendUp,
             iconColor: change <= 0 ? success : danger,
             value:
                 '${change <= 0 ? '↓' : '↑'} ${(change.abs() * 100).round()}%',
@@ -46,7 +46,7 @@ class StatsGrid extends StatelessWidget {
     final tiles = [
       _StatTile(
         label: 'Streak',
-        icon: Symbols.local_fire_department,
+        icon: AppIcons.flame,
         iconColor: context.exhale.warning.foreground,
         value: '${stats.streakDays} ${stats.streakDays == 1 ? 'Day' : 'Days'}',
         caption: 'within limit',
@@ -55,7 +55,7 @@ class StatsGrid extends StatelessWidget {
       changeTile,
       _StatTile(
         label: 'Money saved',
-        icon: Symbols.savings,
+        icon: AppIcons.savings,
         iconColor: context.exhale.warning.foreground,
         value: saved == null
             ? '—'
@@ -65,7 +65,7 @@ class StatsGrid extends StatelessWidget {
       ),
       _StatTile(
         label: 'Avoided',
-        icon: Symbols.air,
+        icon: AppIcons.avoided,
         iconColor: context.colors.primary,
         value: '${stats.avoided} ${stats.avoided == 1 ? 'smoke' : 'smokes'}',
         caption: 'vs ${stats.baseline}/day baseline',

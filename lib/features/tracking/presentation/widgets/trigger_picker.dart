@@ -1,9 +1,12 @@
+import 'dart:async';
+
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
 import 'package:exhale/features/tracking/presentation/smoke_trigger_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import 'package:flutter/services.dart';
 
 /// Two-column grid of trigger pills; tapping the selected one clears it.
 class TriggerPicker extends StatelessWidget {
@@ -31,7 +34,10 @@ class TriggerPicker extends StatelessWidget {
                 child: _TriggerPill(
                   trigger: trigger,
                   isSelected: trigger == selected,
-                  onTap: () => onChanged(trigger == selected ? null : trigger),
+                  onTap: () {
+                    unawaited(HapticFeedback.selectionClick());
+                    onChanged(trigger == selected ? null : trigger);
+                  },
                 ),
               ),
           ],
@@ -96,7 +102,7 @@ class _TriggerPill extends StatelessWidget {
                   ),
                 ),
                 if (isSelected)
-                  Icon(Symbols.check, size: 18, color: foreground),
+                  Icon(AppIcons.check, size: 18, color: foreground),
               ],
             ),
           ),

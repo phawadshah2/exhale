@@ -3,6 +3,7 @@ import 'package:exhale/core/theme/app_palette.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/app_typography.dart';
 import 'package:exhale/core/theme/exhale_colors.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 abstract final class AppTheme {
@@ -39,6 +40,15 @@ abstract final class AppTheme {
       fontFamily: AppFonts.body,
       scaffoldBackgroundColor: colors.surface,
       extensions: [ExhaleColors.fromScheme(colors)],
+      // iOS conventions: no ink ripples, swipe-back page transitions.
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: colors.onSurface.withValues(alpha: 0.06),
+      pageTransitionsTheme: PageTransitionsTheme(
+        builders: {
+          for (final platform in TargetPlatform.values)
+            platform: const CupertinoPageTransitionsBuilder(),
+        },
+      ),
       appBarTheme: AppBarThemeData(
         backgroundColor: colors.surface,
         foregroundColor: colors.onSurface,
@@ -105,8 +115,7 @@ abstract final class AppTheme {
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: colors.surfaceContainer,
         surfaceTintColor: Colors.transparent,
-        showDragHandle: true,
-        dragHandleColor: colors.outline,
+        showDragHandle: false,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(AppRadius.lg),

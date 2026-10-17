@@ -1,7 +1,7 @@
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 /// − value unit + control from the setup designs.
 class NumberStepper extends StatelessWidget {
@@ -40,7 +40,7 @@ class NumberStepper extends StatelessWidget {
       child: Row(
         children: [
           _StepButton(
-            icon: Symbols.remove,
+            icon: AppIcons.remove,
             tooltip: 'Decrease $semanticLabel',
             onPressed: value > min ? () => onChanged(value - 1) : null,
           ),
@@ -84,7 +84,7 @@ class NumberStepper extends StatelessWidget {
             ),
           ),
           _StepButton(
-            icon: Symbols.add,
+            icon: AppIcons.add,
             tooltip: 'Increase $semanticLabel',
             onPressed: value < max ? () => onChanged(value + 1) : null,
           ),

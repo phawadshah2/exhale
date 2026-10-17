@@ -1,10 +1,11 @@
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/status_badge.dart';
 import 'package:exhale/features/settings/presentation/widgets/theme_preference_control.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 /// Living style guide: every token and themed component in one scroll.
 /// Used to check the theme against the Stitch screens in both modes.
@@ -208,13 +209,13 @@ class _Buttons extends StatelessWidget {
           ),
           child: FilledButton.icon(
             onPressed: () {},
-            icon: const Icon(Symbols.local_fire_department),
+            icon: const Icon(AppIcons.flame),
             label: const Text('Log a smoke'),
           ),
         ),
         OutlinedButton.icon(
           onPressed: () {},
-          icon: const Icon(Symbols.tune),
+          icon: const Icon(AppIcons.tune),
           label: const Text('Adjust reduction pace'),
         ),
         TextButton(onPressed: () {}, child: const Text('Skip')),
@@ -232,14 +233,14 @@ class _TriggerChips extends StatefulWidget {
 
 class _TriggerChipsState extends State<_TriggerChips> {
   static const List<(String, IconData)> _triggers = [
-    ('Coffee', Symbols.coffee),
-    ('Stress', Symbols.bolt),
-    ('After meal', Symbols.restaurant),
-    ('Social', Symbols.group),
-    ('Boredom', Symbols.hourglass_empty),
-    ('Habit', Symbols.repeat),
-    ('Commute', Symbols.directions_car),
-    ('Drinks', Symbols.local_bar),
+    ('Coffee', AppIcons.coffee),
+    ('Stress', AppIcons.stress),
+    ('After meal', AppIcons.meal),
+    ('Social', AppIcons.social),
+    ('Boredom', AppIcons.boredom),
+    ('Habit', AppIcons.habit),
+    ('Commute', AppIcons.commute),
+    ('Drinks', AppIcons.drinks),
   ];
 
   String _selected = 'Coffee';
@@ -359,7 +360,7 @@ class _StatCards extends StatelessWidget {
             label: 'Streak',
             value: '4 Days',
             caption: 'within limit',
-            icon: Symbols.local_fire_department,
+            icon: AppIcons.flame,
             accent: success,
           ),
         ),
@@ -368,7 +369,7 @@ class _StatCards extends StatelessWidget {
             label: 'Money saved',
             value: r'$18.85',
             caption: 'Since Day 1',
-            icon: Symbols.savings,
+            icon: AppIcons.savings,
             accent: success,
           ),
         ),
@@ -439,8 +440,8 @@ class _Feedback extends StatelessWidget {
         ),
         Expanded(
           child: OutlinedButton(
-            onPressed: () => showModalBottomSheet<void>(
-              context: context,
+            onPressed: () => showAppSheet<void>(
+              context,
               builder: (context) => Padding(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.lg,

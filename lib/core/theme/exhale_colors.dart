@@ -60,7 +60,7 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
         onSolid: scheme.onErrorContainer,
         foreground: scheme.error,
       ),
-      glow: scheme.primaryContainer.withValues(alpha: isDark ? 0.28 : 0.35),
+      glow: scheme.primaryContainer.withValues(alpha: isDark ? 0.14 : 0.16),
     );
   }
 
@@ -77,7 +77,7 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
   final Color glow;
 
   List<BoxShadow> get accentGlow => [
-    BoxShadow(color: glow, blurRadius: 24, spreadRadius: -2),
+    BoxShadow(color: glow, blurRadius: 14, spreadRadius: -4),
   ];
 
   @override

@@ -1,8 +1,10 @@
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/glow_button.dart';
 import 'package:exhale/core/widgets/number_stepper.dart';
@@ -15,11 +17,11 @@ import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/validation/settings_validation.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 class SetupPage extends ConsumerWidget {
   const SetupPage({super.key});
@@ -114,7 +116,11 @@ class SetupPage extends ConsumerWidget {
                         Row(
                           spacing: AppSpacing.sm,
                           children: [
-                            Icon(Symbols.info, size: 18, color: colors.primary),
+                            Icon(
+                              AppIcons.info,
+                              size: 18,
+                              color: colors.primary,
+                            ),
                             Expanded(
                               child: Text(
                                 '${_paceLabel(form.stepDays)}, your limit '
@@ -213,7 +219,7 @@ class SetupPage extends ConsumerWidget {
                   children: [
                     GlowButton(
                       label: 'Start my plan',
-                      trailingIcon: Symbols.arrow_forward,
+                      trailingIcon: AppIcons.forward,
                       isBusy: form.isSubmitting,
                       onPressed: form.preview == null ? null : submit,
                     ),
@@ -223,7 +229,7 @@ class SetupPage extends ConsumerWidget {
                       spacing: 6,
                       children: [
                         Icon(
-                          Symbols.tune,
+                          AppIcons.tune,
                           size: 16,
                           color: colors.onSurfaceVariant,
                         ),
@@ -345,11 +351,13 @@ class _StartDateCard extends StatelessWidget {
   final ValueChanged<LogicalDay> onChanged;
 
   Future<void> _pick(BuildContext context) async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: day.toLocalDate(),
-      firstDate: today.addDays(-30).toLocalDate(),
-      lastDate: today.addDays(30).toLocalDate(),
+    final picked = await showWheelPicker(
+      context,
+      title: 'Start date',
+      mode: CupertinoDatePickerMode.date,
+      initial: day.toLocalDate(),
+      minimum: today.addDays(-30).toLocalDate(),
+      maximum: today.addDays(30).toLocalDate(),
     );
     if (picked != null) onChanged(LogicalDay.fromDate(picked));
   }
@@ -374,7 +382,7 @@ class _StartDateCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: colors.surfaceContainerHigh,
                 ),
-                child: Icon(Symbols.calendar_today, color: colors.primary),
+                child: Icon(AppIcons.calendar, color: colors.primary),
               ),
               Expanded(
                 child: Column(
@@ -400,7 +408,7 @@ class _StartDateCard extends StatelessWidget {
                   letterSpacing: 1,
                 ),
               ),
-              Icon(Symbols.chevron_right, color: colors.onSurfaceVariant),
+              Icon(AppIcons.chevronRight, color: colors.onSurfaceVariant),
             ],
           ),
         ),
@@ -447,12 +455,12 @@ class _PackEconomicsCardState extends State<_PackEconomicsCard> {
               child: Row(
                 spacing: AppSpacing.gutterSm,
                 children: [
-                  Icon(Symbols.savings, color: colors.primary),
+                  Icon(AppIcons.savings, color: colors.primary),
                   Expanded(
                     child: Text('Pack economics', style: text.titleLarge),
                   ),
                   Icon(
-                    _expanded ? Symbols.expand_less : Symbols.expand_more,
+                    _expanded ? AppIcons.chevronUp : AppIcons.chevronDown,
                     color: colors.onSurfaceVariant,
                   ),
                 ],

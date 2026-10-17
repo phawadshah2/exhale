@@ -1,9 +1,12 @@
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_dialogs.dart';
+import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/core/widgets/status_badge.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
@@ -14,21 +17,12 @@ import 'package:exhale/features/tracking/presentation/smoke_trigger_ui.dart';
 import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 Future<void> showDayDetailSheet(BuildContext context, LogicalDay day) =>
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.65,
-        maxChildSize: 0.95,
-        minChildSize: 0.4,
-        builder: (context, controller) =>
-            DayDetailSheet(day: day, scrollController: controller),
-      ),
+    showAppDraggableSheet<void>(
+      context,
+      builder: (context, controller) =>
+          DayDetailSheet(day: day, scrollController: controller),
     );
 
 class DayDetailSheet extends ConsumerWidget {
@@ -46,30 +40,16 @@ class DayDetailSheet extends ConsumerWidget {
     WidgetRef ref,
     SmokeLog log,
   ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete this log?'),
-        content: Text(
-          'The smoke at ${AppFormat.time(log.loggedAt)} will be '
-          'removed from this day.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: context.exhale.danger.foreground,
-            ),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+    final confirmed = await showAppConfirm(
+      context,
+      title: 'Delete this log?',
+      message:
+          'The smoke at ${AppFormat.time(log.loggedAt)} will be removed '
+          'from this day.',
+      confirmLabel: 'Delete',
+      destructive: true,
     );
-    if (confirmed != true) return;
+    if (!confirmed) return;
     final result = await ref.read(deleteSmokeLogProvider)(log.id);
     if (result case FailureResult(:final failure) when context.mounted) {
       ScaffoldMessenger.of(context)
@@ -122,7 +102,7 @@ class DayDetailSheet extends ConsumerWidget {
                 IconButton(
                   tooltip: 'Close',
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Symbols.close),
+                  icon: const Icon(AppIcons.close),
                   style: IconButton.styleFrom(
                     backgroundColor: colors.surfaceContainerHighest,
                     foregroundColor: colors.onSurface,
@@ -140,7 +120,7 @@ class DayDetailSheet extends ConsumerWidget {
         if (logs == null)
           const SliverFillRemaining(
             hasScrollBody: false,
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(child: CircularProgressIndicator.adaptive()),
           )
         else if (logs.isEmpty)
           SliverPadding(
@@ -183,7 +163,7 @@ class DayDetailSheet extends ConsumerWidget {
               onPressed: day.isAfter(today)
                   ? null
                   : () => showLogEditorSheet(context, day: day),
-              icon: const Icon(Symbols.add),
+              icon: const Icon(AppIcons.add),
               label: const Text('Add missed log'),
             ),
           ),
@@ -313,12 +293,12 @@ class _LogTile extends StatelessWidget {
           IconButton(
             tooltip: 'Edit',
             onPressed: onEdit,
-            icon: Icon(Symbols.edit, color: colors.onSurfaceVariant),
+            icon: Icon(AppIcons.edit, color: colors.onSurfaceVariant),
           ),
           IconButton(
             tooltip: 'Delete',
             onPressed: onDelete,
-            icon: Icon(Symbols.delete, color: colors.onSurfaceVariant),
+            icon: Icon(AppIcons.delete, color: colors.onSurfaceVariant),
           ),
         ],
       ),

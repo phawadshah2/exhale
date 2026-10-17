@@ -1,34 +1,32 @@
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/day_boundary.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/presentation/providers/clock_providers.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_dialogs.dart';
+import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
 import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
 import 'package:exhale/features/tracking/domain/usecases/log_smoke.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:exhale/features/tracking/presentation/widgets/trigger_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 /// Adds a missed log on [day], or edits [log] when given.
 Future<void> showLogEditorSheet(
   BuildContext context, {
   required LogicalDay day,
   SmokeLog? log,
-}) => showModalBottomSheet<void>(
-  context: context,
-  isScrollControlled: true,
-  useSafeArea: true,
-  builder: (context) => Padding(
-    padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-    child: LogEditorSheet(day: day, log: log),
-  ),
+}) => showAppSheet<void>(
+  context,
+  builder: (context) => LogEditorSheet(day: day, log: log),
 );
 
 /// The moment on [day] that [time] refers to, honouring the reset hour:
@@ -85,8 +83,13 @@ class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
   }
 
   Future<void> _pickTime() async {
-    final picked = await showTimePicker(context: context, initialTime: _time);
-    if (picked != null) setState(() => _time = picked);
+    final picked = await showWheelPicker(
+      context,
+      title: 'Time',
+      mode: CupertinoDatePickerMode.time,
+      initial: DateTime(2000, 1, 1, _time.hour, _time.minute),
+    );
+    if (picked != null) setState(() => _time = TimeOfDay.fromDateTime(picked));
   }
 
   Future<void> _save() async {
@@ -163,7 +166,7 @@ class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
             ),
             clipBehavior: Clip.antiAlias,
             child: ListTile(
-              leading: Icon(Symbols.schedule, color: colors.primary),
+              leading: Icon(AppIcons.clock, color: colors.primary),
               title: const Text('Time'),
               trailing: Text(time, style: text.titleLarge),
               onTap: _pickTime,

@@ -1,9 +1,9 @@
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
@@ -82,7 +82,7 @@ class _Avatar extends StatelessWidget {
               ),
             ),
             child: initials == null
-                ? Icon(Symbols.person, color: colors.onSurfaceVariant)
+                ? Icon(AppIcons.person, color: colors.onSurfaceVariant)
                 : Text(
                     initials,
                     style: context.textTheme.titleMedium?.copyWith(

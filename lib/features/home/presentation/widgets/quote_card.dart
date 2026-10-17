@@ -1,7 +1,7 @@
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 /// A short daily line of encouragement, rotating by plan day.
 class QuoteCard extends StatelessWidget {
@@ -32,7 +32,7 @@ class QuoteCard extends StatelessWidget {
       child: Row(
         spacing: AppSpacing.gutterSm,
         children: [
-          Icon(Symbols.spa, color: colors.primary),
+          Icon(AppIcons.breath, color: colors.primary),
           Expanded(
             child: Text(
               '"${quotes[(dayNumber - 1) % quotes.length]}"',

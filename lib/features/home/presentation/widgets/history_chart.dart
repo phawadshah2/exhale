@@ -183,8 +183,8 @@ class _BarSlot extends StatelessWidget {
             boxShadow: slot.isToday
                 ? [
                     BoxShadow(
-                      color: color.withValues(alpha: 0.45),
-                      blurRadius: 14,
+                      color: color.withValues(alpha: 0.18),
+                      blurRadius: 8,
                     ),
                   ]
                 : null,

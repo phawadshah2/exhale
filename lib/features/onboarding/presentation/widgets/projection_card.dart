@@ -1,9 +1,9 @@
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 class ProjectionCard extends StatelessWidget {
   const ProjectionCard({
@@ -81,7 +81,7 @@ class ProjectionCard extends StatelessWidget {
               shape: BoxShape.circle,
               color: colors.primaryContainer.withValues(alpha: 0.12),
             ),
-            child: Icon(Symbols.auto_awesome, color: colors.primary),
+            child: Icon(AppIcons.sparkles, color: colors.primary),
           ),
           Expanded(
             child: Column(

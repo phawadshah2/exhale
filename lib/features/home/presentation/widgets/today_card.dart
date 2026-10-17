@@ -1,4 +1,5 @@
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
@@ -10,7 +11,6 @@ import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 class TodayCard extends StatelessWidget {
   const TodayCard({
@@ -43,7 +43,7 @@ class TodayCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Symbols.spa, color: colors.primary, size: 22),
+                Icon(AppIcons.breath, color: colors.primary, size: 22),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text("Today's Consumption", style: text.titleLarge),
@@ -72,14 +72,14 @@ class TodayCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _InfoCell(
-                    icon: Symbols.schedule,
+                    icon: AppIcons.clock,
                     label: 'Time since last',
                     value: _timeSinceLast(),
                   ),
                 ),
                 Expanded(
                   child: _InfoCell(
-                    icon: Symbols.trending_down,
+                    icon: AppIcons.trendDown,
                     label: 'Next target',
                     value: _nextTarget(),
                   ),

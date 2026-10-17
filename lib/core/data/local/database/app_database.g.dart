@@ -858,6 +858,21 @@ class $SettingsTable extends Settings
     requiredDuringInsert: false,
     defaultValue: const Constant(20),
   );
+  static const VerificationMeta _glassEffectsMeta = const VerificationMeta(
+    'glassEffects',
+  );
+  @override
+  late final GeneratedColumn<bool> glassEffects = GeneratedColumn<bool>(
+    'glass_effects',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("glass_effects" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
   static const VerificationMeta _currencySymbolMeta = const VerificationMeta(
     'currencySymbol',
   );
@@ -880,6 +895,7 @@ class $SettingsTable extends Settings
     appIcon,
     packPriceCents,
     cigarettesPerPack,
+    glassEffects,
     currencySymbol,
   ];
   @override
@@ -954,6 +970,15 @@ class $SettingsTable extends Settings
         ),
       );
     }
+    if (data.containsKey('glass_effects')) {
+      context.handle(
+        _glassEffectsMeta,
+        glassEffects.isAcceptableOrUnknown(
+          data['glass_effects']!,
+          _glassEffectsMeta,
+        ),
+      );
+    }
     if (data.containsKey('currency_symbol')) {
       context.handle(
         _currencySymbolMeta,
@@ -1004,6 +1029,10 @@ class $SettingsTable extends Settings
         DriftSqlType.int,
         data['${effectivePrefix}cigarettes_per_pack'],
       )!,
+      glassEffects: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}glass_effects'],
+      )!,
       currencySymbol: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}currency_symbol'],
@@ -1026,6 +1055,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
   final String appIcon;
   final int? packPriceCents;
   final int cigarettesPerPack;
+  final bool glassEffects;
   final String currencySymbol;
   const SettingsRow({
     required this.id,
@@ -1036,6 +1066,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     required this.appIcon,
     this.packPriceCents,
     required this.cigarettesPerPack,
+    required this.glassEffects,
     required this.currencySymbol,
   });
   @override
@@ -1053,6 +1084,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       map['pack_price_cents'] = Variable<int>(packPriceCents);
     }
     map['cigarettes_per_pack'] = Variable<int>(cigarettesPerPack);
+    map['glass_effects'] = Variable<bool>(glassEffects);
     map['currency_symbol'] = Variable<String>(currencySymbol);
     return map;
   }
@@ -1071,6 +1103,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           ? const Value.absent()
           : Value(packPriceCents),
       cigarettesPerPack: Value(cigarettesPerPack),
+      glassEffects: Value(glassEffects),
       currencySymbol: Value(currencySymbol),
     );
   }
@@ -1089,6 +1122,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       appIcon: serializer.fromJson<String>(json['appIcon']),
       packPriceCents: serializer.fromJson<int?>(json['packPriceCents']),
       cigarettesPerPack: serializer.fromJson<int>(json['cigarettesPerPack']),
+      glassEffects: serializer.fromJson<bool>(json['glassEffects']),
       currencySymbol: serializer.fromJson<String>(json['currencySymbol']),
     );
   }
@@ -1104,6 +1138,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       'appIcon': serializer.toJson<String>(appIcon),
       'packPriceCents': serializer.toJson<int?>(packPriceCents),
       'cigarettesPerPack': serializer.toJson<int>(cigarettesPerPack),
+      'glassEffects': serializer.toJson<bool>(glassEffects),
       'currencySymbol': serializer.toJson<String>(currencySymbol),
     };
   }
@@ -1117,6 +1152,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     String? appIcon,
     Value<int?> packPriceCents = const Value.absent(),
     int? cigarettesPerPack,
+    bool? glassEffects,
     String? currencySymbol,
   }) => SettingsRow(
     id: id ?? this.id,
@@ -1129,6 +1165,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
         ? packPriceCents.value
         : this.packPriceCents,
     cigarettesPerPack: cigarettesPerPack ?? this.cigarettesPerPack,
+    glassEffects: glassEffects ?? this.glassEffects,
     currencySymbol: currencySymbol ?? this.currencySymbol,
   );
   SettingsRow copyWithCompanion(SettingsCompanion data) {
@@ -1151,6 +1188,9 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       cigarettesPerPack: data.cigarettesPerPack.present
           ? data.cigarettesPerPack.value
           : this.cigarettesPerPack,
+      glassEffects: data.glassEffects.present
+          ? data.glassEffects.value
+          : this.glassEffects,
       currencySymbol: data.currencySymbol.present
           ? data.currencySymbol.value
           : this.currencySymbol,
@@ -1168,6 +1208,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           ..write('appIcon: $appIcon, ')
           ..write('packPriceCents: $packPriceCents, ')
           ..write('cigarettesPerPack: $cigarettesPerPack, ')
+          ..write('glassEffects: $glassEffects, ')
           ..write('currencySymbol: $currencySymbol')
           ..write(')'))
         .toString();
@@ -1183,6 +1224,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     appIcon,
     packPriceCents,
     cigarettesPerPack,
+    glassEffects,
     currencySymbol,
   );
   @override
@@ -1197,6 +1239,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           other.appIcon == this.appIcon &&
           other.packPriceCents == this.packPriceCents &&
           other.cigarettesPerPack == this.cigarettesPerPack &&
+          other.glassEffects == this.glassEffects &&
           other.currencySymbol == this.currencySymbol);
 }
 
@@ -1209,6 +1252,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
   final Value<String> appIcon;
   final Value<int?> packPriceCents;
   final Value<int> cigarettesPerPack;
+  final Value<bool> glassEffects;
   final Value<String> currencySymbol;
   const SettingsCompanion({
     this.id = const Value.absent(),
@@ -1219,6 +1263,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.appIcon = const Value.absent(),
     this.packPriceCents = const Value.absent(),
     this.cigarettesPerPack = const Value.absent(),
+    this.glassEffects = const Value.absent(),
     this.currencySymbol = const Value.absent(),
   });
   SettingsCompanion.insert({
@@ -1230,6 +1275,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.appIcon = const Value.absent(),
     this.packPriceCents = const Value.absent(),
     this.cigarettesPerPack = const Value.absent(),
+    this.glassEffects = const Value.absent(),
     this.currencySymbol = const Value.absent(),
   });
   static Insertable<SettingsRow> custom({
@@ -1241,6 +1287,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Expression<String>? appIcon,
     Expression<int>? packPriceCents,
     Expression<int>? cigarettesPerPack,
+    Expression<bool>? glassEffects,
     Expression<String>? currencySymbol,
   }) {
     return RawValuesInsertable({
@@ -1252,6 +1299,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       if (appIcon != null) 'app_icon': appIcon,
       if (packPriceCents != null) 'pack_price_cents': packPriceCents,
       if (cigarettesPerPack != null) 'cigarettes_per_pack': cigarettesPerPack,
+      if (glassEffects != null) 'glass_effects': glassEffects,
       if (currencySymbol != null) 'currency_symbol': currencySymbol,
     });
   }
@@ -1265,6 +1313,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Value<String>? appIcon,
     Value<int?>? packPriceCents,
     Value<int>? cigarettesPerPack,
+    Value<bool>? glassEffects,
     Value<String>? currencySymbol,
   }) {
     return SettingsCompanion(
@@ -1276,6 +1325,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       appIcon: appIcon ?? this.appIcon,
       packPriceCents: packPriceCents ?? this.packPriceCents,
       cigarettesPerPack: cigarettesPerPack ?? this.cigarettesPerPack,
+      glassEffects: glassEffects ?? this.glassEffects,
       currencySymbol: currencySymbol ?? this.currencySymbol,
     );
   }
@@ -1307,6 +1357,9 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     if (cigarettesPerPack.present) {
       map['cigarettes_per_pack'] = Variable<int>(cigarettesPerPack.value);
     }
+    if (glassEffects.present) {
+      map['glass_effects'] = Variable<bool>(glassEffects.value);
+    }
     if (currencySymbol.present) {
       map['currency_symbol'] = Variable<String>(currencySymbol.value);
     }
@@ -1324,6 +1377,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
           ..write('appIcon: $appIcon, ')
           ..write('packPriceCents: $packPriceCents, ')
           ..write('cigarettesPerPack: $cigarettesPerPack, ')
+          ..write('glassEffects: $glassEffects, ')
           ..write('currencySymbol: $currencySymbol')
           ..write(')'))
         .toString();
@@ -1779,6 +1833,7 @@ typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
   Value<String> appIcon,
   Value<int?> packPriceCents,
   Value<int> cigarettesPerPack,
+  Value<bool> glassEffects,
   Value<String> currencySymbol,
 });
 typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
@@ -1790,6 +1845,7 @@ typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<String> appIcon,
   Value<int?> packPriceCents,
   Value<int> cigarettesPerPack,
+  Value<bool> glassEffects,
   Value<String> currencySymbol,
 });
 
@@ -1839,6 +1895,11 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<int> get cigarettesPerPack => $composableBuilder(
     column: $table.cigarettesPerPack,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get glassEffects => $composableBuilder(
+    column: $table.glassEffects,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1897,6 +1958,11 @@ class $$SettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get glassEffects => $composableBuilder(
+    column: $table.glassEffects,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get currencySymbol => $composableBuilder(
     column: $table.currencySymbol,
     builder: (column) => ColumnOrderings(column),
@@ -1946,6 +2012,11 @@ class $$SettingsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<bool> get glassEffects => $composableBuilder(
+    column: $table.glassEffects,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get currencySymbol => $composableBuilder(
     column: $table.currencySymbol,
     builder: (column) => column,
@@ -1991,6 +2062,7 @@ class $$SettingsTableTableManager
                 Value<String> appIcon = const Value.absent(),
                 Value<int?> packPriceCents = const Value.absent(),
                 Value<int> cigarettesPerPack = const Value.absent(),
+                Value<bool> glassEffects = const Value.absent(),
                 Value<String> currencySymbol = const Value.absent(),
               }) => SettingsCompanion(
                 id: id,
@@ -2001,6 +2073,7 @@ class $$SettingsTableTableManager
                 appIcon: appIcon,
                 packPriceCents: packPriceCents,
                 cigarettesPerPack: cigarettesPerPack,
+                glassEffects: glassEffects,
                 currencySymbol: currencySymbol,
               ),
           createCompanionCallback:
@@ -2013,6 +2086,7 @@ class $$SettingsTableTableManager
                 Value<String> appIcon = const Value.absent(),
                 Value<int?> packPriceCents = const Value.absent(),
                 Value<int> cigarettesPerPack = const Value.absent(),
+                Value<bool> glassEffects = const Value.absent(),
                 Value<String> currencySymbol = const Value.absent(),
               }) => SettingsCompanion.insert(
                 id: id,
@@ -2023,6 +2097,7 @@ class $$SettingsTableTableManager
                 appIcon: appIcon,
                 packPriceCents: packPriceCents,
                 cigarettesPerPack: cigarettesPerPack,
+                glassEffects: glassEffects,
                 currencySymbol: currencySymbol,
               ),
           withReferenceMapper: (p0) => p0
