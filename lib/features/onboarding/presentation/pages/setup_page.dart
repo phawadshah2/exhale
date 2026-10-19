@@ -48,7 +48,8 @@ class SetupPage extends ConsumerWidget {
       if (saved && context.mounted) context.go(AppRoutes.home);
     }
 
-    final habit = form.habit;
+    // Step 2 is only reached with a habit picked.
+    final habit = form.habit ?? Habit.smoking;
     final (earliestQuit, latestQuit) = controller.quitDayRange;
 
     return SetupScaffold(
@@ -119,20 +120,22 @@ class SetupPage extends ConsumerWidget {
           onPickDate: controller.setQuitDay,
           onSelectPreset: controller.selectQuitPreset,
         ),
-        const SizedBox(height: AppSpacing.md),
-        _CostCard(
-          habit: habit,
-          currencySymbol: currency,
-          unitsPerContainer: form.cigarettesPerPack,
-          showPriceError: form.hasInvalidPackPrice,
-          onPriceChanged: controller.setPackPriceText,
-          onUnitsPerContainerChanged: controller.setCigarettesPerPack,
-        ),
+        if (habit.tracksCost) ...[
+          const SizedBox(height: AppSpacing.md),
+          _CostCard(
+            habit: habit,
+            currencySymbol: currency,
+            unitsPerContainer: form.cigarettesPerPack,
+            showPriceError: form.hasInvalidPackPrice,
+            onPriceChanged: controller.setPackPriceText,
+            onUnitsPerContainerChanged: controller.setCigarettesPerPack,
+          ),
+        ],
         const SizedBox(height: AppSpacing.md),
         ProjectionCard(
           plan: form.preview,
           habit: habit,
-          unitPriceCents: form.unitPriceCents,
+          unitPriceCents: habit.tracksCost ? form.unitPriceCents : null,
           currencySymbol: currency,
         ),
       ],

@@ -73,6 +73,11 @@ abstract final class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: colors.primaryContainer,
           foregroundColor: colors.onPrimaryContainer,
+          // Opaque so a disabled floating button doesn't show content behind.
+          disabledBackgroundColor: colors.surfaceContainerHighest,
+          disabledForegroundColor: colors.onSurfaceVariant.withValues(
+            alpha: 0.6,
+          ),
           minimumSize: buttonSize,
           shape: pill,
           textStyle: text.titleMedium,

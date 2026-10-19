@@ -43,7 +43,7 @@ class SetupFormState {
     required this.startDay,
     required this.quitDay,
     this.quitPreset = QuitPreset.suggested,
-    this.habitKind = HabitKind.smoking,
+    this.habitKind,
     this.customName = '',
     this.customUnit = '',
     this.reason = '',
@@ -67,7 +67,9 @@ class SetupFormState {
 
   /// Null once the user picks a date on the wheel.
   final QuitPreset? quitPreset;
-  final HabitKind habitKind;
+
+  /// Null until the user picks one.
+  final HabitKind? habitKind;
   final String customName;
   final String customUnit;
   final String reason;
@@ -78,20 +80,27 @@ class SetupFormState {
   final bool isSubmitting;
   final String? errorMessage;
 
-  Habit get habit => habitKind == HabitKind.custom
-      ? Habit.custom(name: customName, unit: customUnit)
-      : Habit.presets.firstWhere((h) => h.kind == habitKind);
+  Habit? get habit => switch (habitKind) {
+    null => null,
+    HabitKind.custom => Habit.custom(name: customName, unit: customUnit),
+    final kind => Habit.presets.firstWhere((h) => h.kind == kind),
+  };
 
-  /// A custom habit needs a name and a unit before moving on.
-  bool get canContinue =>
-      habitKind != HabitKind.custom ||
-      (customName.trim().isNotEmpty && customUnit.trim().isNotEmpty);
+  /// A habit is picked; a custom one also needs a name and a unit.
+  bool get canContinue => switch (habitKind) {
+    null => false,
+    HabitKind.custom =>
+      customName.trim().isNotEmpty && customUnit.trim().isNotEmpty,
+    _ => true,
+  };
 
   /// Price of one unit, from the pack price when the habit has packs.
   double? get unitPriceCents {
     final price = packPriceCents;
     if (price == null) return null;
-    return habit.hasContainer ? price / cigarettesPerPack : price.toDouble();
+    return habit?.hasContainer ?? false
+        ? price / cigarettesPerPack
+        : price.toDouble();
   }
 
   PlanDraft get draft =>
@@ -165,11 +174,12 @@ class SetupFormController extends Notifier<SetupFormState> {
   /// Switches habit and resets the amounts to that habit's defaults.
   void selectHabit(HabitKind kind) {
     if (kind == state.habitKind) return;
-    final next = state.copyWith(habitKind: kind);
+    final habit = state.copyWith(habitKind: kind).habit!;
     state = _withQuitFollowingPreset(
-      next.copyWith(
-        startLimit: next.habit.defaultDailyAmount,
-        cigarettesPerPack: next.habit.defaultUnitsPerContainer,
+      state.copyWith(
+        habitKind: kind,
+        startLimit: habit.defaultDailyAmount,
+        cigarettesPerPack: habit.defaultUnitsPerContainer,
         errorMessage: () => null,
       ),
     );

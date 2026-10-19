@@ -41,6 +41,8 @@ void main() {
     await tester.pumpAppPastSplash();
     expect(find.text('What are you cutting down?'), findsOneWidget);
 
+    await tester.tap(find.text('Smoking'));
+    await tester.pump();
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
     expect(find.text('Craft your gradual quitting plan'), findsOneWidget);

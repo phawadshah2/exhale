@@ -18,6 +18,32 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  testWidgets('offers ten habits plus custom, none picked', (tester) async {
+    await tester.pumpAppPastSplash(height: 2400);
+
+    for (final name in [
+      'Smoking',
+      'Vaping',
+      'Nicotine pouches',
+      'Alcohol',
+      'Caffeine',
+      'Energy drinks',
+      'Soda',
+      'Sugar',
+      'Junk food',
+      'Social media',
+      'Custom',
+    ]) {
+      expect(find.text(name), findsOneWidget, reason: name);
+    }
+
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SetupPage), findsNothing);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('a preset habit changes the plan wording', (tester) async {
     await tester.pumpAppPastSplash(height: 2400);
 
@@ -44,6 +70,20 @@ void main() {
 
     expect(find.text('Price per cup'), findsOneWidget);
     expect(find.textContaining('per pack'), findsNothing);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('social media has no cost card', (tester) async {
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.tap(find.text('Social media'));
+    await tester.pump();
+    await continueToPlan(tester);
+
+    expect(find.text('What it costs'), findsNothing);
+    expect(find.textContaining('sessions avoided'), findsOneWidget);
+    expect(find.textContaining('saved'), findsNothing);
 
     await tester.disposeApp();
   });
