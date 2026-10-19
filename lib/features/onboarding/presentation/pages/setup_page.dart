@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
@@ -8,10 +10,11 @@ import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/glow_button.dart';
 import 'package:exhale/core/widgets/number_stepper.dart';
-import 'package:exhale/core/widgets/pill_segmented_control.dart';
+import 'package:exhale/core/widgets/scroll_edge_blur.dart';
 import 'package:exhale/core/widgets/section_card.dart';
 import 'package:exhale/features/onboarding/presentation/providers/setup_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/projection_card.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/quit_date_card.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/validation/settings_validation.dart';
@@ -48,16 +51,28 @@ class SetupPage extends ConsumerWidget {
     }
 
     final price = form.packPriceCents;
+    final insets = MediaQuery.paddingOf(context);
+    final keyboard = MediaQuery.viewInsetsOf(context).bottom;
+    final (earliestQuit, latestQuit) = controller.quitDayRange;
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
+      // The keyboard slides over the footer instead of pushing it up.
+      resizeToAvoidBottomInset: false,
+      body: ScrollEdgeBlur(
+        child: Stack(
           children: [
-            Expanded(
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () => FocusScope.of(context).unfocus(),
               child: ListView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: AppSpacing.page.copyWith(
-                  top: AppSpacing.md,
-                  bottom: AppSpacing.lg,
+                  top: insets.top + AppSpacing.md,
+                  bottom: math.max(
+                    keyboard + AppSpacing.lg,
+                    insets.bottom + _footerHeight + AppSpacing.lg,
+                  ),
                 ),
                 children: [
                   const Center(child: _StepChip(label: 'Plan Setup')),
@@ -68,8 +83,8 @@ class SetupPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Gentle reduction gives your body and mind time to adapt '
-                    'without shock.',
+                    'Pick a quit date. Your daily limit comes down evenly '
+                    'until then.',
                     style: text.bodyLarge?.copyWith(
                       color: colors.onSurfaceVariant,
                     ),
@@ -96,89 +111,18 @@ class SetupPage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  SectionCard(
-                    title: 'Reduce by 1 every',
-                    subtitle: 'Custom tapering pace',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        NumberStepper(
-                          value: form.stepDays,
-                          min: PlanValidation.minStepDays,
-                          max: PlanValidation.maxStepDays,
-                          onChanged: controller.setStepDays,
-                          unit: form.stepDays == 1 ? 'day' : 'days',
-                          caption: 'gradual step',
-                          valueColor: colors.primary,
-                          semanticLabel: 'reduction pace',
-                        ),
-                        const SizedBox(height: AppSpacing.gutterSm),
-                        Row(
-                          spacing: AppSpacing.sm,
-                          children: [
-                            Icon(
-                              AppIcons.info,
-                              size: 18,
-                              color: colors.primary,
-                            ),
-                            Expanded(
-                              child: Text(
-                                '${_paceLabel(form.stepDays)}, your limit '
-                                'will automatically drop by 1',
-                                style: text.bodySmall,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  SectionCard(
-                    title: 'Target goal',
-                    trailing: form.quitCompletely
-                        ? Text(
-                            'Zero nicotine goal',
-                            style: text.labelLarge?.copyWith(
-                              color: colors.primary,
-                            ),
-                          )
-                        : null,
-                    child: Column(
-                      children: [
-                        PillSegmentedControl<bool>(
-                          selected: form.quitCompletely,
-                          onChanged: (quit) => controller.setQuitCompletely(
-                            quitCompletely: quit,
-                          ),
-                          segments: const [
-                            PillSegment(
-                              value: true,
-                              label: '0 (Quit completely)',
-                            ),
-                            PillSegment(value: false, label: 'Custom limit'),
-                          ],
-                        ),
-                        if (!form.quitCompletely) ...[
-                          const SizedBox(height: AppSpacing.md),
-                          NumberStepper(
-                            value: form.customTarget,
-                            min: 1,
-                            max: form.startLimit - 1,
-                            onChanged: controller.setCustomTarget,
-                            unit: 'cigs',
-                            caption: 'per day, final limit',
-                            semanticLabel: 'target limit',
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
                   _StartDateCard(
                     day: form.startDay,
                     today: today,
                     onChanged: controller.setStartDay,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  QuitDateCard(
+                    form: form,
+                    earliest: earliestQuit,
+                    latest: latestQuit,
+                    onPickDate: controller.setQuitDay,
+                    onSelectPreset: controller.selectQuitPreset,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   _PackEconomicsCard(
@@ -199,53 +143,14 @@ class SetupPage extends ConsumerWidget {
                 ],
               ),
             ),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: colors.surface,
-                border: Border(
-                  top: BorderSide(
-                    color: colors.outlineVariant.withValues(alpha: 0.4),
-                  ),
-                ),
-              ),
-              child: Padding(
-                padding: AppSpacing.page.copyWith(
-                  top: AppSpacing.md,
-                  bottom: AppSpacing.sm,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    GlowButton(
-                      label: 'Start my plan',
-                      trailingIcon: AppIcons.forward,
-                      isBusy: form.isSubmitting,
-                      onPressed: form.preview == null ? null : submit,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 6,
-                      children: [
-                        Icon(
-                          AppIcons.tune,
-                          size: 16,
-                          color: colors.onSurfaceVariant,
-                        ),
-                        Flexible(
-                          child: Text(
-                            'You can adjust your plan anytime in Settings.',
-                            textAlign: TextAlign.center,
-                            style: text.bodySmall?.copyWith(
-                              color: colors.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: _FloatingFooter(
+                bottomInset: insets.bottom,
+                isBusy: form.isSubmitting,
+                onStart: form.preview == null ? null : submit,
               ),
             ),
           ],
@@ -255,8 +160,74 @@ class SetupPage extends ConsumerWidget {
   }
 }
 
-String _paceLabel(int stepDays) =>
-    stepDays == 1 ? 'Every day' : 'Every $stepDays days';
+const double _footerHeight = 96;
+
+/// Start button floating over the form, with only a soft fade behind it.
+class _FloatingFooter extends StatelessWidget {
+  const _FloatingFooter({
+    required this.bottomInset,
+    required this.isBusy,
+    required this.onStart,
+  });
+
+  final double bottomInset;
+  final bool isBusy;
+  final VoidCallback? onStart;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            colors.surface.withValues(alpha: 0),
+            colors.surface.withValues(alpha: 0.85),
+            colors.surface,
+          ],
+          stops: const [0, 0.45, 1],
+        ),
+      ),
+      child: Padding(
+        padding: AppSpacing.page.copyWith(
+          top: AppSpacing.xl,
+          bottom: bottomInset + AppSpacing.sm,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            GlowButton(
+              label: 'Start my plan',
+              trailingIcon: AppIcons.forward,
+              isBusy: isBusy,
+              onPressed: onStart,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 6,
+              children: [
+                Icon(AppIcons.tune, size: 16, color: colors.onSurfaceVariant),
+                Flexible(
+                  child: Text(
+                    'You can adjust your plan anytime in Settings.',
+                    textAlign: TextAlign.center,
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _StepChip extends StatelessWidget {
   const _StepChip({required this.label});

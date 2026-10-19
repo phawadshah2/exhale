@@ -18,7 +18,11 @@ void main() {
   setUp(() async {
     await setUpTestDependencies(FixedClock(DateTime(2026, 10, 16, 15, 42)));
     await sl<SavePlan>()(
-      PlanDraft(startDay: LogicalDay(2026, 10, 16), startLimit: 9),
+      PlanDraft(
+        startDay: LogicalDay(2026, 10, 16),
+        startLimit: 9,
+        quitDay: LogicalDay(2026, 10, 16).addDays(63),
+      ),
     );
   });
 

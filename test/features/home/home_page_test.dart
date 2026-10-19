@@ -21,8 +21,13 @@ void main() {
   setUp(() => setUpTestDependencies(FixedClock(now)));
   tearDown(InjectionContainer.reset);
 
-  Future<void> startPlan(LogicalDay start, {int limit = 9}) =>
-      sl<SavePlan>()(PlanDraft(startDay: start, startLimit: limit));
+  Future<void> startPlan(LogicalDay start, {int limit = 9}) => sl<SavePlan>()(
+    PlanDraft(
+      startDay: start,
+      startLimit: limit,
+      quitDay: start.addDays(limit * 7),
+    ),
+  );
 
   Future<void> logOn(DateTime at, {int times = 1}) async {
     for (var i = 0; i < times; i++) {
@@ -54,7 +59,7 @@ void main() {
     expect(find.text('9 left today'), findsOneWidget);
     expect(find.text('On track'), findsOneWidget);
     expect(find.text('No smokes logged today. Nice start.'), findsOneWidget);
-    expect(find.text('Week 1 of 9 · Daily limit: 9'), findsOneWidget);
+    expect(find.text('Stage 1 of 9 · Daily limit: 9'), findsOneWidget);
     expect(find.text('Plan started today'), findsOneWidget);
     expect(find.text('Drops to 8 in 7d'), findsOneWidget);
     expect(find.text('D1'), findsOneWidget);
@@ -196,6 +201,42 @@ void main() {
     expect(find.text(r'$4.35'), findsOneWidget);
     expect(find.text('6 smokes'), findsOneWidget);
     expect(find.text('D3'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('counts down to quit day on the last stage', (tester) async {
+    await sl<SavePlan>()(
+      PlanDraft(
+        startDay: today.addDays(-10),
+        startLimit: 3,
+        quitDay: today.addDays(3),
+      ),
+    );
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.text('Quit day in 3d'), findsOneWidget);
+    expect(find.text('Stage 3 of 3 · Daily limit: 1'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('after the quit date the limit is 0 and the day is smoke-free', (
+    tester,
+  ) async {
+    await sl<SavePlan>()(
+      PlanDraft(
+        startDay: today.addDays(-20),
+        startLimit: 4,
+        quitDay: today.addDays(-2),
+      ),
+    );
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(countText(tester), '0 / 0');
+    expect(find.text('Smoke-free day'), findsOneWidget);
+    expect(find.text('Smoke-free since Oct 14'), findsOneWidget);
+    expect(find.text('QUIT'), findsOneWidget);
 
     await tester.disposeApp();
   });

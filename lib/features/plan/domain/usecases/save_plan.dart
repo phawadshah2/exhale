@@ -20,8 +20,7 @@ class SavePlan implements UseCase<ReductionPlan, PlanDraft> {
     final plan = ReductionPlan(
       startDay: draft.startDay,
       startLimit: draft.startLimit,
-      stepDays: draft.stepDays,
-      targetLimit: draft.targetLimit,
+      quitDay: draft.quitDay,
     );
     return switch (await _repository.savePlan(plan)) {
       Success() => Success<ReductionPlan>(plan),

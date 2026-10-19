@@ -44,26 +44,15 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, PlanRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _stepDaysMeta = const VerificationMeta(
-    'stepDays',
+  static const VerificationMeta _quitDayMeta = const VerificationMeta(
+    'quitDay',
   );
   @override
-  late final GeneratedColumn<int> stepDays = GeneratedColumn<int>(
-    'step_days',
+  late final GeneratedColumn<String> quitDay = GeneratedColumn<String>(
+    'quit_day',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _targetLimitMeta = const VerificationMeta(
-    'targetLimit',
-  );
-  @override
-  late final GeneratedColumn<int> targetLimit = GeneratedColumn<int>(
-    'target_limit',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
@@ -83,8 +72,7 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, PlanRow> {
     id,
     startDay,
     startLimit,
-    stepDays,
-    targetLimit,
+    quitDay,
     createdAt,
   ];
   @override
@@ -118,24 +106,13 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, PlanRow> {
     } else if (isInserting) {
       context.missing(_startLimitMeta);
     }
-    if (data.containsKey('step_days')) {
+    if (data.containsKey('quit_day')) {
       context.handle(
-        _stepDaysMeta,
-        stepDays.isAcceptableOrUnknown(data['step_days']!, _stepDaysMeta),
+        _quitDayMeta,
+        quitDay.isAcceptableOrUnknown(data['quit_day']!, _quitDayMeta),
       );
     } else if (isInserting) {
-      context.missing(_stepDaysMeta);
-    }
-    if (data.containsKey('target_limit')) {
-      context.handle(
-        _targetLimitMeta,
-        targetLimit.isAcceptableOrUnknown(
-          data['target_limit']!,
-          _targetLimitMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_targetLimitMeta);
+      context.missing(_quitDayMeta);
     }
     if (data.containsKey('created_at')) {
       context.handle(
@@ -164,13 +141,9 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, PlanRow> {
         DriftSqlType.int,
         data['${effectivePrefix}start_limit'],
       )!,
-      stepDays: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}step_days'],
-      )!,
-      targetLimit: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}target_limit'],
+      quitDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}quit_day'],
       )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -191,15 +164,15 @@ class PlanRow extends DataClass implements Insertable<PlanRow> {
   /// LogicalDay in yyyy-mm-dd form.
   final String startDay;
   final int startLimit;
-  final int stepDays;
-  final int targetLimit;
+
+  /// LogicalDay in yyyy-mm-dd form; the limit is 0 from this day.
+  final String quitDay;
   final DateTime createdAt;
   const PlanRow({
     required this.id,
     required this.startDay,
     required this.startLimit,
-    required this.stepDays,
-    required this.targetLimit,
+    required this.quitDay,
     required this.createdAt,
   });
   @override
@@ -208,8 +181,7 @@ class PlanRow extends DataClass implements Insertable<PlanRow> {
     map['id'] = Variable<int>(id);
     map['start_day'] = Variable<String>(startDay);
     map['start_limit'] = Variable<int>(startLimit);
-    map['step_days'] = Variable<int>(stepDays);
-    map['target_limit'] = Variable<int>(targetLimit);
+    map['quit_day'] = Variable<String>(quitDay);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -219,8 +191,7 @@ class PlanRow extends DataClass implements Insertable<PlanRow> {
       id: Value(id),
       startDay: Value(startDay),
       startLimit: Value(startLimit),
-      stepDays: Value(stepDays),
-      targetLimit: Value(targetLimit),
+      quitDay: Value(quitDay),
       createdAt: Value(createdAt),
     );
   }
@@ -234,8 +205,7 @@ class PlanRow extends DataClass implements Insertable<PlanRow> {
       id: serializer.fromJson<int>(json['id']),
       startDay: serializer.fromJson<String>(json['startDay']),
       startLimit: serializer.fromJson<int>(json['startLimit']),
-      stepDays: serializer.fromJson<int>(json['stepDays']),
-      targetLimit: serializer.fromJson<int>(json['targetLimit']),
+      quitDay: serializer.fromJson<String>(json['quitDay']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -246,8 +216,7 @@ class PlanRow extends DataClass implements Insertable<PlanRow> {
       'id': serializer.toJson<int>(id),
       'startDay': serializer.toJson<String>(startDay),
       'startLimit': serializer.toJson<int>(startLimit),
-      'stepDays': serializer.toJson<int>(stepDays),
-      'targetLimit': serializer.toJson<int>(targetLimit),
+      'quitDay': serializer.toJson<String>(quitDay),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -256,15 +225,13 @@ class PlanRow extends DataClass implements Insertable<PlanRow> {
     int? id,
     String? startDay,
     int? startLimit,
-    int? stepDays,
-    int? targetLimit,
+    String? quitDay,
     DateTime? createdAt,
   }) => PlanRow(
     id: id ?? this.id,
     startDay: startDay ?? this.startDay,
     startLimit: startLimit ?? this.startLimit,
-    stepDays: stepDays ?? this.stepDays,
-    targetLimit: targetLimit ?? this.targetLimit,
+    quitDay: quitDay ?? this.quitDay,
     createdAt: createdAt ?? this.createdAt,
   );
   PlanRow copyWithCompanion(PlansCompanion data) {
@@ -274,10 +241,7 @@ class PlanRow extends DataClass implements Insertable<PlanRow> {
       startLimit: data.startLimit.present
           ? data.startLimit.value
           : this.startLimit,
-      stepDays: data.stepDays.present ? data.stepDays.value : this.stepDays,
-      targetLimit: data.targetLimit.present
-          ? data.targetLimit.value
-          : this.targetLimit,
+      quitDay: data.quitDay.present ? data.quitDay.value : this.quitDay,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -288,16 +252,14 @@ class PlanRow extends DataClass implements Insertable<PlanRow> {
           ..write('id: $id, ')
           ..write('startDay: $startDay, ')
           ..write('startLimit: $startLimit, ')
-          ..write('stepDays: $stepDays, ')
-          ..write('targetLimit: $targetLimit, ')
+          ..write('quitDay: $quitDay, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, startDay, startLimit, stepDays, targetLimit, createdAt);
+  int get hashCode => Object.hash(id, startDay, startLimit, quitDay, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -305,8 +267,7 @@ class PlanRow extends DataClass implements Insertable<PlanRow> {
           other.id == this.id &&
           other.startDay == this.startDay &&
           other.startLimit == this.startLimit &&
-          other.stepDays == this.stepDays &&
-          other.targetLimit == this.targetLimit &&
+          other.quitDay == this.quitDay &&
           other.createdAt == this.createdAt);
 }
 
@@ -314,42 +275,36 @@ class PlansCompanion extends UpdateCompanion<PlanRow> {
   final Value<int> id;
   final Value<String> startDay;
   final Value<int> startLimit;
-  final Value<int> stepDays;
-  final Value<int> targetLimit;
+  final Value<String> quitDay;
   final Value<DateTime> createdAt;
   const PlansCompanion({
     this.id = const Value.absent(),
     this.startDay = const Value.absent(),
     this.startLimit = const Value.absent(),
-    this.stepDays = const Value.absent(),
-    this.targetLimit = const Value.absent(),
+    this.quitDay = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   PlansCompanion.insert({
     this.id = const Value.absent(),
     required String startDay,
     required int startLimit,
-    required int stepDays,
-    required int targetLimit,
+    required String quitDay,
     this.createdAt = const Value.absent(),
   }) : startDay = Value(startDay),
        startLimit = Value(startLimit),
-       stepDays = Value(stepDays),
-       targetLimit = Value(targetLimit);
+       quitDay = Value(quitDay);
   static Insertable<PlanRow> custom({
     Expression<int>? id,
     Expression<String>? startDay,
     Expression<int>? startLimit,
-    Expression<int>? stepDays,
-    Expression<int>? targetLimit,
+    Expression<String>? quitDay,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (startDay != null) 'start_day': startDay,
       if (startLimit != null) 'start_limit': startLimit,
-      if (stepDays != null) 'step_days': stepDays,
-      if (targetLimit != null) 'target_limit': targetLimit,
+      if (quitDay != null) 'quit_day': quitDay,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -358,16 +313,14 @@ class PlansCompanion extends UpdateCompanion<PlanRow> {
     Value<int>? id,
     Value<String>? startDay,
     Value<int>? startLimit,
-    Value<int>? stepDays,
-    Value<int>? targetLimit,
+    Value<String>? quitDay,
     Value<DateTime>? createdAt,
   }) {
     return PlansCompanion(
       id: id ?? this.id,
       startDay: startDay ?? this.startDay,
       startLimit: startLimit ?? this.startLimit,
-      stepDays: stepDays ?? this.stepDays,
-      targetLimit: targetLimit ?? this.targetLimit,
+      quitDay: quitDay ?? this.quitDay,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -384,11 +337,8 @@ class PlansCompanion extends UpdateCompanion<PlanRow> {
     if (startLimit.present) {
       map['start_limit'] = Variable<int>(startLimit.value);
     }
-    if (stepDays.present) {
-      map['step_days'] = Variable<int>(stepDays.value);
-    }
-    if (targetLimit.present) {
-      map['target_limit'] = Variable<int>(targetLimit.value);
+    if (quitDay.present) {
+      map['quit_day'] = Variable<String>(quitDay.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -402,8 +352,7 @@ class PlansCompanion extends UpdateCompanion<PlanRow> {
           ..write('id: $id, ')
           ..write('startDay: $startDay, ')
           ..write('startLimit: $startLimit, ')
-          ..write('stepDays: $stepDays, ')
-          ..write('targetLimit: $targetLimit, ')
+          ..write('quitDay: $quitDay, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -1410,16 +1359,14 @@ typedef $$PlansTableCreateCompanionBuilder = PlansCompanion Function({
   Value<int> id,
   required String startDay,
   required int startLimit,
-  required int stepDays,
-  required int targetLimit,
+  required String quitDay,
   Value<DateTime> createdAt,
 });
 typedef $$PlansTableUpdateCompanionBuilder = PlansCompanion Function({
   Value<int> id,
   Value<String> startDay,
   Value<int> startLimit,
-  Value<int> stepDays,
-  Value<int> targetLimit,
+  Value<String> quitDay,
   Value<DateTime> createdAt,
 });
 
@@ -1446,13 +1393,8 @@ class $$PlansTableFilterComposer extends Composer<_$AppDatabase, $PlansTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get stepDays => $composableBuilder(
-    column: $table.stepDays,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get targetLimit => $composableBuilder(
-    column: $table.targetLimit,
+  ColumnFilters<String> get quitDay => $composableBuilder(
+    column: $table.quitDay,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1486,13 +1428,8 @@ class $$PlansTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get stepDays => $composableBuilder(
-    column: $table.stepDays,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get targetLimit => $composableBuilder(
-    column: $table.targetLimit,
+  ColumnOrderings<String> get quitDay => $composableBuilder(
+    column: $table.quitDay,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1522,13 +1459,8 @@ class $$PlansTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get stepDays =>
-      $composableBuilder(column: $table.stepDays, builder: (column) => column);
-
-  GeneratedColumn<int> get targetLimit => $composableBuilder(
-    column: $table.targetLimit,
-    builder: (column) => column,
-  );
+  GeneratedColumn<String> get quitDay =>
+      $composableBuilder(column: $table.quitDay, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -1565,15 +1497,13 @@ class $$PlansTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> startDay = const Value.absent(),
                 Value<int> startLimit = const Value.absent(),
-                Value<int> stepDays = const Value.absent(),
-                Value<int> targetLimit = const Value.absent(),
+                Value<String> quitDay = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => PlansCompanion(
                 id: id,
                 startDay: startDay,
                 startLimit: startLimit,
-                stepDays: stepDays,
-                targetLimit: targetLimit,
+                quitDay: quitDay,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -1581,15 +1511,13 @@ class $$PlansTableTableManager
                 Value<int> id = const Value.absent(),
                 required String startDay,
                 required int startLimit,
-                required int stepDays,
-                required int targetLimit,
+                required String quitDay,
                 Value<DateTime> createdAt = const Value.absent(),
               }) => PlansCompanion.insert(
                 id: id,
                 startDay: startDay,
                 startLimit: startLimit,
-                stepDays: stepDays,
-                targetLimit: targetLimit,
+                quitDay: quitDay,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0

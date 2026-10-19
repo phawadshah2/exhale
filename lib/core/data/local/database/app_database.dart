@@ -13,13 +13,29 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? _createConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (migrator, from, to) async {
       if (from < 2) {
         await migrator.addColumn(settings, settings.glassEffects);
+      }
+      if (from < 3) {
+        // v3 replaces "-1 every step_days down to target_limit" with a quit
+        // date: the day the old schedule reached its target.
+        await migrator.alterTable(
+          TableMigration(
+            plans,
+            columnTransformer: {
+              plans.quitDay: const CustomExpression<String>(
+                "date(start_day, '+' || "
+                "((start_limit - target_limit) * step_days) || ' days')",
+              ),
+            },
+            newColumns: [plans.quitDay],
+          ),
+        );
       }
     },
     beforeOpen: (details) async {

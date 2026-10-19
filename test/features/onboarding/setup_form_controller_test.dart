@@ -16,8 +16,11 @@ import '../../helpers/pump_app.dart';
 void main() {
   late ProviderContainer container;
 
+  // 02:00 on the 20th is still the 19th with a 4 AM reset.
+  final today = LogicalDay(2026, 10, 19);
+
   setUp(() async {
-    await setUpTestDependencies(FixedClock(DateTime(2026, 10, 16, 2)));
+    await setUpTestDependencies(FixedClock(DateTime(2026, 10, 20, 2)));
     container = ProviderContainer.test()..listen(setupFormProvider, (_, _) {});
   });
 
@@ -27,42 +30,63 @@ void main() {
       container.read(setupFormProvider.notifier);
   SetupFormState state() => container.read(setupFormProvider);
 
-  test('starts on the logical day, with design defaults', () {
-    // 02:00 on the 16th is still the 15th with a 4 AM reset.
-    expect(state().startDay, LogicalDay(2026, 10, 15));
+  test('starts today with the suggested quit date', () {
+    expect(state().startDay, today);
     expect(state().startLimit, 9);
-    expect(state().stepDays, 7);
-    expect(state().targetLimit, 0);
-    expect(state().preview!.targetDay, LogicalDay(2026, 12, 17));
+    expect(state().quitPreset, QuitPreset.suggested);
+    expect(state().quitDay, today.addDays(63));
+    expect(state().preview!.daysPerDrop, 7);
   });
 
-  test('clamps steppers to valid ranges', () {
-    controller()
-      ..setStartLimit(0)
-      ..setStepDays(99);
+  test('presets set the quit date from the start day', () {
+    controller().selectQuitPreset(QuitPreset.weeks4);
+    expect(state().quitDay, today.addDays(28));
 
-    expect(state().startLimit, 1);
-    expect(state().stepDays, 30);
+    controller().selectQuitPreset(QuitPreset.months3);
+    expect(state().quitDay, today.addDays(91));
   });
 
-  test('custom target stays below the start limit', () {
+  test('a preset follows changes to the start day and daily amount', () {
     controller()
-      ..setQuitCompletely(quitCompletely: false)
-      ..setCustomTarget(20);
-    expect(state().targetLimit, 8);
+      ..setStartDay(today.addDays(2))
+      ..setStartLimit(12);
+    expect(state().quitDay, today.addDays(2 + 84));
 
-    controller().setStartLimit(5);
-    expect(state().targetLimit, 4);
+    controller()
+      ..selectQuitPreset(QuitPreset.weeks8)
+      ..setStartDay(today.addDays(5));
+    expect(state().quitDay, today.addDays(5 + 56));
   });
 
-  test('a start limit of 1 forces quitting completely', () {
-    controller()
-      ..setQuitCompletely(quitCompletely: false)
-      ..setStartLimit(1);
+  test('a picked date is kept, but clamped into 3–365 days', () {
+    controller().setQuitDay(LogicalDay(2026, 12, 1));
+    expect(state().quitPreset, isNull);
+    expect(state().quitDay, LogicalDay(2026, 12, 1));
 
-    expect(state().quitCompletely, isTrue);
-    controller().setQuitCompletely(quitCompletely: false);
-    expect(state().quitCompletely, isTrue);
+    controller().setStartLimit(4);
+    expect(state().quitDay, LogicalDay(2026, 12, 1));
+
+    controller().setQuitDay(today.addDays(1));
+    expect(state().quitDay, today.addDays(3));
+
+    controller().setQuitDay(today.addDays(500));
+    expect(state().quitDay, today.addDays(365));
+  });
+
+  test('moving the start past a picked quit date pushes it out', () {
+    controller()
+      ..setQuitDay(today.addDays(10))
+      ..setStartDay(today.addDays(20));
+
+    expect(state().quitDay, today.addDays(23));
+  });
+
+  test('flags a steep plan', () {
+    controller().setQuitDay(today.addDays(5));
+    expect(state().isSteep, isTrue);
+
+    controller().selectQuitPreset(QuitPreset.weeks4);
+    expect(state().isSteep, isFalse);
   });
 
   test('an invalid pack price blocks submit', () async {
@@ -76,6 +100,7 @@ void main() {
     controller()
       ..setName('  Fawad ')
       ..setStartLimit(12)
+      ..selectQuitPreset(QuitPreset.weeks8)
       ..setPackPriceText('14.50')
       ..setCigarettesPerPack(25);
 
@@ -91,7 +116,11 @@ void main() {
     expect(settings.cigarettesPerPack, 25);
     expect(
       history.current,
-      ReductionPlan(startDay: LogicalDay(2026, 10, 15), startLimit: 12),
+      ReductionPlan(
+        startDay: today,
+        startLimit: 12,
+        quitDay: today.addDays(56),
+      ),
     );
   });
 }

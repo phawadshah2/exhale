@@ -16,7 +16,6 @@ class StagePill extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final stage = plan.stageOn(today);
-    final unit = plan.stepDays == 7 ? 'Week' : 'Stage';
 
     final (label, chip) = !plan.hasStartedOn(today)
         ? (
@@ -25,9 +24,9 @@ class StagePill extends StatelessWidget {
             'SOON',
           )
         : stage == null
-        ? ('Target reached · Daily limit: ${plan.targetLimit}', 'DONE')
+        ? ('Smoke-free since ${AppFormat.monthDay(plan.quitDay)}', 'QUIT')
         : (
-            '$unit ${stage.number} of ${plan.stageCount} · '
+            'Stage ${stage.number} of ${plan.stageCount} · '
                 'Daily limit: ${stage.limit}',
             'STAGE ${stage.number}',
           );

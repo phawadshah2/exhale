@@ -6,8 +6,7 @@ extension PlanRowMapper on PlanRow {
   ReductionPlan toEntity() => ReductionPlan(
     startDay: LogicalDay.parse(startDay),
     startLimit: startLimit,
-    stepDays: stepDays,
-    targetLimit: targetLimit,
+    quitDay: LogicalDay.parse(quitDay),
   );
 }
 
@@ -15,7 +14,6 @@ extension ReductionPlanMapper on ReductionPlan {
   PlansCompanion toCompanion() => PlansCompanion.insert(
     startDay: startDay.toString(),
     startLimit: startLimit,
-    stepDays: stepDays,
-    targetLimit: targetLimit,
+    quitDay: quitDay.toString(),
   );
 }

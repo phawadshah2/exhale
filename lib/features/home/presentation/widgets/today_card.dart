@@ -103,12 +103,12 @@ class TodayCard extends StatelessWidget {
 
   String _nextTarget() {
     final days = plan.daysUntilNextDrop(today);
-    if (days == null) return 'Target reached';
+    if (days == null) return 'Smoke-free';
     final next = plan.limitOn(plan.nextDropOn(today)!);
-    return switch (days) {
-      1 => 'Drops to $next tomorrow',
-      _ => 'Drops to $next in ${days}d',
-    };
+    if (next == 0) {
+      return days == 1 ? 'Quit day tomorrow' : 'Quit day in ${days}d';
+    }
+    return days == 1 ? 'Drops to $next tomorrow' : 'Drops to $next in ${days}d';
   }
 }
 

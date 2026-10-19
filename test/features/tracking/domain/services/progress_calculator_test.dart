@@ -12,7 +12,13 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   // Plan starts Wed 14 Oct 2026 at 9/day.
   final start = LogicalDay(2026, 10, 14);
-  final history = PlanHistory([ReductionPlan(startDay: start, startLimit: 9)]);
+  final history = PlanHistory([
+    ReductionPlan(
+      startDay: start,
+      startLimit: 9,
+      quitDay: start.addDays(9 * 7),
+    ),
+  ]);
   const boundary = DayBoundary();
   var nextId = 1;
 

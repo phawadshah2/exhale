@@ -38,15 +38,14 @@ class ProjectionCard extends StatelessWidget {
           );
     final body = plan == null
         ? const TextSpan(
-            text: 'Your target must be lower than your daily amount.',
+            text: 'Pick a quit date at least 3 days after you start.',
           )
         : TextSpan(
             children: [
-              const TextSpan(text: "You'll reach "),
-              TextSpan(text: '${plan.targetLimit}', style: highlight),
-              const TextSpan(text: ' by '),
+              TextSpan(text: '${paceSentence(plan)} '),
+              const TextSpan(text: "You'll be smoke-free from "),
               TextSpan(
-                text: AppFormat.fullDate(plan.targetDay),
+                text: AppFormat.fullDate(plan.quitDay),
                 style: highlight.copyWith(color: colors.onSurface),
               ),
               const TextSpan(text: ". That's "),
@@ -103,4 +102,17 @@ class ProjectionCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "Your limit drops by 1 about every 7 days." / "...by about 2 a day."
+String paceSentence(ReductionPlan plan) {
+  final days = plan.daysPerDrop;
+  if (days < 1) {
+    final perDay = (plan.startLimit / plan.totalDays).round();
+    return 'Your limit drops by about $perDay a day.';
+  }
+  final rounded = days.round();
+  return rounded == 1
+      ? 'Your limit drops by 1 every day.'
+      : 'Your limit drops by 1 about every $rounded days.';
 }
