@@ -29,6 +29,7 @@ abstract final class AppIcons {
   static const IconData check = CupertinoIcons.checkmark;
   static const IconData checkCircle = CupertinoIcons.checkmark_circle_fill;
   static const IconData forward = CupertinoIcons.arrow_right;
+  static const IconData back = CupertinoIcons.chevron_left;
   static const IconData chevronRight = CupertinoIcons.chevron_right;
   static const IconData chevronDown = CupertinoIcons.chevron_down;
   static const IconData chevronUp = CupertinoIcons.chevron_up;
@@ -41,6 +42,14 @@ abstract final class AppIcons {
   static const IconData palette = CupertinoIcons.paintbrush;
   static const IconData appearance = CupertinoIcons.circle_lefthalf_fill;
   static const IconData glass = CupertinoIcons.drop;
+
+  // Habits
+  static const IconData smoking = Icons.smoking_rooms_rounded;
+  static const IconData vaping = CupertinoIcons.cloud;
+  static const IconData alcohol = Icons.wine_bar_rounded;
+  static const IconData caffeine = Icons.coffee_rounded;
+  static const IconData sugar = Icons.cake_rounded;
+  static const IconData customHabit = CupertinoIcons.square_pencil;
 
   // Triggers
   static const IconData coffee = Icons.coffee_rounded;

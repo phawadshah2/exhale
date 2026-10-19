@@ -2,6 +2,7 @@ import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
@@ -42,6 +43,10 @@ class SetupFormState {
     required this.startDay,
     required this.quitDay,
     this.quitPreset = QuitPreset.suggested,
+    this.habitKind = HabitKind.smoking,
+    this.customName = '',
+    this.customUnit = '',
+    this.reason = '',
     this.name = '',
     this.startLimit = defaultStartLimit,
     this.packPriceText = '',
@@ -62,12 +67,32 @@ class SetupFormState {
 
   /// Null once the user picks a date on the wheel.
   final QuitPreset? quitPreset;
+  final HabitKind habitKind;
+  final String customName;
+  final String customUnit;
+  final String reason;
   final String name;
   final int startLimit;
   final String packPriceText;
   final int cigarettesPerPack;
   final bool isSubmitting;
   final String? errorMessage;
+
+  Habit get habit => habitKind == HabitKind.custom
+      ? Habit.custom(name: customName, unit: customUnit)
+      : Habit.presets.firstWhere((h) => h.kind == habitKind);
+
+  /// A custom habit needs a name and a unit before moving on.
+  bool get canContinue =>
+      habitKind != HabitKind.custom ||
+      (customName.trim().isNotEmpty && customUnit.trim().isNotEmpty);
+
+  /// Price of one unit, from the pack price when the habit has packs.
+  double? get unitPriceCents {
+    final price = packPriceCents;
+    if (price == null) return null;
+    return habit.hasContainer ? price / cigarettesPerPack : price.toDouble();
+  }
 
   PlanDraft get draft =>
       PlanDraft(startDay: startDay, startLimit: startLimit, quitDay: quitDay);
@@ -95,6 +120,10 @@ class SetupFormState {
     LogicalDay? startDay,
     LogicalDay? quitDay,
     QuitPreset? Function()? quitPreset,
+    HabitKind? habitKind,
+    String? customName,
+    String? customUnit,
+    String? reason,
     String? name,
     int? startLimit,
     String? packPriceText,
@@ -105,6 +134,10 @@ class SetupFormState {
     startDay: startDay ?? this.startDay,
     quitDay: quitDay ?? this.quitDay,
     quitPreset: quitPreset != null ? quitPreset() : this.quitPreset,
+    habitKind: habitKind ?? this.habitKind,
+    customName: customName ?? this.customName,
+    customUnit: customUnit ?? this.customUnit,
+    reason: reason ?? this.reason,
     name: name ?? this.name,
     startLimit: startLimit ?? this.startLimit,
     packPriceText: packPriceText ?? this.packPriceText,
@@ -128,6 +161,25 @@ class SetupFormController extends Notifier<SetupFormState> {
   );
 
   void setName(String name) => state = state.copyWith(name: name);
+
+  /// Switches habit and resets the amounts to that habit's defaults.
+  void selectHabit(HabitKind kind) {
+    if (kind == state.habitKind) return;
+    final next = state.copyWith(habitKind: kind);
+    state = _withQuitFollowingPreset(
+      next.copyWith(
+        startLimit: next.habit.defaultDailyAmount,
+        cigarettesPerPack: next.habit.defaultUnitsPerContainer,
+        errorMessage: () => null,
+      ),
+    );
+  }
+
+  void setCustomName(String text) => state = state.copyWith(customName: text);
+
+  void setCustomUnit(String text) => state = state.copyWith(customUnit: text);
+
+  void setReason(String text) => state = state.copyWith(reason: text);
 
   void setStartLimit(int value) {
     final startLimit = value.clamp(

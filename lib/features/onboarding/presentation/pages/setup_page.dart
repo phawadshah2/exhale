@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
@@ -8,13 +6,13 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
-import 'package:exhale/core/widgets/glow_button.dart';
 import 'package:exhale/core/widgets/number_stepper.dart';
-import 'package:exhale/core/widgets/scroll_edge_blur.dart';
 import 'package:exhale/core/widgets/section_card.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/onboarding/presentation/providers/setup_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/projection_card.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/quit_date_card.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/setup_chrome.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/validation/settings_validation.dart';
@@ -50,219 +48,100 @@ class SetupPage extends ConsumerWidget {
       if (saved && context.mounted) context.go(AppRoutes.home);
     }
 
-    final price = form.packPriceCents;
-    final insets = MediaQuery.paddingOf(context);
-    final keyboard = MediaQuery.viewInsetsOf(context).bottom;
+    final habit = form.habit;
     final (earliestQuit, latestQuit) = controller.quitDayRange;
 
-    return Scaffold(
-      // The keyboard slides over the footer instead of pushing it up.
-      resizeToAvoidBottomInset: false,
-      body: ScrollEdgeBlur(
-        child: Stack(
-          children: [
-            GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: ListView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: AppSpacing.page.copyWith(
-                  top: insets.top + AppSpacing.md,
-                  bottom: math.max(
-                    keyboard + AppSpacing.lg,
-                    insets.bottom + _footerHeight + AppSpacing.lg,
+    return SetupScaffold(
+      footer: (bottomInset) => SetupFooter(
+        label: 'Start my plan',
+        bottomInset: bottomInset,
+        isBusy: form.isSubmitting,
+        onPressed: form.preview == null ? null : submit,
+      ),
+      children: [
+        SizedBox(
+          height: 40,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              if (context.canPop())
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    tooltip: 'Back',
+                    onPressed: context.pop,
+                    icon: Icon(AppIcons.back, color: colors.onSurface),
                   ),
                 ),
-                children: [
-                  const Center(child: _StepChip(label: 'Plan Setup')),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Craft your gradual quitting plan',
-                    style: text.headlineLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'Pick a quit date. Your daily limit comes down evenly '
-                    'until then.',
-                    style: text.bodyLarge?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  SectionCard(
-                    title: 'What should we call you?',
-                    subtitle: 'Optional',
-                    child: _NameField(onChanged: controller.setName),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  SectionCard(
-                    title: 'Your current daily amount',
-                    subtitle: 'Baseline consumption',
-                    trailing: const _Badge(label: 'Starting daily limit'),
-                    child: NumberStepper(
-                      value: form.startLimit,
-                      min: PlanValidation.minStartLimit,
-                      max: PlanValidation.maxStartLimit,
-                      onChanged: controller.setStartLimit,
-                      unit: 'cigs',
-                      caption: 'per day',
-                      semanticLabel: 'daily amount',
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _StartDateCard(
-                    day: form.startDay,
-                    today: today,
-                    onChanged: controller.setStartDay,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  QuitDateCard(
-                    form: form,
-                    earliest: earliestQuit,
-                    latest: latestQuit,
-                    onPickDate: controller.setQuitDay,
-                    onSelectPreset: controller.selectQuitPreset,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _PackEconomicsCard(
-                    currencySymbol: currency,
-                    cigarettesPerPack: form.cigarettesPerPack,
-                    showPriceError: form.hasInvalidPackPrice,
-                    onPriceChanged: controller.setPackPriceText,
-                    onCigarettesPerPackChanged: controller.setCigarettesPerPack,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  ProjectionCard(
-                    plan: form.preview,
-                    cigarettePriceCents: price == null
-                        ? null
-                        : price / form.cigarettesPerPack,
-                    currencySymbol: currency,
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: _FloatingFooter(
-                bottomInset: insets.bottom,
-                isBusy: form.isSubmitting,
-                onStart: form.preview == null ? null : submit,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-const double _footerHeight = 96;
-
-/// Start button floating over the form, with only a soft fade behind it.
-class _FloatingFooter extends StatelessWidget {
-  const _FloatingFooter({
-    required this.bottomInset,
-    required this.isBusy,
-    required this.onStart,
-  });
-
-  final double bottomInset;
-  final bool isBusy;
-  final VoidCallback? onStart;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            colors.surface.withValues(alpha: 0),
-            colors.surface.withValues(alpha: 0.85),
-            colors.surface,
-          ],
-          stops: const [0, 0.45, 1],
-        ),
-      ),
-      child: Padding(
-        padding: AppSpacing.page.copyWith(
-          top: AppSpacing.xl,
-          bottom: bottomInset + AppSpacing.sm,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            GlowButton(
-              label: 'Start my plan',
-              trailingIcon: AppIcons.forward,
-              isBusy: isBusy,
-              onPressed: onStart,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: 6,
-              children: [
-                Icon(AppIcons.tune, size: 16, color: colors.onSurfaceVariant),
-                Flexible(
-                  child: Text(
-                    'You can adjust your plan anytime in Settings.',
-                    textAlign: TextAlign.center,
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StepChip extends StatelessWidget {
-  const _StepChip({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      decoration: ShapeDecoration(
-        color: colors.surfaceContainerHigh,
-        shape: StadiumBorder(
-          side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.6)),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 8,
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: colors.primaryContainer,
-              shape: BoxShape.circle,
-            ),
+              const SetupStepChip(label: 'Step 2 of 2'),
+            ],
           ),
-          Text(label, style: context.textTheme.labelLarge),
-        ],
-      ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        Text('Craft your gradual quitting plan', style: text.headlineLarge),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          'Pick a quit date. Your daily limit comes down evenly until then.',
+          style: text.bodyLarge?.copyWith(color: colors.onSurfaceVariant),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        SectionCard(
+          title: 'What should we call you?',
+          subtitle: 'Optional',
+          child: _NameField(onChanged: controller.setName),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        SectionCard(
+          title: 'Your current daily amount',
+          subtitle: '${_capitalize(habit.units)} on a normal day',
+          trailing: const _Badge(label: 'Starting daily limit'),
+          child: NumberStepper(
+            value: form.startLimit,
+            min: PlanValidation.minStartLimit,
+            max: PlanValidation.maxStartLimit,
+            onChanged: controller.setStartLimit,
+            unit: habit.shortUnits,
+            caption: 'per day',
+            semanticLabel: 'daily amount',
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _StartDateCard(
+          day: form.startDay,
+          today: today,
+          onChanged: controller.setStartDay,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        QuitDateCard(
+          form: form,
+          earliest: earliestQuit,
+          latest: latestQuit,
+          onPickDate: controller.setQuitDay,
+          onSelectPreset: controller.selectQuitPreset,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _CostCard(
+          habit: habit,
+          currencySymbol: currency,
+          unitsPerContainer: form.cigarettesPerPack,
+          showPriceError: form.hasInvalidPackPrice,
+          onPriceChanged: controller.setPackPriceText,
+          onUnitsPerContainerChanged: controller.setCigarettesPerPack,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        ProjectionCard(
+          plan: form.preview,
+          habit: habit,
+          unitPriceCents: form.unitPriceCents,
+          currencySymbol: currency,
+        ),
+      ],
     );
   }
 }
+
+String _capitalize(String value) =>
+    value.isEmpty ? value : value[0].toUpperCase() + value.substring(1);
 
 class _Badge extends StatelessWidget {
   const _Badge({required this.label});
@@ -388,32 +267,36 @@ class _StartDateCard extends StatelessWidget {
   }
 }
 
-class _PackEconomicsCard extends StatefulWidget {
-  const _PackEconomicsCard({
+class _CostCard extends StatefulWidget {
+  const _CostCard({
+    required this.habit,
     required this.currencySymbol,
-    required this.cigarettesPerPack,
+    required this.unitsPerContainer,
     required this.showPriceError,
     required this.onPriceChanged,
-    required this.onCigarettesPerPackChanged,
+    required this.onUnitsPerContainerChanged,
   });
 
+  final Habit habit;
   final String currencySymbol;
-  final int cigarettesPerPack;
+  final int unitsPerContainer;
   final bool showPriceError;
   final ValueChanged<String> onPriceChanged;
-  final ValueChanged<int> onCigarettesPerPackChanged;
+  final ValueChanged<int> onUnitsPerContainerChanged;
 
   @override
-  State<_PackEconomicsCard> createState() => _PackEconomicsCardState();
+  State<_CostCard> createState() => _CostCardState();
 }
 
-class _PackEconomicsCardState extends State<_PackEconomicsCard> {
+class _CostCardState extends State<_CostCard> {
   bool _expanded = true;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.textTheme;
+    final habit = widget.habit;
+    final container = habit.container;
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -428,7 +311,18 @@ class _PackEconomicsCardState extends State<_PackEconomicsCard> {
                 children: [
                   Icon(AppIcons.savings, color: colors.primary),
                   Expanded(
-                    child: Text('Pack economics', style: text.titleLarge),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('What it costs', style: text.titleLarge),
+                        Text(
+                          'Optional. Used to show money saved.',
+                          style: text.bodyMedium?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   Icon(
                     _expanded ? AppIcons.chevronUp : AppIcons.chevronDown,
@@ -453,23 +347,24 @@ class _PackEconomicsCardState extends State<_PackEconomicsCard> {
                       FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),
                     ],
                     decoration: InputDecoration(
-                      labelText: 'Price per pack',
+                      labelText: 'Price per ${container ?? habit.unit}',
                       prefixText: '${widget.currencySymbol} ',
-                      hintText: '14.50',
+                      hintText: container == null ? '3.50' : '14.50',
                       errorText: widget.showPriceError
                           ? 'Enter a valid price'
                           : null,
                     ),
                   ),
-                  NumberStepper(
-                    value: widget.cigarettesPerPack,
-                    min: 1,
-                    max: SettingsValidation.maxCigarettesPerPack,
-                    onChanged: widget.onCigarettesPerPackChanged,
-                    unit: 'pcs',
-                    caption: 'cigarettes per pack',
-                    semanticLabel: 'cigarettes per pack',
-                  ),
+                  if (container != null)
+                    NumberStepper(
+                      value: widget.unitsPerContainer,
+                      min: 1,
+                      max: SettingsValidation.maxCigarettesPerPack,
+                      onChanged: widget.onUnitsPerContainerChanged,
+                      unit: habit.shortUnits,
+                      caption: 'per $container',
+                      semanticLabel: '${habit.units} per $container',
+                    ),
                 ],
               ),
             ),

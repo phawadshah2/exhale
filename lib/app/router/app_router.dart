@@ -2,6 +2,7 @@ import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/app/shell/app_shell.dart';
 import 'package:exhale/features/design_system/presentation/design_system_page.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
+import 'package:exhale/features/onboarding/presentation/pages/habit_picker_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/setup_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
 import 'package:exhale/features/settings/presentation/pages/settings_page.dart';
@@ -18,7 +19,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.setup,
-        builder: (context, state) => const SetupPage(),
+        builder: (context, state) => const HabitPickerPage(),
+        routes: [
+          GoRoute(path: 'plan', builder: (context, state) => const SetupPage()),
+        ],
       ),
       GoRoute(
         path: AppRoutes.designSystem,

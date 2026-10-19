@@ -39,6 +39,10 @@ void main() {
 
   testWidgets('first launch goes from splash to setup to home', (tester) async {
     await tester.pumpAppPastSplash();
+    expect(find.text('What are you cutting down?'), findsOneWidget);
+
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
     expect(find.text('Craft your gradual quitting plan'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField).first, 'Fawad');
