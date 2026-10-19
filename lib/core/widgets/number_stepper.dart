@@ -51,25 +51,28 @@ class NumberStepper extends StatelessWidget {
               child: ExcludeSemantics(
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      spacing: 6,
-                      children: [
-                        Text(
-                          '$value',
-                          style: text.displayMedium?.copyWith(
-                            color: valueColor,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        spacing: 6,
+                        children: [
+                          Text(
+                            '$value',
+                            style: text.displayMedium?.copyWith(
+                              color: valueColor,
+                            ),
                           ),
-                        ),
-                        Text(
-                          unit,
-                          style: text.titleMedium?.copyWith(
-                            color: colors.onSurfaceVariant,
+                          Text(
+                            unit,
+                            style: text.titleMedium?.copyWith(
+                              color: colors.onSurfaceVariant,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     if (caption != null)
                       Text(

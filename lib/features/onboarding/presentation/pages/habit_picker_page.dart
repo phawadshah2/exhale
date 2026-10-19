@@ -19,6 +19,7 @@ class HabitPickerPage extends ConsumerWidget {
   const HabitPickerPage({super.key});
 
   static const int maxReasonLength = 80;
+  static const int _columns = 3;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,7 +34,7 @@ class HabitPickerPage extends ConsumerWidget {
       const _HabitChoice(
         kind: HabitKind.custom,
         name: 'Custom',
-        hint: 'name your own',
+        hint: 'your own',
       ),
     ];
 
@@ -59,24 +60,27 @@ class HabitPickerPage extends ConsumerWidget {
           style: text.bodyLarge?.copyWith(color: colors.onSurfaceVariant),
         ),
         const SizedBox(height: AppSpacing.lg),
-        for (var i = 0; i < choices.length; i += 2) ...[
+        for (var i = 0; i < choices.length; i += _columns) ...[
           IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: AppSpacing.gutterSm,
+              spacing: AppSpacing.sm,
               children: [
-                for (final choice in choices.skip(i).take(2))
+                for (var j = i; j < i + _columns; j++)
                   Expanded(
-                    child: _HabitTile(
-                      choice: choice,
-                      selected: form.habitKind == choice.kind,
-                      onTap: () => controller.selectHabit(choice.kind),
-                    ),
+                    child: j < choices.length
+                        ? _HabitTile(
+                            choice: choices[j],
+                            selected: form.habitKind == choices[j].kind,
+                            onTap: () =>
+                                controller.selectHabit(choices[j].kind),
+                          )
+                        : const SizedBox.shrink(),
                   ),
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.gutterSm),
+          const SizedBox(height: AppSpacing.sm),
         ],
         AnimatedSize(
           duration: const Duration(milliseconds: 250),
@@ -151,7 +155,7 @@ class _HabitTile extends StatelessWidget {
           color: selected
               ? colors.primaryContainer.withValues(alpha: 0.08)
               : colors.surfaceContainerLow,
-          borderRadius: AppRadius.card,
+          borderRadius: AppRadius.inner,
           border: Border.all(
             color: selected
                 ? colors.primaryContainer.withValues(alpha: 0.7)
@@ -162,59 +166,75 @@ class _HabitTile extends StatelessWidget {
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
-            borderRadius: AppRadius.card,
+            borderRadius: AppRadius.inner,
             onTap: () {
               unawaited(HapticFeedback.selectionClick());
               onTap();
             },
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(6, 12, 6, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: selected
-                              ? colors.primaryContainer.withValues(alpha: 0.16)
-                              : colors.surfaceContainerHigh,
-                        ),
-                        child: Icon(
-                          choice.kind.icon,
-                          size: 22,
-                          color: selected
-                              ? colors.primary
-                              : colors.onSurfaceVariant,
+                      Center(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: selected
+                                ? colors.primaryContainer.withValues(
+                                    alpha: 0.16,
+                                  )
+                                : colors.surfaceContainerHigh,
+                          ),
+                          child: Icon(
+                            choice.kind.icon,
+                            size: 20,
+                            color: selected
+                                ? colors.primary
+                                : colors.onSurfaceVariant,
+                          ),
                         ),
                       ),
-                      const Spacer(),
-                      AnimatedOpacity(
-                        opacity: selected ? 1 : 0,
-                        duration: const Duration(milliseconds: 150),
-                        child: Icon(
-                          AppIcons.checkCircle,
-                          size: 20,
-                          color: colors.primary,
+                      const SizedBox(height: AppSpacing.sm),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          choice.name,
+                          maxLines: 1,
+                          style: text.labelLarge,
+                        ),
+                      ),
+                      Text(
+                        choice.hint,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: text.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.gutterSm),
-                  Text(choice.name, style: text.titleMedium),
-                  Text(
-                    choice.hint,
-                    style: text.bodySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: AnimatedOpacity(
+                    opacity: selected ? 1 : 0,
+                    duration: const Duration(milliseconds: 150),
+                    child: Icon(
+                      AppIcons.checkCircle,
+                      size: 16,
+                      color: colors.primary,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

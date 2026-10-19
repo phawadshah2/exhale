@@ -48,6 +48,8 @@ extension PumpApp on WidgetTester {
   /// Launches a first-run app and moves past the habit step to the plan.
   Future<void> pumpToPlanStep({double height = 844}) async {
     await pumpAppPastSplash(height: height);
+    await tap(find.text('Smoking'));
+    await pump();
     await tap(find.text('Continue'));
     await pumpAndSettle();
   }

@@ -1,7 +1,19 @@
 import 'package:meta/meta.dart';
 
 /// Built-in habits. [custom] takes its name and unit from the user.
-enum HabitKind { smoking, vaping, alcohol, caffeine, sugar, custom }
+enum HabitKind {
+  smoking,
+  vaping,
+  nicotinePouches,
+  alcohol,
+  caffeine,
+  energyDrinks,
+  soda,
+  sugar,
+  junkFood,
+  socialMedia,
+  custom,
+}
 
 /// What the user is cutting down, and the words the app uses for it.
 @immutable
@@ -16,6 +28,7 @@ class Habit {
     this.container,
     this.defaultUnitsPerContainer = 1,
     this.freeLabel,
+    this.tracksCost = true,
   });
 
   /// A user-defined habit; plural is a plain "s" unless given.
@@ -56,6 +69,18 @@ class Habit {
     freeLabel: 'vape-free',
   );
 
+  static const nicotinePouches = Habit(
+    kind: HabitKind.nicotinePouches,
+    name: 'Nicotine pouches',
+    unit: 'pouch',
+    units: 'pouches',
+    shortUnits: 'pouches',
+    defaultDailyAmount: 10,
+    container: 'can',
+    defaultUnitsPerContainer: 20,
+    freeLabel: 'nicotine-free',
+  );
+
   static const alcohol = Habit(
     kind: HabitKind.alcohol,
     name: 'Alcohol',
@@ -78,6 +103,29 @@ class Habit {
     freeLabel: 'caffeine-free',
   );
 
+  static const energyDrinks = Habit(
+    kind: HabitKind.energyDrinks,
+    name: 'Energy drinks',
+    unit: 'can',
+    units: 'cans',
+    shortUnits: 'cans',
+    defaultDailyAmount: 2,
+    container: 'pack',
+    defaultUnitsPerContainer: 4,
+  );
+
+  static const soda = Habit(
+    kind: HabitKind.soda,
+    name: 'Soda',
+    unit: 'can',
+    units: 'cans',
+    shortUnits: 'cans',
+    defaultDailyAmount: 3,
+    container: 'pack',
+    defaultUnitsPerContainer: 6,
+    freeLabel: 'soda-free',
+  );
+
   static const sugar = Habit(
     kind: HabitKind.sugar,
     name: 'Sugar',
@@ -88,13 +136,37 @@ class Habit {
     freeLabel: 'sugar-free',
   );
 
+  static const junkFood = Habit(
+    kind: HabitKind.junkFood,
+    name: 'Junk food',
+    unit: 'snack',
+    units: 'snacks',
+    shortUnits: 'snacks',
+    defaultDailyAmount: 3,
+  );
+
+  static const socialMedia = Habit(
+    kind: HabitKind.socialMedia,
+    name: 'Social media',
+    unit: 'session',
+    units: 'sessions',
+    shortUnits: 'sessions',
+    defaultDailyAmount: 20,
+    tracksCost: false,
+  );
+
   /// Presets in picker order (custom is offered separately).
   static const List<Habit> presets = [
     smoking,
     vaping,
+    nicotinePouches,
     alcohol,
     caffeine,
+    energyDrinks,
+    soda,
     sugar,
+    junkFood,
+    socialMedia,
   ];
 
   final HabitKind kind;
@@ -114,6 +186,9 @@ class Habit {
 
   /// "smoke-free"; null when no natural word exists.
   final String? freeLabel;
+
+  /// False when money isn't part of the habit (social media).
+  final bool tracksCost;
 
   bool get hasContainer => container != null;
 
