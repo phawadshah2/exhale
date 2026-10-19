@@ -12,7 +12,7 @@ void main() {
   testWidgets('suggests a quit date and updates it from presets', (
     tester,
   ) async {
-    await tester.pumpAppPastSplash(height: 2400);
+    await tester.pumpToPlanStep(height: 2400);
 
     expect(find.text('18 Dec 2026'), findsWidgets);
     expect(find.text('in 9 weeks'), findsOneWidget);
@@ -34,7 +34,7 @@ void main() {
   });
 
   testWidgets('warns when the pace is more than one a day', (tester) async {
-    await tester.pumpAppPastSplash(height: 2400);
+    await tester.pumpToPlanStep(height: 2400);
 
     for (var i = 0; i < 25; i++) {
       await tester.tap(find.byTooltip('Increase daily amount'));
@@ -51,7 +51,7 @@ void main() {
   testWidgets('the start button stays put when the keyboard opens', (
     tester,
   ) async {
-    await tester.pumpAppPastSplash();
+    await tester.pumpToPlanStep();
     final before = tester.getRect(find.text('Start my plan'));
 
     tester.view.viewInsets = const FakeViewPadding(bottom: 300 * 3);

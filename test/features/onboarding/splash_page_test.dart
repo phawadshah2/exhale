@@ -1,6 +1,6 @@
 import 'package:exhale/app/app.dart';
 import 'package:exhale/core/di/injection_container.dart';
-import 'package:exhale/features/onboarding/presentation/pages/setup_page.dart';
+import 'package:exhale/features/onboarding/presentation/pages/habit_picker_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,7 +57,7 @@ void main() {
 
     await tester.pump(const Duration(milliseconds: 50));
     await leaveSplash(tester);
-    expect(find.byType(SetupPage), findsOneWidget);
+    expect(find.byType(HabitPickerPage), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -75,7 +75,7 @@ void main() {
 
     await tester.pump(intro + hold);
     await leaveSplash(tester);
-    expect(find.byType(SetupPage), findsOneWidget);
+    expect(find.byType(HabitPickerPage), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -91,7 +91,7 @@ void main() {
 
     await tester.pump(hold);
     await leaveSplash(tester);
-    expect(find.byType(SetupPage), findsOneWidget);
+    expect(find.byType(HabitPickerPage), findsOneWidget);
 
     await tester.disposeApp();
   });

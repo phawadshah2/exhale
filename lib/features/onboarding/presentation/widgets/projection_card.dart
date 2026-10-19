@@ -2,20 +2,23 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:flutter/material.dart';
 
 class ProjectionCard extends StatelessWidget {
   const ProjectionCard({
     required this.plan,
-    required this.cigarettePriceCents,
+    required this.habit,
+    required this.unitPriceCents,
     required this.currencySymbol,
     super.key,
   });
 
   /// Null while the form is invalid.
   final ReductionPlan? plan;
-  final double? cigarettePriceCents;
+  final Habit habit;
+  final double? unitPriceCents;
   final String currencySymbol;
 
   @override
@@ -28,7 +31,8 @@ class ProjectionCard extends StatelessWidget {
     );
 
     final plan = this.plan;
-    final price = cigarettePriceCents;
+    final price = unitPriceCents;
+    final free = habit.freeLabel;
     final saved = plan == null || price == null
         ? null
         : AppFormat.money(
@@ -43,14 +47,20 @@ class ProjectionCard extends StatelessWidget {
         : TextSpan(
             children: [
               TextSpan(text: '${paceSentence(plan)} '),
-              const TextSpan(text: "You'll be smoke-free from "),
+              TextSpan(
+                text: free == null
+                    ? 'You reach zero on '
+                    : "You'll be $free from ",
+              ),
               TextSpan(
                 text: AppFormat.fullDate(plan.quitDay),
                 style: highlight.copyWith(color: colors.onSurface),
               ),
               const TextSpan(text: ". That's "),
               TextSpan(text: '${plan.plannedReduction}', style: highlight),
-              const TextSpan(text: ' cigarettes avoided'),
+              TextSpan(
+                text: ' ${habit.unitsFor(plan.plannedReduction)} avoided',
+              ),
               if (saved != null) ...[
                 const TextSpan(text: ' and '),
                 TextSpan(text: '~$saved', style: highlight),
