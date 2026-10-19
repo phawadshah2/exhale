@@ -14,7 +14,16 @@ void main() {
   late LocalPlanRepository repository;
 
   final oct15 = LogicalDay(2026, 10, 15);
-  final first = ReductionPlan(startDay: oct15, startLimit: 9);
+  final first = ReductionPlan(
+    startDay: oct15,
+    startLimit: 9,
+    quitDay: oct15.addDays(63),
+  );
+  ReductionPlan planFrom(LogicalDay start, int limit) => ReductionPlan(
+    startDay: start,
+    startLimit: limit,
+    quitDay: start.addDays(40),
+  );
 
   setUp(() {
     database = createTestDatabase();
@@ -35,8 +44,7 @@ void main() {
     final plan = ReductionPlan(
       startDay: oct15,
       startLimit: 12,
-      stepDays: 5,
-      targetLimit: 2,
+      quitDay: LogicalDay(2027, 1, 31),
     );
 
     expect(await repository.savePlan(plan), isA<Success<void>>());
@@ -44,7 +52,7 @@ void main() {
   });
 
   test('a later plan is added on top of history', () async {
-    final restart = ReductionPlan(startDay: oct15.addDays(14), startLimit: 5);
+    final restart = planFrom(oct15.addDays(14), 5);
 
     await repository.savePlan(first);
     await repository.savePlan(restart);
@@ -53,15 +61,15 @@ void main() {
   });
 
   test('a plan on the same or an earlier day replaces later plans', () async {
-    final later = ReductionPlan(startDay: oct15.addDays(14), startLimit: 5);
-    final earlier = ReductionPlan(startDay: oct15.addDays(7), startLimit: 6);
+    final later = planFrom(oct15.addDays(14), 5);
+    final earlier = planFrom(oct15.addDays(7), 6);
 
     await repository.savePlan(first);
     await repository.savePlan(later);
     await repository.savePlan(earlier);
     expect(historyOf(await repository.getHistory())!.plans, [first, earlier]);
 
-    final sameDay = ReductionPlan(startDay: oct15.addDays(7), startLimit: 4);
+    final sameDay = planFrom(oct15.addDays(7), 4);
     await repository.savePlan(sameDay);
     expect(historyOf(await repository.getHistory())!.plans, [first, sameDay]);
   });

@@ -6,7 +6,11 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final oct15 = LogicalDay(2026, 10, 15);
   final oct29 = LogicalDay(2026, 10, 29);
-  final original = ReductionPlan(startDay: oct15, startLimit: 9);
+  final original = ReductionPlan(
+    startDay: oct15,
+    startLimit: 9,
+    quitDay: oct15.addDays(9 * 7),
+  );
 
   group('PlanHistory', () {
     test('with one plan it behaves like that plan', () {
@@ -29,7 +33,11 @@ void main() {
 
     test('a replan changes the future but keeps past limits', () {
       // On 29 Oct the original plan is at 7/day; the user restarts at 5.
-      final restart = ReductionPlan(startDay: oct29, startLimit: 5);
+      final restart = ReductionPlan(
+        startDay: oct29,
+        startLimit: 5,
+        quitDay: oct29.addDays(5 * 7),
+      );
       final history = PlanHistory([original]).replan(restart);
 
       expect(history.plans, [original, restart]);
@@ -41,21 +49,37 @@ void main() {
 
     test('replanning on the same day replaces that plan', () {
       final first = PlanHistory([original]);
-      final sameDay = ReductionPlan(startDay: oct15, startLimit: 12);
+      final sameDay = ReductionPlan(
+        startDay: oct15,
+        startLimit: 12,
+        quitDay: oct15.addDays(12 * 7),
+      );
 
       expect(first.replan(sameDay).plans, [sameDay]);
     });
 
     test('replanning earlier drops the plans that started later', () {
-      final later = ReductionPlan(startDay: oct29, startLimit: 5);
-      final earlier = ReductionPlan(startDay: oct15.addDays(7), startLimit: 6);
+      final later = ReductionPlan(
+        startDay: oct29,
+        startLimit: 5,
+        quitDay: oct29.addDays(5 * 7),
+      );
+      final earlier = ReductionPlan(
+        startDay: oct15.addDays(7),
+        startLimit: 6,
+        quitDay: oct15.addDays(7).addDays(6 * 7),
+      );
       final history = PlanHistory([original, later]).replan(earlier);
 
       expect(history.plans, [original, earlier]);
     });
 
     test('sorts plans by start day', () {
-      final later = ReductionPlan(startDay: oct29, startLimit: 5);
+      final later = ReductionPlan(
+        startDay: oct29,
+        startLimit: 5,
+        quitDay: oct29.addDays(5 * 7),
+      );
 
       expect(PlanHistory([later, original]).plans, [original, later]);
     });
@@ -71,7 +95,11 @@ void main() {
     });
 
     test('rejects two plans starting on the same day', () {
-      final clash = ReductionPlan(startDay: oct15, startLimit: 5);
+      final clash = ReductionPlan(
+        startDay: oct15,
+        startLimit: 5,
+        quitDay: oct15.addDays(5 * 7),
+      );
 
       expect(() => PlanHistory([original, clash]), throwsArgumentError);
     });

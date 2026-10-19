@@ -4,70 +4,76 @@ import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/plan/domain/entities/plan_stage.dart';
 import 'package:meta/meta.dart';
 
-/// A tapering schedule: [startLimit] per day from [startDay], dropping by
-/// one every [stepDays] days until it reaches [targetLimit].
+/// A taper from [startLimit] per day on [startDay] to zero on [quitDay].
+///
+/// The limit falls evenly: on day `d` of `D` it is
+/// `ceil(startLimit × (D − d) / D)`, so drops are spread across the plan
+/// (9/day over 63 days drops by one every 7 days).
 @immutable
 class ReductionPlan {
   ReductionPlan({
     required this.startDay,
     required this.startLimit,
-    this.stepDays = defaultStepDays,
-    this.targetLimit = 0,
+    required this.quitDay,
   }) {
-    if (targetLimit < 0) {
-      throw ArgumentError.value(targetLimit, 'targetLimit', 'must be >= 0');
+    if (startLimit < 1) {
+      throw ArgumentError.value(startLimit, 'startLimit', 'must be >= 1');
     }
-    if (startLimit <= targetLimit) {
+    if (!quitDay.isAfter(startDay)) {
       throw ArgumentError.value(
-        startLimit,
-        'startLimit',
-        'must be greater than targetLimit ($targetLimit)',
+        quitDay,
+        'quitDay',
+        'must be after startDay ($startDay)',
       );
-    }
-    if (stepDays < 1) {
-      throw ArgumentError.value(stepDays, 'stepDays', 'must be >= 1');
     }
   }
 
-  static const int defaultStepDays = 7;
+  /// About one fewer per week.
+  static LogicalDay suggestedQuitDay(LogicalDay startDay, int startLimit) =>
+      startDay.addDays(math.max(7, startLimit * 7));
 
   final LogicalDay startDay;
   final int startLimit;
-  final int stepDays;
-  final int targetLimit;
+  final LogicalDay quitDay;
 
-  /// Number of stages before the target is reached.
-  int get stageCount => startLimit - targetLimit;
+  int get totalDays => quitDay.daysSince(startDay);
 
-  int get totalDays => stageCount * stepDays;
+  /// Average days between drops of one cigarette.
+  double get daysPerDrop => totalDays / startLimit;
 
-  /// First day on which the limit equals [targetLimit].
-  LogicalDay get targetDay => startDay.addDays(totalDays);
+  /// Every day before [quitDay] whose limit differs from the day before.
+  late final List<PlanStage> stages = List.unmodifiable(_buildStages());
 
-  /// Cigarettes not smoked by the target day if every stage limit is kept,
-  /// compared with staying at [startLimit].
-  int get plannedReduction => stepDays * stageCount * (stageCount - 1) ~/ 2;
+  int get stageCount => stages.length;
 
-  List<PlanStage> get stages =>
-      List.unmodifiable(List.generate(stageCount, _stageAt));
+  /// Cigarettes not smoked by [quitDay] if every limit is kept, compared
+  /// with staying at [startLimit].
+  late final int plannedReduction = [
+    for (var d = 0; d < totalDays; d++) startLimit - _limitAt(d),
+  ].fold(0, (sum, value) => sum + value);
 
-  int limitOn(LogicalDay day) =>
-      math.max(targetLimit, startLimit - _dropsBy(day));
+  int limitOn(LogicalDay day) {
+    if (day.isBefore(startDay)) return startLimit;
+    return _limitAt(day.daysSince(startDay));
+  }
 
   bool hasStartedOn(LogicalDay day) => !day.isBefore(startDay);
 
-  bool isCompleteOn(LogicalDay day) => !day.isBefore(targetDay);
+  bool isCompleteOn(LogicalDay day) => !day.isBefore(quitDay);
 
-  /// The active stage, or null before [startDay] and once complete.
+  /// The stage in force, or null before [startDay] and from [quitDay].
   PlanStage? stageOn(LogicalDay day) {
     if (!hasStartedOn(day) || isCompleteOn(day)) return null;
-    return _stageAt(_dropsBy(day));
+    return stages.lastWhere((stage) => !stage.startDay.isAfter(day));
   }
 
-  /// Next day the limit goes down, or null once complete.
+  /// Next day the limit goes down, or null from [quitDay].
   LogicalDay? nextDropOn(LogicalDay day) {
     if (isCompleteOn(day)) return null;
-    return startDay.addDays((_dropsBy(day) + 1) * stepDays);
+    if (!hasStartedOn(day)) {
+      return stages.length > 1 ? stages[1].startDay : quitDay;
+    }
+    return stageOn(day)!.endDay.addDays(1);
   }
 
   int? daysUntilNextDrop(LogicalDay day) => nextDropOn(day)?.daysSince(day);
@@ -76,31 +82,44 @@ class ReductionPlan {
   double progressOn(LogicalDay day) =>
       (day.daysSince(startDay) / totalDays).clamp(0, 1).toDouble();
 
-  int _dropsBy(LogicalDay day) {
-    if (!hasStartedOn(day)) return 0;
-    return day.daysSince(startDay) ~/ stepDays;
+  int _limitAt(int dayIndex) {
+    if (dayIndex <= 0) return startLimit;
+    if (dayIndex >= totalDays) return 0;
+    final remaining = totalDays - dayIndex;
+    // Integer ceil(startLimit * remaining / totalDays).
+    return (startLimit * remaining + totalDays - 1) ~/ totalDays;
   }
 
-  PlanStage _stageAt(int index) => PlanStage(
-    number: index + 1,
-    limit: startLimit - index,
-    startDay: startDay.addDays(index * stepDays),
-    lengthDays: stepDays,
-  );
+  List<PlanStage> _buildStages() {
+    final stages = <PlanStage>[];
+    var stageStart = 0;
+    for (var d = 1; d <= totalDays; d++) {
+      if (d == totalDays || _limitAt(d) != _limitAt(stageStart)) {
+        stages.add(
+          PlanStage(
+            number: stages.length + 1,
+            limit: _limitAt(stageStart),
+            startDay: startDay.addDays(stageStart),
+            lengthDays: d - stageStart,
+          ),
+        );
+        stageStart = d;
+      }
+    }
+    return stages;
+  }
 
   @override
   bool operator ==(Object other) =>
       other is ReductionPlan &&
       other.startDay == startDay &&
       other.startLimit == startLimit &&
-      other.stepDays == stepDays &&
-      other.targetLimit == targetLimit;
+      other.quitDay == quitDay;
 
   @override
-  int get hashCode => Object.hash(startDay, startLimit, stepDays, targetLimit);
+  int get hashCode => Object.hash(startDay, startLimit, quitDay);
 
   @override
   String toString() =>
-      'ReductionPlan($startLimit → $targetLimit, -1 every $stepDays days '
-      'from $startDay)';
+      'ReductionPlan($startLimit/day from $startDay, quit $quitDay)';
 }

@@ -8,7 +8,7 @@ class AppSettings {
   const AppSettings({
     this.userName,
     this.dayResetHour = DayBoundary.defaultResetHour,
-    this.themePreference = ThemePreference.dark,
+    this.themePreference = ThemePreference.system,
     this.accentIndex = 0,
     this.appIcon = AppIconChoice.breath,
     this.packPriceCents,

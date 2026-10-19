@@ -8,7 +8,7 @@ class Settings extends Table {
   IntColumn get dayResetHour =>
       integer().named('day_reset_hour').withDefault(const Constant(4))();
   TextColumn get themePreference =>
-      text().named('theme_preference').withDefault(const Constant('dark'))();
+      text().named('theme_preference').withDefault(const Constant('system'))();
   IntColumn get accentIndex =>
       integer().named('accent_index').withDefault(const Constant(0))();
   TextColumn get appIcon =>

@@ -1,5 +1,4 @@
 import 'package:exhale/core/domain/time/logical_day.dart';
-import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:meta/meta.dart';
 
 /// Unvalidated plan input from the setup or edit forms.
@@ -8,25 +7,23 @@ class PlanDraft {
   const PlanDraft({
     required this.startDay,
     required this.startLimit,
-    this.stepDays = ReductionPlan.defaultStepDays,
-    this.targetLimit = 0,
+    required this.quitDay,
   });
 
   final LogicalDay startDay;
   final int startLimit;
-  final int stepDays;
-  final int targetLimit;
+  final LogicalDay quitDay;
+
+  int get totalDays => quitDay.daysSince(startDay);
 
   PlanDraft copyWith({
     LogicalDay? startDay,
     int? startLimit,
-    int? stepDays,
-    int? targetLimit,
+    LogicalDay? quitDay,
   }) => PlanDraft(
     startDay: startDay ?? this.startDay,
     startLimit: startLimit ?? this.startLimit,
-    stepDays: stepDays ?? this.stepDays,
-    targetLimit: targetLimit ?? this.targetLimit,
+    quitDay: quitDay ?? this.quitDay,
   );
 
   @override
@@ -34,9 +31,8 @@ class PlanDraft {
       other is PlanDraft &&
       other.startDay == startDay &&
       other.startLimit == startLimit &&
-      other.stepDays == stepDays &&
-      other.targetLimit == targetLimit;
+      other.quitDay == quitDay;
 
   @override
-  int get hashCode => Object.hash(startDay, startLimit, stepDays, targetLimit);
+  int get hashCode => Object.hash(startDay, startLimit, quitDay);
 }

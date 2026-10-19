@@ -9,7 +9,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   final oct15 = LogicalDay(2026, 10, 15);
-  final history = PlanHistory([ReductionPlan(startDay: oct15, startLimit: 9)]);
+  final history = PlanHistory([
+    ReductionPlan(
+      startDay: oct15,
+      startLimit: 9,
+      quitDay: oct15.addDays(9 * 7),
+    ),
+  ]);
   var nextId = 1;
 
   SmokeLog log(DateTime at) => SmokeLog(id: nextId++, loggedAt: at);

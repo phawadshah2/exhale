@@ -57,7 +57,11 @@ void main() {
     tester,
   ) async {
     await sl<SavePlan>()(
-      PlanDraft(startDay: LogicalDay(2026, 10, 16), startLimit: 2),
+      PlanDraft(
+        startDay: LogicalDay(2026, 10, 16),
+        startLimit: 2,
+        quitDay: LogicalDay(2026, 10, 16).addDays(14),
+      ),
     );
 
     await tester.pumpAppPastSplash(height: 2400);
@@ -84,7 +88,11 @@ void main() {
 
   testWidgets('theme choice in settings is saved and applied', (tester) async {
     await sl<SavePlan>()(
-      PlanDraft(startDay: LogicalDay(2026, 10, 16), startLimit: 9),
+      PlanDraft(
+        startDay: LogicalDay(2026, 10, 16),
+        startLimit: 9,
+        quitDay: LogicalDay(2026, 10, 16).addDays(63),
+      ),
     );
     await tester.pumpAppPastSplash();
 
