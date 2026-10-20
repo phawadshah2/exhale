@@ -1,3 +1,4 @@
+import 'package:exhale/core/theme/app_palette.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 
 abstract final class SettingsValidation {
@@ -21,7 +22,8 @@ abstract final class SettingsValidation {
     if (price != null && (price < 0 || price > maxPackPriceCents)) {
       return 'Pack price is out of range.';
     }
-    if (settings.accentIndex < 0) {
+    if (settings.accentIndex < 0 ||
+        settings.accentIndex >= AppPalette.accents.length) {
       return 'Unknown accent colour.';
     }
     return null;

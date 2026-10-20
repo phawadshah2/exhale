@@ -7,10 +7,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 abstract final class AppTheme {
-  // Cached: building a seeded scheme isn't free and the accent is fixed
-  // until the accent picker lands.
-  static final ThemeData light = build(Brightness.light);
-  static final ThemeData dark = build(Brightness.dark);
+  static ThemeData get light => of(Brightness.light);
+  static ThemeData get dark => of(Brightness.dark);
+
+  static final _cache = <(Brightness, Color), ThemeData>{};
+
+  /// Cached per brightness and accent: seeding a scheme isn't free.
+  static ThemeData of(
+    Brightness brightness, {
+    Color accent = AppPalette.eucalyptus,
+  }) => _cache.putIfAbsent((
+    brightness,
+    accent,
+  ), () => build(brightness, accent: accent));
 
   static ThemeData build(
     Brightness brightness, {
@@ -27,9 +36,7 @@ abstract final class AppTheme {
     final cardColor = isDark
         ? colors.surfaceContainerLow
         : colors.surfaceContainerLowest;
-    final hairline = BorderSide(
-      color: colors.outlineVariant.withValues(alpha: isDark ? 0.6 : 0.5),
-    );
+    final hairline = BorderSide(color: colors.outlineVariant);
     const pill = StadiumBorder();
     const buttonSize = Size.fromHeight(56);
 
@@ -63,12 +70,13 @@ abstract final class AppTheme {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
+        // Light cards float on the page without an outline, iOS style.
         shape: RoundedRectangleBorder(
           borderRadius: AppRadius.card,
-          side: hairline,
+          side: isDark ? hairline : BorderSide.none,
         ),
       ),
-      // Primary CTA: solid eucalyptus pill ("Log a smoke", "Start my plan").
+      // Primary CTA: solid accent pill ("Start my plan").
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: colors.primaryContainer,

@@ -117,6 +117,13 @@ class SetupPage extends ConsumerWidget {
           onPickDate: controller.setQuitDay,
           onSelectPreset: controller.selectQuitPreset,
         ),
+        const SizedBox(height: AppSpacing.md),
+        ProjectionCard(
+          plan: form.preview,
+          habit: habit,
+          unitPriceCents: habit.tracksCost ? form.unitPriceCents : null,
+          currencySymbol: currency,
+        ),
         if (habit.tracksCost) ...[
           const SizedBox(height: AppSpacing.md),
           _CostCard(
@@ -128,13 +135,6 @@ class SetupPage extends ConsumerWidget {
             onUnitsPerContainerChanged: controller.setCigarettesPerPack,
           ),
         ],
-        const SizedBox(height: AppSpacing.md),
-        ProjectionCard(
-          plan: form.preview,
-          habit: habit,
-          unitPriceCents: habit.tracksCost ? form.unitPriceCents : null,
-          currencySymbol: currency,
-        ),
       ],
     );
   }

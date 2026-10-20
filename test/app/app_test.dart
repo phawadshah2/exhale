@@ -1,6 +1,8 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/theme/app_palette.dart';
+import 'package:exhale/core/theme/app_theme.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
@@ -31,7 +33,7 @@ void main() {
   );
 
   Future<void> logAndSkipTrigger(WidgetTester tester) async {
-    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.scrollAndTap(find.byTooltip('Log'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Skip and save'));
     await tester.pumpInSteps(const Duration(milliseconds: 900));
@@ -140,10 +142,40 @@ void main() {
 
     await tester.tap(find.byTooltip('Home'));
     await tester.pumpAndSettle();
-    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.scrollAndTap(find.byTooltip('Log'));
     await tester.pumpInSteps(const Duration(milliseconds: 900));
     expect(find.text('What triggered this one?'), findsNothing);
     expect(todayCount('1 / 9'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('a new accent re-tints the app and is saved', (tester) async {
+    await sl<SavePlan>()(
+      PlanDraft(
+        startDay: LogicalDay(2026, 10, 16),
+        startLimit: 9,
+        quitDay: LogicalDay(2026, 10, 16).addDays(63),
+      ),
+    );
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Ocean accent'));
+    await tester.pumpAndSettle();
+
+    final context = tester.element(find.byType(SettingsPage));
+    final theme = Theme.of(context);
+    expect(
+      theme.colorScheme.primaryContainer,
+      AppTheme.of(
+        theme.brightness,
+        accent: AppPalette.ocean,
+      ).colorScheme.primaryContainer,
+    );
+    final stored = await tester.runAsync(() => sl<SettingsRepository>().get());
+    expect((stored! as Success<AppSettings>).value.accentIndex, 1);
 
     await tester.disposeApp();
   });

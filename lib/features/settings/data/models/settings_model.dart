@@ -16,7 +16,6 @@ extension SettingsRowMapper on SettingsRow {
     packPriceCents: packPriceCents,
     cigarettesPerPack: cigarettesPerPack,
     currencySymbol: currencySymbol,
-    glassEffects: glassEffects,
     askForTrigger: askForTrigger,
     triggerPromptIntroSeen: triggerPromptIntroSeen,
   );
@@ -33,7 +32,6 @@ extension AppSettingsMapper on AppSettings {
     packPriceCents: Value(packPriceCents),
     cigarettesPerPack: Value(cigarettesPerPack),
     currencySymbol: Value(currencySymbol),
-    glassEffects: Value(glassEffects),
     askForTrigger: Value(askForTrigger),
     triggerPromptIntroSeen: Value(triggerPromptIntroSeen),
   );

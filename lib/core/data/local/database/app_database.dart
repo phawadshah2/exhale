@@ -13,14 +13,13 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? _createConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (migrator, from, to) async {
-      if (from < 2) {
-        await migrator.addColumn(settings, settings.glassEffects);
-      }
+      // v2 added settings.glass_effects; v5 drops it again, so it is
+      // skipped here.
       if (from < 3) {
         // v3 replaces "-1 every step_days down to target_limit" with a quit
         // date: the day the old schedule reached its target.
@@ -40,6 +39,10 @@ class AppDatabase extends _$AppDatabase {
       if (from < 4) {
         await migrator.addColumn(settings, settings.askForTrigger);
         await migrator.addColumn(settings, settings.triggerPromptIntroSeen);
+      }
+      if (from < 5) {
+        // v5 drops glass_effects: glass follows Reduce Transparency instead.
+        await migrator.alterTable(TableMigration(settings));
       }
     },
     beforeOpen: (details) async {

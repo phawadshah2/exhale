@@ -19,7 +19,7 @@ class HabitPickerPage extends ConsumerWidget {
   const HabitPickerPage({super.key});
 
   static const int maxReasonLength = 80;
-  static const int _columns = 4;
+  static const int _columns = 3;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -181,8 +181,8 @@ class _HabitTile extends StatelessWidget {
                       Center(
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          width: 34,
-                          height: 34,
+                          width: 44,
+                          height: 44,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: selected
@@ -193,7 +193,7 @@ class _HabitTile extends StatelessWidget {
                           ),
                           child: Icon(
                             choice.kind.icon,
-                            size: 18,
+                            size: 22,
                             color: selected
                                 ? colors.primary
                                 : colors.onSurfaceVariant,

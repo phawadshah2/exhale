@@ -807,21 +807,6 @@ class $SettingsTable extends Settings
     requiredDuringInsert: false,
     defaultValue: const Constant(20),
   );
-  static const VerificationMeta _glassEffectsMeta = const VerificationMeta(
-    'glassEffects',
-  );
-  @override
-  late final GeneratedColumn<bool> glassEffects = GeneratedColumn<bool>(
-    'glass_effects',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("glass_effects" IN (0, 1))',
-    ),
-    defaultValue: const Constant(true),
-  );
   static const VerificationMeta _askForTriggerMeta = const VerificationMeta(
     'askForTrigger',
   );
@@ -874,7 +859,6 @@ class $SettingsTable extends Settings
     appIcon,
     packPriceCents,
     cigarettesPerPack,
-    glassEffects,
     askForTrigger,
     triggerPromptIntroSeen,
     currencySymbol,
@@ -951,15 +935,6 @@ class $SettingsTable extends Settings
         ),
       );
     }
-    if (data.containsKey('glass_effects')) {
-      context.handle(
-        _glassEffectsMeta,
-        glassEffects.isAcceptableOrUnknown(
-          data['glass_effects']!,
-          _glassEffectsMeta,
-        ),
-      );
-    }
     if (data.containsKey('ask_for_trigger')) {
       context.handle(
         _askForTriggerMeta,
@@ -1028,10 +1003,6 @@ class $SettingsTable extends Settings
         DriftSqlType.int,
         data['${effectivePrefix}cigarettes_per_pack'],
       )!,
-      glassEffects: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}glass_effects'],
-      )!,
       askForTrigger: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}ask_for_trigger'],
@@ -1062,7 +1033,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
   final String appIcon;
   final int? packPriceCents;
   final int cigarettesPerPack;
-  final bool glassEffects;
   final bool askForTrigger;
   final bool triggerPromptIntroSeen;
   final String currencySymbol;
@@ -1075,7 +1045,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     required this.appIcon,
     this.packPriceCents,
     required this.cigarettesPerPack,
-    required this.glassEffects,
     required this.askForTrigger,
     required this.triggerPromptIntroSeen,
     required this.currencySymbol,
@@ -1095,7 +1064,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       map['pack_price_cents'] = Variable<int>(packPriceCents);
     }
     map['cigarettes_per_pack'] = Variable<int>(cigarettesPerPack);
-    map['glass_effects'] = Variable<bool>(glassEffects);
     map['ask_for_trigger'] = Variable<bool>(askForTrigger);
     map['trigger_prompt_intro_seen'] = Variable<bool>(triggerPromptIntroSeen);
     map['currency_symbol'] = Variable<String>(currencySymbol);
@@ -1116,7 +1084,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           ? const Value.absent()
           : Value(packPriceCents),
       cigarettesPerPack: Value(cigarettesPerPack),
-      glassEffects: Value(glassEffects),
       askForTrigger: Value(askForTrigger),
       triggerPromptIntroSeen: Value(triggerPromptIntroSeen),
       currencySymbol: Value(currencySymbol),
@@ -1137,7 +1104,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       appIcon: serializer.fromJson<String>(json['appIcon']),
       packPriceCents: serializer.fromJson<int?>(json['packPriceCents']),
       cigarettesPerPack: serializer.fromJson<int>(json['cigarettesPerPack']),
-      glassEffects: serializer.fromJson<bool>(json['glassEffects']),
       askForTrigger: serializer.fromJson<bool>(json['askForTrigger']),
       triggerPromptIntroSeen: serializer.fromJson<bool>(
         json['triggerPromptIntroSeen'],
@@ -1157,7 +1123,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       'appIcon': serializer.toJson<String>(appIcon),
       'packPriceCents': serializer.toJson<int?>(packPriceCents),
       'cigarettesPerPack': serializer.toJson<int>(cigarettesPerPack),
-      'glassEffects': serializer.toJson<bool>(glassEffects),
       'askForTrigger': serializer.toJson<bool>(askForTrigger),
       'triggerPromptIntroSeen': serializer.toJson<bool>(triggerPromptIntroSeen),
       'currencySymbol': serializer.toJson<String>(currencySymbol),
@@ -1173,7 +1138,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     String? appIcon,
     Value<int?> packPriceCents = const Value.absent(),
     int? cigarettesPerPack,
-    bool? glassEffects,
     bool? askForTrigger,
     bool? triggerPromptIntroSeen,
     String? currencySymbol,
@@ -1188,7 +1152,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
         ? packPriceCents.value
         : this.packPriceCents,
     cigarettesPerPack: cigarettesPerPack ?? this.cigarettesPerPack,
-    glassEffects: glassEffects ?? this.glassEffects,
     askForTrigger: askForTrigger ?? this.askForTrigger,
     triggerPromptIntroSeen:
         triggerPromptIntroSeen ?? this.triggerPromptIntroSeen,
@@ -1214,9 +1177,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       cigarettesPerPack: data.cigarettesPerPack.present
           ? data.cigarettesPerPack.value
           : this.cigarettesPerPack,
-      glassEffects: data.glassEffects.present
-          ? data.glassEffects.value
-          : this.glassEffects,
       askForTrigger: data.askForTrigger.present
           ? data.askForTrigger.value
           : this.askForTrigger,
@@ -1240,7 +1200,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           ..write('appIcon: $appIcon, ')
           ..write('packPriceCents: $packPriceCents, ')
           ..write('cigarettesPerPack: $cigarettesPerPack, ')
-          ..write('glassEffects: $glassEffects, ')
           ..write('askForTrigger: $askForTrigger, ')
           ..write('triggerPromptIntroSeen: $triggerPromptIntroSeen, ')
           ..write('currencySymbol: $currencySymbol')
@@ -1258,7 +1217,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     appIcon,
     packPriceCents,
     cigarettesPerPack,
-    glassEffects,
     askForTrigger,
     triggerPromptIntroSeen,
     currencySymbol,
@@ -1275,7 +1233,6 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           other.appIcon == this.appIcon &&
           other.packPriceCents == this.packPriceCents &&
           other.cigarettesPerPack == this.cigarettesPerPack &&
-          other.glassEffects == this.glassEffects &&
           other.askForTrigger == this.askForTrigger &&
           other.triggerPromptIntroSeen == this.triggerPromptIntroSeen &&
           other.currencySymbol == this.currencySymbol);
@@ -1290,7 +1247,6 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
   final Value<String> appIcon;
   final Value<int?> packPriceCents;
   final Value<int> cigarettesPerPack;
-  final Value<bool> glassEffects;
   final Value<bool> askForTrigger;
   final Value<bool> triggerPromptIntroSeen;
   final Value<String> currencySymbol;
@@ -1303,7 +1259,6 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.appIcon = const Value.absent(),
     this.packPriceCents = const Value.absent(),
     this.cigarettesPerPack = const Value.absent(),
-    this.glassEffects = const Value.absent(),
     this.askForTrigger = const Value.absent(),
     this.triggerPromptIntroSeen = const Value.absent(),
     this.currencySymbol = const Value.absent(),
@@ -1317,7 +1272,6 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.appIcon = const Value.absent(),
     this.packPriceCents = const Value.absent(),
     this.cigarettesPerPack = const Value.absent(),
-    this.glassEffects = const Value.absent(),
     this.askForTrigger = const Value.absent(),
     this.triggerPromptIntroSeen = const Value.absent(),
     this.currencySymbol = const Value.absent(),
@@ -1331,7 +1285,6 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Expression<String>? appIcon,
     Expression<int>? packPriceCents,
     Expression<int>? cigarettesPerPack,
-    Expression<bool>? glassEffects,
     Expression<bool>? askForTrigger,
     Expression<bool>? triggerPromptIntroSeen,
     Expression<String>? currencySymbol,
@@ -1345,7 +1298,6 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       if (appIcon != null) 'app_icon': appIcon,
       if (packPriceCents != null) 'pack_price_cents': packPriceCents,
       if (cigarettesPerPack != null) 'cigarettes_per_pack': cigarettesPerPack,
-      if (glassEffects != null) 'glass_effects': glassEffects,
       if (askForTrigger != null) 'ask_for_trigger': askForTrigger,
       if (triggerPromptIntroSeen != null)
         'trigger_prompt_intro_seen': triggerPromptIntroSeen,
@@ -1362,7 +1314,6 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Value<String>? appIcon,
     Value<int?>? packPriceCents,
     Value<int>? cigarettesPerPack,
-    Value<bool>? glassEffects,
     Value<bool>? askForTrigger,
     Value<bool>? triggerPromptIntroSeen,
     Value<String>? currencySymbol,
@@ -1376,7 +1327,6 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       appIcon: appIcon ?? this.appIcon,
       packPriceCents: packPriceCents ?? this.packPriceCents,
       cigarettesPerPack: cigarettesPerPack ?? this.cigarettesPerPack,
-      glassEffects: glassEffects ?? this.glassEffects,
       askForTrigger: askForTrigger ?? this.askForTrigger,
       triggerPromptIntroSeen:
           triggerPromptIntroSeen ?? this.triggerPromptIntroSeen,
@@ -1411,9 +1361,6 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     if (cigarettesPerPack.present) {
       map['cigarettes_per_pack'] = Variable<int>(cigarettesPerPack.value);
     }
-    if (glassEffects.present) {
-      map['glass_effects'] = Variable<bool>(glassEffects.value);
-    }
     if (askForTrigger.present) {
       map['ask_for_trigger'] = Variable<bool>(askForTrigger.value);
     }
@@ -1439,7 +1386,6 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
           ..write('appIcon: $appIcon, ')
           ..write('packPriceCents: $packPriceCents, ')
           ..write('cigarettesPerPack: $cigarettesPerPack, ')
-          ..write('glassEffects: $glassEffects, ')
           ..write('askForTrigger: $askForTrigger, ')
           ..write('triggerPromptIntroSeen: $triggerPromptIntroSeen, ')
           ..write('currencySymbol: $currencySymbol')
@@ -1876,7 +1822,6 @@ typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
   Value<String> appIcon,
   Value<int?> packPriceCents,
   Value<int> cigarettesPerPack,
-  Value<bool> glassEffects,
   Value<bool> askForTrigger,
   Value<bool> triggerPromptIntroSeen,
   Value<String> currencySymbol,
@@ -1890,7 +1835,6 @@ typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<String> appIcon,
   Value<int?> packPriceCents,
   Value<int> cigarettesPerPack,
-  Value<bool> glassEffects,
   Value<bool> askForTrigger,
   Value<bool> triggerPromptIntroSeen,
   Value<String> currencySymbol,
@@ -1942,11 +1886,6 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<int> get cigarettesPerPack => $composableBuilder(
     column: $table.cigarettesPerPack,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get glassEffects => $composableBuilder(
-    column: $table.glassEffects,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2015,11 +1954,6 @@ class $$SettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get glassEffects => $composableBuilder(
-    column: $table.glassEffects,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<bool> get askForTrigger => $composableBuilder(
     column: $table.askForTrigger,
     builder: (column) => ColumnOrderings(column),
@@ -2079,11 +2013,6 @@ class $$SettingsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<bool> get glassEffects => $composableBuilder(
-    column: $table.glassEffects,
-    builder: (column) => column,
-  );
-
   GeneratedColumn<bool> get askForTrigger => $composableBuilder(
     column: $table.askForTrigger,
     builder: (column) => column,
@@ -2139,7 +2068,6 @@ class $$SettingsTableTableManager
                 Value<String> appIcon = const Value.absent(),
                 Value<int?> packPriceCents = const Value.absent(),
                 Value<int> cigarettesPerPack = const Value.absent(),
-                Value<bool> glassEffects = const Value.absent(),
                 Value<bool> askForTrigger = const Value.absent(),
                 Value<bool> triggerPromptIntroSeen = const Value.absent(),
                 Value<String> currencySymbol = const Value.absent(),
@@ -2152,7 +2080,6 @@ class $$SettingsTableTableManager
                 appIcon: appIcon,
                 packPriceCents: packPriceCents,
                 cigarettesPerPack: cigarettesPerPack,
-                glassEffects: glassEffects,
                 askForTrigger: askForTrigger,
                 triggerPromptIntroSeen: triggerPromptIntroSeen,
                 currencySymbol: currencySymbol,
@@ -2167,7 +2094,6 @@ class $$SettingsTableTableManager
                 Value<String> appIcon = const Value.absent(),
                 Value<int?> packPriceCents = const Value.absent(),
                 Value<int> cigarettesPerPack = const Value.absent(),
-                Value<bool> glassEffects = const Value.absent(),
                 Value<bool> askForTrigger = const Value.absent(),
                 Value<bool> triggerPromptIntroSeen = const Value.absent(),
                 Value<String> currencySymbol = const Value.absent(),
@@ -2180,7 +2106,6 @@ class $$SettingsTableTableManager
                 appIcon: appIcon,
                 packPriceCents: packPriceCents,
                 cigarettesPerPack: cigarettesPerPack,
-                glassEffects: glassEffects,
                 askForTrigger: askForTrigger,
                 triggerPromptIntroSeen: triggerPromptIntroSeen,
                 currencySymbol: currencySymbol,

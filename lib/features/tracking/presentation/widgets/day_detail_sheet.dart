@@ -99,15 +99,6 @@ class DayDetailSheet extends ConsumerWidget {
                     ],
                   ),
                 ),
-                IconButton(
-                  tooltip: 'Close',
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(AppIcons.close),
-                  style: IconButton.styleFrom(
-                    backgroundColor: colors.surfaceContainerHighest,
-                    foregroundColor: colors.onSurface,
-                  ),
-                ),
               ],
             ),
           ),

@@ -49,6 +49,7 @@ ColorScheme buildColorScheme({
     surfaceContainerHigh: neutrals.containerHigh,
     surfaceContainerHighest: neutrals.containerHighest,
     onSurface: neutrals.onSurface,
+    outlineVariant: neutrals.hairline,
     inverseSurface: neutrals.inverseSurface,
     onInverseSurface: neutrals.onInverseSurface,
   );

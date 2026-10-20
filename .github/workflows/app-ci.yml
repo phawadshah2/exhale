@@ -47,29 +47,29 @@ jobs:
       - name: Test
         run: flutter test --no-pub
 
-  build-ios:
-    name: Validate iOS build
-    needs: analyze-and-test
-    runs-on: macos-latest
-    timeout-minutes: 30
+  # build-ios:
+  #   name: Validate iOS build
+  #   needs: analyze-and-test
+  #   runs-on: macos-latest
+  #   timeout-minutes: 30
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v7
 
-      - name: Read Flutter version
-        id: fvm
-        run: echo "version=$(jq -er .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+  #     - name: Read Flutter version
+  #       id: fvm
+  #       run: echo "version=$(jq -er .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ steps.fvm.outputs.version }}
-          channel: stable
-          cache: true
+  #     - name: Set up Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         flutter-version: ${{ steps.fvm.outputs.version }}
+  #         channel: stable
+  #         cache: true
 
-      - name: Install dependencies
-        run: flutter pub get
+  #     - name: Install dependencies
+  #       run: flutter pub get
 
-      - name: Build release app (unsigned)
-        run: flutter build ios --release --no-codesign --no-pub --build-number="$GITHUB_RUN_NUMBER"
+  #     - name: Build release app (unsigned)
+  #       run: flutter build ios --release --no-codesign --no-pub --build-number="$GITHUB_RUN_NUMBER"

@@ -71,7 +71,7 @@ void main() {
     await startPlan(today);
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.scrollAndTap(find.byTooltip('Log'));
     await tester.pumpAndSettle();
     expect(find.text('What triggered this one?'), findsOneWidget);
 
@@ -92,7 +92,7 @@ void main() {
     await startPlan(today);
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.scrollAndTap(find.byTooltip('Log'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Skip and save'));
     await tester.pumpInSteps(const Duration(milliseconds: 900));
@@ -107,7 +107,7 @@ void main() {
     await startPlan(today);
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.scrollAndTap(find.byTooltip('Log'));
     await tester.pumpAndSettle();
     await tester.tapAt(const Offset(200, 40));
     await tester.pumpAndSettle();
@@ -125,7 +125,7 @@ void main() {
     await startPlan(today);
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.scrollAndTap(find.byTooltip('Log'));
     await tester.pumpAndSettle();
     expect(find.text('Ask every time'), findsOneWidget);
 
@@ -136,7 +136,7 @@ void main() {
     expect(countText(tester), '1 / 9');
 
     // Asking is now off: the next log saves straight away.
-    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.scrollAndTap(find.byTooltip('Log'));
     await tester.pumpInSteps(const Duration(milliseconds: 900));
     expect(find.text('What triggered this one?'), findsNothing);
     expect(countText(tester), '2 / 9');
@@ -149,7 +149,7 @@ void main() {
     await sl<SaveSettings>()(const AppSettings(triggerPromptIntroSeen: true));
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.scrollAndTap(find.byTooltip('Log'));
     await tester.pumpAndSettle();
     expect(find.text('What triggered this one?'), findsOneWidget);
     expect(find.text('Ask every time'), findsNothing);
@@ -166,7 +166,7 @@ void main() {
     await sl<SaveSettings>()(const AppSettings(askForTrigger: false));
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.scrollAndTap(find.byTooltip('Log'));
     await tester.pumpInSteps(const Duration(milliseconds: 900));
 
     expect(find.text('What triggered this one?'), findsNothing);

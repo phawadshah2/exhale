@@ -8,8 +8,6 @@ enum HabitKind {
   alcohol,
   caffeine,
   energyDrinks,
-  soda,
-  sugar,
   junkFood,
   socialMedia,
   custom,
@@ -114,28 +112,6 @@ class Habit {
     defaultUnitsPerContainer: 4,
   );
 
-  static const soda = Habit(
-    kind: HabitKind.soda,
-    name: 'Soda',
-    unit: 'can',
-    units: 'cans',
-    shortUnits: 'cans',
-    defaultDailyAmount: 3,
-    container: 'pack',
-    defaultUnitsPerContainer: 6,
-    freeLabel: 'soda-free',
-  );
-
-  static const sugar = Habit(
-    kind: HabitKind.sugar,
-    name: 'Sugar',
-    unit: 'treat',
-    units: 'treats',
-    shortUnits: 'treats',
-    defaultDailyAmount: 3,
-    freeLabel: 'sugar-free',
-  );
-
   static const junkFood = Habit(
     kind: HabitKind.junkFood,
     name: 'Junk food',
@@ -163,8 +139,6 @@ class Habit {
     alcohol,
     caffeine,
     energyDrinks,
-    soda,
-    sugar,
     junkFood,
     socialMedia,
   ];

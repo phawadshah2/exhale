@@ -1,7 +1,11 @@
+import 'package:exhale/core/platform/native_ui.dart';
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/widgets/app_sheet.dart';
+import 'package:exhale/core/widgets/liquid_glass.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// iOS alert with Cancel and a confirm action. Resolves true on confirm.
 Future<bool> showAppConfirm(
@@ -11,6 +15,25 @@ Future<bool> showAppConfirm(
   required String confirmLabel,
   bool destructive = false,
 }) async {
+  // The system alert (Liquid Glass on iOS 26+); Flutter's where unavailable.
+  final choice = await ProviderScope.containerOf(context)
+      .read(nativeUiProvider)
+      .showAlert(
+        title: title,
+        message: message,
+        actions: [
+          const NativeAlertAction('Cancel', style: NativeAlertStyle.cancel),
+          NativeAlertAction(
+            confirmLabel,
+            style: destructive
+                ? NativeAlertStyle.destructive
+                : NativeAlertStyle.normal,
+          ),
+        ],
+      );
+  if (choice != null) return choice == 1;
+  if (!context.mounted) return false;
+
   final confirmed = await showCupertinoDialog<bool>(
     context: context,
     barrierDismissible: true,
@@ -47,6 +70,7 @@ Future<DateTime?> showWheelPicker(
   var selected = initial;
   return showAppSheet<DateTime>(
     context,
+    showClose: false,
     builder: (context) => Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -55,10 +79,10 @@ Future<DateTime?> showWheelPicker(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: Row(
             children: [
-              CupertinoButton(
-                padding: EdgeInsets.zero,
+              GlassIconButton(
+                icon: AppIcons.close,
+                tooltip: 'Cancel',
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Cancel'),
               ),
               Expanded(
                 child: Text(
@@ -67,13 +91,11 @@ Future<DateTime?> showWheelPicker(
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-              CupertinoButton(
-                padding: EdgeInsets.zero,
+              GlassIconButton(
+                icon: AppIcons.check,
+                tooltip: 'Done',
+                tint: Theme.of(context).colorScheme.primaryContainer,
                 onPressed: () => Navigator.of(context).pop(selected),
-                child: const Text(
-                  'Done',
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
               ),
             ],
           ),

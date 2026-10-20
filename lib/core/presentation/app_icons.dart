@@ -50,8 +50,6 @@ abstract final class AppIcons {
   static const IconData alcohol = Icons.wine_bar_rounded;
   static const IconData caffeine = Icons.coffee_rounded;
   static const IconData energyDrinks = CupertinoIcons.bolt_circle;
-  static const IconData soda = Icons.local_drink_rounded;
-  static const IconData sugar = Icons.cake_rounded;
   static const IconData junkFood = Icons.fastfood_rounded;
   static const IconData socialMedia = CupertinoIcons.device_phone_portrait;
   static const IconData customHabit = CupertinoIcons.square_pencil;

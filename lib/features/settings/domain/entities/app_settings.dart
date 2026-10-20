@@ -14,7 +14,6 @@ class AppSettings {
     this.packPriceCents,
     this.cigarettesPerPack = defaultCigarettesPerPack,
     this.currencySymbol = defaultCurrencySymbol,
-    this.glassEffects = true,
     this.askForTrigger = true,
     this.triggerPromptIntroSeen = false,
   });
@@ -30,9 +29,6 @@ class AppSettings {
   final int? packPriceCents;
   final int cigarettesPerPack;
   final String currencySymbol;
-
-  /// Translucent blurred surfaces (tab bar, sheets, status bar).
-  final bool glassEffects;
 
   /// Show the trigger picker before each log is saved.
   final bool askForTrigger;
@@ -55,7 +51,6 @@ class AppSettings {
     int? Function()? packPriceCents,
     int? cigarettesPerPack,
     String? currencySymbol,
-    bool? glassEffects,
     bool? askForTrigger,
     bool? triggerPromptIntroSeen,
   }) => AppSettings(
@@ -69,7 +64,6 @@ class AppSettings {
         : this.packPriceCents,
     cigarettesPerPack: cigarettesPerPack ?? this.cigarettesPerPack,
     currencySymbol: currencySymbol ?? this.currencySymbol,
-    glassEffects: glassEffects ?? this.glassEffects,
     askForTrigger: askForTrigger ?? this.askForTrigger,
     triggerPromptIntroSeen:
         triggerPromptIntroSeen ?? this.triggerPromptIntroSeen,
@@ -86,7 +80,6 @@ class AppSettings {
       other.packPriceCents == packPriceCents &&
       other.cigarettesPerPack == cigarettesPerPack &&
       other.currencySymbol == currencySymbol &&
-      other.glassEffects == glassEffects &&
       other.askForTrigger == askForTrigger &&
       other.triggerPromptIntroSeen == triggerPromptIntroSeen;
 
@@ -100,7 +93,6 @@ class AppSettings {
     packPriceCents,
     cigarettesPerPack,
     currencySymbol,
-    glassEffects,
     askForTrigger,
     triggerPromptIntroSeen,
   );

@@ -71,7 +71,7 @@ void main() {
       setUp(() => database = _openLegacy(version));
       tearDown(() => database.close());
 
-      test('keeps settings; glass and trigger prompt on', () async {
+      test('keeps settings; trigger prompt on', () async {
         final settings =
             (await LocalSettingsRepository(SettingsLocalDataSource(database))
                         .get()
@@ -80,7 +80,6 @@ void main() {
 
         expect(settings.userName, 'Fawad');
         expect(settings.packPriceCents, 1450);
-        expect(settings.glassEffects, isTrue);
         expect(settings.askForTrigger, isTrue);
         expect(settings.triggerPromptIntroSeen, isFalse);
       });
@@ -104,11 +103,18 @@ void main() {
         expect(plan.stageCount, 9);
       });
 
-      test('ends on schema v4', () async {
+      test('ends on schema v5 without glass_effects', () async {
         final row = await database
             .customSelect('PRAGMA user_version')
             .getSingle();
-        expect(row.data.values.single, 4);
+        expect(row.data.values.single, 5);
+        final columns = await database
+            .customSelect('PRAGMA table_info(settings)')
+            .get();
+        expect(
+          columns.map((c) => c.data['name']),
+          isNot(contains('glass_effects')),
+        );
       });
     });
   }

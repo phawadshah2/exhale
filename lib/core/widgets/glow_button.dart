@@ -1,7 +1,7 @@
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:flutter/material.dart';
 
-/// Primary pill button with the accent halo ("Log a smoke", "Start my plan").
+/// Primary pill button with the accent halo ("Start my plan").
 class GlowButton extends StatelessWidget {
   const GlowButton({
     required this.label,
