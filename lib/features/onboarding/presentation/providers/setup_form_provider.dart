@@ -7,7 +7,6 @@ import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
-import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/validation/settings_validation.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
@@ -42,25 +41,31 @@ class SetupFormState {
   const SetupFormState({
     required this.startDay,
     required this.quitDay,
+    required this.startLimit,
+    required this.cigarettesPerPack,
     this.quitPreset = QuitPreset.suggested,
-    this.habitKind,
+    this.habitKind = defaultHabit,
     this.customName = '',
     this.customUnit = '',
     this.reason = '',
     this.name = '',
-    this.startLimit = defaultStartLimit,
     this.packPriceText = '',
-    this.cigarettesPerPack = AppSettings.defaultCigarettesPerPack,
     this.isSubmitting = false,
     this.errorMessage,
   });
 
-  factory SetupFormState.initial(LogicalDay today) => SetupFormState(
-    startDay: today,
-    quitDay: QuitPreset.suggested.quitDayFor(today, defaultStartLimit),
-  );
+  /// Starts on [defaultHabit] (the app leads with vaping) and its amounts.
+  factory SetupFormState.initial(LogicalDay today) {
+    final habit = Habit.presets.firstWhere((h) => h.kind == defaultHabit);
+    return SetupFormState(
+      startDay: today,
+      startLimit: habit.defaultDailyAmount,
+      cigarettesPerPack: habit.defaultUnitsPerContainer,
+      quitDay: QuitPreset.suggested.quitDayFor(today, habit.defaultDailyAmount),
+    );
+  }
 
-  static const int defaultStartLimit = 9;
+  static const HabitKind defaultHabit = HabitKind.vaping;
 
   final LogicalDay startDay;
   final LogicalDay quitDay;
@@ -68,8 +73,7 @@ class SetupFormState {
   /// Null once the user picks a date on the wheel.
   final QuitPreset? quitPreset;
 
-  /// Null until the user picks one.
-  final HabitKind? habitKind;
+  final HabitKind habitKind;
   final String customName;
   final String customUnit;
   final String reason;
@@ -80,27 +84,20 @@ class SetupFormState {
   final bool isSubmitting;
   final String? errorMessage;
 
-  Habit? get habit => switch (habitKind) {
-    null => null,
-    HabitKind.custom => Habit.custom(name: customName, unit: customUnit),
-    final kind => Habit.presets.firstWhere((h) => h.kind == kind),
-  };
+  Habit get habit => habitKind == HabitKind.custom
+      ? Habit.custom(name: customName, unit: customUnit)
+      : Habit.presets.firstWhere((h) => h.kind == habitKind);
 
-  /// A habit is picked; a custom one also needs a name and a unit.
-  bool get canContinue => switch (habitKind) {
-    null => false,
-    HabitKind.custom =>
-      customName.trim().isNotEmpty && customUnit.trim().isNotEmpty,
-    _ => true,
-  };
+  /// A custom habit needs a name and a unit before moving on.
+  bool get canContinue =>
+      habitKind != HabitKind.custom ||
+      (customName.trim().isNotEmpty && customUnit.trim().isNotEmpty);
 
   /// Price of one unit, from the pack price when the habit has packs.
   double? get unitPriceCents {
     final price = packPriceCents;
     if (price == null) return null;
-    return habit?.hasContainer ?? false
-        ? price / cigarettesPerPack
-        : price.toDouble();
+    return habit.hasContainer ? price / cigarettesPerPack : price.toDouble();
   }
 
   PlanDraft get draft =>
@@ -163,18 +160,16 @@ class SetupFormController extends Notifier<SetupFormState> {
   @override
   SetupFormState build() => SetupFormState.initial(ref.read(todayProvider));
 
-  /// Earliest and latest quit days allowed for the current start day.
-  (LogicalDay, LogicalDay) get quitDayRange => (
-    state.startDay.addDays(PlanValidation.minPlanDays),
-    state.startDay.addDays(PlanValidation.maxPlanDays),
-  );
+  /// Earliest quit day for the current start day; there is no latest.
+  LogicalDay get earliestQuitDay =>
+      state.startDay.addDays(PlanValidation.minPlanDays);
 
   void setName(String name) => state = state.copyWith(name: name);
 
   /// Switches habit and resets the amounts to that habit's defaults.
   void selectHabit(HabitKind kind) {
     if (kind == state.habitKind) return;
-    final habit = state.copyWith(habitKind: kind).habit!;
+    final habit = state.copyWith(habitKind: kind).habit;
     state = _withQuitFollowingPreset(
       state.copyWith(
         habitKind: kind,
@@ -211,16 +206,11 @@ class SetupFormController extends Notifier<SetupFormState> {
     errorMessage: () => null,
   );
 
-  /// A date picked on the wheel; clamped into the allowed range.
+  /// A date picked on the wheel; any day after the start is allowed.
   void setQuitDay(LogicalDay day) {
-    final (earliest, latest) = quitDayRange;
-    final quitDay = day.isBefore(earliest)
-        ? earliest
-        : day.isAfter(latest)
-        ? latest
-        : day;
+    final earliest = earliestQuitDay;
     state = state.copyWith(
-      quitDay: quitDay,
+      quitDay: day.isBefore(earliest) ? earliest : day,
       quitPreset: () => null,
       errorMessage: () => null,
     );
@@ -278,8 +268,8 @@ class SetupFormController extends Notifier<SetupFormState> {
     return true;
   }
 
-  /// Keeps the quit date tied to the chosen preset, or inside the allowed
-  /// range for a hand-picked date.
+  /// Keeps the quit date tied to the chosen preset, or after the start for
+  /// a hand-picked date.
   SetupFormState _withQuitFollowingPreset(SetupFormState next) {
     final preset = next.quitPreset;
     if (preset != null) {
@@ -288,11 +278,8 @@ class SetupFormController extends Notifier<SetupFormState> {
       );
     }
     final earliest = next.startDay.addDays(PlanValidation.minPlanDays);
-    final latest = next.startDay.addDays(PlanValidation.maxPlanDays);
-    if (next.quitDay.isBefore(earliest)) {
-      return next.copyWith(quitDay: earliest);
-    }
-    if (next.quitDay.isAfter(latest)) return next.copyWith(quitDay: latest);
-    return next;
+    return next.quitDay.isBefore(earliest)
+        ? next.copyWith(quitDay: earliest)
+        : next;
   }
 }

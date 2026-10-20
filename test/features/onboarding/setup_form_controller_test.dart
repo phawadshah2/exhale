@@ -1,6 +1,7 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/onboarding/presentation/providers/setup_form_provider.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
@@ -30,12 +31,21 @@ void main() {
       container.read(setupFormProvider.notifier);
   SetupFormState state() => container.read(setupFormProvider);
 
-  test('starts today with the suggested quit date', () {
+  test('starts today on vaping with the suggested quit date', () {
     expect(state().startDay, today);
-    expect(state().startLimit, 9);
+    expect(state().habitKind, HabitKind.vaping);
+    expect(state().startLimit, Habit.vaping.defaultDailyAmount);
+    expect(state().cigarettesPerPack, Habit.vaping.defaultUnitsPerContainer);
     expect(state().quitPreset, QuitPreset.suggested);
-    expect(state().quitDay, today.addDays(63));
+    expect(state().quitDay, today.addDays(12 * 7));
     expect(state().preview!.daysPerDrop, 7);
+  });
+
+  test("picking a habit uses that habit's amounts", () {
+    controller().selectHabit(HabitKind.smoking);
+    expect(state().startLimit, 9);
+    expect(state().cigarettesPerPack, 20);
+    expect(state().quitDay, today.addDays(63));
   });
 
   test('presets set the quit date from the start day', () {
@@ -49,8 +59,8 @@ void main() {
   test('a preset follows changes to the start day and daily amount', () {
     controller()
       ..setStartDay(today.addDays(2))
-      ..setStartLimit(12);
-    expect(state().quitDay, today.addDays(2 + 84));
+      ..setStartLimit(10);
+    expect(state().quitDay, today.addDays(2 + 70));
 
     controller()
       ..selectQuitPreset(QuitPreset.weeks8)
@@ -58,7 +68,7 @@ void main() {
     expect(state().quitDay, today.addDays(5 + 56));
   });
 
-  test('a picked date is kept, but clamped into 3–365 days', () {
+  test('any later quit date is kept; earlier ones move after the start', () {
     controller().setQuitDay(LogicalDay(2026, 12, 1));
     expect(state().quitPreset, isNull);
     expect(state().quitDay, LogicalDay(2026, 12, 1));
@@ -66,11 +76,12 @@ void main() {
     controller().setStartLimit(4);
     expect(state().quitDay, LogicalDay(2026, 12, 1));
 
-    controller().setQuitDay(today.addDays(1));
-    expect(state().quitDay, today.addDays(3));
+    controller().setQuitDay(today);
+    expect(state().quitDay, today.addDays(1));
 
-    controller().setQuitDay(today.addDays(500));
-    expect(state().quitDay, today.addDays(365));
+    controller().setQuitDay(today.addDays(2000));
+    expect(state().quitDay, today.addDays(2000));
+    expect(state().preview, isNotNull);
   });
 
   test('moving the start past a picked quit date pushes it out', () {
@@ -78,7 +89,7 @@ void main() {
       ..setQuitDay(today.addDays(10))
       ..setStartDay(today.addDays(20));
 
-    expect(state().quitDay, today.addDays(23));
+    expect(state().quitDay, today.addDays(21));
   });
 
   test('flags a steep plan', () {

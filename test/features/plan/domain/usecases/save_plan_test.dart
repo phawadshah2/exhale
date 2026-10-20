@@ -57,18 +57,17 @@ void main() {
   test('rejects out-of-range values without saving', () async {
     expect(await rejection(draft(limit: 0)), contains('Daily amount'));
     expect(await rejection(draft(limit: 81)), contains('Daily amount'));
-    expect(await rejection(draft(days: 2)), contains('at least 3 days'));
-    expect(await rejection(draft(days: -1)), contains('at least 3 days'));
-    expect(await rejection(draft(days: 366)), contains('within a year'));
+    expect(await rejection(draft(days: 0)), contains('after your start'));
+    expect(await rejection(draft(days: -1)), contains('after your start'));
     expect(
       (await repository.getHistory() as Success<PlanHistory?>).value,
       isNull,
     );
   });
 
-  test('accepts the boundaries', () async {
-    expect(await savePlan(draft(days: 3)), isA<Success<ReductionPlan>>());
-    expect(await savePlan(draft(days: 365)), isA<Success<ReductionPlan>>());
+  test('accepts a next-day quit date and any later one', () async {
+    expect(await savePlan(draft(days: 1)), isA<Success<ReductionPlan>>());
+    expect(await savePlan(draft(days: 3650)), isA<Success<ReductionPlan>>());
   });
 
   test('steep plans are allowed but flagged', () {

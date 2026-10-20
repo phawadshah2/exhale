@@ -48,9 +48,7 @@ class SetupPage extends ConsumerWidget {
       if (saved && context.mounted) context.go(AppRoutes.home);
     }
 
-    // Step 2 is only reached with a habit picked.
-    final habit = form.habit ?? Habit.smoking;
-    final (earliestQuit, latestQuit) = controller.quitDayRange;
+    final habit = form.habit;
 
     return SetupScaffold(
       footer: (bottomInset) => SetupFooter(
@@ -115,8 +113,7 @@ class SetupPage extends ConsumerWidget {
         const SizedBox(height: AppSpacing.md),
         QuitDateCard(
           form: form,
-          earliest: earliestQuit,
-          latest: latestQuit,
+          earliest: controller.earliestQuitDay,
           onPickDate: controller.setQuitDay,
           onSelectPreset: controller.selectQuitPreset,
         ),
