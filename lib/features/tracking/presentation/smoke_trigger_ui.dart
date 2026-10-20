@@ -12,6 +12,18 @@ extension SmokeTriggerUi on SmokeTrigger {
     SmokeTrigger.habit => 'Habit',
     SmokeTrigger.commute => 'Commute',
     SmokeTrigger.drinks => 'Drinks',
+    SmokeTrigger.work => 'Work',
+    SmokeTrigger.tired => 'Tired',
+    SmokeTrigger.morning => 'Morning',
+    SmokeTrigger.lateNight => 'Late night',
+    SmokeTrigger.bedtime => 'Bedtime',
+    SmokeTrigger.lonely => 'Lonely',
+    SmokeTrigger.celebrating => 'Celebrating',
+    SmokeTrigger.studying => 'Studying',
+    SmokeTrigger.workout => 'Workout',
+    SmokeTrigger.watchingTv => 'Watching TV',
+    SmokeTrigger.notification => 'Notification',
+    SmokeTrigger.avoidingTasks => 'Avoiding tasks',
   };
 
   IconData get icon => switch (this) {
@@ -23,5 +35,17 @@ extension SmokeTriggerUi on SmokeTrigger {
     SmokeTrigger.habit => AppIcons.habit,
     SmokeTrigger.commute => AppIcons.commute,
     SmokeTrigger.drinks => AppIcons.drinks,
+    SmokeTrigger.work => AppIcons.work,
+    SmokeTrigger.tired => AppIcons.tired,
+    SmokeTrigger.morning => AppIcons.morning,
+    SmokeTrigger.lateNight => AppIcons.lateNight,
+    SmokeTrigger.bedtime => AppIcons.bedtime,
+    SmokeTrigger.lonely => AppIcons.lonely,
+    SmokeTrigger.celebrating => AppIcons.celebrating,
+    SmokeTrigger.studying => AppIcons.studying,
+    SmokeTrigger.workout => AppIcons.workout,
+    SmokeTrigger.watchingTv => AppIcons.watchingTv,
+    SmokeTrigger.notification => AppIcons.notification,
+    SmokeTrigger.avoidingTasks => AppIcons.avoidingTasks,
   };
 }

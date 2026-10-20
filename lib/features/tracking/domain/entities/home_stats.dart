@@ -23,10 +23,10 @@ class HomeStats {
   /// Average of the last 7 completed days, or null before any completes.
   final double? recentAverage;
 
-  /// Cigarettes not smoked versus the baseline, completed days only.
+  /// Units not used versus the baseline, completed days only.
   final int avoided;
 
-  /// Null when no pack price is set.
+  /// Null when no price is set or the habit has no cost.
   final double? moneySavedCents;
 
   /// Change of [recentAverage] versus [baseline]: -0.33 means 33% less.

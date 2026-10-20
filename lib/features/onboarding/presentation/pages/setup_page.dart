@@ -129,10 +129,10 @@ class SetupPage extends ConsumerWidget {
           _CostCard(
             habit: habit,
             currencySymbol: currency,
-            unitsPerContainer: form.cigarettesPerPack,
-            showPriceError: form.hasInvalidPackPrice,
-            onPriceChanged: controller.setPackPriceText,
-            onUnitsPerContainerChanged: controller.setCigarettesPerPack,
+            unitsPerContainer: form.unitsPerContainer,
+            showPriceError: form.hasInvalidPrice,
+            onPriceChanged: controller.setPriceText,
+            onUnitsPerContainerChanged: controller.setUnitsPerContainer,
           ),
         ],
       ],
@@ -359,7 +359,7 @@ class _CostCardState extends State<_CostCard> {
                     NumberStepper(
                       value: widget.unitsPerContainer,
                       min: 1,
-                      max: SettingsValidation.maxCigarettesPerPack,
+                      max: SettingsValidation.maxUnitsPerContainer,
                       onChanged: widget.onUnitsPerContainerChanged,
                       unit: habit.shortUnits,
                       caption: 'per $container',

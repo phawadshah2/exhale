@@ -1,6 +1,7 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/day_boundary.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
@@ -38,6 +39,10 @@ final themeModeProvider = Provider<ThemeMode>(
     ThemePreference.dark => ThemeMode.dark,
     ThemePreference.system => ThemeMode.system,
   },
+);
+
+final habitProvider = Provider<Habit>(
+  (ref) => ref.watch(currentSettingsProvider.select((s) => s.habit)),
 );
 
 final dayBoundaryProvider = Provider<DayBoundary>(

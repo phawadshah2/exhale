@@ -1,5 +1,7 @@
 import 'package:exhale/core/theme/exhale_colors.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +22,8 @@ extension LimitStatusUi on LimitStatus {
 }
 
 extension DailyProgressUi on DailyProgress {
-  String get badgeLabel => switch (status) {
-    LimitStatus.under when limit == 0 => 'Smoke-free',
+  String badgeLabel(Habit habit) => switch (status) {
+    LimitStatus.under when limit == 0 => habit.freeTitle,
     LimitStatus.under => 'On track',
     LimitStatus.at => 'At limit',
     LimitStatus.over => 'Over limit',

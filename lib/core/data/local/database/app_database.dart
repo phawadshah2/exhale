@@ -13,7 +13,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? _createConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -42,13 +42,28 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 5) {
         // v5 drops glass_effects: glass follows Reduce Transparency instead.
-        await migrator.alterTable(TableMigration(settings));
+        // Rebuilding the table also creates the v6 habit columns.
+        await migrator.alterTable(
+          TableMigration(settings, newColumns: _habitColumns),
+        );
+      } else if (from < 6) {
+        for (final column in _habitColumns) {
+          await migrator.addColumn(settings, column);
+        }
       }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },
   );
+
+  /// Added in v6; existing rows become the smoking habit.
+  List<GeneratedColumn<Object>> get _habitColumns => [
+    settings.habitKind,
+    settings.customHabitName,
+    settings.customHabitUnit,
+    settings.reason,
+  ];
 
   static QueryExecutor _createConnection() {
     return driftDatabase(

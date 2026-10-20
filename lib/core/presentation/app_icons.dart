@@ -63,4 +63,19 @@ abstract final class AppIcons {
   static const IconData habit = CupertinoIcons.repeat;
   static const IconData commute = CupertinoIcons.car;
   static const IconData drinks = Icons.local_bar_rounded;
+  static const IconData work = CupertinoIcons.briefcase;
+  static const IconData tired = CupertinoIcons.zzz;
+  static const IconData morning = CupertinoIcons.sunrise;
+  static const IconData lateNight = CupertinoIcons.moon_stars;
+  static const IconData bedtime = CupertinoIcons.bed_double;
+  static const IconData lonely = CupertinoIcons.person;
+  static const IconData celebrating = Icons.celebration_rounded;
+  static const IconData studying = CupertinoIcons.book;
+  static const IconData workout = Icons.fitness_center_rounded;
+  static const IconData watchingTv = CupertinoIcons.tv;
+  static const IconData notification = CupertinoIcons.bell;
+  static const IconData avoidingTasks = CupertinoIcons.tray_full;
+
+  // Reason
+  static const IconData heart = CupertinoIcons.heart_fill;
 }

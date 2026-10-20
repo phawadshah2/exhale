@@ -42,14 +42,14 @@ class SetupFormState {
     required this.startDay,
     required this.quitDay,
     required this.startLimit,
-    required this.cigarettesPerPack,
+    required this.unitsPerContainer,
     this.quitPreset = QuitPreset.suggested,
     this.habitKind = defaultHabit,
     this.customName = '',
     this.customUnit = '',
     this.reason = '',
     this.name = '',
-    this.packPriceText = '',
+    this.priceText = '',
     this.isSubmitting = false,
     this.errorMessage,
   });
@@ -60,7 +60,7 @@ class SetupFormState {
     return SetupFormState(
       startDay: today,
       startLimit: habit.defaultDailyAmount,
-      cigarettesPerPack: habit.defaultUnitsPerContainer,
+      unitsPerContainer: habit.defaultUnitsPerContainer,
       quitDay: QuitPreset.suggested.quitDayFor(today, habit.defaultDailyAmount),
     );
   }
@@ -79,8 +79,8 @@ class SetupFormState {
   final String reason;
   final String name;
   final int startLimit;
-  final String packPriceText;
-  final int cigarettesPerPack;
+  final String priceText;
+  final int unitsPerContainer;
   final bool isSubmitting;
   final String? errorMessage;
 
@@ -93,11 +93,11 @@ class SetupFormState {
       habitKind != HabitKind.custom ||
       (customName.trim().isNotEmpty && customUnit.trim().isNotEmpty);
 
-  /// Price of one unit, from the pack price when the habit has packs.
+  /// Price of one unit, from the container price when the habit has one.
   double? get unitPriceCents {
-    final price = packPriceCents;
+    final price = priceCents;
     if (price == null) return null;
-    return habit.hasContainer ? price / cigarettesPerPack : price.toDouble();
+    return habit.hasContainer ? price / unitsPerContainer : price.toDouble();
   }
 
   PlanDraft get draft =>
@@ -106,12 +106,11 @@ class SetupFormState {
   /// More than one fewer per day: allowed, with a warning.
   bool get isSteep => PlanValidation.isSteep(draft);
 
-  int? get packPriceCents => AppFormat.parseCents(packPriceText);
+  int? get priceCents => AppFormat.parseCents(priceText);
 
-  bool get hasInvalidPackPrice =>
-      packPriceText.trim().isNotEmpty &&
-      (packPriceCents == null ||
-          packPriceCents! > SettingsValidation.maxPackPriceCents);
+  bool get hasInvalidPrice =>
+      priceText.trim().isNotEmpty &&
+      (priceCents == null || priceCents! > SettingsValidation.maxPriceCents);
 
   /// The plan this form would create, or null while it is invalid.
   ReductionPlan? get preview => PlanValidation.validate(draft) == null
@@ -132,8 +131,8 @@ class SetupFormState {
     String? reason,
     String? name,
     int? startLimit,
-    String? packPriceText,
-    int? cigarettesPerPack,
+    String? priceText,
+    int? unitsPerContainer,
     bool? isSubmitting,
     String? Function()? errorMessage,
   }) => SetupFormState(
@@ -146,8 +145,8 @@ class SetupFormState {
     reason: reason ?? this.reason,
     name: name ?? this.name,
     startLimit: startLimit ?? this.startLimit,
-    packPriceText: packPriceText ?? this.packPriceText,
-    cigarettesPerPack: cigarettesPerPack ?? this.cigarettesPerPack,
+    priceText: priceText ?? this.priceText,
+    unitsPerContainer: unitsPerContainer ?? this.unitsPerContainer,
     isSubmitting: isSubmitting ?? this.isSubmitting,
     errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
   );
@@ -174,7 +173,7 @@ class SetupFormController extends Notifier<SetupFormState> {
       state.copyWith(
         habitKind: kind,
         startLimit: habit.defaultDailyAmount,
-        cigarettesPerPack: habit.defaultUnitsPerContainer,
+        unitsPerContainer: habit.defaultUnitsPerContainer,
         errorMessage: () => null,
       ),
     );
@@ -216,19 +215,19 @@ class SetupFormController extends Notifier<SetupFormState> {
     );
   }
 
-  void setPackPriceText(String text) =>
-      state = state.copyWith(packPriceText: text, errorMessage: () => null);
+  void setPriceText(String text) =>
+      state = state.copyWith(priceText: text, errorMessage: () => null);
 
-  void setCigarettesPerPack(int value) => state = state.copyWith(
-    cigarettesPerPack: value.clamp(1, SettingsValidation.maxCigarettesPerPack),
+  void setUnitsPerContainer(int value) => state = state.copyWith(
+    unitsPerContainer: value.clamp(1, SettingsValidation.maxUnitsPerContainer),
   );
 
   /// Saves settings and the plan. Returns true when both are stored.
   Future<bool> submit() async {
     if (state.isSubmitting) return false;
-    if (state.hasInvalidPackPrice) {
+    if (state.hasInvalidPrice) {
       state = state.copyWith(
-        errorMessage: () => 'Enter a valid pack price, or leave it empty.',
+        errorMessage: () => 'Enter a valid price, or leave it empty.',
       );
       return false;
     }
@@ -241,8 +240,15 @@ class SetupFormController extends Notifier<SetupFormState> {
         .update(
           (current) => current.copyWith(
             userName: () => form.name,
-            packPriceCents: () => form.packPriceCents,
-            cigarettesPerPack: form.cigarettesPerPack,
+            habitKind: form.habitKind,
+            customHabitName: () =>
+                form.habitKind == HabitKind.custom ? form.habit.name : null,
+            customHabitUnit: () =>
+                form.habitKind == HabitKind.custom ? form.habit.unit : null,
+            reason: () =>
+                form.reason.trim().isEmpty ? null : form.reason.trim(),
+            priceCents: () => form.habit.tracksCost ? form.priceCents : null,
+            unitsPerContainer: form.unitsPerContainer,
           ),
         );
     if (!ref.mounted) return false;

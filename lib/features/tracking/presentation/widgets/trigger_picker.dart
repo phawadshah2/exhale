@@ -1,15 +1,17 @@
 import 'dart:async';
 
-import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
 import 'package:exhale/features/tracking/presentation/smoke_trigger_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Two-column grid of trigger pills; tapping the selected one clears it.
-class TriggerPicker extends StatelessWidget {
+/// Two-column grid of the habit's trigger pills; tapping the selected one
+/// clears it. A selected trigger from another habit is still shown.
+class TriggerPicker extends ConsumerWidget {
   const TriggerPicker({
     required this.selected,
     required this.onChanged,
@@ -20,7 +22,13 @@ class TriggerPicker extends StatelessWidget {
   final ValueChanged<SmokeTrigger?> onChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final habitTriggers = ref.watch(habitProvider).kind.triggers;
+    final current = selected;
+    final triggers = [
+      ...habitTriggers,
+      if (current != null && !habitTriggers.contains(current)) current,
+    ];
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = (constraints.maxWidth - AppSpacing.gutterSm) / 2;
@@ -28,7 +36,7 @@ class TriggerPicker extends StatelessWidget {
           spacing: AppSpacing.gutterSm,
           runSpacing: AppSpacing.gutterSm,
           children: [
-            for (final trigger in SmokeTrigger.values)
+            for (final trigger in triggers)
               SizedBox(
                 width: width,
                 child: _TriggerPill(
@@ -101,8 +109,8 @@ class _TriggerPill extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (isSelected)
-                  Icon(AppIcons.check, size: 18, color: foreground),
+                // if (isSelected)
+                // Icon(AppIcons.check, size: 18, color: foreground),
               ],
             ),
           ),

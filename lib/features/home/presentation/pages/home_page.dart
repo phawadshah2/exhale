@@ -7,6 +7,7 @@ import 'package:exhale/features/home/presentation/widgets/quote_card.dart';
 import 'package:exhale/features/home/presentation/widgets/stage_pill.dart';
 import 'package:exhale/features/home/presentation/widgets/stats_grid.dart';
 import 'package:exhale/features/home/presentation/widgets/today_card.dart';
+import 'package:exhale/features/home/presentation/widgets/why_card.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
@@ -26,6 +27,8 @@ class HomePage extends ConsumerWidget {
     final progress = ref.watch(todayProgressProvider).value;
     final latestLog = ref.watch(latestLogProvider).value;
     final stats = ref.watch(homeStatsProvider).value;
+    final habit = settings.habit;
+    final reason = settings.reason;
 
     // Edge to edge: content scrolls under the status bar and the floating
     // tab bar (reported as bottom padding).
@@ -43,7 +46,8 @@ class HomePage extends ConsumerWidget {
           dayNumber: stats?.dayNumber,
         ),
         const SizedBox(height: AppSpacing.md),
-        if (history != null) StagePill(plan: history.current, today: today),
+        if (history != null)
+          StagePill(plan: history.current, today: today, habit: habit),
         const SizedBox(height: AppSpacing.md),
         if (progress == null || history == null)
           const SizedBox(
@@ -58,12 +62,21 @@ class HomePage extends ConsumerWidget {
             now: now,
             latestLog: latestLog,
             isFirstDay: today == history.firstDay,
+            habit: habit,
           ),
+        if (reason != null) ...[
+          const SizedBox(height: AppSpacing.md),
+          WhyCard(reason: reason),
+        ],
         const SizedBox(height: AppSpacing.md),
         HistoryCard(onDayTap: (day) => showDayDetailSheet(context, day)),
         if (stats != null) ...[
           const SizedBox(height: AppSpacing.md),
-          StatsGrid(stats: stats, currencySymbol: settings.currencySymbol),
+          StatsGrid(
+            stats: stats,
+            currencySymbol: settings.currencySymbol,
+            habit: habit,
+          ),
           const SizedBox(height: AppSpacing.md),
           QuoteCard(dayNumber: stats.dayNumber),
         ],

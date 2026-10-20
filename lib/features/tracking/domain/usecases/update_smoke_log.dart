@@ -15,7 +15,7 @@ class UpdateSmokeLog implements UseCase<void, SmokeLog> {
   Future<Result<void>> call(SmokeLog log) async {
     if (log.loggedAt.isAfter(_clock.now())) {
       return const FailureResult<void>(
-        ValidationFailure('A smoke cannot be logged in the future.'),
+        ValidationFailure('A log cannot be in the future.'),
       );
     }
     return await _repository.updateLog(

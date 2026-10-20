@@ -1,8 +1,9 @@
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:drift/native.dart';
 import 'package:exhale/core/data/local/database/app_database.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/data/datasources/plan_local_data_source.dart';
 import 'package:exhale/features/plan/data/repositories/local_plan_repository.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
@@ -79,9 +80,11 @@ void main() {
                 .value;
 
         expect(settings.userName, 'Fawad');
-        expect(settings.packPriceCents, 1450);
+        expect(settings.priceCents, 1450);
         expect(settings.askForTrigger, isTrue);
         expect(settings.triggerPromptIntroSeen, isFalse);
+        expect(settings.habitKind, HabitKind.smoking);
+        expect(settings.reason, isNull);
       });
 
       test('turns step plans into quit dates', () async {
@@ -103,11 +106,11 @@ void main() {
         expect(plan.stageCount, 9);
       });
 
-      test('ends on schema v5 without glass_effects', () async {
+      test('ends on schema v6 without glass_effects', () async {
         final row = await database
             .customSelect('PRAGMA user_version')
             .getSingle();
-        expect(row.data.values.single, 5);
+        expect(row.data.values.single, 6);
         final columns = await database
             .customSelect('PRAGMA table_info(settings)')
             .get();
@@ -118,4 +121,61 @@ void main() {
       });
     });
   }
+
+  group('upgrade from v5', () {
+    late AppDatabase database;
+
+    setUp(() {
+      driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+      database = AppDatabase(
+        NativeDatabase.memory(
+          setup: (raw) => raw
+            ..execute(r'''
+              CREATE TABLE "settings" (
+                "id" INTEGER NOT NULL DEFAULT 1,
+                "user_name" TEXT NULL,
+                "day_reset_hour" INTEGER NOT NULL DEFAULT 4,
+                "theme_preference" TEXT NOT NULL DEFAULT 'system',
+                "accent_index" INTEGER NOT NULL DEFAULT 0,
+                "app_icon" TEXT NOT NULL DEFAULT 'breath',
+                "pack_price_cents" INTEGER NULL,
+                "cigarettes_per_pack" INTEGER NOT NULL DEFAULT 20,
+                "ask_for_trigger" INTEGER NOT NULL DEFAULT 1,
+                "trigger_prompt_intro_seen" INTEGER NOT NULL DEFAULT 0,
+                "currency_symbol" TEXT NOT NULL DEFAULT '$',
+                PRIMARY KEY ("id"))''')
+            ..execute(
+              '''
+              CREATE TABLE "plans" (
+                "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                "start_day" TEXT NOT NULL UNIQUE,
+                "start_limit" INTEGER NOT NULL,
+                "quit_day" TEXT NOT NULL,
+                "created_at" INTEGER NOT NULL
+                  DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)))''',
+            )
+            ..execute(
+              'INSERT INTO settings (id, user_name, ask_for_trigger) '
+              "VALUES (1, 'Fawad', 0)",
+            )
+            ..execute('PRAGMA user_version = 5'),
+        ),
+      );
+    });
+    tearDown(() => database.close());
+
+    test('keeps settings and becomes the smoking habit', () async {
+      final settings =
+          (await LocalSettingsRepository(SettingsLocalDataSource(database))
+                      .get()
+                  as Success<AppSettings>)
+              .value;
+
+      expect(settings.userName, 'Fawad');
+      expect(settings.askForTrigger, isFalse);
+      expect(settings.habitKind, HabitKind.smoking);
+      expect(settings.customHabitName, isNull);
+      expect(settings.reason, isNull);
+    });
+  });
 }

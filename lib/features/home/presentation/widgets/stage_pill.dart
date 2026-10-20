@@ -2,14 +2,22 @@ import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:flutter/material.dart';
 
 /// "Week 1 of 9 · Daily limit: 9" with a STAGE chip.
 class StagePill extends StatelessWidget {
-  const StagePill({required this.plan, required this.today, super.key});
+  const StagePill({
+    required this.plan,
+    required this.today,
+    required this.habit,
+    super.key,
+  });
 
   final ReductionPlan plan;
+  final Habit habit;
   final LogicalDay today;
 
   @override
@@ -24,7 +32,10 @@ class StagePill extends StatelessWidget {
             'SOON',
           )
         : stage == null
-        ? ('Smoke-free since ${AppFormat.monthDay(plan.quitDay)}', 'QUIT')
+        ? (
+            '${habit.freeTitle} since ${AppFormat.monthDay(plan.quitDay)}',
+            'QUIT',
+          )
         : (
             'Stage ${stage.number} of ${plan.stageCount} · '
                 'Daily limit: ${stage.limit}',
@@ -34,9 +45,9 @@ class StagePill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 10, 10),
       decoration: ShapeDecoration(
-        color: colors.surfaceContainerLow,
+        color: colors.surfaceContainerHigh,
         shape: StadiumBorder(
-          side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.5)),
+          side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.6)),
         ),
       ),
       child: Row(

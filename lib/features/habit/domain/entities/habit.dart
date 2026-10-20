@@ -32,7 +32,7 @@ class Habit {
   /// A user-defined habit; plural is a plain "s" unless given.
   factory Habit.custom({required String name, required String unit}) {
     final singular = unit.trim().isEmpty ? 'time' : unit.trim().toLowerCase();
-    final plural = singular.endsWith('s') ? singular : '${singular}s';
+    final plural = _pluralOf(singular);
     return Habit(
       kind: HabitKind.custom,
       name: name.trim().isEmpty ? 'My habit' : name.trim(),
@@ -41,6 +41,15 @@ class Habit {
       shortUnits: plural,
       defaultDailyAmount: 5,
     );
+  }
+
+  static String _pluralOf(String word) {
+    if (word.endsWith('s')) return word;
+    if (RegExp(r'(x|z|ch|sh)$').hasMatch(word)) return '${word}es';
+    if (RegExp(r'[^aeiou]y$').hasMatch(word)) {
+      return '${word.substring(0, word.length - 1)}ies';
+    }
+    return '${word}s';
   }
 
   static const smoking = Habit(
@@ -129,6 +138,12 @@ class Habit {
     shortUnits: 'sessions',
     defaultDailyAmount: 20,
     tracksCost: false,
+  );
+
+  /// The preset for [kind]; [HabitKind.custom] needs [Habit.custom].
+  static Habit preset(HabitKind kind) => presets.firstWhere(
+    (habit) => habit.kind == kind,
+    orElse: () => throw ArgumentError.value(kind, 'kind', 'has no preset'),
   );
 
   /// Presets in picker order (custom is offered separately).

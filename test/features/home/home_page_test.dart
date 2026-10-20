@@ -1,5 +1,6 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
@@ -58,7 +59,10 @@ void main() {
     expect(countText(tester), '0 / 9');
     expect(find.text('9 left today'), findsOneWidget);
     expect(find.text('On track'), findsOneWidget);
-    expect(find.text('No smokes logged today. Nice start.'), findsOneWidget);
+    expect(
+      find.text('No cigarettes logged today. Nice start.'),
+      findsOneWidget,
+    );
     expect(find.text('Stage 1 of 9 · Daily limit: 9'), findsOneWidget);
     expect(find.text('Plan started today'), findsOneWidget);
     expect(find.text('Drops to 8 in 7d'), findsOneWidget);
@@ -260,8 +264,8 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('stats reflect completed days and pack price', (tester) async {
-    await sl<SaveSettings>()(const AppSettings(packPriceCents: 1450));
+  testWidgets('stats reflect completed days and the price', (tester) async {
+    await sl<SaveSettings>()(const AppSettings(priceCents: 1450));
     await startPlan(LogicalDay(2026, 10, 14));
     await logOn(DateTime(2026, 10, 14, 9), times: 6);
     await logOn(DateTime(2026, 10, 15, 9), times: 6);
@@ -272,7 +276,7 @@ void main() {
     expect(find.text('3 Days'), findsOneWidget);
     expect(find.text('↓ 33%'), findsOneWidget);
     expect(find.text(r'$4.35'), findsOneWidget);
-    expect(find.text('6 smokes'), findsOneWidget);
+    expect(find.text('6 cigs'), findsOneWidget);
     expect(find.text('D3'), findsOneWidget);
 
     await tester.disposeApp();
@@ -310,6 +314,72 @@ void main() {
     expect(find.text('Smoke-free day'), findsOneWidget);
     expect(find.text('Smoke-free since Oct 14'), findsOneWidget);
     expect(find.text('QUIT'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets("a vaping plan uses the habit's words and triggers", (
+    tester,
+  ) async {
+    await sl<SaveSettings>()(
+      const AppSettings(
+        habitKind: HabitKind.vaping,
+        reason: 'Breathe easier on my runs',
+      ),
+    );
+    await startPlan(today, limit: 12);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.text('No sessions logged today. Nice start.'), findsOneWidget);
+    expect(find.text('Vaping History'), findsOneWidget);
+    expect(find.text('YOUR WHY'), findsOneWidget);
+    expect(find.text('Breathe easier on my runs'), findsOneWidget);
+
+    await tester.scrollAndTap(find.byTooltip('Log'));
+    await tester.pumpAndSettle();
+    expect(find.text('Work'), findsOneWidget);
+    expect(find.text('Drinks'), findsNothing);
+
+    await tester.tap(find.text('Work'));
+    await tester.pump();
+    await tester.tap(find.text('Save with trigger'));
+    await tester.pumpInSteps(const Duration(milliseconds: 900));
+    expect(await storedTriggers(tester), [SmokeTrigger.work]);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('a vape-free day after the quit date', (tester) async {
+    await sl<SaveSettings>()(const AppSettings(habitKind: HabitKind.vaping));
+    await sl<SavePlan>()(
+      PlanDraft(
+        startDay: today.addDays(-20),
+        startLimit: 4,
+        quitDay: today.addDays(-2),
+      ),
+    );
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.text('Vape-free day'), findsOneWidget);
+    expect(find.text('Vape-free since Oct 14'), findsOneWidget);
+    expect(find.text('Vape-free'), findsWidgets);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('social media has no money tile', (tester) async {
+    await sl<SaveSettings>()(
+      const AppSettings(habitKind: HabitKind.socialMedia, priceCents: 500),
+    );
+    await startPlan(LogicalDay(2026, 10, 14), limit: 20);
+    await logOn(DateTime(2026, 10, 14, 9), times: 15);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.ensureVisible(find.text('Avoided'));
+    await tester.pumpAndSettle();
+    expect(find.text('Money saved'), findsNothing);
+    expect(find.text('25 sessions'), findsOneWidget);
+    expect(find.text('YOUR WHY'), findsNothing);
 
     await tester.disposeApp();
   });
