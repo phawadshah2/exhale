@@ -10,7 +10,7 @@ extension SettingsRowMapper on SettingsRow {
     dayResetHour: dayResetHour,
     themePreference:
         ThemePreference.values.asNameMap()[themePreference] ??
-        ThemePreference.dark,
+        ThemePreference.system,
     accentIndex: accentIndex,
     appIcon: AppIconChoice.values.asNameMap()[appIcon] ?? AppIconChoice.breath,
     packPriceCents: packPriceCents,

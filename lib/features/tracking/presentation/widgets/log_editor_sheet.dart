@@ -157,7 +157,7 @@ class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
           ),
           const SizedBox(height: AppSpacing.lg),
           Material(
-            color: colors.surfaceContainerHigh,
+            color: context.exhale.inset,
             shape: RoundedRectangleBorder(
               borderRadius: AppRadius.inner,
               side: BorderSide(

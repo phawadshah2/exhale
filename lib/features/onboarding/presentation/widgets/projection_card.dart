@@ -54,7 +54,10 @@ class ProjectionCard extends StatelessWidget {
                 style: highlight.copyWith(color: colors.onSurface),
               ),
               const TextSpan(text: ". That's "),
-              TextSpan(text: '${plan.plannedReduction}', style: highlight),
+              TextSpan(
+                text: '${plan.plannedReduction}',
+                style: highlight.copyWith(color: colors.primary),
+              ),
               TextSpan(
                 text: ' ${habit.unitsFor(plan.plannedReduction)} avoided',
               ),

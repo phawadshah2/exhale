@@ -75,7 +75,7 @@ void main() {
 
     final settings = valueOf(await repository.get());
 
-    expect(settings.themePreference, ThemePreference.dark);
+    expect(settings.themePreference, ThemePreference.system);
     expect(settings.appIcon, AppIconChoice.breath);
   });
 }

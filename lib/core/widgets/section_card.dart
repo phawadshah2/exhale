@@ -9,6 +9,7 @@ class SectionCard extends StatelessWidget {
     this.title,
     this.subtitle,
     this.trailing,
+    this.padding,
     super.key,
   });
 
@@ -16,13 +17,14 @@ class SectionCard extends StatelessWidget {
   final String? subtitle;
   final Widget? trailing;
   final Widget child;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
     final hasHeader = title != null || trailing != null;
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: padding ?? const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

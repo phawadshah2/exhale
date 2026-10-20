@@ -32,12 +32,16 @@ class NativeUi {
     required String title,
     required List<NativeAlertAction> actions,
     String? message,
+    Brightness? brightness,
+    Color? tint,
   }) async {
     if (!isAvailable) return null;
     try {
       return await _channel.invokeMethod<int>('showAlert', {
         'title': title,
         'message': ?message,
+        if (brightness != null) 'dark': brightness == Brightness.dark,
+        if (tint != null) 'tint': tint.toARGB32(),
         'actions': [
           for (final action in actions)
             {'label': action.label, 'style': action.style.name},

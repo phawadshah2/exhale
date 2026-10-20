@@ -74,7 +74,7 @@ class _TriggerSheetState extends State<_TriggerSheet> {
           if (widget.offerToStopAsking) ...[
             const SizedBox(height: AppSpacing.md),
             Material(
-              color: colors.surfaceContainer,
+              color: context.exhale.inset,
               borderRadius: AppRadius.inner,
               clipBehavior: Clip.antiAlias,
               child: SwitchListTile.adaptive(

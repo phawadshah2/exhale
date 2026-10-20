@@ -71,6 +71,18 @@ final class NativeUiPlugin: NSObject, FlutterPlugin {
       message: args["message"] as? String,
       preferredStyle: .alert
     )
+    // Match the app's theme and accent rather than the system's.
+    if let dark = args["dark"] as? Bool {
+      alert.overrideUserInterfaceStyle = dark ? .dark : .light
+    }
+    if let argb = (args["tint"] as? NSNumber)?.uint32Value {
+      alert.view.tintColor = UIColor(
+        red: CGFloat((argb >> 16) & 0xFF) / 255,
+        green: CGFloat((argb >> 8) & 0xFF) / 255,
+        blue: CGFloat(argb & 0xFF) / 255,
+        alpha: CGFloat((argb >> 24) & 0xFF) / 255
+      )
+    }
     let actions = args["actions"] as? [[String: Any]] ?? []
     for (index, action) in actions.enumerated() {
       let style: UIAlertAction.Style = switch action["style"] as? String {

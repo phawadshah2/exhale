@@ -230,7 +230,7 @@ class _StartDateCard extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: colors.surfaceContainerHigh,
+                  color: colors.surfaceContainerHighest,
                 ),
                 child: Icon(AppIcons.calendar, color: colors.primary),
               ),

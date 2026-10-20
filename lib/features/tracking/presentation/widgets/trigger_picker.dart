@@ -80,7 +80,7 @@ class _TriggerPill extends StatelessWidget {
             decoration: ShapeDecoration(
               color: isSelected
                   ? colors.primaryContainer
-                  : colors.surfaceContainerHigh,
+                  : context.exhale.inset,
               shape: StadiumBorder(
                 side: BorderSide(
                   color: isSelected

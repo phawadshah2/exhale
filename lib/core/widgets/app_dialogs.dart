@@ -16,11 +16,14 @@ Future<bool> showAppConfirm(
   bool destructive = false,
 }) async {
   // The system alert (Liquid Glass on iOS 26+); Flutter's where unavailable.
+  final theme = Theme.of(context);
   final choice = await ProviderScope.containerOf(context)
       .read(nativeUiProvider)
       .showAlert(
         title: title,
         message: message,
+        brightness: theme.brightness,
+        tint: theme.colorScheme.primary,
         actions: [
           const NativeAlertAction('Cancel', style: NativeAlertStyle.cancel),
           NativeAlertAction(
@@ -94,7 +97,8 @@ Future<DateTime?> showWheelPicker(
               GlassIconButton(
                 icon: AppIcons.check,
                 tooltip: 'Done',
-                tint: Theme.of(context).colorScheme.primaryContainer,
+                tint: Theme.of(context).colorScheme.primaryContainer
+                    .withValues(alpha: 0.6),
                 onPressed: () => Navigator.of(context).pop(selected),
               ),
             ],

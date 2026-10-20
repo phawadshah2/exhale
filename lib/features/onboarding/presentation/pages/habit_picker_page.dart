@@ -60,28 +60,37 @@ class HabitPickerPage extends ConsumerWidget {
           style: text.bodyLarge?.copyWith(color: colors.onSurfaceVariant),
         ),
         const SizedBox(height: AppSpacing.lg),
-        for (var i = 0; i < choices.length; i += _columns) ...[
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: AppSpacing.sm,
-              children: [
-                for (var j = i; j < i + _columns; j++)
-                  Expanded(
-                    child: j < choices.length
-                        ? _HabitTile(
-                            choice: choices[j],
-                            selected: form.habitKind == choices[j].kind,
-                            onTap: () =>
-                                controller.selectHabit(choices[j].kind),
-                          )
-                        : const SizedBox.shrink(),
+        SectionCard(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              for (var i = 0; i < choices.length; i += _columns) ...[
+                const SizedBox(height: AppSpacing.xs),
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: AppSpacing.sm,
+                    children: [
+                      for (var j = i; j < i + _columns; j++)
+                        Expanded(
+                          child: j < choices.length
+                              ? _HabitTile(
+                                  choice: choices[j],
+                                  selected: form.habitKind == choices[j].kind,
+                                  onTap: () =>
+                                      controller.selectHabit(choices[j].kind),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                    ],
                   ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
               ],
-            ),
+            ],
           ),
-          const SizedBox(height: AppSpacing.sm),
-        ],
+        ),
+        const SizedBox(height: AppSpacing.md),
         AnimatedSize(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeOutCubic,
@@ -154,7 +163,7 @@ class _HabitTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected
               ? colors.primaryContainer.withValues(alpha: 0.08)
-              : colors.surfaceContainerLow,
+              : context.exhale.inset,
           borderRadius: AppRadius.inner,
           border: Border.all(
             color: selected
@@ -181,8 +190,8 @@ class _HabitTile extends StatelessWidget {
                       Center(
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          width: 44,
-                          height: 44,
+                          width: 54,
+                          height: 54,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: selected
@@ -193,7 +202,7 @@ class _HabitTile extends StatelessWidget {
                           ),
                           child: Icon(
                             choice.kind.icon,
-                            size: 22,
+                            size: 24,
                             color: selected
                                 ? colors.primary
                                 : colors.onSurfaceVariant,

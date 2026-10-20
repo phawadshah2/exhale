@@ -39,8 +39,9 @@ class AppGlassLayer extends StatelessWidget {
 /// A floating control in Liquid Glass (refracting, iOS 26 style), or a
 /// solid surface when Reduce Transparency is on.
 ///
-/// [radius] null gives a circle/oval. [tint] colours the glass (accent
-/// buttons). Renders on a parent [AppGlassLayer] when there is one.
+/// [radius] null gives a circle/oval. [tint] colours the glass, alpha
+/// included (accent buttons). Renders on a parent [AppGlassLayer] when
+/// there is one.
 class AppGlass extends StatelessWidget {
   const AppGlass({
     required this.child,
@@ -54,8 +55,9 @@ class AppGlass extends StatelessWidget {
   final double? radius;
   final Color? tint;
 
-  /// Apple's "tinted" glass: more frost behind content-heavy surfaces such
-  /// as sheets, so text stays readable.
+  /// Apple's "tinted" glass for content-heavy surfaces such as sheets: more
+  /// frost, a shallower lens and a surface-coloured wash, so text stays
+  /// readable and dark mode stays dark.
   final bool frosted;
 
   @override
@@ -75,7 +77,7 @@ class AppGlass extends StatelessWidget {
         decoration: ShapeDecoration(
           shape: shape,
           color:
-              tint ??
+              tint?.withValues(alpha: 1) ??
               (isDark
                   ? colors.surfaceContainerHigh
                   : colors.surfaceContainerLowest),
@@ -86,19 +88,28 @@ class AppGlass extends StatelessWidget {
     }
 
     final brightness = Theme.of(context).brightness;
+    final wash = frosted
+        ? (isDark
+              ? colors.surfaceContainerLow.withValues(alpha: 0.82)
+              : colors.surfaceContainerLowest.withValues(alpha: 0.8))
+        : null;
+    final settings = LiquidGlassSettings.ios27Regular(
+      brightness: brightness,
+      tintAmount: frosted ? 1 : 0,
+    );
+    final appearanceTint = tint ?? wash;
     return LiquidGlass.auto(
       shape: radius == null
           ? const LiquidOval()
           : LiquidRoundedSuperellipse(borderRadius: radius),
-      settings: LiquidGlassSettings.ios27Regular(
-        brightness: brightness,
-        tintAmount: frosted ? 1 : 0,
-      ),
-      appearance: tint == null
+      settings: frosted
+          ? settings.copyWith(refractionHeight: 10, refractionAmount: 24)
+          : settings,
+      appearance: appearanceTint == null
           ? null
           : LiquidGlassAppearance.ios27Regular(
               brightness: brightness,
-              tint: tint.withValues(alpha: 0.6),
+              tint: appearanceTint,
             ),
       shadows: _floatingShadow(isDark),
       child: child,
@@ -135,16 +146,26 @@ class GlassIconButton extends StatelessWidget {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onPressed,
+          // Glass nested in a glass sheet barely shows, so the button also
+          // carries its own fill: a soft wash, or the solid tint.
           child: AppGlass(
             tint: tint,
-            child: SizedBox.square(
-              dimension: size,
-              child: Icon(
-                icon,
-                size: size * 0.45,
-                color: tint == null
-                    ? colors.onSurface
-                    : colors.onPrimaryContainer,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color:
+                    tint?.withValues(alpha: 1) ??
+                    colors.onSurface.withValues(alpha: 0.07),
+              ),
+              child: SizedBox.square(
+                dimension: size,
+                child: Icon(
+                  icon,
+                  size: size * 0.45,
+                  color: tint == null
+                      ? colors.onSurface
+                      : colors.onPrimaryContainer,
+                ),
               ),
             ),
           ),

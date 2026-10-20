@@ -203,7 +203,7 @@ class _LogButton extends StatelessWidget {
             onLongPress(box.localToGlobal(Offset.zero) & box.size);
           },
           child: AppGlass(
-            tint: colors.primaryContainer,
+            tint: colors.primaryContainer.withValues(alpha: 0.6),
             child: SizedBox.square(
               dimension: FloatingTabBar.height,
               child: Icon(

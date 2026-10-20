@@ -171,11 +171,10 @@ class _Summary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerHigh,
+        color: context.exhale.inset,
         borderRadius: AppRadius.inner,
       ),
       child: Row(
@@ -219,7 +218,7 @@ class _LogTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 4, 12),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+        color: context.exhale.inset,
         borderRadius: AppRadius.inner,
         border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.4)),
       ),
