@@ -17,7 +17,6 @@ class QuitDateCard extends StatelessWidget {
   const QuitDateCard({
     required this.form,
     required this.earliest,
-    required this.latest,
     required this.onPickDate,
     required this.onSelectPreset,
     super.key,
@@ -25,16 +24,20 @@ class QuitDateCard extends StatelessWidget {
 
   final SetupFormState form;
   final LogicalDay earliest;
-  final LogicalDay latest;
   final ValueChanged<LogicalDay> onPickDate;
   final ValueChanged<QuitPreset> onSelectPreset;
 
-  /// "in 23 days" / "in 8 weeks" / "in about 9 weeks"
+  /// "in 23 days" / "in 8 weeks" / "in about 5 months" / "in about 2 years"
   static String relative(LogicalDay from, LogicalDay to) {
     final days = to.daysSince(from);
     if (days < 14) return 'in $days ${days == 1 ? 'day' : 'days'}';
-    if (days % 7 == 0) return 'in ${days ~/ 7} weeks';
-    return 'in about ${(days / 7).round()} weeks';
+    if (days <= 91) {
+      return days % 7 == 0
+          ? 'in ${days ~/ 7} weeks'
+          : 'in about ${(days / 7).round()} weeks';
+    }
+    if (days < 730) return 'in about ${(days / 30.44).round()} months';
+    return 'in about ${(days / 365.25).round()} years';
   }
 
   Future<void> _pick(BuildContext context) async {
@@ -44,7 +47,6 @@ class QuitDateCard extends StatelessWidget {
       mode: CupertinoDatePickerMode.date,
       initial: form.quitDay.toLocalDate(),
       minimum: earliest.toLocalDate(),
-      maximum: latest.toLocalDate(),
     );
     if (picked != null) onPickDate(LogicalDay.fromDate(picked));
   }

@@ -73,11 +73,11 @@ void main() {
 
     await tester.scrollAndTap(find.text('Log a smoke'));
     await tester.pumpAndSettle();
-    expect(find.text('What triggered this smoke?'), findsOneWidget);
+    expect(find.text('What triggered this one?'), findsOneWidget);
 
     await tester.tap(find.text('Coffee'));
     await tester.pump();
-    await tester.tap(find.text('Save trigger'));
+    await tester.tap(find.text('Save with trigger'));
     await tester.pumpInSteps(const Duration(milliseconds: 900));
 
     expect(countText(tester), '1 / 9');
@@ -94,11 +94,84 @@ void main() {
 
     await tester.scrollAndTap(find.text('Log a smoke'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Skip'));
+    await tester.tap(find.text('Skip and save'));
     await tester.pumpInSteps(const Duration(milliseconds: 900));
 
     expect(countText(tester), '1 / 9');
     expect(await storedTriggers(tester), [null]);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('dismissing the trigger sheet logs nothing', (tester) async {
+    await startPlan(today);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(200, 40));
+    await tester.pumpAndSettle();
+
+    expect(find.text('What triggered this one?'), findsNothing);
+    expect(countText(tester), '0 / 9');
+    expect(await storedTriggers(tester), isEmpty);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('the first log offers to stop asking for triggers', (
+    tester,
+  ) async {
+    await startPlan(today);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.pumpAndSettle();
+    expect(find.text('Ask every time'), findsOneWidget);
+
+    await tester.tap(find.text('Ask every time'));
+    await tester.pump();
+    await tester.tap(find.text('Skip and save'));
+    await tester.pumpInSteps(const Duration(milliseconds: 900));
+    expect(countText(tester), '1 / 9');
+
+    // Asking is now off: the next log saves straight away.
+    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.pumpInSteps(const Duration(milliseconds: 900));
+    expect(find.text('What triggered this one?'), findsNothing);
+    expect(countText(tester), '2 / 9');
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('later logs ask without the offer', (tester) async {
+    await startPlan(today);
+    await sl<SaveSettings>()(const AppSettings(triggerPromptIntroSeen: true));
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.pumpAndSettle();
+    expect(find.text('What triggered this one?'), findsOneWidget);
+    expect(find.text('Ask every time'), findsNothing);
+
+    await tester.tap(find.text('Skip and save'));
+    await tester.pumpInSteps(const Duration(milliseconds: 900));
+    expect(countText(tester), '1 / 9');
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('with asking turned off a log saves in one tap', (tester) async {
+    await startPlan(today);
+    await sl<SaveSettings>()(const AppSettings(askForTrigger: false));
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.pumpInSteps(const Duration(milliseconds: 900));
+
+    expect(find.text('What triggered this one?'), findsNothing);
+    expect(countText(tester), '1 / 9');
+    expect(find.text('Logged at 3:42 PM'), findsOneWidget);
 
     await tester.disposeApp();
   });

@@ -72,13 +72,13 @@ void main() {
     await tester.tap(find.text('Log a smoke'));
     await tester.pumpAndSettle();
 
-    final sheet = tester.getRect(find.text('What triggered this smoke?'));
+    final sheet = tester.getRect(find.text('What triggered this one?'));
     final tabBar = tester.getRect(find.byTooltip('Home'));
-    expect(find.text('What triggered this smoke?'), findsOneWidget);
+    expect(find.text('What triggered this one?'), findsOneWidget);
     // The sheet is a root route, so it is painted over the tab bar area.
     expect(sheet.top, lessThan(tabBar.top));
 
-    await tester.tap(find.text('Skip'));
+    await tester.tap(find.text('Skip and save'));
     await tester.pumpAndSettle();
     await tester.disposeApp();
   });

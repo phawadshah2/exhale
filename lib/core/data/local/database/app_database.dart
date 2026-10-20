@@ -13,7 +13,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? _createConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -36,6 +36,10 @@ class AppDatabase extends _$AppDatabase {
             newColumns: [plans.quitDay],
           ),
         );
+      }
+      if (from < 4) {
+        await migrator.addColumn(settings, settings.askForTrigger);
+        await migrator.addColumn(settings, settings.triggerPromptIntroSeen);
       }
     },
     beforeOpen: (details) async {

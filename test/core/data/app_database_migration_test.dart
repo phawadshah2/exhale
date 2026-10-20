@@ -71,7 +71,7 @@ void main() {
       setUp(() => database = _openLegacy(version));
       tearDown(() => database.close());
 
-      test('keeps settings, glass effects on', () async {
+      test('keeps settings; glass and trigger prompt on', () async {
         final settings =
             (await LocalSettingsRepository(SettingsLocalDataSource(database))
                         .get()
@@ -81,6 +81,8 @@ void main() {
         expect(settings.userName, 'Fawad');
         expect(settings.packPriceCents, 1450);
         expect(settings.glassEffects, isTrue);
+        expect(settings.askForTrigger, isTrue);
+        expect(settings.triggerPromptIntroSeen, isFalse);
       });
 
       test('turns step plans into quit dates', () async {
@@ -102,11 +104,11 @@ void main() {
         expect(plan.stageCount, 9);
       });
 
-      test('ends on schema v3', () async {
+      test('ends on schema v4', () async {
         final row = await database
             .customSelect('PRAGMA user_version')
             .getSingle();
-        expect(row.data.values.single, 3);
+        expect(row.data.values.single, 4);
       });
     });
   }

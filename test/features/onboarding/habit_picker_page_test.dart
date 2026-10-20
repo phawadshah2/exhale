@@ -18,12 +18,14 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('offers ten habits plus custom, none picked', (tester) async {
+  testWidgets('leads with vaping, picked by default, in three rows', (
+    tester,
+  ) async {
     await tester.pumpAppPastSplash(height: 2400);
 
-    for (final name in [
-      'Smoking',
+    const names = [
       'Vaping',
+      'Smoking',
       'Nicotine pouches',
       'Alcohol',
       'Caffeine',
@@ -33,13 +35,47 @@ void main() {
       'Junk food',
       'Social media',
       'Custom',
-    ]) {
-      expect(find.text(name), findsOneWidget, reason: name);
+    ];
+    final icons = [
+      for (final name in names)
+        tester.getCenter(
+          find
+              .descendant(
+                of: find.bySemanticsLabel(name),
+                matching: find.byType(Icon),
+              )
+              .first,
+        ),
+    ];
+    // The selected tile's thicker border shifts it by half a pixel.
+    bool sameRow(Offset a, Offset b) => (a.dy - b.dy).abs() < 4;
+    final rows = <Offset>[];
+    for (final icon in icons) {
+      if (!rows.any((r) => sameRow(r, icon))) rows.add(icon);
     }
+    expect(rows, hasLength(3));
+    // Reading order: left to right, then top to bottom.
+    for (var i = 1; i < icons.length; i++) {
+      final prev = icons[i - 1];
+      final next = icons[i];
+      expect(
+        sameRow(prev, next) ? next.dx > prev.dx : next.dy > prev.dy,
+        isTrue,
+        reason: names[i],
+      );
+    }
+    expect(
+      tester
+          .getSemantics(find.bySemanticsLabel('Vaping'))
+          .flagsCollection
+          .isSelected,
+      Tristate.isTrue,
+    );
 
-    await tester.tap(find.text('Continue'));
-    await tester.pumpAndSettle();
-    expect(find.byType(SetupPage), findsNothing);
+    await continueToPlan(tester);
+    expect(find.byType(SetupPage), findsOneWidget);
+    expect(find.text('Sessions on a normal day'), findsOneWidget);
+    expect(find.text('Price per pod'), findsOneWidget);
 
     await tester.disposeApp();
   });

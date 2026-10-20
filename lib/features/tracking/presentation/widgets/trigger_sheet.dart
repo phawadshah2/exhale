@@ -5,15 +5,33 @@ import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
 import 'package:exhale/features/tracking/presentation/widgets/trigger_picker.dart';
 import 'package:flutter/material.dart';
 
-/// Asks what triggered a smoke. Returns the choice, or null when skipped.
-Future<SmokeTrigger?> showTriggerSheet(BuildContext context) =>
-    showAppSheet<SmokeTrigger>(
-      context,
-      builder: (context) => const _TriggerSheet(),
-    );
+/// What the trigger sheet answered: a trigger (or none when skipped), and
+/// whether to keep asking on future logs.
+@immutable
+class TriggerAnswer {
+  const TriggerAnswer({this.trigger, this.keepAsking = true});
+
+  final SmokeTrigger? trigger;
+  final bool keepAsking;
+}
+
+/// Asks what triggered a log before it is saved. Returns null when the
+/// sheet is dismissed, so nothing should be logged.
+///
+/// With [offerToStopAsking] the sheet also lets the user turn the question
+/// off for future logs (shown on the first log).
+Future<TriggerAnswer?> showTriggerSheet(
+  BuildContext context, {
+  bool offerToStopAsking = false,
+}) => showAppSheet<TriggerAnswer>(
+  context,
+  builder: (context) => _TriggerSheet(offerToStopAsking: offerToStopAsking),
+);
 
 class _TriggerSheet extends StatefulWidget {
-  const _TriggerSheet();
+  const _TriggerSheet({required this.offerToStopAsking});
+
+  final bool offerToStopAsking;
 
   @override
   State<_TriggerSheet> createState() => _TriggerSheetState();
@@ -21,9 +39,15 @@ class _TriggerSheet extends StatefulWidget {
 
 class _TriggerSheetState extends State<_TriggerSheet> {
   SmokeTrigger? _selected;
+  bool _keepAsking = true;
+
+  void _finish(SmokeTrigger? trigger) =>
+      Navigator.of(context)
+          .pop(TriggerAnswer(trigger: trigger, keepAsking: _keepAsking));
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final text = context.textTheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -36,30 +60,44 @@ class _TriggerSheetState extends State<_TriggerSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('What triggered this smoke?', style: text.headlineSmall),
+          Text('What triggered this one?', style: text.headlineSmall),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Understanding patterns helps identify cravings (optional).',
-            style: text.bodyMedium?.copyWith(
-              color: context.colors.onSurfaceVariant,
-            ),
+            'Spotting patterns helps you see cravings coming (optional).',
+            style: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
           ),
           const SizedBox(height: AppSpacing.lg),
           TriggerPicker(
             selected: _selected,
             onChanged: (trigger) => setState(() => _selected = trigger),
           ),
+          if (widget.offerToStopAsking) ...[
+            const SizedBox(height: AppSpacing.md),
+            Material(
+              color: colors.surfaceContainer,
+              borderRadius: AppRadius.inner,
+              clipBehavior: Clip.antiAlias,
+              child: SwitchListTile.adaptive(
+                value: _keepAsking,
+                onChanged: (value) => setState(() => _keepAsking = value),
+                title: const Text('Ask every time'),
+                subtitle: const Text(
+                  'Turn off to log in one tap. You can change this in '
+                  'Settings.',
+                ),
+                activeTrackColor: colors.primaryContainer,
+              ),
+            ),
+          ],
           const SizedBox(height: AppSpacing.lg),
           FilledButton(
-            onPressed: _selected == null
-                ? null
-                : () => Navigator.of(context).pop(_selected),
-            child: const Text('Save trigger'),
+            onPressed: _selected == null ? null : () => _finish(_selected),
+            child: const Text('Save with trigger'),
           ),
           const SizedBox(height: AppSpacing.xs),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Skip'),
+            onPressed: () => _finish(null),
+            child: const Text('Skip and save'),
           ),
         ],
       ),

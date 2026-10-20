@@ -2,8 +2,8 @@ import 'package:meta/meta.dart';
 
 /// Built-in habits. [custom] takes its name and unit from the user.
 enum HabitKind {
-  smoking,
   vaping,
+  smoking,
   nicotinePouches,
   alcohol,
   caffeine,
@@ -157,8 +157,8 @@ class Habit {
 
   /// Presets in picker order (custom is offered separately).
   static const List<Habit> presets = [
-    smoking,
     vaping,
+    smoking,
     nicotinePouches,
     alcohol,
     caffeine,

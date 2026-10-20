@@ -33,7 +33,7 @@ void main() {
   Future<void> logAndSkipTrigger(WidgetTester tester) async {
     await tester.scrollAndTap(find.text('Log a smoke'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Skip'));
+    await tester.tap(find.text('Skip and save'));
     await tester.pumpInSteps(const Duration(milliseconds: 900));
   }
 
@@ -114,6 +114,36 @@ void main() {
       (stored as Success<AppSettings>).value.themePreference,
       ThemePreference.light,
     );
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('the trigger prompt can be turned off in settings', (
+    tester,
+  ) async {
+    await sl<SavePlan>()(
+      PlanDraft(
+        startDay: LogicalDay(2026, 10, 16),
+        startLimit: 9,
+        quitDay: LogicalDay(2026, 10, 16).addDays(63),
+      ),
+    );
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Ask for a trigger'));
+    await tester.pumpAndSettle();
+
+    final stored = await sl<SettingsRepository>().get();
+    expect((stored as Success<AppSettings>).value.askForTrigger, isFalse);
+
+    await tester.tap(find.byTooltip('Home'));
+    await tester.pumpAndSettle();
+    await tester.scrollAndTap(find.text('Log a smoke'));
+    await tester.pumpInSteps(const Duration(milliseconds: 900));
+    expect(find.text('What triggered this one?'), findsNothing);
+    expect(todayCount('1 / 9'), findsOneWidget);
 
     await tester.disposeApp();
   });

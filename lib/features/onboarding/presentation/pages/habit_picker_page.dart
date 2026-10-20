@@ -19,7 +19,7 @@ class HabitPickerPage extends ConsumerWidget {
   const HabitPickerPage({super.key});
 
   static const int maxReasonLength = 80;
-  static const int _columns = 3;
+  static const int _columns = 4;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -174,15 +174,15 @@ class _HabitTile extends StatelessWidget {
             child: Stack(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(6, 12, 6, 10),
+                  padding: const EdgeInsets.fromLTRB(4, 10, 4, 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Center(
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          width: 38,
-                          height: 38,
+                          width: 34,
+                          height: 34,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: selected
@@ -193,43 +193,44 @@ class _HabitTile extends StatelessWidget {
                           ),
                           child: Icon(
                             choice.kind.icon,
-                            size: 20,
+                            size: 18,
                             color: selected
                                 ? colors.primary
                                 : colors.onSurfaceVariant,
                           ),
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.sm),
+                      const SizedBox(height: 6),
+                      Text(
+                        choice.name,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: text.labelMedium?.copyWith(height: 1.15),
+                      ),
+                      const SizedBox(height: 2),
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          choice.name,
+                          choice.hint,
                           maxLines: 1,
-                          style: text.labelLarge,
-                        ),
-                      ),
-                      Text(
-                        choice.hint,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: text.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
+                          style: text.labelSmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
                 Positioned(
-                  top: 8,
-                  right: 8,
+                  top: 6,
+                  right: 6,
                   child: AnimatedOpacity(
                     opacity: selected ? 1 : 0,
                     duration: const Duration(milliseconds: 150),
                     child: Icon(
                       AppIcons.checkCircle,
-                      size: 16,
+                      size: 14,
                       color: colors.primary,
                     ),
                   ),

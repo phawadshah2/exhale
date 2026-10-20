@@ -15,6 +15,8 @@ class AppSettings {
     this.cigarettesPerPack = defaultCigarettesPerPack,
     this.currencySymbol = defaultCurrencySymbol,
     this.glassEffects = true,
+    this.askForTrigger = true,
+    this.triggerPromptIntroSeen = false,
   });
 
   static const int defaultCigarettesPerPack = 20;
@@ -32,6 +34,12 @@ class AppSettings {
   /// Translucent blurred surfaces (tab bar, sheets, status bar).
   final bool glassEffects;
 
+  /// Show the trigger picker before each log is saved.
+  final bool askForTrigger;
+
+  /// The first log offers to stop asking; true once that offer was shown.
+  final bool triggerPromptIntroSeen;
+
   DayBoundary get dayBoundary => DayBoundary(resetHour: dayResetHour);
 
   /// Price of one cigarette in cents, or null when no pack price is set.
@@ -48,6 +56,8 @@ class AppSettings {
     int? cigarettesPerPack,
     String? currencySymbol,
     bool? glassEffects,
+    bool? askForTrigger,
+    bool? triggerPromptIntroSeen,
   }) => AppSettings(
     userName: userName != null ? userName() : this.userName,
     dayResetHour: dayResetHour ?? this.dayResetHour,
@@ -60,6 +70,9 @@ class AppSettings {
     cigarettesPerPack: cigarettesPerPack ?? this.cigarettesPerPack,
     currencySymbol: currencySymbol ?? this.currencySymbol,
     glassEffects: glassEffects ?? this.glassEffects,
+    askForTrigger: askForTrigger ?? this.askForTrigger,
+    triggerPromptIntroSeen:
+        triggerPromptIntroSeen ?? this.triggerPromptIntroSeen,
   );
 
   @override
@@ -73,7 +86,9 @@ class AppSettings {
       other.packPriceCents == packPriceCents &&
       other.cigarettesPerPack == cigarettesPerPack &&
       other.currencySymbol == currencySymbol &&
-      other.glassEffects == glassEffects;
+      other.glassEffects == glassEffects &&
+      other.askForTrigger == askForTrigger &&
+      other.triggerPromptIntroSeen == triggerPromptIntroSeen;
 
   @override
   int get hashCode => Object.hash(
@@ -86,5 +101,7 @@ class AppSettings {
     cigarettesPerPack,
     currencySymbol,
     glassEffects,
+    askForTrigger,
+    triggerPromptIntroSeen,
   );
 }

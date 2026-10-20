@@ -19,6 +19,11 @@ class Settings extends Table {
       integer().named('cigarettes_per_pack').withDefault(const Constant(20))();
   BoolColumn get glassEffects =>
       boolean().named('glass_effects').withDefault(const Constant(true))();
+  BoolColumn get askForTrigger =>
+      boolean().named('ask_for_trigger').withDefault(const Constant(true))();
+  BoolColumn get triggerPromptIntroSeen => boolean()
+      .named('trigger_prompt_intro_seen')
+      .withDefault(const Constant(false))();
   TextColumn get currencySymbol =>
       text().named('currency_symbol').withDefault(const Constant(r'$'))();
 

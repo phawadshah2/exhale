@@ -19,6 +19,7 @@ import 'package:exhale/features/home/presentation/widgets/today_card.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
+import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
 import 'package:exhale/features/tracking/domain/usecases/log_smoke.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:exhale/features/tracking/presentation/widgets/day_detail_sheet.dart';
@@ -30,19 +31,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
+  /// Asks for a trigger first (unless turned off), then saves the log.
+  /// Dismissing the trigger sheet cancels the log.
   Future<void> _logSmoke(BuildContext context, WidgetRef ref) async {
     unawaited(HapticFeedback.mediumImpact());
-    final result = await ref.read(logSmokeProvider)(const LogSmokeInput());
+    final loggedAt = ref.read(clockProvider).now();
+    final settings = ref.read(currentSettingsProvider);
+
+    SmokeTrigger? trigger;
+    if (settings.askForTrigger) {
+      final firstPrompt = !settings.triggerPromptIntroSeen;
+      final answer = await showTriggerSheet(
+        context,
+        offerToStopAsking: firstPrompt,
+      );
+      if (answer == null || !context.mounted) return;
+      trigger = answer.trigger;
+      if (firstPrompt) {
+        await ref
+            .read(settingsActionsProvider)
+            .update(
+              (s) => s.copyWith(
+                triggerPromptIntroSeen: true,
+                askForTrigger: answer.keepAsking,
+              ),
+            );
+        if (!context.mounted) return;
+      }
+    }
+
+    final result = await ref.read(logSmokeProvider)(
+      LogSmokeInput(loggedAt: loggedAt, trigger: trigger),
+    );
     if (!context.mounted) return;
     switch (result) {
       case Success(value: final SmokeLog log):
-        final trigger = await showTriggerSheet(context);
-        if (trigger != null) {
-          await ref.read(updateSmokeLogProvider)(
-            log.copyWith(trigger: () => trigger),
-          );
-        }
-        if (!context.mounted) return;
         showAppSnackBar(
           context,
           message: 'Logged at ${AppFormat.time(log.loggedAt)}',

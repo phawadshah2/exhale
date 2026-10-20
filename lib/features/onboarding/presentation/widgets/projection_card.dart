@@ -41,9 +41,7 @@ class ProjectionCard extends StatelessWidget {
             wholeUnits: true,
           );
     final body = plan == null
-        ? const TextSpan(
-            text: 'Pick a quit date at least 3 days after you start.',
-          )
+        ? const TextSpan(text: 'Pick a quit date after your start date.')
         : TextSpan(
             children: [
               TextSpan(text: '${paceSentence(plan)} '),
