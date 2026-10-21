@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart' hide isNotNull, isNull;
+import 'package:drift/drift.dart' hide Trigger, isNotNull, isNull;
 import 'package:drift/native.dart';
 import 'package:exhale/core/data/local/database/app_database.dart';
 import 'package:exhale/core/domain/result/result.dart';
@@ -10,8 +10,66 @@ import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/settings/data/datasources/settings_local_data_source.dart';
 import 'package:exhale/features/settings/data/repositories/local_settings_repository.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
+import 'package:exhale/features/tracking/data/datasources/habit_log_local_data_source.dart';
+import 'package:exhale/features/tracking/data/repositories/local_habit_log_repository.dart';
+import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite;
+
+const _legacySmokeLogs = '''
+  CREATE TABLE "smoke_logs" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "logged_at" INTEGER NOT NULL,
+    "trigger" TEXT NULL,
+    "note" TEXT NULL,
+    "created_at" INTEGER NOT NULL
+      DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)))''';
+
+const _legacySmokeLogsIndex =
+    'CREATE INDEX idx_smoke_logs_logged_at ON smoke_logs (logged_at)';
+
+/// 16 Oct 2026, 09:00 local, as drift stores it (unix seconds).
+final int _legacyLogSeconds =
+    DateTime(2026, 10, 16, 9).millisecondsSinceEpoch ~/ 1000;
+
+void _insertLegacyLog(sqlite.Database raw) => raw.execute(
+  'INSERT INTO smoke_logs (logged_at, trigger, note) '
+  "VALUES ($_legacyLogSeconds, 'coffee', 'after lunch')",
+);
+
+/// The logs table after upgrading: renamed, with the log kept as smoking.
+Future<void> _expectLogsMigrated(AppDatabase database) async {
+  final tables = await database
+      .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
+      .get();
+  final names = tables.map((t) => t.data['name']).toList();
+  expect(names, contains('habit_logs'));
+  expect(names, isNot(contains('smoke_logs')));
+
+  final indexes = await database
+      .customSelect("SELECT name FROM sqlite_master WHERE type = 'index'")
+      .get();
+  expect(
+    indexes.map((i) => i.data['name']),
+    allOf(
+      contains('idx_habit_logs_logged_at'),
+      isNot(contains('idx_smoke_logs_logged_at')),
+    ),
+  );
+
+  final logs = await LocalHabitLogRepository(HabitLogLocalDataSource(database))
+      .watchLogs(
+        habitKind: HabitKind.smoking,
+        from: DateTime(2026),
+        to: DateTime(2027),
+      )
+      .first;
+  expect(logs, hasLength(1));
+  expect(logs.single.loggedAt, DateTime(2026, 10, 16, 9));
+  expect(logs.single.habitKind, HabitKind.smoking);
+  expect(logs.single.trigger, Trigger.coffee);
+  expect(logs.single.note, 'after lunch');
+}
 
 /// Tables as they were before v3 (v1 settings lack glass_effects).
 void _createLegacySchema(sqlite.Database raw, {required int version}) {
@@ -44,6 +102,8 @@ void _createLegacySchema(sqlite.Database raw, {required int version}) {
     );
   }
   raw
+    ..execute(_legacySmokeLogs)
+    ..execute(_legacySmokeLogsIndex)
     ..execute(
       'INSERT INTO settings (id, user_name, pack_price_cents) '
       "VALUES (1, 'Fawad', 1450)",
@@ -53,6 +113,7 @@ void _createLegacySchema(sqlite.Database raw, {required int version}) {
       "VALUES ('2026-10-16', 9, 7, 0), ('2026-11-20', 5, 3, 1)",
     )
     ..execute('PRAGMA user_version = $version');
+  _insertLegacyLog(raw);
 }
 
 AppDatabase _openLegacy(int version) {
@@ -106,17 +167,26 @@ void main() {
         expect(plan.stageCount, 9);
       });
 
-      test('ends on schema v6 without glass_effects', () async {
+      test('renames smoke_logs and keeps its logs', () async {
+        await _expectLogsMigrated(database);
+      });
+
+      test('ends on schema v7 without glass_effects', () async {
         final row = await database
             .customSelect('PRAGMA user_version')
             .getSingle();
-        expect(row.data.values.single, 6);
+        expect(row.data.values.single, 7);
         final columns = await database
             .customSelect('PRAGMA table_info(settings)')
             .get();
         expect(
           columns.map((c) => c.data['name']),
-          isNot(contains('glass_effects')),
+          allOf(
+            isNot(contains('glass_effects')),
+            isNot(contains('pack_price_cents')),
+            contains('price_cents'),
+            contains('units_per_container'),
+          ),
         );
       });
     });
@@ -129,8 +199,9 @@ void main() {
       driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
       database = AppDatabase(
         NativeDatabase.memory(
-          setup: (raw) => raw
-            ..execute(r'''
+          setup: (raw) {
+            raw
+              ..execute(r'''
               CREATE TABLE "settings" (
                 "id" INTEGER NOT NULL DEFAULT 1,
                 "user_name" TEXT NULL,
@@ -144,8 +215,8 @@ void main() {
                 "trigger_prompt_intro_seen" INTEGER NOT NULL DEFAULT 0,
                 "currency_symbol" TEXT NOT NULL DEFAULT '$',
                 PRIMARY KEY ("id"))''')
-            ..execute(
-              '''
+              ..execute(
+                '''
               CREATE TABLE "plans" (
                 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 "start_day" TEXT NOT NULL UNIQUE,
@@ -153,12 +224,17 @@ void main() {
                 "quit_day" TEXT NOT NULL,
                 "created_at" INTEGER NOT NULL
                   DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)))''',
-            )
-            ..execute(
-              'INSERT INTO settings (id, user_name, ask_for_trigger) '
-              "VALUES (1, 'Fawad', 0)",
-            )
-            ..execute('PRAGMA user_version = 5'),
+              )
+              ..execute(_legacySmokeLogs)
+              ..execute(_legacySmokeLogsIndex)
+              ..execute(
+                'INSERT INTO settings (id, user_name, ask_for_trigger, '
+                'pack_price_cents, cigarettes_per_pack) '
+                "VALUES (1, 'Fawad', 0, 900, 30)",
+              )
+              ..execute('PRAGMA user_version = 5');
+            _insertLegacyLog(raw);
+          },
         ),
       );
     });
@@ -173,9 +249,15 @@ void main() {
 
       expect(settings.userName, 'Fawad');
       expect(settings.askForTrigger, isFalse);
+      expect(settings.priceCents, 900);
+      expect(settings.unitsPerContainer, 30);
       expect(settings.habitKind, HabitKind.smoking);
       expect(settings.customHabitName, isNull);
       expect(settings.reason, isNull);
+    });
+
+    test('renames smoke_logs and keeps its logs', () async {
+      await _expectLogsMigrated(database);
     });
   });
 }

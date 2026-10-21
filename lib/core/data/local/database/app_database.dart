@@ -1,19 +1,19 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:exhale/core/data/local/database/tables/habit_logs_table.dart';
 import 'package:exhale/core/data/local/database/tables/plans_table.dart';
 import 'package:exhale/core/data/local/database/tables/settings_table.dart';
-import 'package:exhale/core/data/local/database/tables/smoke_logs_table.dart';
 import 'package:path_provider/path_provider.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Plans, SmokeLogs, Settings])
+@DriftDatabase(tables: [Plans, HabitLogs, Settings])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
     : super(executor ?? _createConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -42,14 +42,36 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 5) {
         // v5 drops glass_effects: glass follows Reduce Transparency instead.
-        // Rebuilding the table also creates the v6 habit columns.
+        // Rebuilding the table also brings it to v7: habit columns and the
+        // renamed price columns.
         await migrator.alterTable(
-          TableMigration(settings, newColumns: _habitColumns),
+          TableMigration(
+            settings,
+            columnTransformer: _renamedPriceColumns.map(
+              (column, oldName) => MapEntry(column, CustomExpression(oldName)),
+            ),
+            newColumns: _habitColumns,
+          ),
         );
-      } else if (from < 6) {
-        for (final column in _habitColumns) {
-          await migrator.addColumn(settings, column);
+      } else {
+        if (from < 6) {
+          for (final column in _habitColumns) {
+            await migrator.addColumn(settings, column);
+          }
         }
+        if (from < 7) {
+          for (final MapEntry(key: column, value: oldName)
+              in _renamedPriceColumns.entries) {
+            await migrator.renameColumn(settings, oldName, column);
+          }
+        }
+      }
+      if (from < 7) {
+        // v7 renames smoke_logs to habit_logs and records the habit per log.
+        await migrator.renameTable(habitLogs, 'smoke_logs');
+        await customStatement('DROP INDEX IF EXISTS idx_smoke_logs_logged_at');
+        await migrator.create(idxHabitLogsLoggedAt);
+        await migrator.addColumn(habitLogs, habitLogs.habitKind);
       }
     },
     beforeOpen: (details) async {
@@ -64,6 +86,12 @@ class AppDatabase extends _$AppDatabase {
     settings.customHabitUnit,
     settings.reason,
   ];
+
+  /// Renamed in v7 from their cigarette-only names.
+  Map<GeneratedColumn<Object>, String> get _renamedPriceColumns => {
+    settings.priceCents: 'pack_price_cents',
+    settings.unitsPerContainer: 'cigarettes_per_pack',
+  };
 
   static QueryExecutor _createConnection() {
     return driftDatabase(

@@ -10,9 +10,9 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
-import 'package:exhale/features/tracking/domain/usecases/log_smoke.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
+import 'package:exhale/features/tracking/domain/entities/trigger.dart';
+import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:exhale/features/tracking/presentation/widgets/trigger_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,7 +23,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 Future<void> showLogEditorSheet(
   BuildContext context, {
   required LogicalDay day,
-  SmokeLog? log,
+  HabitLog? log,
 }) => showAppSheet<void>(
   context,
   builder: (context) => LogEditorSheet(day: day, log: log),
@@ -44,7 +44,7 @@ class LogEditorSheet extends ConsumerStatefulWidget {
   const LogEditorSheet({required this.day, this.log, super.key});
 
   final LogicalDay day;
-  final SmokeLog? log;
+  final HabitLog? log;
 
   @override
   ConsumerState<LogEditorSheet> createState() => _LogEditorSheetState();
@@ -52,7 +52,7 @@ class LogEditorSheet extends ConsumerStatefulWidget {
 
 class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
   late TimeOfDay _time;
-  late SmokeTrigger? _trigger = widget.log?.trigger;
+  late Trigger? _trigger = widget.log?.trigger;
   late final TextEditingController _note = TextEditingController(
     text: widget.log?.note,
   );
@@ -104,14 +104,15 @@ class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
     );
     final log = widget.log;
     final Result<Object?> result = log == null
-        ? await ref.read(logSmokeProvider)(
-            LogSmokeInput(
+        ? await ref.read(addHabitLogProvider)(
+            AddHabitLogInput(
+              habitKind: ref.read(currentSettingsProvider).habitKind,
               loggedAt: loggedAt,
               trigger: _trigger,
               note: _note.text,
             ),
           )
-        : await ref.read(updateSmokeLogProvider)(
+        : await ref.read(updateHabitLogProvider)(
             log.copyWith(
               loggedAt: loggedAt,
               trigger: () => _trigger,

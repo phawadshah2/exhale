@@ -1,11 +1,12 @@
 import 'package:exhale/core/domain/time/day_boundary.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/period_summary.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
 import 'package:exhale/features/tracking/domain/services/progress_calculator.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,11 +23,12 @@ void main() {
   const boundary = DayBoundary();
   var nextId = 1;
 
-  List<SmokeLog> logsOn(LogicalDay day, int count) => [
+  List<HabitLog> logsOn(LogicalDay day, int count) => [
     for (var i = 0; i < count; i++)
-      SmokeLog(
+      HabitLog(
         id: nextId++,
         loggedAt: DateTime(day.year, day.month, day.day, 9 + i),
+        habitKind: HabitKind.smoking,
       ),
   ];
 
@@ -45,6 +47,51 @@ void main() {
       expect(month.from, LogicalDay(2026, 2, 1));
       expect(month.to, LogicalDay(2026, 2, 28));
       expect(month.length, 28);
+    });
+  });
+
+  group('ChartPeriod', () {
+    test('a week step keeps the weekday', () {
+      expect(
+        ChartPeriod.week.shift(LogicalDay(2026, 10, 16), -1),
+        LogicalDay(2026, 10, 9),
+      );
+    });
+
+    test('a month step keeps the day, clamped to shorter months', () {
+      expect(
+        ChartPeriod.month.shift(LogicalDay(2026, 3, 31), -1),
+        LogicalDay(2026, 2, 28),
+      );
+      expect(
+        ChartPeriod.month.shift(LogicalDay(2026, 1, 15), -2),
+        LogicalDay(2025, 11, 15),
+      );
+    });
+
+    test('counts whole periods between two days', () {
+      // Sun 11 Oct and Mon 12 Oct sit in different weeks.
+      expect(
+        ChartPeriod.week.periodsBetween(
+          LogicalDay(2026, 10, 11),
+          LogicalDay(2026, 10, 12),
+        ),
+        1,
+      );
+      expect(
+        ChartPeriod.week.periodsBetween(
+          LogicalDay(2026, 10, 12),
+          LogicalDay(2026, 10, 18),
+        ),
+        0,
+      );
+      expect(
+        ChartPeriod.month.periodsBetween(
+          LogicalDay(2025, 12, 31),
+          LogicalDay(2026, 2, 1),
+        ),
+        2,
+      );
     });
   });
 
@@ -76,6 +123,26 @@ void main() {
       expect(summary.slots[5].progress, isNull);
       expect(summary.slots[5].limit, 9);
       expect(summary.slots.first.limit, isNull);
+    });
+
+    test('back-filled days before the plan carry counts but no limit', () {
+      final backfilled = ProgressCalculator.summarize(
+        range: PeriodRange.weekOf(today),
+        logs: [...logsOn(start.addDays(-2), 15), ...logsOn(today, 4)],
+        boundary: boundary,
+        history: history,
+        today: today,
+      );
+
+      expect(backfilled.slots.first.kind, DaySlotKind.beforePlan);
+      expect(backfilled.slots.first.count, 15);
+      expect(backfilled.slots.first.progress, isNull);
+      expect(backfilled.slots.first.limit, isNull);
+      expect(backfilled.slots[1].count, 0);
+      expect(backfilled.peak, 15);
+      // The legend still describes plan days only.
+      expect(backfilled.averagePerDay, closeTo(4 / 3, 1e-9));
+      expect(backfilled.daysOver, 0);
     });
 
     test('summarises tracked days only', () {

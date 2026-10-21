@@ -5,7 +5,7 @@ import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:meta/meta.dart';
 
 enum DaySlotKind {
-  /// Before the first plan started: nothing to show.
+  /// Before the first plan started: back-filled logs, with no limit.
   beforePlan,
 
   /// Today or earlier, inside the plan.
@@ -23,6 +23,7 @@ class DaySlot {
     required this.kind,
     required this.isToday,
     this.progress,
+    this.beforePlanCount,
     this.limit,
   });
 
@@ -32,6 +33,12 @@ class DaySlot {
 
   /// Set for [DaySlotKind.tracked].
   final DailyProgress? progress;
+
+  /// Logs on a [DaySlotKind.beforePlan] day up to today.
+  final int? beforePlanCount;
+
+  /// Logs that day, whether tracked or back-filled before the plan.
+  int? get count => progress?.count ?? beforePlanCount;
 
   /// Limit for tracked and future days; null before the plan.
   final int? limit;
@@ -43,10 +50,12 @@ class DaySlot {
       other.kind == kind &&
       other.isToday == isToday &&
       other.progress == progress &&
+      other.beforePlanCount == beforePlanCount &&
       other.limit == limit;
 
   @override
-  int get hashCode => Object.hash(day, kind, isToday, progress, limit);
+  int get hashCode =>
+      Object.hash(day, kind, isToday, progress, beforePlanCount, limit);
 }
 
 @immutable
@@ -76,7 +85,7 @@ class PeriodSummary {
 
   /// Highest count or limit in the period, for scaling the chart.
   int get peak => slots.fold(0, (peak, slot) {
-    final count = slot.progress?.count ?? 0;
+    final count = slot.count ?? 0;
     final limit = slot.limit ?? 0;
     final high = count > limit ? count : limit;
     return high > peak ? high : peak;

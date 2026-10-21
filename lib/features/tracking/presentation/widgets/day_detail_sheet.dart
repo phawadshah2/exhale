@@ -12,10 +12,10 @@ import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
-import 'package:exhale/features/tracking/presentation/smoke_trigger_ui.dart';
+import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
 import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,7 +40,7 @@ class DayDetailSheet extends ConsumerWidget {
   Future<void> _confirmDelete(
     BuildContext context,
     WidgetRef ref,
-    SmokeLog log,
+    HabitLog log,
   ) async {
     final confirmed = await showAppConfirm(
       context,
@@ -53,7 +53,7 @@ class DayDetailSheet extends ConsumerWidget {
       destructive: true,
     );
     if (!confirmed) return;
-    final result = await ref.read(deleteSmokeLogProvider)(log.id);
+    final result = await ref.read(deleteHabitLogProvider)(log.id);
     if (result case FailureResult(:final failure) when context.mounted) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(failureMessage(failure))));
@@ -113,6 +113,7 @@ class DayDetailSheet extends ConsumerWidget {
               child: _Summary(
                 progress: progress,
                 habit: ref.watch(habitProvider),
+                beforePlan: day.isBefore(history!.firstDay),
               ),
             ),
           ),
@@ -173,10 +174,17 @@ class DayDetailSheet extends ConsumerWidget {
 }
 
 class _Summary extends StatelessWidget {
-  const _Summary({required this.progress, required this.habit});
+  const _Summary({
+    required this.progress,
+    required this.habit,
+    required this.beforePlan,
+  });
 
   final DailyProgress progress;
   final Habit habit;
+
+  /// A back-filled day with no limit.
+  final bool beforePlan;
 
   @override
   Widget build(BuildContext context) {
@@ -190,14 +198,24 @@ class _Summary extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              '${progress.count} of ${progress.limit} logged',
+              beforePlan
+                  ? '${progress.count} logged'
+                  : '${progress.count} of ${progress.limit} logged',
               style: context.textTheme.titleLarge,
             ),
           ),
-          StatusBadge(
-            label: progress.badgeLabel(habit),
-            colors: progress.status.colors(context),
-          ),
+          if (beforePlan)
+            Text(
+              'Before your plan',
+              style: context.textTheme.labelLarge?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
+            )
+          else
+            StatusBadge(
+              label: progress.badgeLabel(habit),
+              colors: progress.status.colors(context),
+            ),
         ],
       ),
     );
@@ -212,7 +230,7 @@ class _LogTile extends StatelessWidget {
     required this.onDelete,
   });
 
-  final SmokeLog log;
+  final HabitLog log;
   final Color dotColor;
   final VoidCallback onEdit;
   final VoidCallback onDelete;

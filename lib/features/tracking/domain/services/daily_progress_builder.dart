@@ -2,12 +2,12 @@ import 'package:exhale/core/domain/time/day_boundary.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 
 /// One [DailyProgress] per day from [from] to [to] (both inclusive), with
 /// each log counted on the logical day [boundary] assigns it to.
 List<DailyProgress> buildDailyProgress({
-  required Iterable<SmokeLog> logs,
+  required Iterable<HabitLog> logs,
   required DayBoundary boundary,
   required PlanHistory history,
   required LogicalDay from,

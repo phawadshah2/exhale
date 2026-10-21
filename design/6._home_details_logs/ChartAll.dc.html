@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>All time</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#57F1DB}a:hover{color:#2DD4BF}
+</style>
+</helmet>
+<div style="width: 390px; height: 700px; box-sizing: border-box; background: #0E141D; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px">
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 28px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<h2 style="margin: 0; font-family: Manrope, sans-serif; font-size: 19px; font-weight: 700">History</h2>
+<div style="display: flex; padding: 4px; border-radius: 99px; background: #242A34">
+<button type="button" style="border: 0; border-radius: 99px; background: transparent; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 12px">Week</button>
+<button type="button" style="border: 0; border-radius: 99px; background: transparent; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 7px 12px">Month</button>
+<button type="button" style="border: 0; border-radius: 99px; background: #2DD4BF; color: #003731; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; padding: 7px 12px">All</button>
+</div>
+</div>
+<span style="text-align: center; font-size: 14px; font-weight: 600; padding: 8px 0">Since Oct 10 · day 12 of 95</span>
+<div style="display: flex; align-items: flex-end; justify-content: space-between">
+<span><span style="font-family: Manrope, sans-serif; font-size: 28px; font-weight: 800">129</span><span style="font-family: Manrope, sans-serif; font-size: 18px; font-weight: 600; color: #93A0AE"> / 139 allowed</span></span>
+<span style="font-size: 12px; font-weight: 700; color: #4EDEA3; background: rgba(78,222,163,0.12); border: 1px solid rgba(78,222,163,0.45); border-radius: 99px; padding: 4px 10px">10 under</span>
+</div>
+<a href="Logs.dc.html" aria-label="Open all logs" style="text-decoration: none; display: block; background: #1E252F; border-radius: 20px; padding: 10px 0 6px">
+<svg width="310" height="200" viewBox="0 0 310 200" role="img" aria-label="Every day since Oct 10 against the plan, which steps down to zero on Jan 12">
+<defs><linearGradient id="areaAll" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2DD4BF" stop-opacity="0.35"></stop><stop offset="1" stop-color="#2DD4BF" stop-opacity="0"></stop></linearGradient></defs>
+<g stroke="#242A34" stroke-width="1"><line x1="10" y1="50" x2="300" y2="50"></line><line x1="10" y1="110" x2="300" y2="110"></line><line x1="10" y1="170" x2="300" y2="170"></line></g>
+<path d="M10 50 H34.7 V60 H59.4 V70 H84 V80 H108.7 V90 H133.4 V100 H158 V110 H182.8 V120 H207.4 V130 H232 V140 H253.7 V150 H278.4 V160 H300 V170" fill="none" stroke="#DDE2F0" stroke-width="1.6" stroke-dasharray="2 4" opacity="0.7"></path>
+<path d="M10 60 L13.1 50 L16.2 50 L19.3 40 L22.3 60 L25.4 50 L28.5 80 L31.6 30 L34.7 90 L37.8 40 L40.9 70 L43.9 130 L43.9 170 L10 170 Z" fill="url(#areaAll)"></path>
+<path d="M10 60 L13.1 50 L16.2 50 L19.3 40 L22.3 60 L25.4 50 L28.5 80 L31.6 30 L34.7 90 L37.8 40 L40.9 70 L43.9 130" fill="none" stroke="#2DD4BF" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></path>
+<line x1="43.9" y1="22" x2="43.9" y2="170" stroke="#57F1DB" stroke-width="1"></line>
+<circle cx="43.9" cy="130" r="4" fill="#1E252F" stroke="#2DD4BF" stroke-width="2.5"></circle>
+<text x="43.9" y="16" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="700" fill="#57F1DB">Today</text>
+<path d="M300 170 V150 h10 l-3 4 l3 4 h-10" fill="#FFB95F"></path>
+<text x="296" y="142" text-anchor="end" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="700" fill="#FFB95F">Quit Jan 12</text>
+<g font-family="Plus Jakarta Sans, sans-serif" font-size="11" fill="#93A0AE"><text x="10" y="192">Oct</text><text x="105" y="192">Nov</text><text x="200" y="192">Dec</text><text x="280" y="192">Jan</text></g>
+</svg>
+</a>
+<div style="display: flex; gap: 16px; font-size: 12px; color: #93A0AE">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 3px; border-radius: 2px; background: #2DD4BF"></span>Your days</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; border-top: 2px dotted #DDE2F0"></span>Your plan</span>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12px">
+<span>Avg 10.8/day</span>
+<span style="color: #FFB4AB">3 days over</span>
+<span style="color: #4EDEA3">9 days on track</span>
+</div>
+<div style="border-top: 1px solid #2C333D; padding-top: 12px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: #93A0AE">TOP TRIGGERS SINCE DAY 1</span>
+<a href="Logs.dc.html" style="text-decoration: none; font-size: 12px; font-weight: 700">All triggers ›</a>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<a href="Logs.dc.html" style="text-decoration: none; font-size: 12px; font-weight: 600; color: #FFB4AB; background: rgba(255,180,171,0.1); border: 1px solid rgba(255,180,171,0.35); border-radius: 99px; padding: 7px 10px">Stress · 36% ›</a>
+<a href="Logs.dc.html" style="text-decoration: none; font-size: 12px; font-weight: 600; color: #FFB95F; background: rgba(255,185,95,0.1); border: 1px solid rgba(255,185,95,0.35); border-radius: 99px; padding: 7px 10px">Work · 24% ›</a>
+<a href="Logs.dc.html" style="text-decoration: none; font-size: 12px; font-weight: 600; color: #57F1DB; background: rgba(45,212,191,0.1); border: 1px solid rgba(45,212,191,0.35); border-radius: 99px; padding: 7px 10px">Social · 17% ›</a>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":700}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

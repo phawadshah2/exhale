@@ -2,37 +2,46 @@ import 'package:exhale/core/domain/error/failure.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/clock.dart';
 import 'package:exhale/core/domain/usecase/usecase.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
-import 'package:exhale/features/tracking/domain/repositories/smoke_log_repository.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
+import 'package:exhale/features/tracking/domain/entities/trigger.dart';
+import 'package:exhale/features/tracking/domain/repositories/habit_log_repository.dart';
 import 'package:meta/meta.dart';
 
 @immutable
-class LogSmokeInput {
-  const LogSmokeInput({this.loggedAt, this.trigger, this.note});
+class AddHabitLogInput {
+  const AddHabitLogInput({
+    required this.habitKind,
+    this.loggedAt,
+    this.trigger,
+    this.note,
+  });
+
+  final HabitKind habitKind;
 
   /// Defaults to now; set it to back-fill a missed log.
   final DateTime? loggedAt;
-  final SmokeTrigger? trigger;
+  final Trigger? trigger;
   final String? note;
 }
 
-class LogSmoke implements UseCase<SmokeLog, LogSmokeInput> {
-  const LogSmoke(this._repository, this._clock);
-  final SmokeLogRepository _repository;
+class AddHabitLog implements UseCase<HabitLog, AddHabitLogInput> {
+  const AddHabitLog(this._repository, this._clock);
+  final HabitLogRepository _repository;
   final Clock _clock;
 
   @override
-  Future<Result<SmokeLog>> call(LogSmokeInput input) async {
+  Future<Result<HabitLog>> call(AddHabitLogInput input) async {
     final now = _clock.now();
     final loggedAt = input.loggedAt ?? now;
     if (loggedAt.isAfter(now)) {
-      return const FailureResult<SmokeLog>(
+      return const FailureResult<HabitLog>(
         ValidationFailure('A log cannot be in the future.'),
       );
     }
     return await _repository.addLog(
       loggedAt: loggedAt,
+      habitKind: input.habitKind,
       trigger: input.trigger,
       note: normalizeNote(input.note),
     );

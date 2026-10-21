@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Edit plan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#57F1DB}a:hover{color:#2DD4BF}
+</style>
+</helmet>
+<div style="width: 390px; height: 1560px; box-sizing: border-box; background: #0E141D; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 58px 20px 40px; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; align-items: center; justify-content: space-between">
+<a href="Details.dc.html" aria-label="Back" style="width: 44px; height: 44px; box-sizing: border-box; border-radius: 50%; background: #1A2029; border: 1px solid #2C333D; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+<h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 20px; font-weight: 700">Edit plan</h1>
+<span style="width: 44px"></span>
+</div>
+
+<div style="display: flex; align-items: center; gap: 12px; background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 14px 16px">
+<span style="width: 44px; height: 44px; border-radius: 15px; background: #242A34; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#57F1DB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.1 9.6 4.2 4.2 0 0 0 7 18z"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-family: Manrope, sans-serif; font-size: 17px; font-weight: 700">Vaping</span><span style="font-size: 12px; color: #93A0AE">Counted in sessions · Stage 2 of 9</span></div>
+</div>
+
+<div style="display: flex; gap: 10px; align-items: flex-start; background: rgba(45,212,191,0.08); border: 1px solid rgba(45,212,191,0.3); border-radius: 20px; padding: 12px 14px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#57F1DB" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
+<span style="font-size: 13px; line-height: 1.45">Changes start today. Past days keep the limits they had.</span>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 28px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: Manrope, sans-serif; font-size: 17px; font-weight: 700">Daily limit from today</span><span style="font-size: 13px; color: #93A0AE">Your plan tapers down from here</span></div>
+<div style="background: #1E252F; border-radius: 22px; padding: 12px; display: flex; align-items: center; justify-content: space-between">
+<button type="button" aria-label="Decrease" style="width: 52px; height: 52px; border-radius: 50%; border: 0; background: #2F353F; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+<div style="display: flex; flex-direction: column; align-items: center"><span><span style="font-family: Manrope, sans-serif; font-size: 40px; font-weight: 700">11</span><span style="font-size: 16px; color: #93A0AE"> sessions</span></span><span style="font-size: 12px; color: #93A0AE">per day</span></div>
+<button type="button" aria-label="Increase" style="width: 52px; height: 52px; border-radius: 50%; border: 0; background: #2F353F; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+</div>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 28px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: Manrope, sans-serif; font-size: 17px; font-weight: 700">Quit date</span><span style="font-size: 13px; color: #93A0AE">Your limit reaches zero on this day</span></div>
+<button type="button" style="border: 0; background: #1E252F; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; border-radius: 20px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; text-align: left">
+<span style="width: 44px; height: 44px; border-radius: 50%; background: #2F353F; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#57F1DB" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg></span>
+<span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-family: Manrope, sans-serif; font-size: 18px; font-weight: 700">Tue, Jan 12</span><span style="font-size: 12px; color: #93A0AE">in 12 weeks</span></span>
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #93A0AE">CHANGE</span>
+</button>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" aria-pressed="true" style="height: 36px; border-radius: 99px; border: 0; background: rgba(45,212,191,0.22); color: #57F1DB; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; padding: 0 14px">Keep current</button>
+<button type="button" style="height: 36px; border-radius: 99px; border: 0; background: #1E252F; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 0 14px">Suggested</button>
+<button type="button" style="height: 36px; border-radius: 99px; border: 0; background: #1E252F; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 0 14px">8 weeks</button>
+<button type="button" style="height: 36px; border-radius: 99px; border: 0; background: #1E252F; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 0 14px">16 weeks</button>
+</div>
+<div style="border-top: 1px solid #222934; padding-top: 12px; display: flex; justify-content: space-between; font-size: 13px">
+<span style="color: #93A0AE">About 1 fewer every 8 days</span>
+<span style="font-weight: 700; color: #57F1DB">462 fewer by Jan 12</span>
+</div>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 28px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: Manrope, sans-serif; font-size: 17px; font-weight: 700">What it costs</span><span style="font-size: 13px; color: #93A0AE">Used for money saved</span></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<label style="background: #1E252F; border-radius: 18px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #93A0AE">Price per pod</span><input type="text" value="$12.00" style="border: 0; background: transparent; color: #DDE2F0; font-family: Manrope, sans-serif; font-size: 20px; font-weight: 700; padding: 0; width: 100%"></label>
+<label style="background: #1E252F; border-radius: 18px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #93A0AE">Sessions per pod</span><input type="text" value="30" style="border: 0; background: transparent; color: #DDE2F0; font-family: Manrope, sans-serif; font-size: 20px; font-weight: 700; padding: 0; width: 100%"></label>
+</div>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 28px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px">
+<label for="whyEdit" style="font-family: Manrope, sans-serif; font-size: 17px; font-weight: 700">Your why</label>
+<input id="whyEdit" type="text" value="Breathe easier on my morning runs" style="height: 44px; box-sizing: border-box; border: 0; border-bottom: 1px solid #3C4A46; background: transparent; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; padding: 0">
+</div>
+
+<button type="button" style="height: 56px; border-radius: 99px; border: 0; background: #2DD4BF; color: #003731; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 700; margin-top: 4px">Save changes</button>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 8px">
+<button type="button" style="border: 0; background: transparent; color: #FFB4AB; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; padding: 10px">Stop tracking Vaping</button>
+<span style="font-size: 12px; color: #93A0AE; text-align: center">Its logs are kept. You can add it again later.</span>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1560}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

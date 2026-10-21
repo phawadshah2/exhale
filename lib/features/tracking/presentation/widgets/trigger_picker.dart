@@ -3,14 +3,15 @@ import 'dart:async';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
-import 'package:exhale/features/tracking/presentation/smoke_trigger_ui.dart';
+import 'package:exhale/features/tracking/domain/entities/trigger.dart';
+import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Two-column grid of the habit's trigger pills; tapping the selected one
-/// clears it. A selected trigger from another habit is still shown.
+/// clears it. A selected trigger from another habit is still shown; a last
+/// pill left alone on its row spans the full width.
 class TriggerPicker extends ConsumerWidget {
   const TriggerPicker({
     required this.selected,
@@ -18,8 +19,8 @@ class TriggerPicker extends ConsumerWidget {
     super.key,
   });
 
-  final SmokeTrigger? selected;
-  final ValueChanged<SmokeTrigger?> onChanged;
+  final Trigger? selected;
+  final ValueChanged<Trigger?> onChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,14 +32,16 @@ class TriggerPicker extends ConsumerWidget {
     ];
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = (constraints.maxWidth - AppSpacing.gutterSm) / 2;
+        final half = (constraints.maxWidth - AppSpacing.gutterSm) / 2;
         return Wrap(
           spacing: AppSpacing.gutterSm,
           runSpacing: AppSpacing.gutterSm,
           children: [
-            for (final trigger in triggers)
+            for (final (i, trigger) in triggers.indexed)
               SizedBox(
-                width: width,
+                width: i == triggers.length - 1 && triggers.length.isOdd
+                    ? constraints.maxWidth
+                    : half,
                 child: _TriggerPill(
                   trigger: trigger,
                   isSelected: trigger == selected,
@@ -62,7 +65,7 @@ class _TriggerPill extends StatelessWidget {
     required this.onTap,
   });
 
-  final SmokeTrigger trigger;
+  final Trigger trigger;
   final bool isSelected;
   final VoidCallback onTap;
 

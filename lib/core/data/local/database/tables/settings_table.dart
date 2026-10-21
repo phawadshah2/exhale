@@ -13,9 +13,11 @@ class Settings extends Table {
       integer().named('accent_index').withDefault(const Constant(0))();
   TextColumn get appIcon =>
       text().named('app_icon').withDefault(const Constant('breath'))();
-  IntColumn get priceCents => integer().named('pack_price_cents').nullable()();
+
+  /// Per container when the habit has one, else per unit.
+  IntColumn get priceCents => integer().named('price_cents').nullable()();
   IntColumn get unitsPerContainer =>
-      integer().named('cigarettes_per_pack').withDefault(const Constant(20))();
+      integer().named('units_per_container').withDefault(const Constant(20))();
   BoolColumn get askForTrigger =>
       boolean().named('ask_for_trigger').withDefault(const Constant(true))();
   BoolColumn get triggerPromptIntroSeen => boolean()

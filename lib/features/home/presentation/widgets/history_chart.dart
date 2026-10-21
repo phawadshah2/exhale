@@ -7,22 +7,31 @@ import 'package:exhale/features/tracking/domain/entities/period_summary.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:flutter/material.dart';
 
-/// Daily bars against a dashed, stepped limit line.
+/// Daily bars against a dashed, stepped limit line, spread across the full
+/// width. [selected] is highlighted; tapping a bar selects its day.
 class HistoryChart extends StatelessWidget {
   const HistoryChart({
     required this.summary,
-    required this.onDayTap,
+    required this.selected,
+    required this.canSelect,
+    required this.onSelect,
     super.key,
   });
 
   final PeriodSummary summary;
-  final ValueChanged<LogicalDay> onDayTap;
+  final LogicalDay selected;
+  final bool Function(LogicalDay day) canSelect;
+  final ValueChanged<LogicalDay> onSelect;
 
   static const double chartHeight = 168;
   static const double _labelHeight = 18;
 
-  /// Space on the right for the "Limit" chip, clear of the bars.
-  static const double _chipGutter = 64;
+  /// Bars plus day labels.
+  static const double height = chartHeight + 8 + _labelHeight;
+
+  /// Bars keep the width they had when 64pt on the right held the limit
+  /// chip, now that the chart uses the full width.
+  static const double _barWidthInset = 64;
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +40,9 @@ class HistoryChart extends StatelessWidget {
     final maxY = math.max(summary.peak, 1) * 1.25;
     double topFor(num value) => chartHeight - value / maxY * chartHeight;
 
-    final currentLimit = slots
+    final shownLimit = slots
         .lastWhere(
-          (s) => s.isToday,
+          (s) => s.day == selected && s.limit != null,
           orElse: () =>
               slots.lastWhere((s) => s.limit != null, orElse: () => slots.last),
         )
@@ -41,8 +50,13 @@ class HistoryChart extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final gutter = currentLimit == null ? 0.0 : _chipGutter;
-        final slotWidth = (constraints.maxWidth - gutter) / slots.length;
+        final slotWidth = constraints.maxWidth / slots.length;
+        final barWidth = math.min<double>(
+          (constraints.maxWidth - _barWidthInset) /
+              slots.length *
+              (isWeek ? 0.58 : 0.62),
+          34,
+        );
         return Column(
           children: [
             SizedBox(
@@ -50,11 +64,7 @@ class HistoryChart extends StatelessWidget {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    right: gutter,
+                  Positioned.fill(
                     child: CustomPaint(
                       painter: _GridAndLimitPainter(
                         limits: [for (final s in slots) s.limit],
@@ -69,6 +79,24 @@ class HistoryChart extends StatelessWidget {
                     ),
                   ),
                   for (var i = 0; i < slots.length; i++)
+                    if (slots[i].day == selected)
+                      Positioned(
+                        left: i * slotWidth + (isWeek ? 4 : 0),
+                        width: slotWidth - (isWeek ? 8 : 0),
+                        top: 0,
+                        bottom: 0,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: context.colors.primary.withValues(
+                              alpha: 0.08,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              isWeek ? 10 : 3,
+                            ),
+                          ),
+                        ),
+                      ),
+                  for (var i = 0; i < slots.length; i++)
                     Positioned(
                       left: i * slotWidth,
                       width: slotWidth,
@@ -76,23 +104,24 @@ class HistoryChart extends StatelessWidget {
                       bottom: 0,
                       child: _BarSlot(
                         slot: slots[i],
-                        slotWidth: slotWidth,
+                        barWidth: barWidth,
                         isWeek: isWeek,
+                        isSelected: slots[i].day == selected,
                         heightFor: (value) => chartHeight - topFor(value),
-                        onTap: slots[i].kind == DaySlotKind.tracked
-                            ? () => onDayTap(slots[i].day)
+                        onTap:
+                            slots[i].kind != DaySlotKind.future &&
+                                canSelect(slots[i].day)
+                            ? () => onSelect(slots[i].day)
                             : null,
                       ),
                     ),
-                  if (currentLimit != null)
+                  if (shownLimit != null)
                     Positioned(
-                      right: 0,
-                      width: gutter - 6,
-                      top: (topFor(currentLimit) - 11).clamp(
-                        0,
-                        chartHeight - 22,
+                      left: 0,
+                      top: (topFor(shownLimit) - 18).clamp(0, chartHeight - 16),
+                      child: IgnorePointer(
+                        child: _LimitLabel(limit: shownLimit),
                       ),
-                      child: _LimitChip(limit: currentLimit),
                     ),
                 ],
               ),
@@ -112,7 +141,7 @@ class HistoryChart extends StatelessWidget {
                           text: isWeek
                               ? AppFormat.weekdayInitial(slots[i].day)
                               : '${slots[i].day.day}',
-                          highlighted: slots[i].isToday,
+                          highlighted: slots[i].day == selected,
                         ),
                       ),
                 ],
@@ -128,23 +157,25 @@ class HistoryChart extends StatelessWidget {
 class _BarSlot extends StatelessWidget {
   const _BarSlot({
     required this.slot,
-    required this.slotWidth,
+    required this.barWidth,
     required this.isWeek,
+    required this.isSelected,
     required this.heightFor,
     required this.onTap,
   });
 
   final DaySlot slot;
-  final double slotWidth;
+  final double barWidth;
   final bool isWeek;
+  final bool isSelected;
   final double Function(num value) heightFor;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final barWidth = math.min<double>(slotWidth * (isWeek ? 0.58 : 0.62), 34);
     final radius = Radius.circular(isWeek ? 8 : 3);
     final progress = slot.progress;
+    final count = slot.count;
 
     final Widget bar;
     if (slot.kind == DaySlotKind.future) {
@@ -157,9 +188,9 @@ class _BarSlot extends StatelessWidget {
               ),
             )
           : const SizedBox.shrink();
-    } else if (progress == null) {
+    } else if (count == null) {
       bar = const SizedBox.shrink();
-    } else if (progress.count == 0) {
+    } else if (count == 0) {
       bar = Container(
         width: barWidth,
         height: 3,
@@ -169,18 +200,20 @@ class _BarSlot extends StatelessWidget {
         ),
       );
     } else {
-      final color = progress.status.barColor(context);
+      final color =
+          progress?.status.barColor(context) ??
+          context.colors.onSurfaceVariant.withValues(alpha: 0.45);
       bar = TweenAnimationBuilder<double>(
-        tween: Tween(end: heightFor(progress.count)),
+        tween: Tween(end: heightFor(count)),
         duration: const Duration(milliseconds: 600),
         curve: Curves.easeOutCubic,
         builder: (context, height, _) => Container(
           width: barWidth,
           height: height,
           decoration: BoxDecoration(
-            color: slot.isToday ? color : color.withValues(alpha: 0.82),
+            color: isSelected ? color : color.withValues(alpha: 0.82),
             borderRadius: BorderRadius.vertical(top: radius),
-            boxShadow: slot.isToday
+            boxShadow: isSelected && progress != null
                 ? [
                     BoxShadow(
                       color: color.withValues(alpha: 0.18),
@@ -193,13 +226,16 @@ class _BarSlot extends StatelessWidget {
       );
     }
 
-    final label = progress == null
-        ? null
-        : '${AppFormat.weekdayDate(slot.day)}: '
-              '${progress.count} of ${progress.limit}';
+    final label = progress != null
+        ? '${AppFormat.weekdayDate(slot.day)}: '
+              '${progress.count} of ${progress.limit}'
+        : count != null
+        ? '${AppFormat.weekdayDate(slot.day)}: $count before your plan'
+        : null;
 
     return Semantics(
       button: onTap != null,
+      selected: isSelected,
       label: label,
       excludeSemantics: true,
       child: GestureDetector(
@@ -208,13 +244,13 @@ class _BarSlot extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            if (isWeek && progress != null && progress.count > 0)
+            if (isWeek && count != null && count > 0)
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Text(
-                  '${progress.count}',
+                  '$count',
                   style: context.textTheme.labelMedium?.copyWith(
-                    color: slot.isToday
+                    color: isSelected
                         ? context.colors.onSurface
                         : context.colors.onSurfaceVariant,
                   ),
@@ -249,26 +285,18 @@ class _DayLabel extends StatelessWidget {
   }
 }
 
-class _LimitChip extends StatelessWidget {
-  const _LimitChip({required this.limit});
+class _LimitLabel extends StatelessWidget {
+  const _LimitLabel({required this.limit});
 
   final int limit;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    return Container(
-      height: 22,
-      alignment: Alignment.center,
-      decoration: ShapeDecoration(
-        color: colors.surfaceContainerHighest,
-        shape: StadiumBorder(
-          side: BorderSide(color: colors.primary.withValues(alpha: 0.5)),
-        ),
-      ),
-      child: Text(
-        'Limit $limit',
-        style: context.textTheme.labelMedium?.copyWith(color: colors.primary),
+    return Text(
+      'Limit $limit',
+      style: context.textTheme.labelSmall?.copyWith(
+        color: context.colors.primary,
+        fontWeight: FontWeight.w600,
       ),
     );
   }

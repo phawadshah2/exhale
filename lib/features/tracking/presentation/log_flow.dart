@@ -6,9 +6,9 @@ import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/presentation/providers/clock_providers.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
-import 'package:exhale/features/tracking/domain/usecases/log_smoke.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
+import 'package:exhale/features/tracking/domain/entities/trigger.dart';
+import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:exhale/features/tracking/presentation/widgets/trigger_sheet.dart';
 import 'package:flutter/services.dart';
@@ -22,7 +22,7 @@ Future<void> logNow(BuildContext context, WidgetRef ref) async {
   final loggedAt = ref.read(clockProvider).now();
   final settings = ref.read(currentSettingsProvider);
 
-  SmokeTrigger? trigger;
+  Trigger? trigger;
   if (settings.askForTrigger) {
     final firstPrompt = !settings.triggerPromptIntroSeen;
     final answer = await showTriggerSheet(
@@ -44,17 +44,21 @@ Future<void> logNow(BuildContext context, WidgetRef ref) async {
     }
   }
 
-  final result = await ref.read(logSmokeProvider)(
-    LogSmokeInput(loggedAt: loggedAt, trigger: trigger),
+  final result = await ref.read(addHabitLogProvider)(
+    AddHabitLogInput(
+      habitKind: settings.habitKind,
+      loggedAt: loggedAt,
+      trigger: trigger,
+    ),
   );
   if (!context.mounted) return;
   switch (result) {
-    case Success(value: final SmokeLog log):
+    case Success(value: final HabitLog log):
       showAppSnackBar(
         context,
         message: 'Logged at ${AppFormat.time(log.loggedAt)}',
         actionLabel: 'Undo',
-        onAction: () => ref.read(deleteSmokeLogProvider)(log.id),
+        onAction: () => ref.read(deleteHabitLogProvider)(log.id),
         duration: const Duration(seconds: 2),
       );
     case FailureResult(:final failure):

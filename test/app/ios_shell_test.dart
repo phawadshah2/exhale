@@ -59,7 +59,7 @@ void main() {
     await tester.tap(find.byTooltip('Log'));
     await tester.pumpAndSettle();
     expect(find.text('What triggered this one?'), findsOneWidget);
-    await tester.tap(find.text('Skip and save'));
+    await tester.tap(find.text('Save without trigger'));
     await tester.pumpInSteps(const Duration(milliseconds: 900));
     expect(find.text('Logged at 3:42 PM'), findsOneWidget);
 
@@ -94,7 +94,7 @@ void main() {
     // The sheet is a root route, so it is painted over the tab bar area.
     expect(sheet.top, lessThan(tabBar.top));
 
-    await tester.tap(find.text('Skip and save'));
+    await tester.tap(find.text('Save without trigger'));
     await tester.pumpAndSettle();
     await tester.disposeApp();
   });
