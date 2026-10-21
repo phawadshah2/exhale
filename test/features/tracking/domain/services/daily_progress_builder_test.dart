@@ -1,9 +1,10 @@
 import 'package:exhale/core/domain/time/day_boundary.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/services/daily_progress_builder.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -18,7 +19,8 @@ void main() {
   ]);
   var nextId = 1;
 
-  SmokeLog log(DateTime at) => SmokeLog(id: nextId++, loggedAt: at);
+  HabitLog log(DateTime at) =>
+      HabitLog(id: nextId++, loggedAt: at, habitKind: HabitKind.smoking);
 
   test('one entry per day, including empty days', () {
     final result = buildDailyProgress(

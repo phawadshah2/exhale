@@ -12,10 +12,10 @@ import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
-import 'package:exhale/features/tracking/presentation/smoke_trigger_ui.dart';
+import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
 import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,7 +40,7 @@ class DayDetailSheet extends ConsumerWidget {
   Future<void> _confirmDelete(
     BuildContext context,
     WidgetRef ref,
-    SmokeLog log,
+    HabitLog log,
   ) async {
     final confirmed = await showAppConfirm(
       context,
@@ -53,7 +53,7 @@ class DayDetailSheet extends ConsumerWidget {
       destructive: true,
     );
     if (!confirmed) return;
-    final result = await ref.read(deleteSmokeLogProvider)(log.id);
+    final result = await ref.read(deleteHabitLogProvider)(log.id);
     if (result case FailureResult(:final failure) when context.mounted) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(failureMessage(failure))));
@@ -212,7 +212,7 @@ class _LogTile extends StatelessWidget {
     required this.onDelete,
   });
 
-  final SmokeLog log;
+  final HabitLog log;
   final Color dotColor;
   final VoidCallback onEdit;
   final VoidCallback onDelete;

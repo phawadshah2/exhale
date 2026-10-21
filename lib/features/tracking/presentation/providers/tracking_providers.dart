@@ -4,26 +4,26 @@ import 'package:exhale/core/presentation/providers/clock_providers.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
-import 'package:exhale/features/tracking/domain/repositories/smoke_log_repository.dart';
-import 'package:exhale/features/tracking/domain/usecases/delete_smoke_log.dart';
-import 'package:exhale/features/tracking/domain/usecases/log_smoke.dart';
-import 'package:exhale/features/tracking/domain/usecases/update_smoke_log.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
+import 'package:exhale/features/tracking/domain/repositories/habit_log_repository.dart';
+import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
+import 'package:exhale/features/tracking/domain/usecases/delete_habit_log.dart';
+import 'package:exhale/features/tracking/domain/usecases/update_habit_log.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 
-final smokeLogRepositoryProvider = Provider<SmokeLogRepository>(
-  (ref) => sl<SmokeLogRepository>(),
+final habitLogRepositoryProvider = Provider<HabitLogRepository>(
+  (ref) => sl<HabitLogRepository>(),
 );
 
-final logSmokeProvider = Provider<LogSmoke>((ref) => sl<LogSmoke>());
+final addHabitLogProvider = Provider<AddHabitLog>((ref) => sl<AddHabitLog>());
 
-final updateSmokeLogProvider = Provider<UpdateSmokeLog>(
-  (ref) => sl<UpdateSmokeLog>(),
+final updateHabitLogProvider = Provider<UpdateHabitLog>(
+  (ref) => sl<UpdateHabitLog>(),
 );
 
-final deleteSmokeLogProvider = Provider<DeleteSmokeLog>(
-  (ref) => sl<DeleteSmokeLog>(),
+final deleteHabitLogProvider = Provider<DeleteHabitLog>(
+  (ref) => sl<DeleteHabitLog>(),
 );
 
 /// The logical day it is now, under the user's reset hour.
@@ -32,16 +32,24 @@ final todayProvider = Provider<LogicalDay>((ref) {
   return ref.watch(dayBoundaryProvider).dayOf(now);
 });
 
-final StreamProviderFamily<List<SmokeLog>, LogicalDay> logsForDayProvider =
-    StreamProvider.autoDispose.family<List<SmokeLog>, LogicalDay>((ref, day) {
+/// The current habit's logs on [LogicalDay], oldest first.
+final StreamProviderFamily<List<HabitLog>, LogicalDay> logsForDayProvider =
+    StreamProvider.autoDispose.family<List<HabitLog>, LogicalDay>((ref, day) {
       final boundary = ref.watch(dayBoundaryProvider);
       return ref
-          .watch(smokeLogRepositoryProvider)
-          .watchLogs(from: boundary.startOf(day), to: boundary.endOf(day));
+          .watch(habitLogRepositoryProvider)
+          .watchLogs(
+            habitKind: ref.watch(habitProvider).kind,
+            from: boundary.startOf(day),
+            to: boundary.endOf(day),
+          );
     });
 
-final latestLogProvider = StreamProvider<SmokeLog?>(
-  (ref) => ref.watch(smokeLogRepositoryProvider).watchLatest(),
+/// The current habit's most recent log.
+final latestLogProvider = StreamProvider<HabitLog?>(
+  (ref) => ref
+      .watch(habitLogRepositoryProvider)
+      .watchLatest(habitKind: ref.watch(habitProvider).kind),
 );
 
 /// Today's count against today's limit; null before a plan exists.

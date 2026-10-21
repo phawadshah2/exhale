@@ -359,12 +359,12 @@ class PlansCompanion extends UpdateCompanion<PlanRow> {
   }
 }
 
-class $SmokeLogsTable extends SmokeLogs
-    with TableInfo<$SmokeLogsTable, SmokeLogRow> {
+class $HabitLogsTable extends HabitLogs
+    with TableInfo<$HabitLogsTable, HabitLogRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $SmokeLogsTable(this.attachedDatabase, [this._alias]);
+  $HabitLogsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -388,6 +388,18 @@ class $SmokeLogsTable extends SmokeLogs
     false,
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _habitKindMeta = const VerificationMeta(
+    'habitKind',
+  );
+  @override
+  late final GeneratedColumn<String> habitKind = GeneratedColumn<String>(
+    'habit_kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('smoking'),
   );
   static const VerificationMeta _triggerMeta = const VerificationMeta(
     'trigger',
@@ -425,6 +437,7 @@ class $SmokeLogsTable extends SmokeLogs
   List<GeneratedColumn> get $columns => [
     id,
     loggedAt,
+    habitKind,
     trigger,
     note,
     createdAt,
@@ -433,10 +446,10 @@ class $SmokeLogsTable extends SmokeLogs
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'smoke_logs';
+  static const String $name = 'habit_logs';
   @override
   VerificationContext validateIntegrity(
-    Insertable<SmokeLogRow> instance, {
+    Insertable<HabitLogRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -451,6 +464,12 @@ class $SmokeLogsTable extends SmokeLogs
       );
     } else if (isInserting) {
       context.missing(_loggedAtMeta);
+    }
+    if (data.containsKey('habit_kind')) {
+      context.handle(
+        _habitKindMeta,
+        habitKind.isAcceptableOrUnknown(data['habit_kind']!, _habitKindMeta),
+      );
     }
     if (data.containsKey('trigger')) {
       context.handle(
@@ -476,9 +495,9 @@ class $SmokeLogsTable extends SmokeLogs
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  SmokeLogRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+  HabitLogRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return SmokeLogRow(
+    return HabitLogRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -486,6 +505,10 @@ class $SmokeLogsTable extends SmokeLogs
       loggedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}logged_at'],
+      )!,
+      habitKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}habit_kind'],
       )!,
       trigger: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -503,22 +526,27 @@ class $SmokeLogsTable extends SmokeLogs
   }
 
   @override
-  $SmokeLogsTable createAlias(String alias) {
-    return $SmokeLogsTable(attachedDatabase, alias);
+  $HabitLogsTable createAlias(String alias) {
+    return $HabitLogsTable(attachedDatabase, alias);
   }
 }
 
-class SmokeLogRow extends DataClass implements Insertable<SmokeLogRow> {
+class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
   final int id;
   final DateTime loggedAt;
 
-  /// SmokeTrigger.name, or null when skipped.
+  /// HabitKind.name of the habit when it was logged; rows from before v7
+  /// were smoking.
+  final String habitKind;
+
+  /// Trigger.name, or null when skipped.
   final String? trigger;
   final String? note;
   final DateTime createdAt;
-  const SmokeLogRow({
+  const HabitLogRow({
     required this.id,
     required this.loggedAt,
+    required this.habitKind,
     this.trigger,
     this.note,
     required this.createdAt,
@@ -528,6 +556,7 @@ class SmokeLogRow extends DataClass implements Insertable<SmokeLogRow> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['logged_at'] = Variable<DateTime>(loggedAt);
+    map['habit_kind'] = Variable<String>(habitKind);
     if (!nullToAbsent || trigger != null) {
       map['trigger'] = Variable<String>(trigger);
     }
@@ -538,10 +567,11 @@ class SmokeLogRow extends DataClass implements Insertable<SmokeLogRow> {
     return map;
   }
 
-  SmokeLogsCompanion toCompanion(bool nullToAbsent) {
-    return SmokeLogsCompanion(
+  HabitLogsCompanion toCompanion(bool nullToAbsent) {
+    return HabitLogsCompanion(
       id: Value(id),
       loggedAt: Value(loggedAt),
+      habitKind: Value(habitKind),
       trigger: trigger == null && nullToAbsent
           ? const Value.absent()
           : Value(trigger),
@@ -550,14 +580,15 @@ class SmokeLogRow extends DataClass implements Insertable<SmokeLogRow> {
     );
   }
 
-  factory SmokeLogRow.fromJson(
+  factory HabitLogRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return SmokeLogRow(
+    return HabitLogRow(
       id: serializer.fromJson<int>(json['id']),
       loggedAt: serializer.fromJson<DateTime>(json['loggedAt']),
+      habitKind: serializer.fromJson<String>(json['habitKind']),
       trigger: serializer.fromJson<String?>(json['trigger']),
       note: serializer.fromJson<String?>(json['note']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -569,29 +600,33 @@ class SmokeLogRow extends DataClass implements Insertable<SmokeLogRow> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'loggedAt': serializer.toJson<DateTime>(loggedAt),
+      'habitKind': serializer.toJson<String>(habitKind),
       'trigger': serializer.toJson<String?>(trigger),
       'note': serializer.toJson<String?>(note),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
-  SmokeLogRow copyWith({
+  HabitLogRow copyWith({
     int? id,
     DateTime? loggedAt,
+    String? habitKind,
     Value<String?> trigger = const Value.absent(),
     Value<String?> note = const Value.absent(),
     DateTime? createdAt,
-  }) => SmokeLogRow(
+  }) => HabitLogRow(
     id: id ?? this.id,
     loggedAt: loggedAt ?? this.loggedAt,
+    habitKind: habitKind ?? this.habitKind,
     trigger: trigger.present ? trigger.value : this.trigger,
     note: note.present ? note.value : this.note,
     createdAt: createdAt ?? this.createdAt,
   );
-  SmokeLogRow copyWithCompanion(SmokeLogsCompanion data) {
-    return SmokeLogRow(
+  HabitLogRow copyWithCompanion(HabitLogsCompanion data) {
+    return HabitLogRow(
       id: data.id.present ? data.id.value : this.id,
       loggedAt: data.loggedAt.present ? data.loggedAt.value : this.loggedAt,
+      habitKind: data.habitKind.present ? data.habitKind.value : this.habitKind,
       trigger: data.trigger.present ? data.trigger.value : this.trigger,
       note: data.note.present ? data.note.value : this.note,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -600,9 +635,10 @@ class SmokeLogRow extends DataClass implements Insertable<SmokeLogRow> {
 
   @override
   String toString() {
-    return (StringBuffer('SmokeLogRow(')
+    return (StringBuffer('HabitLogRow(')
           ..write('id: $id, ')
           ..write('loggedAt: $loggedAt, ')
+          ..write('habitKind: $habitKind, ')
           ..write('trigger: $trigger, ')
           ..write('note: $note, ')
           ..write('createdAt: $createdAt')
@@ -611,41 +647,47 @@ class SmokeLogRow extends DataClass implements Insertable<SmokeLogRow> {
   }
 
   @override
-  int get hashCode => Object.hash(id, loggedAt, trigger, note, createdAt);
+  int get hashCode =>
+      Object.hash(id, loggedAt, habitKind, trigger, note, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is SmokeLogRow &&
+      (other is HabitLogRow &&
           other.id == this.id &&
           other.loggedAt == this.loggedAt &&
+          other.habitKind == this.habitKind &&
           other.trigger == this.trigger &&
           other.note == this.note &&
           other.createdAt == this.createdAt);
 }
 
-class SmokeLogsCompanion extends UpdateCompanion<SmokeLogRow> {
+class HabitLogsCompanion extends UpdateCompanion<HabitLogRow> {
   final Value<int> id;
   final Value<DateTime> loggedAt;
+  final Value<String> habitKind;
   final Value<String?> trigger;
   final Value<String?> note;
   final Value<DateTime> createdAt;
-  const SmokeLogsCompanion({
+  const HabitLogsCompanion({
     this.id = const Value.absent(),
     this.loggedAt = const Value.absent(),
+    this.habitKind = const Value.absent(),
     this.trigger = const Value.absent(),
     this.note = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
-  SmokeLogsCompanion.insert({
+  HabitLogsCompanion.insert({
     this.id = const Value.absent(),
     required DateTime loggedAt,
+    this.habitKind = const Value.absent(),
     this.trigger = const Value.absent(),
     this.note = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : loggedAt = Value(loggedAt);
-  static Insertable<SmokeLogRow> custom({
+  static Insertable<HabitLogRow> custom({
     Expression<int>? id,
     Expression<DateTime>? loggedAt,
+    Expression<String>? habitKind,
     Expression<String>? trigger,
     Expression<String>? note,
     Expression<DateTime>? createdAt,
@@ -653,22 +695,25 @@ class SmokeLogsCompanion extends UpdateCompanion<SmokeLogRow> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (loggedAt != null) 'logged_at': loggedAt,
+      if (habitKind != null) 'habit_kind': habitKind,
       if (trigger != null) 'trigger': trigger,
       if (note != null) 'note': note,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
 
-  SmokeLogsCompanion copyWith({
+  HabitLogsCompanion copyWith({
     Value<int>? id,
     Value<DateTime>? loggedAt,
+    Value<String>? habitKind,
     Value<String?>? trigger,
     Value<String?>? note,
     Value<DateTime>? createdAt,
   }) {
-    return SmokeLogsCompanion(
+    return HabitLogsCompanion(
       id: id ?? this.id,
       loggedAt: loggedAt ?? this.loggedAt,
+      habitKind: habitKind ?? this.habitKind,
       trigger: trigger ?? this.trigger,
       note: note ?? this.note,
       createdAt: createdAt ?? this.createdAt,
@@ -684,6 +729,9 @@ class SmokeLogsCompanion extends UpdateCompanion<SmokeLogRow> {
     if (loggedAt.present) {
       map['logged_at'] = Variable<DateTime>(loggedAt.value);
     }
+    if (habitKind.present) {
+      map['habit_kind'] = Variable<String>(habitKind.value);
+    }
     if (trigger.present) {
       map['trigger'] = Variable<String>(trigger.value);
     }
@@ -698,9 +746,10 @@ class SmokeLogsCompanion extends UpdateCompanion<SmokeLogRow> {
 
   @override
   String toString() {
-    return (StringBuffer('SmokeLogsCompanion(')
+    return (StringBuffer('HabitLogsCompanion(')
           ..write('id: $id, ')
           ..write('loggedAt: $loggedAt, ')
+          ..write('habitKind: $habitKind, ')
           ..write('trigger: $trigger, ')
           ..write('note: $note, ')
           ..write('createdAt: $createdAt')
@@ -789,7 +838,7 @@ class $SettingsTable extends Settings
   );
   @override
   late final GeneratedColumn<int> priceCents = GeneratedColumn<int>(
-    'pack_price_cents',
+    'price_cents',
     aliasedName,
     true,
     type: DriftSqlType.int,
@@ -800,7 +849,7 @@ class $SettingsTable extends Settings
   );
   @override
   late final GeneratedColumn<int> unitsPerContainer = GeneratedColumn<int>(
-    'cigarettes_per_pack',
+    'units_per_container',
     aliasedName,
     false,
     type: DriftSqlType.int,
@@ -964,20 +1013,17 @@ class $SettingsTable extends Settings
         appIcon.isAcceptableOrUnknown(data['app_icon']!, _appIconMeta),
       );
     }
-    if (data.containsKey('pack_price_cents')) {
+    if (data.containsKey('price_cents')) {
       context.handle(
         _priceCentsMeta,
-        priceCents.isAcceptableOrUnknown(
-          data['pack_price_cents']!,
-          _priceCentsMeta,
-        ),
+        priceCents.isAcceptableOrUnknown(data['price_cents']!, _priceCentsMeta),
       );
     }
-    if (data.containsKey('cigarettes_per_pack')) {
+    if (data.containsKey('units_per_container')) {
       context.handle(
         _unitsPerContainerMeta,
         unitsPerContainer.isAcceptableOrUnknown(
-          data['cigarettes_per_pack']!,
+          data['units_per_container']!,
           _unitsPerContainerMeta,
         ),
       );
@@ -1074,11 +1120,11 @@ class $SettingsTable extends Settings
       )!,
       priceCents: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}pack_price_cents'],
+        data['${effectivePrefix}price_cents'],
       ),
       unitsPerContainer: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}cigarettes_per_pack'],
+        data['${effectivePrefix}units_per_container'],
       )!,
       askForTrigger: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
@@ -1124,6 +1170,8 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
   final String themePreference;
   final int accentIndex;
   final String appIcon;
+
+  /// Per container when the habit has one, else per unit.
   final int? priceCents;
   final int unitsPerContainer;
   final bool askForTrigger;
@@ -1164,9 +1212,9 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     map['accent_index'] = Variable<int>(accentIndex);
     map['app_icon'] = Variable<String>(appIcon);
     if (!nullToAbsent || priceCents != null) {
-      map['pack_price_cents'] = Variable<int>(priceCents);
+      map['price_cents'] = Variable<int>(priceCents);
     }
-    map['cigarettes_per_pack'] = Variable<int>(unitsPerContainer);
+    map['units_per_container'] = Variable<int>(unitsPerContainer);
     map['ask_for_trigger'] = Variable<bool>(askForTrigger);
     map['trigger_prompt_intro_seen'] = Variable<bool>(triggerPromptIntroSeen);
     map['habit_kind'] = Variable<String>(habitKind);
@@ -1473,8 +1521,8 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       if (themePreference != null) 'theme_preference': themePreference,
       if (accentIndex != null) 'accent_index': accentIndex,
       if (appIcon != null) 'app_icon': appIcon,
-      if (priceCents != null) 'pack_price_cents': priceCents,
-      if (unitsPerContainer != null) 'cigarettes_per_pack': unitsPerContainer,
+      if (priceCents != null) 'price_cents': priceCents,
+      if (unitsPerContainer != null) 'units_per_container': unitsPerContainer,
       if (askForTrigger != null) 'ask_for_trigger': askForTrigger,
       if (triggerPromptIntroSeen != null)
         'trigger_prompt_intro_seen': triggerPromptIntroSeen,
@@ -1545,10 +1593,10 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       map['app_icon'] = Variable<String>(appIcon.value);
     }
     if (priceCents.present) {
-      map['pack_price_cents'] = Variable<int>(priceCents.value);
+      map['price_cents'] = Variable<int>(priceCents.value);
     }
     if (unitsPerContainer.present) {
-      map['cigarettes_per_pack'] = Variable<int>(unitsPerContainer.value);
+      map['units_per_container'] = Variable<int>(unitsPerContainer.value);
     }
     if (askForTrigger.present) {
       map['ask_for_trigger'] = Variable<bool>(askForTrigger.value);
@@ -1603,11 +1651,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $PlansTable plans = $PlansTable(this);
-  late final $SmokeLogsTable smokeLogs = $SmokeLogsTable(this);
+  late final $HabitLogsTable habitLogs = $HabitLogsTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
-  late final Index idxSmokeLogsLoggedAt = Index(
-    'idx_smoke_logs_logged_at',
-    'CREATE INDEX idx_smoke_logs_logged_at ON smoke_logs (logged_at)',
+  late final Index idxHabitLogsLoggedAt = Index(
+    'idx_habit_logs_logged_at',
+    'CREATE INDEX idx_habit_logs_logged_at ON habit_logs (logged_at)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -1615,9 +1663,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     plans,
-    smokeLogs,
+    habitLogs,
     settings,
-    idxSmokeLogsLoggedAt,
+    idxHabitLogsLoggedAt,
   ];
 }
 
@@ -1817,24 +1865,26 @@ typedef $$PlansTableProcessedTableManager =
       PlanRow,
       PrefetchHooks Function()
     >;
-typedef $$SmokeLogsTableCreateCompanionBuilder = SmokeLogsCompanion Function({
+typedef $$HabitLogsTableCreateCompanionBuilder = HabitLogsCompanion Function({
   Value<int> id,
   required DateTime loggedAt,
+  Value<String> habitKind,
   Value<String?> trigger,
   Value<String?> note,
   Value<DateTime> createdAt,
 });
-typedef $$SmokeLogsTableUpdateCompanionBuilder = SmokeLogsCompanion Function({
+typedef $$HabitLogsTableUpdateCompanionBuilder = HabitLogsCompanion Function({
   Value<int> id,
   Value<DateTime> loggedAt,
+  Value<String> habitKind,
   Value<String?> trigger,
   Value<String?> note,
   Value<DateTime> createdAt,
 });
 
-class $$SmokeLogsTableFilterComposer
-    extends Composer<_$AppDatabase, $SmokeLogsTable> {
-  $$SmokeLogsTableFilterComposer({
+class $$HabitLogsTableFilterComposer
+    extends Composer<_$AppDatabase, $HabitLogsTable> {
+  $$HabitLogsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1848,6 +1898,11 @@ class $$SmokeLogsTableFilterComposer
 
   ColumnFilters<DateTime> get loggedAt => $composableBuilder(
     column: $table.loggedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get habitKind => $composableBuilder(
+    column: $table.habitKind,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1867,9 +1922,9 @@ class $$SmokeLogsTableFilterComposer
   );
 }
 
-class $$SmokeLogsTableOrderingComposer
-    extends Composer<_$AppDatabase, $SmokeLogsTable> {
-  $$SmokeLogsTableOrderingComposer({
+class $$HabitLogsTableOrderingComposer
+    extends Composer<_$AppDatabase, $HabitLogsTable> {
+  $$HabitLogsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1883,6 +1938,11 @@ class $$SmokeLogsTableOrderingComposer
 
   ColumnOrderings<DateTime> get loggedAt => $composableBuilder(
     column: $table.loggedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get habitKind => $composableBuilder(
+    column: $table.habitKind,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1902,9 +1962,9 @@ class $$SmokeLogsTableOrderingComposer
   );
 }
 
-class $$SmokeLogsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $SmokeLogsTable> {
-  $$SmokeLogsTableAnnotationComposer({
+class $$HabitLogsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HabitLogsTable> {
+  $$HabitLogsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1917,6 +1977,9 @@ class $$SmokeLogsTableAnnotationComposer
   GeneratedColumn<DateTime> get loggedAt =>
       $composableBuilder(column: $table.loggedAt, builder: (column) => column);
 
+  GeneratedColumn<String> get habitKind =>
+      $composableBuilder(column: $table.habitKind, builder: (column) => column);
+
   GeneratedColumn<String> get trigger =>
       $composableBuilder(column: $table.trigger, builder: (column) => column);
 
@@ -1927,45 +1990,47 @@ class $$SmokeLogsTableAnnotationComposer
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
 
-class $$SmokeLogsTableTableManager
+class $$HabitLogsTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $SmokeLogsTable,
-          SmokeLogRow,
-          $$SmokeLogsTableFilterComposer,
-          $$SmokeLogsTableOrderingComposer,
-          $$SmokeLogsTableAnnotationComposer,
-          $$SmokeLogsTableCreateCompanionBuilder,
-          $$SmokeLogsTableUpdateCompanionBuilder,
+          $HabitLogsTable,
+          HabitLogRow,
+          $$HabitLogsTableFilterComposer,
+          $$HabitLogsTableOrderingComposer,
+          $$HabitLogsTableAnnotationComposer,
+          $$HabitLogsTableCreateCompanionBuilder,
+          $$HabitLogsTableUpdateCompanionBuilder,
           (
-            SmokeLogRow,
-            BaseReferences<_$AppDatabase, $SmokeLogsTable, SmokeLogRow>,
+            HabitLogRow,
+            BaseReferences<_$AppDatabase, $HabitLogsTable, HabitLogRow>,
           ),
-          SmokeLogRow,
+          HabitLogRow,
           PrefetchHooks Function()
         > {
-  $$SmokeLogsTableTableManager(_$AppDatabase db, $SmokeLogsTable table)
+  $$HabitLogsTableTableManager(_$AppDatabase db, $HabitLogsTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$SmokeLogsTableFilterComposer($db: db, $table: table),
+              $$HabitLogsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$SmokeLogsTableOrderingComposer($db: db, $table: table),
+              $$HabitLogsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$SmokeLogsTableAnnotationComposer($db: db, $table: table),
+              $$HabitLogsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<DateTime> loggedAt = const Value.absent(),
+                Value<String> habitKind = const Value.absent(),
                 Value<String?> trigger = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
-              }) => SmokeLogsCompanion(
+              }) => HabitLogsCompanion(
                 id: id,
                 loggedAt: loggedAt,
+                habitKind: habitKind,
                 trigger: trigger,
                 note: note,
                 createdAt: createdAt,
@@ -1974,12 +2039,14 @@ class $$SmokeLogsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required DateTime loggedAt,
+                Value<String> habitKind = const Value.absent(),
                 Value<String?> trigger = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
-              }) => SmokeLogsCompanion.insert(
+              }) => HabitLogsCompanion.insert(
                 id: id,
                 loggedAt: loggedAt,
+                habitKind: habitKind,
                 trigger: trigger,
                 note: note,
                 createdAt: createdAt,
@@ -1987,8 +2054,8 @@ class $$SmokeLogsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$SmokeLogsTable, SmokeLogRow>(table),
-                  BaseReferences<_$AppDatabase, $SmokeLogsTable, SmokeLogRow>(
+                  e.readTable<$HabitLogsTable, HabitLogRow>(table),
+                  BaseReferences<_$AppDatabase, $HabitLogsTable, HabitLogRow>(
                     db,
                     table,
                     e,
@@ -2001,21 +2068,21 @@ class $$SmokeLogsTableTableManager
       );
 }
 
-typedef $$SmokeLogsTableProcessedTableManager =
+typedef $$HabitLogsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $SmokeLogsTable,
-      SmokeLogRow,
-      $$SmokeLogsTableFilterComposer,
-      $$SmokeLogsTableOrderingComposer,
-      $$SmokeLogsTableAnnotationComposer,
-      $$SmokeLogsTableCreateCompanionBuilder,
-      $$SmokeLogsTableUpdateCompanionBuilder,
+      $HabitLogsTable,
+      HabitLogRow,
+      $$HabitLogsTableFilterComposer,
+      $$HabitLogsTableOrderingComposer,
+      $$HabitLogsTableAnnotationComposer,
+      $$HabitLogsTableCreateCompanionBuilder,
+      $$HabitLogsTableUpdateCompanionBuilder,
       (
-        SmokeLogRow,
-        BaseReferences<_$AppDatabase, $SmokeLogsTable, SmokeLogRow>,
+        HabitLogRow,
+        BaseReferences<_$AppDatabase, $HabitLogsTable, HabitLogRow>,
       ),
-      SmokeLogRow,
+      HabitLogRow,
       PrefetchHooks Function()
     >;
 typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
@@ -2432,8 +2499,8 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$PlansTableTableManager get plans =>
       $$PlansTableTableManager(_db, _db.plans);
-  $$SmokeLogsTableTableManager get smokeLogs =>
-      $$SmokeLogsTableTableManager(_db, _db.smokeLogs);
+  $$HabitLogsTableTableManager get habitLogs =>
+      $$HabitLogsTableTableManager(_db, _db.habitLogs);
   $$SettingsTableTableManager get settings =>
       $$SettingsTableTableManager(_db, _db.settings);
 }

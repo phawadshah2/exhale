@@ -157,7 +157,7 @@ class _TypeScale extends StatelessWidget {
       ('headlineMedium', t.headlineMedium, '5 left today'),
       ('headlineSmall', t.headlineSmall, 'Smoking History'),
       ('titleLarge', t.titleLarge, 'Weekly Milestones'),
-      ('titleMedium', t.titleMedium, 'Log a smoke'),
+      ('titleMedium', t.titleMedium, 'Log now'),
       ('bodyLarge', t.bodyLarge, 'Gentle reduction gives your body time.'),
       ('bodyMedium', t.bodyMedium, 'Every 7 days your limit drops by 1.'),
       ('bodySmall', t.bodySmall, 'Since Day 1'),
@@ -210,7 +210,7 @@ class _Buttons extends StatelessWidget {
           child: FilledButton.icon(
             onPressed: () {},
             icon: const Icon(AppIcons.flame),
-            label: const Text('Log a smoke'),
+            label: const Text('Log now'),
           ),
         ),
         OutlinedButton.icon(
@@ -454,7 +454,7 @@ class _Feedback extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'What triggered this smoke?',
+                      'What triggered this one?',
                       style: context.textTheme.headlineSmall,
                     ),
                     const SizedBox(height: AppSpacing.xs),

@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
-import 'package:exhale/features/tracking/presentation/smoke_trigger_ui.dart';
+import 'package:exhale/features/tracking/domain/entities/trigger.dart';
+import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,8 +18,8 @@ class TriggerPicker extends ConsumerWidget {
     super.key,
   });
 
-  final SmokeTrigger? selected;
-  final ValueChanged<SmokeTrigger?> onChanged;
+  final Trigger? selected;
+  final ValueChanged<Trigger?> onChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -62,7 +62,7 @@ class _TriggerPill extends StatelessWidget {
     required this.onTap,
   });
 
-  final SmokeTrigger trigger;
+  final Trigger trigger;
   final bool isSelected;
   final VoidCallback onTap;
 

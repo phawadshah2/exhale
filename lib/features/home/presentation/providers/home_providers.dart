@@ -1,9 +1,9 @@
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/home_stats.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/period_summary.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
 import 'package:exhale/features/tracking/domain/services/daily_progress_builder.dart';
 import 'package:exhale/features/tracking/domain/services/progress_calculator.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
@@ -24,16 +24,17 @@ class ChartPeriodController extends Notifier<ChartPeriod> {
   void select(ChartPeriod period) => state = period;
 }
 
-/// Logs on the logical days in [PeriodRange], oldest first.
-final StreamProviderFamily<List<SmokeLog>, PeriodRange> logsInRangeProvider =
-    StreamProvider.autoDispose.family<List<SmokeLog>, PeriodRange>((
+/// The current habit's logs on the days in [PeriodRange], oldest first.
+final StreamProviderFamily<List<HabitLog>, PeriodRange> logsInRangeProvider =
+    StreamProvider.autoDispose.family<List<HabitLog>, PeriodRange>((
       ref,
       range,
     ) {
       final boundary = ref.watch(dayBoundaryProvider);
       return ref
-          .watch(smokeLogRepositoryProvider)
+          .watch(habitLogRepositoryProvider)
           .watchLogs(
+            habitKind: ref.watch(habitProvider).kind,
             from: boundary.startOf(range.from),
             to: boundary.endOf(range.to),
           );

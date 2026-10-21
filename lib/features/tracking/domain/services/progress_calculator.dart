@@ -4,11 +4,11 @@ import 'package:exhale/core/domain/time/day_boundary.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/home_stats.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/period_summary.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
 import 'package:exhale/features/tracking/domain/services/daily_progress_builder.dart';
 
 abstract final class ProgressCalculator {
@@ -17,7 +17,7 @@ abstract final class ProgressCalculator {
   /// Chart slots for [range]; [logs] must cover the range.
   static PeriodSummary summarize({
     required PeriodRange range,
-    required Iterable<SmokeLog> logs,
+    required Iterable<HabitLog> logs,
     required DayBoundary boundary,
     required PlanHistory history,
     required LogicalDay today,

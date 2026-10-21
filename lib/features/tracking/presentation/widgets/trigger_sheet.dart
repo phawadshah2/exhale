@@ -1,7 +1,7 @@
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_sheet.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_trigger.dart';
+import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/presentation/widgets/trigger_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 class TriggerAnswer {
   const TriggerAnswer({this.trigger, this.keepAsking = true});
 
-  final SmokeTrigger? trigger;
+  final Trigger? trigger;
   final bool keepAsking;
 }
 
@@ -38,10 +38,10 @@ class _TriggerSheet extends StatefulWidget {
 }
 
 class _TriggerSheetState extends State<_TriggerSheet> {
-  SmokeTrigger? _selected;
+  Trigger? _selected;
   bool _keepAsking = true;
 
-  void _finish(SmokeTrigger? trigger) =>
+  void _finish(Trigger? trigger) =>
       Navigator.of(context)
           .pop(TriggerAnswer(trigger: trigger, keepAsking: _keepAsking));
 

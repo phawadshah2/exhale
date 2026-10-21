@@ -9,8 +9,8 @@ import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/home/presentation/widgets/progress_ring.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +30,7 @@ class TodayCard extends StatelessWidget {
   final ReductionPlan plan;
   final LogicalDay today;
   final DateTime now;
-  final SmokeLog? latestLog;
+  final HabitLog? latestLog;
   final bool isFirstDay;
   final Habit habit;
 

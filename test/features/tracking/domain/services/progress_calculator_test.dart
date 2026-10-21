@@ -1,11 +1,12 @@
 import 'package:exhale/core/domain/time/day_boundary.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/period_summary.dart';
-import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
 import 'package:exhale/features/tracking/domain/services/progress_calculator.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,11 +23,12 @@ void main() {
   const boundary = DayBoundary();
   var nextId = 1;
 
-  List<SmokeLog> logsOn(LogicalDay day, int count) => [
+  List<HabitLog> logsOn(LogicalDay day, int count) => [
     for (var i = 0; i < count; i++)
-      SmokeLog(
+      HabitLog(
         id: nextId++,
         loggedAt: DateTime(day.year, day.month, day.day, 9 + i),
+        habitKind: HabitKind.smoking,
       ),
   ];
 
