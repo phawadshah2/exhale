@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Trigger sheet with habit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#57F1DB}a:hover{color:#2DD4BF}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0E141D; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; position: relative; overflow: hidden">
+
+<div aria-hidden="true" style="padding: 62px 20px 0; display: flex; flex-direction: column; gap: 16px">
+<div style="height: 52px; border-radius: 26px; background: #161C25"></div>
+<div style="height: 250px; border-radius: 28px; background: #161C25; border: 1px solid #2C333D; display: flex; align-items: center; justify-content: center"><svg width="190" height="190" viewBox="0 0 190 190"><circle cx="95" cy="95" r="80" fill="none" stroke="#242A34" stroke-width="14"></circle><circle cx="95" cy="95" r="80" fill="none" stroke="#2DD4BF" stroke-width="14" stroke-linecap="round" stroke-dasharray="223 503" transform="rotate(-90 95 95)"></circle></svg></div>
+<div style="height: 196px; border-radius: 28px; background: #161C25; border: 1px solid #2C333D"></div>
+</div>
+<div style="position: absolute; inset: 0; background: rgba(8,14,23,0.35)"></div>
+
+<div role="dialog" aria-label="What triggered this one?" style="position: absolute; left: 8px; right: 8px; bottom: 8px; border-radius: 34px; background: rgba(30,37,47,0.66); backdrop-filter: blur(28px) saturate(160%); -webkit-backdrop-filter: blur(28px) saturate(160%); border: 1px solid rgba(255,255,255,0.14); box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 20px 50px rgba(0,0,0,0.45); padding: 10px 22px 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="align-self: center; width: 40px; height: 5px; border-radius: 99px; background: rgba(221,226,240,0.35)"></div>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="font-size: 12px; font-weight: 700; color: #57F1DB; background: rgba(45,212,191,0.14); border: 1px solid rgba(45,212,191,0.4); border-radius: 99px; padding: 6px 12px; display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#57F1DB" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 15h14v3H3zM19 15v3M21 15v3M17 11c0-2-2-2-2-4s2-2 2-4"></path></svg>Smoking · 5 of 9 after this</span>
+<button type="button" aria-label="Close" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.16); background: rgba(221,226,240,0.1); display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h2 style="margin: 0; font-family: Manrope, sans-serif; font-size: 22px; font-weight: 700">What triggered this one?</h2>
+<span style="font-size: 14px; color: #A9B4C2">Spotting patterns helps you see cravings coming (optional).</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<button type="button" style="height: 50px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.1); background: rgba(221,226,240,0.07); color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; padding: 0 16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 8h12v6a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5zM17 10h2a2 2 0 0 1 0 4h-2"></path></svg>Coffee</button>
+<button type="button" aria-pressed="true" style="height: 50px; border-radius: 99px; border: 1px solid #2DD4BF; background: #2DD4BF; color: #003731; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 10px; padding: 0 16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#003731" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg>Stress</button>
+<button type="button" style="height: 50px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.1); background: rgba(221,226,240,0.07); color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; padding: 0 16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M7 3v7a2 2 0 0 0 4 0V3M9 10v11M17 3c-2 2-2 6 0 8v10"></path></svg>After meal</button>
+<button type="button" style="height: 50px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.1); background: rgba(221,226,240,0.07); color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; padding: 0 16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3"></circle><path d="M3 20a6 6 0 0 1 12 0M16 4a3 3 0 0 1 0 6M21 20a6 6 0 0 0-4-5.6"></path></svg>Social</button>
+<button type="button" style="height: 50px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.1); background: rgba(221,226,240,0.07); color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; padding: 0 16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12M6 21h12M7 3v3l5 6 5-6V3M7 21v-3l5-6 5 6v3"></path></svg>Boredom</button>
+<button type="button" style="height: 50px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.1); background: rgba(221,226,240,0.07); color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; padding: 0 16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4"></path></svg>Habit</button>
+<button type="button" style="height: 50px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.1); background: rgba(221,226,240,0.07); color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; padding: 0 16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 16v-5l2-5h10l2 5v5zM5 16v2M19 16v2"></path><circle cx="8" cy="13.5" r="1"></circle><circle cx="16" cy="13.5" r="1"></circle></svg>Commute</button>
+<button type="button" style="height: 50px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.1); background: rgba(221,226,240,0.07); color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; padding: 0 16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14l-7 8zM12 12v8M8 20h8"></path></svg>Drinks</button>
+</div>
+<button type="button" style="height: 54px; border-radius: 99px; border: 0; background: #2DD4BF; color: #003731; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 700">Save</button>
+<button type="button" style="height: 40px; border: 0; background: transparent; color: #57F1DB; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700">Save without trigger</button>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

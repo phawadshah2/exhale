@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Add a habit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#57F1DB}a:hover{color:#2DD4BF}
+</style>
+</helmet>
+<div style="width: 390px; height: 1000px; box-sizing: border-box; background: #0E141D; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 58px 20px 0; display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden">
+
+<div style="display: flex; align-items: center; justify-content: space-between">
+<a href="Main.dc.html" aria-label="Close" style="width: 44px; height: 44px; box-sizing: border-box; border-radius: 50%; background: #1A2029; border: 1px solid #2C333D; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></a>
+<span style="font-size: 13px; font-weight: 600; background: #242A34; border-radius: 99px; padding: 8px 14px; display: flex; align-items: center; gap: 8px"><span style="width: 7px; height: 7px; border-radius: 50%; background: #2DD4BF"></span>Step 1 of 2</span>
+<span style="width: 44px"></span>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px; padding-top: 6px">
+<h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15">Add a habit</h1>
+<span style="font-size: 15px; color: #93A0AE">It gets its own plan, limits and logs. Home will show all your habits.</span>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 28px; padding: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<div style="border-radius: 20px; background: #1E252F; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0.55">
+<span style="width: 44px; height: 44px; border-radius: 50%; background: #242A34; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93A0AE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.1 9.6 4.2 4.2 0 0 0 7 18z"></path></svg></span>
+<span style="font-size: 13px; font-weight: 600">Vaping</span>
+<span style="font-size: 10px; font-weight: 700; letter-spacing: 0.05em; color: #57F1DB">TRACKING</span>
+</div>
+<button type="button" aria-pressed="true" style="border-radius: 20px; border: 1.5px solid #2DD4BF; background: rgba(45,212,191,0.1); color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="width: 44px; height: 44px; border-radius: 50%; background: rgba(45,212,191,0.2); display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#57F1DB" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 15h14v3H3zM19 15v3M21 15v3M17 11c0-2-2-2-2-4s2-2 2-4"></path></svg></span>
+<span style="font-size: 13px; font-weight: 700">Smoking</span>
+<span style="font-size: 11px; color: #93A0AE">cigarettes</span>
+</button>
+<button type="button" style="border-radius: 20px; border: 0; background: #1E252F; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="width: 44px; height: 44px; border-radius: 50%; background: #242A34; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="3"></circle></svg></span>
+<span style="font-size: 13px; font-weight: 600">Pouches</span>
+<span style="font-size: 11px; color: #93A0AE">pouches</span>
+</button>
+<button type="button" style="border-radius: 20px; border: 0; background: #1E252F; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="width: 44px; height: 44px; border-radius: 50%; background: #242A34; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M7 3h10l-1 7a4 4 0 0 1-8 0zM12 14v6M8 21h8"></path></svg></span>
+<span style="font-size: 13px; font-weight: 600">Alcohol</span>
+<span style="font-size: 11px; color: #93A0AE">drinks</span>
+</button>
+<button type="button" style="border-radius: 20px; border: 0; background: #1E252F; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="width: 44px; height: 44px; border-radius: 50%; background: #242A34; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 8h12v6a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5zM17 10h2a2 2 0 0 1 0 4h-2"></path></svg></span>
+<span style="font-size: 13px; font-weight: 600">Caffeine</span>
+<span style="font-size: 11px; color: #93A0AE">cups</span>
+</button>
+<button type="button" style="border-radius: 20px; border: 0; background: #1E252F; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="width: 44px; height: 44px; border-radius: 50%; background: #242A34; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg></span>
+<span style="font-size: 13px; font-weight: 600">Energy</span>
+<span style="font-size: 11px; color: #93A0AE">cans</span>
+</button>
+<button type="button" style="border-radius: 20px; border: 0; background: #1E252F; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="width: 44px; height: 44px; border-radius: 50%; background: #242A34; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 11h16M5 11a7 4 0 0 1 14 0M5 15h14M6 15l1 4h10l1-4"></path></svg></span>
+<span style="font-size: 13px; font-weight: 600">Junk food</span>
+<span style="font-size: 11px; color: #93A0AE">snacks</span>
+</button>
+<button type="button" style="border-radius: 20px; border: 0; background: #1E252F; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="width: 44px; height: 44px; border-radius: 50%; background: #242A34; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"></rect><path d="M11 18h2"></path></svg></span>
+<span style="font-size: 13px; font-weight: 600">Social</span>
+<span style="font-size: 11px; color: #93A0AE">sessions</span>
+</button>
+<button type="button" style="border-radius: 20px; border: 0; background: #1E252F; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="width: 44px; height: 44px; border-radius: 50%; background: #242A34; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16zM13 7l4 4"></path></svg></span>
+<span style="font-size: 13px; font-weight: 600">Custom</span>
+<span style="font-size: 11px; color: #93A0AE">your own</span>
+</button>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 28px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px">
+<label for="why2" style="font-family: Manrope, sans-serif; font-size: 17px; font-weight: 700">Why this one?</label>
+<span style="font-size: 13px; color: #93A0AE">Optional. Shown on this habit's page.</span>
+<input id="why2" type="text" placeholder="Save for a holiday" style="height: 44px; box-sizing: border-box; border: 0; border-bottom: 1px solid #3C4A46; background: transparent; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; padding: 0">
+</div>
+
+<div style="position: absolute; left: 20px; right: 20px; bottom: 34px; display: flex; flex-direction: column; gap: 10px">
+<button type="button" style="height: 56px; border-radius: 99px; border: 0; background: #2DD4BF; color: #003731; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px">Continue to plan<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#003731" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+<span style="text-align: center; font-size: 12px; color: #93A0AE">Step 2 is the same plan screen as setup.</span>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
