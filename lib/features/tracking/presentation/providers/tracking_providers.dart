@@ -52,15 +52,20 @@ final latestLogProvider = StreamProvider<HabitLog?>(
       .watchLatest(habitKind: ref.watch(habitProvider).kind),
 );
 
-/// Today's count against today's limit; null before a plan exists.
-final todayProgressProvider = FutureProvider<DailyProgress?>((ref) async {
-  final day = ref.watch(todayProvider);
-  final history = await ref.watch(planHistoryProvider.future);
-  if (history == null) return null;
-  final logs = await ref.watch(logsForDayProvider(day).future);
-  return DailyProgress(
-    day: day,
-    count: logs.length,
-    limit: history.limitOn(day),
-  );
-});
+/// [LogicalDay]'s count against that day's limit; null before a plan exists.
+/// Days before the plan use the first plan's limit; callers decide whether
+/// to show it.
+final FutureProviderFamily<DailyProgress?, LogicalDay> dayProgressProvider =
+    FutureProvider.autoDispose.family<DailyProgress?, LogicalDay>((
+      ref,
+      day,
+    ) async {
+      final history = await ref.watch(planHistoryProvider.future);
+      if (history == null) return null;
+      final logs = await ref.watch(logsForDayProvider(day).future);
+      return DailyProgress(
+        day: day,
+        count: logs.length,
+        limit: history.limitOn(day),
+      );
+    });

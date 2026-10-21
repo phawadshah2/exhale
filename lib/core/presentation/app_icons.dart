@@ -31,6 +31,7 @@ abstract final class AppIcons {
   static const IconData forward = CupertinoIcons.arrow_right;
   static const IconData back = CupertinoIcons.chevron_left;
   static const IconData chevronRight = CupertinoIcons.chevron_right;
+  static const IconData backToToday = CupertinoIcons.arrow_uturn_right;
   static const IconData chevronDown = CupertinoIcons.chevron_down;
   static const IconData chevronUp = CupertinoIcons.chevron_up;
 

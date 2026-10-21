@@ -1,28 +1,61 @@
+import 'dart:async';
+
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
+import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/pill_segmented_control.dart';
 import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
+import 'package:exhale/features/home/presentation/widgets/backward_pager.dart';
 import 'package:exhale/features/home/presentation/widgets/history_chart.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/period_summary.dart';
+import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// Week or month bars for the selected day's period. Swipe the chart, or
+/// use the arrows, to move by a period; tap a bar to select that day.
 class HistoryCard extends ConsumerWidget {
-  const HistoryCard({required this.onDayTap, super.key});
-
-  final ValueChanged<LogicalDay> onDayTap;
+  const HistoryCard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final period = ref.watch(chartPeriodProvider);
-    final summary = ref.watch(periodSummaryProvider).value;
+    final today = ref.watch(todayProvider);
+    final earliest = ref.watch(earliestDayProvider);
+    final selected = ref.watch(selectedDayProvider);
+    final picker = ref.read(pickedDayProvider.notifier);
+    final page = period.periodsBetween(selected, today);
+    final pageCount = period.periodsBetween(earliest, today) + 1;
+    final range = PeriodRange.of(period, selected);
+    final summary = ref.watch(periodSummaryProvider(range)).value;
     final text = context.textTheme;
     final colors = context.colors;
+
+    LogicalDay clamp(LogicalDay day) => day.isAfter(today)
+        ? today
+        : day.isBefore(earliest)
+        ? earliest
+        : day;
+
+    void moveToPage(int target) =>
+        picker.pick(clamp(period.shift(selected, page - target)));
+
+    void step(int target) {
+      unawaited(HapticFeedback.selectionClick());
+      moveToPage(target);
+    }
+
+    final label = page == 0
+        ? (period == ChartPeriod.week ? 'This week' : 'This month')
+        : period == ChartPeriod.week
+        ? AppFormat.dayRange(range.from, range.to)
+        : AppFormat.monthYear(range.from);
 
     return Card(
       child: Padding(
@@ -62,27 +95,58 @@ class HistoryCard extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [
+                IconButton(
+                  tooltip: period == ChartPeriod.week
+                      ? 'Previous week'
+                      : 'Previous month',
+                  onPressed: page < pageCount - 1 ? () => step(page + 1) : null,
+                  icon: const Icon(AppIcons.back, size: 20),
+                  color: colors.onSurfaceVariant,
+                  disabledColor: colors.outlineVariant,
+                ),
+                Expanded(
+                  child: Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: text.titleSmall,
+                  ),
+                ),
+                IconButton(
+                  tooltip: period == ChartPeriod.week
+                      ? 'Next week'
+                      : 'Next month',
+                  onPressed: page > 0 ? () => step(page - 1) : null,
+                  icon: const Icon(AppIcons.chevronRight, size: 20),
+                  color: colors.onSurfaceVariant,
+                  disabledColor: colors.outlineVariant,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
             Container(
               padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
               decoration: BoxDecoration(
                 color: colors.surfaceContainer.withValues(alpha: 0.6),
                 borderRadius: AppRadius.inner,
               ),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                child: summary == null
-                    ? const SizedBox(
-                        height: HistoryChart.chartHeight + 26,
-                        child: Center(
-                          child: CircularProgressIndicator.adaptive(),
-                        ),
-                      )
-                    : HistoryChart(
-                        key: ValueKey(summary.range),
-                        summary: summary,
-                        onDayTap: onDayTap,
-                      ),
+              child: SizedBox(
+                height: HistoryChart.height,
+                child: BackwardPager(
+                  key: ValueKey(period),
+                  pageCount: pageCount,
+                  page: page,
+                  onPageChanged: moveToPage,
+                  itemBuilder: (context, index) => _ChartPage(
+                    range: PeriodRange.of(period, period.shift(today, -index)),
+                    selected: selected,
+                    canSelect: (day) =>
+                        !day.isAfter(today) && !day.isBefore(earliest),
+                    onSelect: picker.pick,
+                  ),
+                ),
               ),
             ),
             if (summary != null) ...[
@@ -92,6 +156,37 @@ class HistoryCard extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ChartPage extends ConsumerWidget {
+  const _ChartPage({
+    required this.range,
+    required this.selected,
+    required this.canSelect,
+    required this.onSelect,
+  });
+
+  final PeriodRange range;
+  final LogicalDay selected;
+  final bool Function(LogicalDay day) canSelect;
+  final ValueChanged<LogicalDay> onSelect;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final summary = ref.watch(periodSummaryProvider(range)).value;
+    if (summary == null) {
+      return const Center(child: CircularProgressIndicator.adaptive());
+    }
+    return HistoryChart(
+      summary: summary,
+      selected: selected,
+      canSelect: canSelect,
+      onSelect: (day) {
+        unawaited(HapticFeedback.selectionClick());
+        onSelect(day);
+      },
     );
   }
 }

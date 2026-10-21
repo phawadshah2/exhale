@@ -23,15 +23,13 @@ abstract final class ProgressCalculator {
     required LogicalDay today,
   }) {
     final firstDay = history.firstDay;
-    final trackedFrom = range.from.isBefore(firstDay) ? firstDay : range.from;
-    final trackedTo = range.to.isAfter(today) ? today : range.to;
     final progress = {
       for (final p in buildDailyProgress(
         logs: logs,
         boundary: boundary,
         history: history,
-        from: trackedFrom,
-        to: trackedTo,
+        from: range.from,
+        to: range.to.isAfter(today) ? today : range.to,
       ))
         p.day: p,
     };
@@ -45,6 +43,7 @@ abstract final class ProgressCalculator {
               day: day,
               kind: DaySlotKind.beforePlan,
               isToday: day == today,
+              beforePlanCount: progress[day]?.count,
             )
           else if (day.isAfter(today))
             DaySlot(

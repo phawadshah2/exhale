@@ -113,6 +113,7 @@ class DayDetailSheet extends ConsumerWidget {
               child: _Summary(
                 progress: progress,
                 habit: ref.watch(habitProvider),
+                beforePlan: day.isBefore(history!.firstDay),
               ),
             ),
           ),
@@ -173,10 +174,17 @@ class DayDetailSheet extends ConsumerWidget {
 }
 
 class _Summary extends StatelessWidget {
-  const _Summary({required this.progress, required this.habit});
+  const _Summary({
+    required this.progress,
+    required this.habit,
+    required this.beforePlan,
+  });
 
   final DailyProgress progress;
   final Habit habit;
+
+  /// A back-filled day with no limit.
+  final bool beforePlan;
 
   @override
   Widget build(BuildContext context) {
@@ -190,14 +198,24 @@ class _Summary extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              '${progress.count} of ${progress.limit} logged',
+              beforePlan
+                  ? '${progress.count} logged'
+                  : '${progress.count} of ${progress.limit} logged',
               style: context.textTheme.titleLarge,
             ),
           ),
-          StatusBadge(
-            label: progress.badgeLabel(habit),
-            colors: progress.status.colors(context),
-          ),
+          if (beforePlan)
+            Text(
+              'Before your plan',
+              style: context.textTheme.labelLarge?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
+            )
+          else
+            StatusBadge(
+              label: progress.badgeLabel(habit),
+              colors: progress.status.colors(context),
+            ),
         ],
       ),
     );

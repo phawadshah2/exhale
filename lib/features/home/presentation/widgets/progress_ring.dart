@@ -5,7 +5,8 @@ import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:flutter/material.dart';
 
-/// Today's ring: fills toward the limit, then shows the overflow in red.
+/// A day's ring: fills toward the limit, then shows the overflow in red.
+/// With no [progress] (a day before the plan) only the track is drawn.
 class ProgressRing extends StatelessWidget {
   const ProgressRing({
     required this.progress,
@@ -15,7 +16,7 @@ class ProgressRing extends StatelessWidget {
     super.key,
   });
 
-  final DailyProgress progress;
+  final DailyProgress? progress;
   final Widget child;
   final double size;
   final double strokeWidth;
@@ -24,14 +25,17 @@ class ProgressRing extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final status = context.exhale;
-    final overflow = progress.limit == 0
+    final progress = this.progress;
+    final overflow = progress == null
+        ? 0.0
+        : progress.limit == 0
         ? (progress.count > 0 ? 1.0 : 0.0)
         : math.min(1, progress.overBy / progress.limit).toDouble();
 
     return SizedBox.square(
       dimension: size,
       child: TweenAnimationBuilder<double>(
-        tween: Tween(end: progress.usedFraction),
+        tween: Tween(end: progress?.usedFraction ?? 0),
         duration: const Duration(milliseconds: 700),
         curve: Curves.easeOutCubic,
         builder: (context, fill, _) => TweenAnimationBuilder<double>(
@@ -44,7 +48,7 @@ class ProgressRing extends StatelessWidget {
               overflow: over,
               strokeWidth: strokeWidth,
               track: colors.surfaceContainerHigh,
-              gradient: switch (progress.status) {
+              gradient: switch (progress?.status ?? LimitStatus.under) {
                 LimitStatus.under => [
                   colors.secondaryContainer,
                   colors.primaryContainer,

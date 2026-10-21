@@ -28,14 +28,14 @@ void main() {
   Finder todayCount(String value) => find.byWidgetPredicate(
     (widget) =>
         widget is Text &&
-        widget.key == const Key('today-count') &&
+        widget.key == const Key('day-count') &&
         widget.textSpan?.toPlainText() == value,
   );
 
   Future<void> logAndSkipTrigger(WidgetTester tester) async {
     await tester.scrollAndTap(find.byTooltip('Log'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Skip and save'));
+    await tester.tap(find.text('Save without trigger'));
     await tester.pumpInSteps(const Duration(milliseconds: 900));
   }
 

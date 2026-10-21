@@ -10,7 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Two-column grid of the habit's trigger pills; tapping the selected one
-/// clears it. A selected trigger from another habit is still shown.
+/// clears it. A selected trigger from another habit is still shown; a last
+/// pill left alone on its row spans the full width.
 class TriggerPicker extends ConsumerWidget {
   const TriggerPicker({
     required this.selected,
@@ -31,14 +32,16 @@ class TriggerPicker extends ConsumerWidget {
     ];
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = (constraints.maxWidth - AppSpacing.gutterSm) / 2;
+        final half = (constraints.maxWidth - AppSpacing.gutterSm) / 2;
         return Wrap(
           spacing: AppSpacing.gutterSm,
           runSpacing: AppSpacing.gutterSm,
           children: [
-            for (final trigger in triggers)
+            for (final (i, trigger) in triggers.indexed)
               SizedBox(
-                width: width,
+                width: i == triggers.length - 1 && triggers.length.isOdd
+                    ? constraints.maxWidth
+                    : half,
                 child: _TriggerPill(
                   trigger: trigger,
                   isSelected: trigger == selected,

@@ -92,12 +92,12 @@ class _TriggerSheetState extends State<_TriggerSheet> {
           const SizedBox(height: AppSpacing.lg),
           FilledButton(
             onPressed: _selected == null ? null : () => _finish(_selected),
-            child: const Text('Save with trigger'),
+            child: const Text('Save'),
           ),
           const SizedBox(height: AppSpacing.xs),
           TextButton(
             onPressed: () => _finish(null),
-            child: const Text('Skip and save'),
+            child: const Text('Save without trigger'),
           ),
         ],
       ),
