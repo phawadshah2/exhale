@@ -41,7 +41,7 @@ void main() {
       final teal = buildColorScheme(brightness: Brightness.dark);
       final blue = buildColorScheme(
         brightness: Brightness.dark,
-        accent: AppPalette.accents[1],
+        accent: AppPalette.accents[1].color,
       );
 
       expect(blue.primary, isNot(teal.primary));

@@ -33,7 +33,7 @@ class NumberStepper extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.gutterSm),
       decoration: BoxDecoration(
-        color: colors.surfaceContainer,
+        color: context.exhale.inset,
         borderRadius: AppRadius.inner,
         border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.5)),
       ),

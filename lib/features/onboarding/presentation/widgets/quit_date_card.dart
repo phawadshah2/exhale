@@ -64,7 +64,7 @@ class QuitDateCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Material(
-            color: colors.surfaceContainer,
+            color: context.exhale.inset,
             shape: RoundedRectangleBorder(
               borderRadius: AppRadius.inner,
               side: BorderSide(
@@ -79,7 +79,15 @@ class QuitDateCard extends StatelessWidget {
                 child: Row(
                   spacing: AppSpacing.md,
                   children: [
-                    Icon(AppIcons.calendar, color: colors.primary),
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colors.surfaceContainerHighest,
+                      ),
+                      child: Icon(AppIcons.calendar, color: colors.primary),
+                    ),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,16 +171,8 @@ class _PresetPill extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: ShapeDecoration(
-            color: selected
-                ? colors.primaryContainer
-                : colors.surfaceContainerHigh,
-            shape: StadiumBorder(
-              side: BorderSide(
-                color: selected
-                    ? colors.primaryContainer
-                    : colors.outlineVariant.withValues(alpha: 0.6),
-              ),
-            ),
+            color: selected ? colors.primaryContainer : context.exhale.inset,
+            shape: const StadiumBorder(),
           ),
           child: Text(
             label,

@@ -36,8 +36,8 @@ void main() {
       themePreference: ThemePreference.light,
       accentIndex: 2,
       appIcon: AppIconChoice.ember,
-      packPriceCents: 1450,
-      cigarettesPerPack: 25,
+      priceCents: 1450,
+      unitsPerContainer: 25,
       currencySymbol: 'AED',
     );
 
@@ -55,12 +55,12 @@ void main() {
   });
 
   test('can clear optional fields', () async {
-    await repository.save(const AppSettings(packPriceCents: 1450));
+    await repository.save(const AppSettings(priceCents: 1450));
     final cleared = valueOf(await repository.get())
-        .copyWith(packPriceCents: () => null);
+        .copyWith(priceCents: () => null);
     await repository.save(cleared);
 
-    expect(valueOf(await repository.get()).packPriceCents, isNull);
+    expect(valueOf(await repository.get()).priceCents, isNull);
   });
 
   test('unknown stored enum names fall back to defaults', () async {
@@ -75,7 +75,7 @@ void main() {
 
     final settings = valueOf(await repository.get());
 
-    expect(settings.themePreference, ThemePreference.dark);
+    expect(settings.themePreference, ThemePreference.system);
     expect(settings.appIcon, AppIconChoice.breath);
   });
 }

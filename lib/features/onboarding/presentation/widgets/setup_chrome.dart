@@ -4,7 +4,6 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/glow_button.dart';
-import 'package:exhale/core/widgets/scroll_edge_blur.dart';
 import 'package:flutter/material.dart';
 
 /// Room the floating footer takes above the bottom inset.
@@ -28,33 +27,30 @@ class SetupScaffold extends StatelessWidget {
     final keyboard = MediaQuery.viewInsetsOf(context).bottom;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: ScrollEdgeBlur(
-        child: Stack(
-          children: [
-            GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: ListView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: AppSpacing.page.copyWith(
-                  top: insets.top + AppSpacing.md,
-                  bottom: math.max(
-                    keyboard + AppSpacing.lg,
-                    insets.bottom + setupFooterHeight + AppSpacing.lg,
-                  ),
+      body: Stack(
+        children: [
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: AppSpacing.page.copyWith(
+                top: insets.top + AppSpacing.md,
+                bottom: math.max(
+                  keyboard + AppSpacing.lg,
+                  insets.bottom + setupFooterHeight + AppSpacing.lg,
                 ),
-                children: children,
               ),
+              children: children,
             ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: footer(insets.bottom),
-            ),
-          ],
-        ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: footer(insets.bottom),
+          ),
+        ],
       ),
     );
   }

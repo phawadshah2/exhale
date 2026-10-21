@@ -784,43 +784,28 @@ class $SettingsTable extends Settings
     requiredDuringInsert: false,
     defaultValue: const Constant('breath'),
   );
-  static const VerificationMeta _packPriceCentsMeta = const VerificationMeta(
-    'packPriceCents',
+  static const VerificationMeta _priceCentsMeta = const VerificationMeta(
+    'priceCents',
   );
   @override
-  late final GeneratedColumn<int> packPriceCents = GeneratedColumn<int>(
+  late final GeneratedColumn<int> priceCents = GeneratedColumn<int>(
     'pack_price_cents',
     aliasedName,
     true,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _cigarettesPerPackMeta = const VerificationMeta(
-    'cigarettesPerPack',
+  static const VerificationMeta _unitsPerContainerMeta = const VerificationMeta(
+    'unitsPerContainer',
   );
   @override
-  late final GeneratedColumn<int> cigarettesPerPack = GeneratedColumn<int>(
+  late final GeneratedColumn<int> unitsPerContainer = GeneratedColumn<int>(
     'cigarettes_per_pack',
     aliasedName,
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
     defaultValue: const Constant(20),
-  );
-  static const VerificationMeta _glassEffectsMeta = const VerificationMeta(
-    'glassEffects',
-  );
-  @override
-  late final GeneratedColumn<bool> glassEffects = GeneratedColumn<bool>(
-    'glass_effects',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("glass_effects" IN (0, 1))',
-    ),
-    defaultValue: const Constant(true),
   );
   static const VerificationMeta _askForTriggerMeta = const VerificationMeta(
     'askForTrigger',
@@ -852,6 +837,49 @@ class $SettingsTable extends Settings
         ),
         defaultValue: const Constant(false),
       );
+  static const VerificationMeta _habitKindMeta = const VerificationMeta(
+    'habitKind',
+  );
+  @override
+  late final GeneratedColumn<String> habitKind = GeneratedColumn<String>(
+    'habit_kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('smoking'),
+  );
+  static const VerificationMeta _customHabitNameMeta = const VerificationMeta(
+    'customHabitName',
+  );
+  @override
+  late final GeneratedColumn<String> customHabitName = GeneratedColumn<String>(
+    'custom_habit_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _customHabitUnitMeta = const VerificationMeta(
+    'customHabitUnit',
+  );
+  @override
+  late final GeneratedColumn<String> customHabitUnit = GeneratedColumn<String>(
+    'custom_habit_unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
+  @override
+  late final GeneratedColumn<String> reason = GeneratedColumn<String>(
+    'reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _currencySymbolMeta = const VerificationMeta(
     'currencySymbol',
   );
@@ -872,11 +900,14 @@ class $SettingsTable extends Settings
     themePreference,
     accentIndex,
     appIcon,
-    packPriceCents,
-    cigarettesPerPack,
-    glassEffects,
+    priceCents,
+    unitsPerContainer,
     askForTrigger,
     triggerPromptIntroSeen,
+    habitKind,
+    customHabitName,
+    customHabitUnit,
+    reason,
     currencySymbol,
   ];
   @override
@@ -935,28 +966,19 @@ class $SettingsTable extends Settings
     }
     if (data.containsKey('pack_price_cents')) {
       context.handle(
-        _packPriceCentsMeta,
-        packPriceCents.isAcceptableOrUnknown(
+        _priceCentsMeta,
+        priceCents.isAcceptableOrUnknown(
           data['pack_price_cents']!,
-          _packPriceCentsMeta,
+          _priceCentsMeta,
         ),
       );
     }
     if (data.containsKey('cigarettes_per_pack')) {
       context.handle(
-        _cigarettesPerPackMeta,
-        cigarettesPerPack.isAcceptableOrUnknown(
+        _unitsPerContainerMeta,
+        unitsPerContainer.isAcceptableOrUnknown(
           data['cigarettes_per_pack']!,
-          _cigarettesPerPackMeta,
-        ),
-      );
-    }
-    if (data.containsKey('glass_effects')) {
-      context.handle(
-        _glassEffectsMeta,
-        glassEffects.isAcceptableOrUnknown(
-          data['glass_effects']!,
-          _glassEffectsMeta,
+          _unitsPerContainerMeta,
         ),
       );
     }
@@ -976,6 +998,36 @@ class $SettingsTable extends Settings
           data['trigger_prompt_intro_seen']!,
           _triggerPromptIntroSeenMeta,
         ),
+      );
+    }
+    if (data.containsKey('habit_kind')) {
+      context.handle(
+        _habitKindMeta,
+        habitKind.isAcceptableOrUnknown(data['habit_kind']!, _habitKindMeta),
+      );
+    }
+    if (data.containsKey('custom_habit_name')) {
+      context.handle(
+        _customHabitNameMeta,
+        customHabitName.isAcceptableOrUnknown(
+          data['custom_habit_name']!,
+          _customHabitNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('custom_habit_unit')) {
+      context.handle(
+        _customHabitUnitMeta,
+        customHabitUnit.isAcceptableOrUnknown(
+          data['custom_habit_unit']!,
+          _customHabitUnitMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reason')) {
+      context.handle(
+        _reasonMeta,
+        reason.isAcceptableOrUnknown(data['reason']!, _reasonMeta),
       );
     }
     if (data.containsKey('currency_symbol')) {
@@ -1020,17 +1072,13 @@ class $SettingsTable extends Settings
         DriftSqlType.string,
         data['${effectivePrefix}app_icon'],
       )!,
-      packPriceCents: attachedDatabase.typeMapping.read(
+      priceCents: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}pack_price_cents'],
       ),
-      cigarettesPerPack: attachedDatabase.typeMapping.read(
+      unitsPerContainer: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}cigarettes_per_pack'],
-      )!,
-      glassEffects: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}glass_effects'],
       )!,
       askForTrigger: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
@@ -1040,6 +1088,22 @@ class $SettingsTable extends Settings
         DriftSqlType.bool,
         data['${effectivePrefix}trigger_prompt_intro_seen'],
       )!,
+      habitKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}habit_kind'],
+      )!,
+      customHabitName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}custom_habit_name'],
+      ),
+      customHabitUnit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}custom_habit_unit'],
+      ),
+      reason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason'],
+      ),
       currencySymbol: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}currency_symbol'],
@@ -1060,11 +1124,16 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
   final String themePreference;
   final int accentIndex;
   final String appIcon;
-  final int? packPriceCents;
-  final int cigarettesPerPack;
-  final bool glassEffects;
+  final int? priceCents;
+  final int unitsPerContainer;
   final bool askForTrigger;
   final bool triggerPromptIntroSeen;
+
+  /// HabitKind.name; rows from before v6 were smoking.
+  final String habitKind;
+  final String? customHabitName;
+  final String? customHabitUnit;
+  final String? reason;
   final String currencySymbol;
   const SettingsRow({
     required this.id,
@@ -1073,11 +1142,14 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     required this.themePreference,
     required this.accentIndex,
     required this.appIcon,
-    this.packPriceCents,
-    required this.cigarettesPerPack,
-    required this.glassEffects,
+    this.priceCents,
+    required this.unitsPerContainer,
     required this.askForTrigger,
     required this.triggerPromptIntroSeen,
+    required this.habitKind,
+    this.customHabitName,
+    this.customHabitUnit,
+    this.reason,
     required this.currencySymbol,
   });
   @override
@@ -1091,13 +1163,22 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     map['theme_preference'] = Variable<String>(themePreference);
     map['accent_index'] = Variable<int>(accentIndex);
     map['app_icon'] = Variable<String>(appIcon);
-    if (!nullToAbsent || packPriceCents != null) {
-      map['pack_price_cents'] = Variable<int>(packPriceCents);
+    if (!nullToAbsent || priceCents != null) {
+      map['pack_price_cents'] = Variable<int>(priceCents);
     }
-    map['cigarettes_per_pack'] = Variable<int>(cigarettesPerPack);
-    map['glass_effects'] = Variable<bool>(glassEffects);
+    map['cigarettes_per_pack'] = Variable<int>(unitsPerContainer);
     map['ask_for_trigger'] = Variable<bool>(askForTrigger);
     map['trigger_prompt_intro_seen'] = Variable<bool>(triggerPromptIntroSeen);
+    map['habit_kind'] = Variable<String>(habitKind);
+    if (!nullToAbsent || customHabitName != null) {
+      map['custom_habit_name'] = Variable<String>(customHabitName);
+    }
+    if (!nullToAbsent || customHabitUnit != null) {
+      map['custom_habit_unit'] = Variable<String>(customHabitUnit);
+    }
+    if (!nullToAbsent || reason != null) {
+      map['reason'] = Variable<String>(reason);
+    }
     map['currency_symbol'] = Variable<String>(currencySymbol);
     return map;
   }
@@ -1112,13 +1193,22 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       themePreference: Value(themePreference),
       accentIndex: Value(accentIndex),
       appIcon: Value(appIcon),
-      packPriceCents: packPriceCents == null && nullToAbsent
+      priceCents: priceCents == null && nullToAbsent
           ? const Value.absent()
-          : Value(packPriceCents),
-      cigarettesPerPack: Value(cigarettesPerPack),
-      glassEffects: Value(glassEffects),
+          : Value(priceCents),
+      unitsPerContainer: Value(unitsPerContainer),
       askForTrigger: Value(askForTrigger),
       triggerPromptIntroSeen: Value(triggerPromptIntroSeen),
+      habitKind: Value(habitKind),
+      customHabitName: customHabitName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customHabitName),
+      customHabitUnit: customHabitUnit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customHabitUnit),
+      reason: reason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reason),
       currencySymbol: Value(currencySymbol),
     );
   }
@@ -1135,13 +1225,16 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       themePreference: serializer.fromJson<String>(json['themePreference']),
       accentIndex: serializer.fromJson<int>(json['accentIndex']),
       appIcon: serializer.fromJson<String>(json['appIcon']),
-      packPriceCents: serializer.fromJson<int?>(json['packPriceCents']),
-      cigarettesPerPack: serializer.fromJson<int>(json['cigarettesPerPack']),
-      glassEffects: serializer.fromJson<bool>(json['glassEffects']),
+      priceCents: serializer.fromJson<int?>(json['priceCents']),
+      unitsPerContainer: serializer.fromJson<int>(json['unitsPerContainer']),
       askForTrigger: serializer.fromJson<bool>(json['askForTrigger']),
       triggerPromptIntroSeen: serializer.fromJson<bool>(
         json['triggerPromptIntroSeen'],
       ),
+      habitKind: serializer.fromJson<String>(json['habitKind']),
+      customHabitName: serializer.fromJson<String?>(json['customHabitName']),
+      customHabitUnit: serializer.fromJson<String?>(json['customHabitUnit']),
+      reason: serializer.fromJson<String?>(json['reason']),
       currencySymbol: serializer.fromJson<String>(json['currencySymbol']),
     );
   }
@@ -1155,11 +1248,14 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       'themePreference': serializer.toJson<String>(themePreference),
       'accentIndex': serializer.toJson<int>(accentIndex),
       'appIcon': serializer.toJson<String>(appIcon),
-      'packPriceCents': serializer.toJson<int?>(packPriceCents),
-      'cigarettesPerPack': serializer.toJson<int>(cigarettesPerPack),
-      'glassEffects': serializer.toJson<bool>(glassEffects),
+      'priceCents': serializer.toJson<int?>(priceCents),
+      'unitsPerContainer': serializer.toJson<int>(unitsPerContainer),
       'askForTrigger': serializer.toJson<bool>(askForTrigger),
       'triggerPromptIntroSeen': serializer.toJson<bool>(triggerPromptIntroSeen),
+      'habitKind': serializer.toJson<String>(habitKind),
+      'customHabitName': serializer.toJson<String?>(customHabitName),
+      'customHabitUnit': serializer.toJson<String?>(customHabitUnit),
+      'reason': serializer.toJson<String?>(reason),
       'currencySymbol': serializer.toJson<String>(currencySymbol),
     };
   }
@@ -1171,11 +1267,14 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     String? themePreference,
     int? accentIndex,
     String? appIcon,
-    Value<int?> packPriceCents = const Value.absent(),
-    int? cigarettesPerPack,
-    bool? glassEffects,
+    Value<int?> priceCents = const Value.absent(),
+    int? unitsPerContainer,
     bool? askForTrigger,
     bool? triggerPromptIntroSeen,
+    String? habitKind,
+    Value<String?> customHabitName = const Value.absent(),
+    Value<String?> customHabitUnit = const Value.absent(),
+    Value<String?> reason = const Value.absent(),
     String? currencySymbol,
   }) => SettingsRow(
     id: id ?? this.id,
@@ -1184,14 +1283,19 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     themePreference: themePreference ?? this.themePreference,
     accentIndex: accentIndex ?? this.accentIndex,
     appIcon: appIcon ?? this.appIcon,
-    packPriceCents: packPriceCents.present
-        ? packPriceCents.value
-        : this.packPriceCents,
-    cigarettesPerPack: cigarettesPerPack ?? this.cigarettesPerPack,
-    glassEffects: glassEffects ?? this.glassEffects,
+    priceCents: priceCents.present ? priceCents.value : this.priceCents,
+    unitsPerContainer: unitsPerContainer ?? this.unitsPerContainer,
     askForTrigger: askForTrigger ?? this.askForTrigger,
     triggerPromptIntroSeen:
         triggerPromptIntroSeen ?? this.triggerPromptIntroSeen,
+    habitKind: habitKind ?? this.habitKind,
+    customHabitName: customHabitName.present
+        ? customHabitName.value
+        : this.customHabitName,
+    customHabitUnit: customHabitUnit.present
+        ? customHabitUnit.value
+        : this.customHabitUnit,
+    reason: reason.present ? reason.value : this.reason,
     currencySymbol: currencySymbol ?? this.currencySymbol,
   );
   SettingsRow copyWithCompanion(SettingsCompanion data) {
@@ -1208,21 +1312,26 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           ? data.accentIndex.value
           : this.accentIndex,
       appIcon: data.appIcon.present ? data.appIcon.value : this.appIcon,
-      packPriceCents: data.packPriceCents.present
-          ? data.packPriceCents.value
-          : this.packPriceCents,
-      cigarettesPerPack: data.cigarettesPerPack.present
-          ? data.cigarettesPerPack.value
-          : this.cigarettesPerPack,
-      glassEffects: data.glassEffects.present
-          ? data.glassEffects.value
-          : this.glassEffects,
+      priceCents: data.priceCents.present
+          ? data.priceCents.value
+          : this.priceCents,
+      unitsPerContainer: data.unitsPerContainer.present
+          ? data.unitsPerContainer.value
+          : this.unitsPerContainer,
       askForTrigger: data.askForTrigger.present
           ? data.askForTrigger.value
           : this.askForTrigger,
       triggerPromptIntroSeen: data.triggerPromptIntroSeen.present
           ? data.triggerPromptIntroSeen.value
           : this.triggerPromptIntroSeen,
+      habitKind: data.habitKind.present ? data.habitKind.value : this.habitKind,
+      customHabitName: data.customHabitName.present
+          ? data.customHabitName.value
+          : this.customHabitName,
+      customHabitUnit: data.customHabitUnit.present
+          ? data.customHabitUnit.value
+          : this.customHabitUnit,
+      reason: data.reason.present ? data.reason.value : this.reason,
       currencySymbol: data.currencySymbol.present
           ? data.currencySymbol.value
           : this.currencySymbol,
@@ -1238,11 +1347,14 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           ..write('themePreference: $themePreference, ')
           ..write('accentIndex: $accentIndex, ')
           ..write('appIcon: $appIcon, ')
-          ..write('packPriceCents: $packPriceCents, ')
-          ..write('cigarettesPerPack: $cigarettesPerPack, ')
-          ..write('glassEffects: $glassEffects, ')
+          ..write('priceCents: $priceCents, ')
+          ..write('unitsPerContainer: $unitsPerContainer, ')
           ..write('askForTrigger: $askForTrigger, ')
           ..write('triggerPromptIntroSeen: $triggerPromptIntroSeen, ')
+          ..write('habitKind: $habitKind, ')
+          ..write('customHabitName: $customHabitName, ')
+          ..write('customHabitUnit: $customHabitUnit, ')
+          ..write('reason: $reason, ')
           ..write('currencySymbol: $currencySymbol')
           ..write(')'))
         .toString();
@@ -1256,11 +1368,14 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     themePreference,
     accentIndex,
     appIcon,
-    packPriceCents,
-    cigarettesPerPack,
-    glassEffects,
+    priceCents,
+    unitsPerContainer,
     askForTrigger,
     triggerPromptIntroSeen,
+    habitKind,
+    customHabitName,
+    customHabitUnit,
+    reason,
     currencySymbol,
   );
   @override
@@ -1273,11 +1388,14 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           other.themePreference == this.themePreference &&
           other.accentIndex == this.accentIndex &&
           other.appIcon == this.appIcon &&
-          other.packPriceCents == this.packPriceCents &&
-          other.cigarettesPerPack == this.cigarettesPerPack &&
-          other.glassEffects == this.glassEffects &&
+          other.priceCents == this.priceCents &&
+          other.unitsPerContainer == this.unitsPerContainer &&
           other.askForTrigger == this.askForTrigger &&
           other.triggerPromptIntroSeen == this.triggerPromptIntroSeen &&
+          other.habitKind == this.habitKind &&
+          other.customHabitName == this.customHabitName &&
+          other.customHabitUnit == this.customHabitUnit &&
+          other.reason == this.reason &&
           other.currencySymbol == this.currencySymbol);
 }
 
@@ -1288,11 +1406,14 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
   final Value<String> themePreference;
   final Value<int> accentIndex;
   final Value<String> appIcon;
-  final Value<int?> packPriceCents;
-  final Value<int> cigarettesPerPack;
-  final Value<bool> glassEffects;
+  final Value<int?> priceCents;
+  final Value<int> unitsPerContainer;
   final Value<bool> askForTrigger;
   final Value<bool> triggerPromptIntroSeen;
+  final Value<String> habitKind;
+  final Value<String?> customHabitName;
+  final Value<String?> customHabitUnit;
+  final Value<String?> reason;
   final Value<String> currencySymbol;
   const SettingsCompanion({
     this.id = const Value.absent(),
@@ -1301,11 +1422,14 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.themePreference = const Value.absent(),
     this.accentIndex = const Value.absent(),
     this.appIcon = const Value.absent(),
-    this.packPriceCents = const Value.absent(),
-    this.cigarettesPerPack = const Value.absent(),
-    this.glassEffects = const Value.absent(),
+    this.priceCents = const Value.absent(),
+    this.unitsPerContainer = const Value.absent(),
     this.askForTrigger = const Value.absent(),
     this.triggerPromptIntroSeen = const Value.absent(),
+    this.habitKind = const Value.absent(),
+    this.customHabitName = const Value.absent(),
+    this.customHabitUnit = const Value.absent(),
+    this.reason = const Value.absent(),
     this.currencySymbol = const Value.absent(),
   });
   SettingsCompanion.insert({
@@ -1315,11 +1439,14 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.themePreference = const Value.absent(),
     this.accentIndex = const Value.absent(),
     this.appIcon = const Value.absent(),
-    this.packPriceCents = const Value.absent(),
-    this.cigarettesPerPack = const Value.absent(),
-    this.glassEffects = const Value.absent(),
+    this.priceCents = const Value.absent(),
+    this.unitsPerContainer = const Value.absent(),
     this.askForTrigger = const Value.absent(),
     this.triggerPromptIntroSeen = const Value.absent(),
+    this.habitKind = const Value.absent(),
+    this.customHabitName = const Value.absent(),
+    this.customHabitUnit = const Value.absent(),
+    this.reason = const Value.absent(),
     this.currencySymbol = const Value.absent(),
   });
   static Insertable<SettingsRow> custom({
@@ -1329,11 +1456,14 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Expression<String>? themePreference,
     Expression<int>? accentIndex,
     Expression<String>? appIcon,
-    Expression<int>? packPriceCents,
-    Expression<int>? cigarettesPerPack,
-    Expression<bool>? glassEffects,
+    Expression<int>? priceCents,
+    Expression<int>? unitsPerContainer,
     Expression<bool>? askForTrigger,
     Expression<bool>? triggerPromptIntroSeen,
+    Expression<String>? habitKind,
+    Expression<String>? customHabitName,
+    Expression<String>? customHabitUnit,
+    Expression<String>? reason,
     Expression<String>? currencySymbol,
   }) {
     return RawValuesInsertable({
@@ -1343,12 +1473,15 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       if (themePreference != null) 'theme_preference': themePreference,
       if (accentIndex != null) 'accent_index': accentIndex,
       if (appIcon != null) 'app_icon': appIcon,
-      if (packPriceCents != null) 'pack_price_cents': packPriceCents,
-      if (cigarettesPerPack != null) 'cigarettes_per_pack': cigarettesPerPack,
-      if (glassEffects != null) 'glass_effects': glassEffects,
+      if (priceCents != null) 'pack_price_cents': priceCents,
+      if (unitsPerContainer != null) 'cigarettes_per_pack': unitsPerContainer,
       if (askForTrigger != null) 'ask_for_trigger': askForTrigger,
       if (triggerPromptIntroSeen != null)
         'trigger_prompt_intro_seen': triggerPromptIntroSeen,
+      if (habitKind != null) 'habit_kind': habitKind,
+      if (customHabitName != null) 'custom_habit_name': customHabitName,
+      if (customHabitUnit != null) 'custom_habit_unit': customHabitUnit,
+      if (reason != null) 'reason': reason,
       if (currencySymbol != null) 'currency_symbol': currencySymbol,
     });
   }
@@ -1360,11 +1493,14 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Value<String>? themePreference,
     Value<int>? accentIndex,
     Value<String>? appIcon,
-    Value<int?>? packPriceCents,
-    Value<int>? cigarettesPerPack,
-    Value<bool>? glassEffects,
+    Value<int?>? priceCents,
+    Value<int>? unitsPerContainer,
     Value<bool>? askForTrigger,
     Value<bool>? triggerPromptIntroSeen,
+    Value<String>? habitKind,
+    Value<String?>? customHabitName,
+    Value<String?>? customHabitUnit,
+    Value<String?>? reason,
     Value<String>? currencySymbol,
   }) {
     return SettingsCompanion(
@@ -1374,12 +1510,15 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       themePreference: themePreference ?? this.themePreference,
       accentIndex: accentIndex ?? this.accentIndex,
       appIcon: appIcon ?? this.appIcon,
-      packPriceCents: packPriceCents ?? this.packPriceCents,
-      cigarettesPerPack: cigarettesPerPack ?? this.cigarettesPerPack,
-      glassEffects: glassEffects ?? this.glassEffects,
+      priceCents: priceCents ?? this.priceCents,
+      unitsPerContainer: unitsPerContainer ?? this.unitsPerContainer,
       askForTrigger: askForTrigger ?? this.askForTrigger,
       triggerPromptIntroSeen:
           triggerPromptIntroSeen ?? this.triggerPromptIntroSeen,
+      habitKind: habitKind ?? this.habitKind,
+      customHabitName: customHabitName ?? this.customHabitName,
+      customHabitUnit: customHabitUnit ?? this.customHabitUnit,
+      reason: reason ?? this.reason,
       currencySymbol: currencySymbol ?? this.currencySymbol,
     );
   }
@@ -1405,14 +1544,11 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     if (appIcon.present) {
       map['app_icon'] = Variable<String>(appIcon.value);
     }
-    if (packPriceCents.present) {
-      map['pack_price_cents'] = Variable<int>(packPriceCents.value);
+    if (priceCents.present) {
+      map['pack_price_cents'] = Variable<int>(priceCents.value);
     }
-    if (cigarettesPerPack.present) {
-      map['cigarettes_per_pack'] = Variable<int>(cigarettesPerPack.value);
-    }
-    if (glassEffects.present) {
-      map['glass_effects'] = Variable<bool>(glassEffects.value);
+    if (unitsPerContainer.present) {
+      map['cigarettes_per_pack'] = Variable<int>(unitsPerContainer.value);
     }
     if (askForTrigger.present) {
       map['ask_for_trigger'] = Variable<bool>(askForTrigger.value);
@@ -1421,6 +1557,18 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       map['trigger_prompt_intro_seen'] = Variable<bool>(
         triggerPromptIntroSeen.value,
       );
+    }
+    if (habitKind.present) {
+      map['habit_kind'] = Variable<String>(habitKind.value);
+    }
+    if (customHabitName.present) {
+      map['custom_habit_name'] = Variable<String>(customHabitName.value);
+    }
+    if (customHabitUnit.present) {
+      map['custom_habit_unit'] = Variable<String>(customHabitUnit.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(reason.value);
     }
     if (currencySymbol.present) {
       map['currency_symbol'] = Variable<String>(currencySymbol.value);
@@ -1437,11 +1585,14 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
           ..write('themePreference: $themePreference, ')
           ..write('accentIndex: $accentIndex, ')
           ..write('appIcon: $appIcon, ')
-          ..write('packPriceCents: $packPriceCents, ')
-          ..write('cigarettesPerPack: $cigarettesPerPack, ')
-          ..write('glassEffects: $glassEffects, ')
+          ..write('priceCents: $priceCents, ')
+          ..write('unitsPerContainer: $unitsPerContainer, ')
           ..write('askForTrigger: $askForTrigger, ')
           ..write('triggerPromptIntroSeen: $triggerPromptIntroSeen, ')
+          ..write('habitKind: $habitKind, ')
+          ..write('customHabitName: $customHabitName, ')
+          ..write('customHabitUnit: $customHabitUnit, ')
+          ..write('reason: $reason, ')
           ..write('currencySymbol: $currencySymbol')
           ..write(')'))
         .toString();
@@ -1874,11 +2025,14 @@ typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
   Value<String> themePreference,
   Value<int> accentIndex,
   Value<String> appIcon,
-  Value<int?> packPriceCents,
-  Value<int> cigarettesPerPack,
-  Value<bool> glassEffects,
+  Value<int?> priceCents,
+  Value<int> unitsPerContainer,
   Value<bool> askForTrigger,
   Value<bool> triggerPromptIntroSeen,
+  Value<String> habitKind,
+  Value<String?> customHabitName,
+  Value<String?> customHabitUnit,
+  Value<String?> reason,
   Value<String> currencySymbol,
 });
 typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
@@ -1888,11 +2042,14 @@ typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<String> themePreference,
   Value<int> accentIndex,
   Value<String> appIcon,
-  Value<int?> packPriceCents,
-  Value<int> cigarettesPerPack,
-  Value<bool> glassEffects,
+  Value<int?> priceCents,
+  Value<int> unitsPerContainer,
   Value<bool> askForTrigger,
   Value<bool> triggerPromptIntroSeen,
+  Value<String> habitKind,
+  Value<String?> customHabitName,
+  Value<String?> customHabitUnit,
+  Value<String?> reason,
   Value<String> currencySymbol,
 });
 
@@ -1935,18 +2092,13 @@ class $$SettingsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get packPriceCents => $composableBuilder(
-    column: $table.packPriceCents,
+  ColumnFilters<int> get priceCents => $composableBuilder(
+    column: $table.priceCents,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get cigarettesPerPack => $composableBuilder(
-    column: $table.cigarettesPerPack,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get glassEffects => $composableBuilder(
-    column: $table.glassEffects,
+  ColumnFilters<int> get unitsPerContainer => $composableBuilder(
+    column: $table.unitsPerContainer,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1957,6 +2109,26 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<bool> get triggerPromptIntroSeen => $composableBuilder(
     column: $table.triggerPromptIntroSeen,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get habitKind => $composableBuilder(
+    column: $table.habitKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get customHabitName => $composableBuilder(
+    column: $table.customHabitName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get customHabitUnit => $composableBuilder(
+    column: $table.customHabitUnit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reason => $composableBuilder(
+    column: $table.reason,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2005,18 +2177,13 @@ class $$SettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get packPriceCents => $composableBuilder(
-    column: $table.packPriceCents,
+  ColumnOrderings<int> get priceCents => $composableBuilder(
+    column: $table.priceCents,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get cigarettesPerPack => $composableBuilder(
-    column: $table.cigarettesPerPack,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get glassEffects => $composableBuilder(
-    column: $table.glassEffects,
+  ColumnOrderings<int> get unitsPerContainer => $composableBuilder(
+    column: $table.unitsPerContainer,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2027,6 +2194,26 @@ class $$SettingsTableOrderingComposer
 
   ColumnOrderings<bool> get triggerPromptIntroSeen => $composableBuilder(
     column: $table.triggerPromptIntroSeen,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get habitKind => $composableBuilder(
+    column: $table.habitKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get customHabitName => $composableBuilder(
+    column: $table.customHabitName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get customHabitUnit => $composableBuilder(
+    column: $table.customHabitUnit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2069,18 +2256,13 @@ class $$SettingsTableAnnotationComposer
   GeneratedColumn<String> get appIcon =>
       $composableBuilder(column: $table.appIcon, builder: (column) => column);
 
-  GeneratedColumn<int> get packPriceCents => $composableBuilder(
-    column: $table.packPriceCents,
+  GeneratedColumn<int> get priceCents => $composableBuilder(
+    column: $table.priceCents,
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get cigarettesPerPack => $composableBuilder(
-    column: $table.cigarettesPerPack,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<bool> get glassEffects => $composableBuilder(
-    column: $table.glassEffects,
+  GeneratedColumn<int> get unitsPerContainer => $composableBuilder(
+    column: $table.unitsPerContainer,
     builder: (column) => column,
   );
 
@@ -2093,6 +2275,22 @@ class $$SettingsTableAnnotationComposer
     column: $table.triggerPromptIntroSeen,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get habitKind =>
+      $composableBuilder(column: $table.habitKind, builder: (column) => column);
+
+  GeneratedColumn<String> get customHabitName => $composableBuilder(
+    column: $table.customHabitName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get customHabitUnit => $composableBuilder(
+    column: $table.customHabitUnit,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
 
   GeneratedColumn<String> get currencySymbol => $composableBuilder(
     column: $table.currencySymbol,
@@ -2137,11 +2335,14 @@ class $$SettingsTableTableManager
                 Value<String> themePreference = const Value.absent(),
                 Value<int> accentIndex = const Value.absent(),
                 Value<String> appIcon = const Value.absent(),
-                Value<int?> packPriceCents = const Value.absent(),
-                Value<int> cigarettesPerPack = const Value.absent(),
-                Value<bool> glassEffects = const Value.absent(),
+                Value<int?> priceCents = const Value.absent(),
+                Value<int> unitsPerContainer = const Value.absent(),
                 Value<bool> askForTrigger = const Value.absent(),
                 Value<bool> triggerPromptIntroSeen = const Value.absent(),
+                Value<String> habitKind = const Value.absent(),
+                Value<String?> customHabitName = const Value.absent(),
+                Value<String?> customHabitUnit = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
                 Value<String> currencySymbol = const Value.absent(),
               }) => SettingsCompanion(
                 id: id,
@@ -2150,11 +2351,14 @@ class $$SettingsTableTableManager
                 themePreference: themePreference,
                 accentIndex: accentIndex,
                 appIcon: appIcon,
-                packPriceCents: packPriceCents,
-                cigarettesPerPack: cigarettesPerPack,
-                glassEffects: glassEffects,
+                priceCents: priceCents,
+                unitsPerContainer: unitsPerContainer,
                 askForTrigger: askForTrigger,
                 triggerPromptIntroSeen: triggerPromptIntroSeen,
+                habitKind: habitKind,
+                customHabitName: customHabitName,
+                customHabitUnit: customHabitUnit,
+                reason: reason,
                 currencySymbol: currencySymbol,
               ),
           createCompanionCallback:
@@ -2165,11 +2369,14 @@ class $$SettingsTableTableManager
                 Value<String> themePreference = const Value.absent(),
                 Value<int> accentIndex = const Value.absent(),
                 Value<String> appIcon = const Value.absent(),
-                Value<int?> packPriceCents = const Value.absent(),
-                Value<int> cigarettesPerPack = const Value.absent(),
-                Value<bool> glassEffects = const Value.absent(),
+                Value<int?> priceCents = const Value.absent(),
+                Value<int> unitsPerContainer = const Value.absent(),
                 Value<bool> askForTrigger = const Value.absent(),
                 Value<bool> triggerPromptIntroSeen = const Value.absent(),
+                Value<String> habitKind = const Value.absent(),
+                Value<String?> customHabitName = const Value.absent(),
+                Value<String?> customHabitUnit = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
                 Value<String> currencySymbol = const Value.absent(),
               }) => SettingsCompanion.insert(
                 id: id,
@@ -2178,11 +2385,14 @@ class $$SettingsTableTableManager
                 themePreference: themePreference,
                 accentIndex: accentIndex,
                 appIcon: appIcon,
-                packPriceCents: packPriceCents,
-                cigarettesPerPack: cigarettesPerPack,
-                glassEffects: glassEffects,
+                priceCents: priceCents,
+                unitsPerContainer: unitsPerContainer,
                 askForTrigger: askForTrigger,
                 triggerPromptIntroSeen: triggerPromptIntroSeen,
+                habitKind: habitKind,
+                customHabitName: customHabitName,
+                customHabitUnit: customHabitUnit,
+                reason: reason,
                 currencySymbol: currencySymbol,
               ),
           withReferenceMapper: (p0) => p0

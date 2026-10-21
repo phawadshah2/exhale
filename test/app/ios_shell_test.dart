@@ -1,14 +1,10 @@
 import 'package:exhale/core/di/injection_container.dart';
-import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/widgets/glass_surface.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
-import 'package:exhale/features/settings/domain/entities/app_settings.dart';
-import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:exhale/features/settings/presentation/pages/settings_page.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/fixed_clock.dart';
@@ -47,19 +43,39 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('glass effects can be turned off and are saved', (tester) async {
+  testWidgets('glass is on unless Reduce Transparency is', (tester) async {
     await tester.pumpAppPastSplash();
     expect(glassOn(tester), isTrue);
-    expect(find.byType(BackdropFilter), findsWidgets);
+    expect(find.text('Glass effects'), findsNothing);
 
-    await tester.tap(find.byTooltip('Settings'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Glass effects'));
-    await tester.pumpAndSettle();
+    await tester.disposeApp();
+  });
 
-    expect(glassOn(tester), isFalse);
-    final stored = await tester.runAsync(() => sl<SettingsRepository>().get());
-    expect((stored! as Success<AppSettings>).value.glassEffects, isFalse);
+  testWidgets('the + button logs, and long-press opens the log menu', (
+    tester,
+  ) async {
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.tap(find.byTooltip('Log'));
+    await tester.pumpAndSettle();
+    expect(find.text('What triggered this one?'), findsOneWidget);
+    await tester.tap(find.text('Skip and save'));
+    await tester.pumpInSteps(const Duration(milliseconds: 900));
+    expect(find.text('Logged at 3:42 PM'), findsOneWidget);
+
+    await tester.longPress(find.byTooltip('Log'));
+    await tester.pumpAndSettle();
+    expect(find.text('Log now'), findsOneWidget);
+    expect(find.text('Add a missed log'), findsOneWidget);
+
+    await tester.tap(find.text('Add a missed log'));
+    await tester.pumpAndSettle();
+    expect(find.text('Log now'), findsNothing);
+    expect(find.byTooltip('Close'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Close'), findsNothing);
 
     await tester.disposeApp();
   });
@@ -69,7 +85,7 @@ void main() {
   ) async {
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.tap(find.text('Log a smoke'));
+    await tester.tap(find.byTooltip('Log'));
     await tester.pumpAndSettle();
 
     final sheet = tester.getRect(find.text('What triggered this one?'));

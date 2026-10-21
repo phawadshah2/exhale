@@ -35,7 +35,7 @@ void main() {
     expect(state().startDay, today);
     expect(state().habitKind, HabitKind.vaping);
     expect(state().startLimit, Habit.vaping.defaultDailyAmount);
-    expect(state().cigarettesPerPack, Habit.vaping.defaultUnitsPerContainer);
+    expect(state().unitsPerContainer, Habit.vaping.defaultUnitsPerContainer);
     expect(state().quitPreset, QuitPreset.suggested);
     expect(state().quitDay, today.addDays(12 * 7));
     expect(state().preview!.daysPerDrop, 7);
@@ -44,7 +44,7 @@ void main() {
   test("picking a habit uses that habit's amounts", () {
     controller().selectHabit(HabitKind.smoking);
     expect(state().startLimit, 9);
-    expect(state().cigarettesPerPack, 20);
+    expect(state().unitsPerContainer, 20);
     expect(state().quitDay, today.addDays(63));
   });
 
@@ -101,10 +101,10 @@ void main() {
   });
 
   test('an invalid pack price blocks submit', () async {
-    controller().setPackPriceText('abc');
+    controller().setPriceText('abc');
 
     expect(await controller().submit(), isFalse);
-    expect(state().errorMessage, contains('pack price'));
+    expect(state().errorMessage, contains('valid price'));
   });
 
   test('submit saves settings and the plan', () async {
@@ -112,8 +112,8 @@ void main() {
       ..setName('  Fawad ')
       ..setStartLimit(12)
       ..selectQuitPreset(QuitPreset.weeks8)
-      ..setPackPriceText('14.50')
-      ..setCigarettesPerPack(25);
+      ..setPriceText('14.50')
+      ..setUnitsPerContainer(25);
 
     expect(await controller().submit(), isTrue);
 
@@ -123,8 +123,10 @@ void main() {
         (await sl<PlanRepository>().getHistory() as Success<PlanHistory?>)
             .value!;
     expect(settings.userName, 'Fawad');
-    expect(settings.packPriceCents, 1450);
-    expect(settings.cigarettesPerPack, 25);
+    expect(settings.priceCents, 1450);
+    expect(settings.unitsPerContainer, 25);
+    expect(settings.habitKind, HabitKind.vaping);
+    expect(settings.reason, isNull);
     expect(
       history.current,
       ReductionPlan(
@@ -133,5 +135,22 @@ void main() {
         quitDay: today.addDays(56),
       ),
     );
+  });
+
+  test('submit saves a custom habit and the reason', () async {
+    controller()
+      ..selectHabit(HabitKind.custom)
+      ..setCustomName(' Gaming ')
+      ..setCustomUnit('Match')
+      ..setReason('  More time with family ');
+
+    expect(await controller().submit(), isTrue);
+
+    final settings =
+        (await sl<SettingsRepository>().get() as Success<AppSettings>).value;
+    expect(settings.habitKind, HabitKind.custom);
+    expect(settings.customHabitName, 'Gaming');
+    expect(settings.customHabitUnit, 'match');
+    expect(settings.reason, 'More time with family');
   });
 }

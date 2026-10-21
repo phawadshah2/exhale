@@ -10,8 +10,6 @@ extension HabitIcon on HabitKind {
     HabitKind.alcohol => AppIcons.alcohol,
     HabitKind.caffeine => AppIcons.caffeine,
     HabitKind.energyDrinks => AppIcons.energyDrinks,
-    HabitKind.soda => AppIcons.soda,
-    HabitKind.sugar => AppIcons.sugar,
     HabitKind.junkFood => AppIcons.junkFood,
     HabitKind.socialMedia => AppIcons.socialMedia,
     HabitKind.custom => AppIcons.customHabit,

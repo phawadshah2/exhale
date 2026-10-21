@@ -2,6 +2,7 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/tracking/domain/entities/home_stats.dart';
 import 'package:flutter/material.dart';
 
@@ -9,11 +10,13 @@ class StatsGrid extends StatelessWidget {
   const StatsGrid({
     required this.stats,
     required this.currencySymbol,
+    required this.habit,
     super.key,
   });
 
   final HomeStats stats;
   final String currencySymbol;
+  final Habit habit;
 
   @override
   Widget build(BuildContext context) {
@@ -53,21 +56,24 @@ class StatsGrid extends StatelessWidget {
         captionColor: success,
       ),
       changeTile,
-      _StatTile(
-        label: 'Money saved',
-        icon: AppIcons.savings,
-        iconColor: context.exhale.warning.foreground,
-        value: saved == null
-            ? '—'
-            : AppFormat.money(saved, symbol: currencySymbol),
-        caption: saved == null ? 'Add a pack price in Settings' : 'Since Day 1',
-        captionColor: saved == null ? muted : success,
-      ),
+      if (habit.tracksCost)
+        _StatTile(
+          label: 'Money saved',
+          icon: AppIcons.savings,
+          iconColor: context.exhale.warning.foreground,
+          value: saved == null
+              ? '—'
+              : AppFormat.money(saved, symbol: currencySymbol),
+          caption: saved == null ? 'Add a price in Settings' : 'Since Day 1',
+          captionColor: saved == null ? muted : success,
+        ),
       _StatTile(
         label: 'Avoided',
         icon: AppIcons.avoided,
         iconColor: context.colors.primary,
-        value: '${stats.avoided} ${stats.avoided == 1 ? 'smoke' : 'smokes'}',
+        value:
+            '${stats.avoided} '
+            '${stats.avoided == 1 ? habit.unit : habit.shortUnits}',
         caption: 'vs ${stats.baseline}/day baseline',
         captionColor: muted,
       ),
@@ -77,16 +83,19 @@ class StatsGrid extends StatelessWidget {
       spacing: AppSpacing.gutterSm,
       children: [
         for (var row = 0; row < tiles.length; row += 2)
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: AppSpacing.gutterSm,
-              children: [
-                Expanded(child: tiles[row]),
-                Expanded(child: tiles[row + 1]),
-              ],
+          if (row + 1 == tiles.length)
+            SizedBox(width: double.infinity, child: tiles[row])
+          else
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: AppSpacing.gutterSm,
+                children: [
+                  Expanded(child: tiles[row]),
+                  Expanded(child: tiles[row + 1]),
+                ],
+              ),
             ),
-          ),
       ],
     );
   }

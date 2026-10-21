@@ -39,6 +39,7 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
     required this.warning,
     required this.danger,
     required this.glow,
+    required this.inset,
   });
 
   /// Derived from the scheme so there is a single source of truth.
@@ -61,6 +62,11 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
         foreground: scheme.error,
       ),
       glow: scheme.primaryContainer.withValues(alpha: isDark ? 0.14 : 0.16),
+      // Dark cards are already containerLow, so insets step up to stay
+      // visible; light insets stay barely off-white.
+      inset: isDark
+          ? scheme.surfaceContainerHigh
+          : scheme.surfaceContainerLow.withValues(alpha: 0.6),
     );
   }
 
@@ -76,6 +82,9 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
   /// Soft accent halo around the primary log button and active ring.
   final Color glow;
 
+  /// Fill for boxes inside a card (steppers, date rows, chips).
+  final Color inset;
+
   List<BoxShadow> get accentGlow => [
     BoxShadow(color: glow, blurRadius: 14, spreadRadius: -4),
   ];
@@ -86,11 +95,13 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
     StatusColors? warning,
     StatusColors? danger,
     Color? glow,
+    Color? inset,
   }) => ExhaleColors(
     success: success ?? this.success,
     warning: warning ?? this.warning,
     danger: danger ?? this.danger,
     glow: glow ?? this.glow,
+    inset: inset ?? this.inset,
   );
 
   // Called by AnimatedTheme while switching light <-> dark, so colours
@@ -103,6 +114,7 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
       warning: StatusColors.lerp(warning, other.warning, t),
       danger: StatusColors.lerp(danger, other.danger, t),
       glow: Color.lerp(glow, other.glow, t)!,
+      inset: Color.lerp(inset, other.inset, t)!,
     );
   }
 }

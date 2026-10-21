@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/core/widgets/glass_surface.dart';
+import 'package:exhale/core/widgets/liquid_glass.dart';
 import 'package:flutter/material.dart';
 
 const double _sheetRadius = 34;
@@ -12,6 +13,7 @@ const EdgeInsets _sheetMargin = EdgeInsets.fromLTRB(10, 0, 10, 10);
 Future<T?> showAppSheet<T>(
   BuildContext context, {
   required WidgetBuilder builder,
+  bool showClose = true,
 }) => showModalBottomSheet<T>(
   context: context,
   useRootNavigator: true,
@@ -28,7 +30,10 @@ Future<T?> showAppSheet<T>(
       ),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: media.size.height * 0.92),
-        child: AppSheetFrame(child: Flexible(child: builder(context))),
+        child: AppSheetFrame(
+          showClose: showClose,
+          child: Flexible(child: builder(context)),
+        ),
       ),
     );
   },
@@ -61,37 +66,55 @@ Future<T?> showAppDraggableSheet<T>(
   ),
 );
 
-/// Rounded glass panel with an iOS grabber; [child] must be a flex child.
+/// Liquid Glass panel with an iOS grabber and a glass close button;
+/// [child] must be a flex child.
 class AppSheetFrame extends StatelessWidget {
-  const AppSheetFrame({required this.child, super.key});
+  const AppSheetFrame({required this.child, this.showClose = true, super.key});
 
   final Widget child;
+
+  /// A round glass ✕ in the top corner that dismisses the sheet.
+  final bool showClose;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final isDark = colors.brightness == Brightness.dark;
-    return GlassSurface(
+    return AppGlass(
       radius: _sheetRadius,
-      blur: 30,
-      color: isDark ? colors.surfaceContainer : colors.surfaceContainerLowest,
+      frosted: true,
       child: Material(
         type: MaterialType.transparency,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 8, bottom: 14),
-              child: Center(
-                child: Container(
-                  width: 36,
-                  height: 5,
-                  decoration: ShapeDecoration(
-                    color: colors.onSurfaceVariant.withValues(alpha: 0.35),
-                    shape: const StadiumBorder(),
+            SizedBox(
+              height: showClose ? 56 : 27,
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      width: 36,
+                      height: 5,
+                      decoration: ShapeDecoration(
+                        color: colors.onSurfaceVariant.withValues(alpha: 0.35),
+                        shape: const StadiumBorder(),
+                      ),
+                    ),
                   ),
-                ),
+                  if (showClose)
+                    Positioned(
+                      top: 12,
+                      right: 14,
+                      child: GlassIconButton(
+                        icon: AppIcons.close,
+                        tooltip: 'Close',
+                        onPressed: () => Navigator.of(context).maybePop(),
+                      ),
+                    ),
+                ],
               ),
             ),
             child,

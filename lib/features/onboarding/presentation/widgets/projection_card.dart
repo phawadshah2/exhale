@@ -44,7 +44,6 @@ class ProjectionCard extends StatelessWidget {
         ? const TextSpan(text: 'Pick a quit date after your start date.')
         : TextSpan(
             children: [
-              TextSpan(text: '${paceSentence(plan)} '),
               TextSpan(
                 text: free == null
                     ? 'You reach zero on '
@@ -55,7 +54,10 @@ class ProjectionCard extends StatelessWidget {
                 style: highlight.copyWith(color: colors.onSurface),
               ),
               const TextSpan(text: ". That's "),
-              TextSpan(text: '${plan.plannedReduction}', style: highlight),
+              TextSpan(
+                text: '${plan.plannedReduction}',
+                style: highlight.copyWith(color: colors.primary),
+              ),
               TextSpan(
                 text: ' ${habit.unitsFor(plan.plannedReduction)} avoided',
               ),

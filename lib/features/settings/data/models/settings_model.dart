@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:exhale/core/data/local/database/app_database.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/settings/domain/entities/app_icon_choice.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
@@ -10,15 +11,18 @@ extension SettingsRowMapper on SettingsRow {
     dayResetHour: dayResetHour,
     themePreference:
         ThemePreference.values.asNameMap()[themePreference] ??
-        ThemePreference.dark,
+        ThemePreference.system,
     accentIndex: accentIndex,
     appIcon: AppIconChoice.values.asNameMap()[appIcon] ?? AppIconChoice.breath,
-    packPriceCents: packPriceCents,
-    cigarettesPerPack: cigarettesPerPack,
+    priceCents: priceCents,
+    unitsPerContainer: unitsPerContainer,
     currencySymbol: currencySymbol,
-    glassEffects: glassEffects,
     askForTrigger: askForTrigger,
     triggerPromptIntroSeen: triggerPromptIntroSeen,
+    habitKind: HabitKind.values.asNameMap()[habitKind] ?? HabitKind.smoking,
+    customHabitName: customHabitName,
+    customHabitUnit: customHabitUnit,
+    reason: reason,
   );
 }
 
@@ -30,11 +34,14 @@ extension AppSettingsMapper on AppSettings {
     themePreference: Value(themePreference.name),
     accentIndex: Value(accentIndex),
     appIcon: Value(appIcon.name),
-    packPriceCents: Value(packPriceCents),
-    cigarettesPerPack: Value(cigarettesPerPack),
+    priceCents: Value(priceCents),
+    unitsPerContainer: Value(unitsPerContainer),
     currencySymbol: Value(currencySymbol),
-    glassEffects: Value(glassEffects),
     askForTrigger: Value(askForTrigger),
     triggerPromptIntroSeen: Value(triggerPromptIntroSeen),
+    habitKind: Value(habitKind.name),
+    customHabitName: Value(customHabitName),
+    customHabitUnit: Value(customHabitUnit),
+    reason: Value(reason),
   );
 }

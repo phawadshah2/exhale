@@ -28,7 +28,7 @@ class LogSmoke implements UseCase<SmokeLog, LogSmokeInput> {
     final loggedAt = input.loggedAt ?? now;
     if (loggedAt.isAfter(now)) {
       return const FailureResult<SmokeLog>(
-        ValidationFailure('A smoke cannot be logged in the future.'),
+        ValidationFailure('A log cannot be in the future.'),
       );
     }
     return await _repository.addLog(

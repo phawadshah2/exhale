@@ -13,17 +13,23 @@ class Settings extends Table {
       integer().named('accent_index').withDefault(const Constant(0))();
   TextColumn get appIcon =>
       text().named('app_icon').withDefault(const Constant('breath'))();
-  IntColumn get packPriceCents =>
-      integer().named('pack_price_cents').nullable()();
-  IntColumn get cigarettesPerPack =>
+  IntColumn get priceCents => integer().named('pack_price_cents').nullable()();
+  IntColumn get unitsPerContainer =>
       integer().named('cigarettes_per_pack').withDefault(const Constant(20))();
-  BoolColumn get glassEffects =>
-      boolean().named('glass_effects').withDefault(const Constant(true))();
   BoolColumn get askForTrigger =>
       boolean().named('ask_for_trigger').withDefault(const Constant(true))();
   BoolColumn get triggerPromptIntroSeen => boolean()
       .named('trigger_prompt_intro_seen')
       .withDefault(const Constant(false))();
+
+  /// HabitKind.name; rows from before v6 were smoking.
+  TextColumn get habitKind =>
+      text().named('habit_kind').withDefault(const Constant('smoking'))();
+  TextColumn get customHabitName =>
+      text().named('custom_habit_name').nullable()();
+  TextColumn get customHabitUnit =>
+      text().named('custom_habit_unit').nullable()();
+  TextColumn get reason => text().nullable()();
   TextColumn get currencySymbol =>
       text().named('currency_symbol').withDefault(const Constant(r'$'))();
 

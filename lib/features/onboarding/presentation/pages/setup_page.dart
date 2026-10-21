@@ -117,17 +117,6 @@ class SetupPage extends ConsumerWidget {
           onPickDate: controller.setQuitDay,
           onSelectPreset: controller.selectQuitPreset,
         ),
-        if (habit.tracksCost) ...[
-          const SizedBox(height: AppSpacing.md),
-          _CostCard(
-            habit: habit,
-            currencySymbol: currency,
-            unitsPerContainer: form.cigarettesPerPack,
-            showPriceError: form.hasInvalidPackPrice,
-            onPriceChanged: controller.setPackPriceText,
-            onUnitsPerContainerChanged: controller.setCigarettesPerPack,
-          ),
-        ],
         const SizedBox(height: AppSpacing.md),
         ProjectionCard(
           plan: form.preview,
@@ -135,6 +124,17 @@ class SetupPage extends ConsumerWidget {
           unitPriceCents: habit.tracksCost ? form.unitPriceCents : null,
           currencySymbol: currency,
         ),
+        if (habit.tracksCost) ...[
+          const SizedBox(height: AppSpacing.md),
+          _CostCard(
+            habit: habit,
+            currencySymbol: currency,
+            unitsPerContainer: form.unitsPerContainer,
+            showPriceError: form.hasInvalidPrice,
+            onPriceChanged: controller.setPriceText,
+            onUnitsPerContainerChanged: controller.setUnitsPerContainer,
+          ),
+        ],
       ],
     );
   }
@@ -230,7 +230,7 @@ class _StartDateCard extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: colors.surfaceContainerHigh,
+                  color: colors.surfaceContainerHighest,
                 ),
                 child: Icon(AppIcons.calendar, color: colors.primary),
               ),
@@ -359,7 +359,7 @@ class _CostCardState extends State<_CostCard> {
                     NumberStepper(
                       value: widget.unitsPerContainer,
                       min: 1,
-                      max: SettingsValidation.maxCigarettesPerPack,
+                      max: SettingsValidation.maxUnitsPerContainer,
                       onChanged: widget.onUnitsPerContainerChanged,
                       unit: habit.shortUnits,
                       caption: 'per $container',

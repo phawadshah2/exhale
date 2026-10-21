@@ -77,8 +77,6 @@ final FutureProvider<HomeStats?> homeStatsProvider =
         days: days,
         history: history,
         today: today,
-        cigarettePriceCents: ref
-            .watch(currentSettingsProvider)
-            .cigarettePriceCents,
+        unitPriceCents: ref.watch(currentSettingsProvider).unitPriceCents,
       );
     });

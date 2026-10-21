@@ -8,7 +8,9 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/core/widgets/status_badge.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
+import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/smoke_log.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
@@ -44,7 +46,8 @@ class DayDetailSheet extends ConsumerWidget {
       context,
       title: 'Delete this log?',
       message:
-          'The smoke at ${AppFormat.time(log.loggedAt)} will be removed '
+          'The ${ref.read(habitProvider).unit} at '
+          '${AppFormat.time(log.loggedAt)} will be removed '
           'from this day.',
       confirmLabel: 'Delete',
       destructive: true,
@@ -99,15 +102,6 @@ class DayDetailSheet extends ConsumerWidget {
                     ],
                   ),
                 ),
-                IconButton(
-                  tooltip: 'Close',
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(AppIcons.close),
-                  style: IconButton.styleFrom(
-                    backgroundColor: colors.surfaceContainerHighest,
-                    foregroundColor: colors.onSurface,
-                  ),
-                ),
               ],
             ),
           ),
@@ -115,7 +109,12 @@ class DayDetailSheet extends ConsumerWidget {
         if (progress != null)
           SliverPadding(
             padding: AppSpacing.page.copyWith(bottom: AppSpacing.md),
-            sliver: SliverToBoxAdapter(child: _Summary(progress: progress)),
+            sliver: SliverToBoxAdapter(
+              child: _Summary(
+                progress: progress,
+                habit: ref.watch(habitProvider),
+              ),
+            ),
           ),
         if (logs == null)
           const SliverFillRemaining(
@@ -174,17 +173,17 @@ class DayDetailSheet extends ConsumerWidget {
 }
 
 class _Summary extends StatelessWidget {
-  const _Summary({required this.progress});
+  const _Summary({required this.progress, required this.habit});
 
   final DailyProgress progress;
+  final Habit habit;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerHigh,
+        color: context.exhale.inset,
         borderRadius: AppRadius.inner,
       ),
       child: Row(
@@ -196,7 +195,7 @@ class _Summary extends StatelessWidget {
             ),
           ),
           StatusBadge(
-            label: progress.badgeLabel,
+            label: progress.badgeLabel(habit),
             colors: progress.status.colors(context),
           ),
         ],
@@ -228,7 +227,7 @@ class _LogTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 4, 12),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+        color: context.exhale.inset,
         borderRadius: AppRadius.inner,
         border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.4)),
       ),

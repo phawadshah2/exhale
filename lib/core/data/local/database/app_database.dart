@@ -13,14 +13,13 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? _createConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (migrator, from, to) async {
-      if (from < 2) {
-        await migrator.addColumn(settings, settings.glassEffects);
-      }
+      // v2 added settings.glass_effects; v5 drops it again, so it is
+      // skipped here.
       if (from < 3) {
         // v3 replaces "-1 every step_days down to target_limit" with a quit
         // date: the day the old schedule reached its target.
@@ -41,11 +40,30 @@ class AppDatabase extends _$AppDatabase {
         await migrator.addColumn(settings, settings.askForTrigger);
         await migrator.addColumn(settings, settings.triggerPromptIntroSeen);
       }
+      if (from < 5) {
+        // v5 drops glass_effects: glass follows Reduce Transparency instead.
+        // Rebuilding the table also creates the v6 habit columns.
+        await migrator.alterTable(
+          TableMigration(settings, newColumns: _habitColumns),
+        );
+      } else if (from < 6) {
+        for (final column in _habitColumns) {
+          await migrator.addColumn(settings, column);
+        }
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },
   );
+
+  /// Added in v6; existing rows become the smoking habit.
+  List<GeneratedColumn<Object>> get _habitColumns => [
+    settings.habitKind,
+    settings.customHabitName,
+    settings.customHabitUnit,
+    settings.reason,
+  ];
 
   static QueryExecutor _createConnection() {
     return driftDatabase(

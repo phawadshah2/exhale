@@ -38,7 +38,7 @@ class ReductionPlan {
 
   int get totalDays => quitDay.daysSince(startDay);
 
-  /// Average days between drops of one cigarette.
+  /// Average days between drops of one unit.
   double get daysPerDrop => totalDays / startLimit;
 
   /// Every day before [quitDay] whose limit differs from the day before.
@@ -46,7 +46,7 @@ class ReductionPlan {
 
   int get stageCount => stages.length;
 
-  /// Cigarettes not smoked by [quitDay] if every limit is kept, compared
+  /// Units not used by [quitDay] if every limit is kept, compared
   /// with staying at [startLimit].
   late final int plannedReduction = [
     for (var d = 0; d < totalDays; d++) startLimit - _limitAt(d),

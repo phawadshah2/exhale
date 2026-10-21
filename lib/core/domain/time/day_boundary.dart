@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 
 /// Decides which [LogicalDay] a moment belongs to.
 ///
-/// With a reset hour of 4, a cigarette at 01:30 on Tuesday still counts
+/// With a reset hour of 4, a log at 01:30 on Tuesday still counts
 /// toward Monday.
 @immutable
 class DayBoundary {

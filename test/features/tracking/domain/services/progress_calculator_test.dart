@@ -117,7 +117,7 @@ void main() {
         days: days([0]),
         history: history,
         today: start,
-        cigarettePriceCents: 72.5,
+        unitPriceCents: 72.5,
       );
 
       expect(stats.dayNumber, 1);
@@ -133,7 +133,7 @@ void main() {
         days: days([5, 12, 6, 7, 3]),
         history: history,
         today: start.addDays(4),
-        cigarettePriceCents: null,
+        unitPriceCents: null,
       );
 
       expect(stats.dayNumber, 5);
@@ -145,7 +145,7 @@ void main() {
         days: days([5, 6, 10]),
         history: history,
         today: start.addDays(2),
-        cigarettePriceCents: null,
+        unitPriceCents: null,
       );
 
       expect(stats.streakDays, 0);
@@ -156,7 +156,7 @@ void main() {
         days: days([6, 6, 6, 1]),
         history: history,
         today: start.addDays(3),
-        cigarettePriceCents: 50,
+        unitPriceCents: 50,
       );
 
       expect(stats.recentAverage, 6);
@@ -170,7 +170,7 @@ void main() {
         days: days([9, 9, 2, 2, 2, 2, 2, 2, 2, 0]),
         history: history,
         today: start.addDays(9),
-        cigarettePriceCents: null,
+        unitPriceCents: null,
       );
 
       expect(stats.recentAverage, 2);
@@ -181,7 +181,7 @@ void main() {
         days: days([15, 15, 0]),
         history: history,
         today: start.addDays(2),
-        cigarettePriceCents: 50,
+        unitPriceCents: 50,
       );
 
       expect(stats.avoided, 0);

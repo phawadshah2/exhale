@@ -4,6 +4,8 @@ import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/status_badge.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/home/presentation/widgets/progress_ring.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
@@ -20,6 +22,7 @@ class TodayCard extends StatelessWidget {
     required this.now,
     required this.latestLog,
     required this.isFirstDay,
+    required this.habit,
     super.key,
   });
 
@@ -29,6 +32,7 @@ class TodayCard extends StatelessWidget {
   final DateTime now;
   final SmokeLog? latestLog;
   final bool isFirstDay;
+  final Habit habit;
 
   @override
   Widget build(BuildContext context) {
@@ -48,20 +52,25 @@ class TodayCard extends StatelessWidget {
                 Expanded(
                   child: Text("Today's Consumption", style: text.titleLarge),
                 ),
-                StatusBadge(label: progress.badgeLabel, colors: statusColors),
+                StatusBadge(
+                  label: progress.badgeLabel(habit),
+                  colors: statusColors,
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
             ProgressRing(
               progress: progress,
-              child: _RingCentre(progress: progress),
+              child: _RingCentre(progress: progress, habit: habit),
             ),
             if (progress.count == 0) ...[
               const SizedBox(height: AppSpacing.md),
               _Note(
                 label: progress.limit == 0
-                    ? 'Smoke-free so far today.'
-                    : 'No smokes logged today. Nice start.',
+                    ? habit.freeLabel == null
+                          ? 'None so far today.'
+                          : '${habit.freeTitle} so far today.'
+                    : 'No ${habit.units} logged today. Nice start.',
               ),
             ],
             const SizedBox(height: AppSpacing.lg),
@@ -103,7 +112,7 @@ class TodayCard extends StatelessWidget {
 
   String _nextTarget() {
     final days = plan.daysUntilNextDrop(today);
-    if (days == null) return 'Smoke-free';
+    if (days == null) return habit.freeTitle;
     final next = plan.limitOn(plan.nextDropOn(today)!);
     if (next == 0) {
       return days == 1 ? 'Quit day tomorrow' : 'Quit day in ${days}d';
@@ -113,9 +122,10 @@ class TodayCard extends StatelessWidget {
 }
 
 class _RingCentre extends StatelessWidget {
-  const _RingCentre({required this.progress});
+  const _RingCentre({required this.progress, required this.habit});
 
   final DailyProgress progress;
+  final Habit habit;
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +137,7 @@ class _RingCentre extends StatelessWidget {
 
     final (headline, caption, color) = switch (progress.status) {
       LimitStatus.under when progress.limit == 0 => (
-        'Smoke-free day',
+        habit.freeDayTitle,
         'Keep it going',
         context.exhale.success.foreground,
       ),

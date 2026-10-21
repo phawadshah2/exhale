@@ -30,8 +30,6 @@ void main() {
       'Alcohol',
       'Caffeine',
       'Energy drinks',
-      'Soda',
-      'Sugar',
       'Junk food',
       'Social media',
       'Custom',
@@ -156,7 +154,7 @@ void main() {
   ) async {
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.tap(find.text('Sugar'));
+    await tester.tap(find.text('Junk food'));
     await tester.pump();
     await continueToPlan(tester);
 
@@ -167,7 +165,7 @@ void main() {
     expect(find.byType(SetupPage), findsNothing);
     expect(
       tester
-          .getSemantics(find.bySemanticsLabel('Sugar'))
+          .getSemantics(find.bySemanticsLabel('Junk food'))
           .flagsCollection
           .isSelected,
       Tristate.isTrue,

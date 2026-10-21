@@ -3,8 +3,10 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/pill_segmented_control.dart';
+import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
 import 'package:exhale/features/home/presentation/widgets/history_chart.dart';
+import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/period_summary.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +36,10 @@ class HistoryCard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Smoking History', style: text.headlineSmall),
+                      Text(
+                        ref.watch(habitProvider).historyTitle,
+                        style: text.headlineSmall,
+                      ),
                       Text(
                         'Paced tapering progress',
                         style: text.bodySmall?.copyWith(

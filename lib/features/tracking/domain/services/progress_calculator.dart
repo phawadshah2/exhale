@@ -70,7 +70,7 @@ abstract final class ProgressCalculator {
     required List<DailyProgress> days,
     required PlanHistory history,
     required LogicalDay today,
-    required double? cigarettePriceCents,
+    required double? unitPriceCents,
   }) {
     final baseline = history.plans.first.startLimit;
     final completed = days.where((d) => d.day.isBefore(today)).toList();
@@ -99,9 +99,7 @@ abstract final class ProgressCalculator {
       baseline: baseline,
       recentAverage: recentAverage,
       avoided: avoided,
-      moneySavedCents: cigarettePriceCents == null
-          ? null
-          : avoided * cigarettePriceCents,
+      moneySavedCents: unitPriceCents == null ? null : avoided * unitPriceCents,
     );
   }
 }
