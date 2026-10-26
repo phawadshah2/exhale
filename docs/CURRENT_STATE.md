@@ -40,7 +40,7 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
   `ringDayProvider`/`ringShownDayProvider`; ring tests in
   `test/features/home/ring_card_test.dart`; matched to the canvas designs.
 
-- M2 Task 2.5 (Logs page), written and awaiting commit. Logs tests (9) passed as observed by me; format, analyze and the full suite were run by Fawad and passed (his report, not observed by me). Added
+- M2 Task 2.5 (Logs page), committed (5900464, tree clean at handoff). Logs tests (9) passed as observed by me; format, analyze and the full suite were run by Fawad and passed (his report, not observed by me). Added
   `lib/features/logs/` (`LogsQuery` + `openLogs`, `logs_providers.dart`,
   `LogsPage`, `LogsPeriodCard`, `LogsDayCard`, `DayGroup`, `LogRow`), route
   `/logs`, tests in `test/features/logs/`. Ring "View logs" and the ring's
@@ -55,9 +55,9 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
 
 ## Next action
 
-Commit Task 2.5 (`feat(logs): logs page with filters, allowed counts and
-swipe delete`). Then Task 2.4 (History card): give it its own anchor and wire
-its taps to `openLogs`; then the M2 independent review (Opus 5.5, high) and a
+Task 2.5 is committed. Start Task 2.4 (History card): give it its own anchor
+and wire its taps to `openLogs` (plan "Task 2.4", spec §4.5, designs
+`ChartA/B/C/All*.dc.html`); then the M2 independent review (Opus 5.5, high) and a
 simulator check of every Logs entry point (ask first). Suggested: Sonnet 5.5,
 medium, fresh session.
 
