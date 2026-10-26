@@ -36,35 +36,33 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
 
 ## Next action
 
-Task 2.3, Ring card, on `feat/dashboard-stats`: done, uncommitted. Format
-(Fawad), analyze `--fatal-infos` clean, `test/features/home` (33) and the full
-suite (262) passed, observed. Next: Fawad commits as
-`feat(home): ring card with last entry and day triggers`, then Task 2.4.
+Task 2.3 (ring card, matched to the designs) is committed and pushed.
 
-Task 2.3 changes: `day_card.dart` → `ring_card.dart` (`RingCard(habitId)`);
-new `day_triggers.dart` (`DayTriggers`, `onSelect` unset); `ringDayProvider`
-and `ringShownDayProvider` in `home_providers.dart`; ring tests moved to
-`test/features/home/ring_card_test.dart`. Today's details are now Last entry /
-Last trigger (the old "Time since last" / "Next target" cells are gone, per
-spec §4.4). History still uses `pickedDayProvider`/`selectedDayProvider` until
-Task 2.4 gives it its own anchor, so the ring and chart no longer move
-together (the old "ring and chart move together" test was removed).
+**Do Task 2.5 (Logs page) before Task 2.4 (History card).** 2.4's taps, and the
+ring's trigger rows, all need `LogsQuery` / `openLogs` from 2.5. The plan's
+"Task 2.6" references mean 2.5. Suggested: Sonnet 5.5, medium effort (new
+feature, so a fresh session). Commit message per the plan:
+`feat(logs): logs page with filters, allowed counts and swipe delete`.
 
-Matched to `design/6._home_details_logs` (`Main`, `StateOver`, `StateFirstDay`,
-`StatePastDay`): tinted triggers box with uppercase header and rank-coloured
-bars, bolt icon on Last trigger, Next target kept when nothing is logged
-(restored), "that day's limit" caption and "N units" on past days, over-limit
-note (today only), dashed first-day placeholder. Format, analyze and the
-full suite (263) were rerun after this.
+Read first: plan "Task 2.5", spec §4.6, designs `Logs.dc.html` and
+`LogsFiltered.dc.html` (canvas
+https://claude.ai/artifact/Es7ju6TWmMj5pkNon4tbHu is the source of truth).
+Reuse from `day_detail_sheet.dart` (to be deleted): the confirm-delete flow
+(`showAppConfirm`, `deleteHabitLogProvider`, `failureMessage`). The router has
+no `/logs` yet (`app_router.dart`, `app_routes.dart`). The ring's "View logs"
+button (`ring_card.dart`) calls `showDayDetailSheet`: switch it to `openLogs`.
 
-Left for later: trigger rows do not open Logs until Task 2.6 (wire `onSelect`
-with `LogsQuery`, which also adds "· TAP TO SEE LOGS" to the header, and add
-that test then); the after-quit-date state (`StateQuit`: full green ring,
-"N days vape-free", "You reached your quit date" card with Keep at zero / New
-goal) is not built because Edit plan does not exist yet.
+After 2.5: wire `DayTriggers.onSelect` in `ring_card.dart` to `openLogs`
+(this also adds "· TAP TO SEE LOGS" to its header; add that test), then Task
+2.4 with its taps wired, then the M2 independent review (Opus 5.5, high) and
+the full suite. Once the one-habit Home is complete, ask Fawad before running
+the simulator to review it against the canvas.
 
-Then Tasks 2.4–2.5, then the M2 independent review (Opus 5.5, high) and a
-full-suite run before merging.
+Not built, deliberately: the after-quit-date ring state and "You reached your
+quit date" card (`StateQuit`), because Edit plan does not exist yet.
+
+Ring/History decoupling: History still uses `pickedDayProvider` /
+`selectedDayProvider` until 2.4 gives it its own anchor.
 
 Test gotcha: never `await` a go_router `push` in a test (it completes on pop);
 use `unawaited`.
