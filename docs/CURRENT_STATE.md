@@ -34,9 +34,15 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
   Task 2.5; money tile caption unchanged until 3.5; `stage_pill.dart`
   unchanged (its wording is covered by existing tests).
 
+- M2 Task 2.3, committed and pushed (tree clean at handoff). Checks observed
+  by me after the last edit: format, `analyze --fatal-infos` clean, full suite
+  263 passed. `RingCard(habitId)` (was `DayCard`), `DayTriggers`,
+  `ringDayProvider`/`ringShownDayProvider`; ring tests in
+  `test/features/home/ring_card_test.dart`; matched to the canvas designs.
+
 ## Next action
 
-Task 2.3 (ring card, matched to the designs) is committed and pushed.
+Task 2.3 is done. Start Task 2.5 now (see below); no work is in progress.
 
 **Do Task 2.5 (Logs page) before Task 2.4 (History card).** 2.4's taps, and the
 ring's trigger rows, all need `LogsQuery` / `openLogs` from 2.5. The plan's
