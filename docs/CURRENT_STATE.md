@@ -53,16 +53,30 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
   tappable (a `Trigger?` filter cannot express it); no month/trigger
   dropdown from the design.
 
+- M2 Task 2.4 (History card), written, tree uncommitted. Observed by me:
+  analyze clean, `test/features/home` 43 passed; format run once more after
+  that (one file changed); full suite 281 passed after it (observed by me).
+  Not checked on a simulator against the designs. `HistoryCard(habitId)` is rewritten
+  with Week line, Month rings and All (`widgets/history/`: `week_line_chart`,
+  `month_ring_calendar`, `all_time_chart`, `history_stats_line`,
+  `top_triggers`, `chart_paint`); providers `historyPeriodProvider`,
+  `historyAnchorProvider`, `historyShownDayProvider`, `historyStatsProvider`,
+  `allTimeSeriesProvider`; `chartPeriodProvider`, `pickedDayProvider` and
+  `selectedDayProvider` removed. Header is now plain "History";
+  `HabitWording.historyTitle` is unused. Tests: `history_card_test.dart`
+  (new); the old chart test and two "Vaping History" asserts in
+  `home_page_test.dart` migrated. Choices: day taps open Logs for that day;
+  chips and "All triggers" open Logs for the shown period (All = plan start
+  to today); the chart pager covers the chart only, totals and chips follow
+  the shown period; "Since ... day N of D" uses quit day minus first day.
+  `AllTimeChart` also takes `quitDay`.
+
 ## Next action
 
-Task 2.5 is committed. Start Task 2.4 (History card): give it its own anchor
-and wire its taps to `openLogs` (plan "Task 2.4", spec §4.5, designs
-`ChartA/B/C/All*.dc.html`); then the M2 independent review (Opus 5.5, high) and a
-simulator check of every Logs entry point (ask first). Suggested: Sonnet 5.5,
-medium, fresh session.
-
-Ring/History decoupling: History still uses `pickedDayProvider` /
-`selectedDayProvider` until 2.4 gives it its own anchor.
+Task 2.4 is checked; commit it.
+After that: the M2 independent review (Opus 5.5, high) and a simulator check
+of every Logs entry point (ask first). Visual match to `ChartB/C/All*.dc.html`
+is unverified until a simulator run.
 
 Test gotcha: never `await` a go_router `push` in a test (it completes on pop);
 use `unawaited`.
