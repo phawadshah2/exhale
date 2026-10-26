@@ -6,29 +6,45 @@ Updated 2026-10-26. Roadmap:
 
 ## Goal
 
-Home, Details and Logs redesign. Milestone **M1 (Habits foundation)** is
-done and merged to main. Now starting **M2 (Dashboard and Logs)**.
+Home, Details and Logs redesign. **M1 (Habits foundation)** is merged to main.
+In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
 
 ## Done
 
-- M1, Tasks 1.1–1.3: schema v8 (`habits` table; plans and logs keyed by
-  `habit_id`), habit domain/data/providers, `StartTracking`, Home on
-  `primaryHabitProvider`. Every v7 log maps to habit 1 in the migration.
-- Checks passed on the merged code: format, `analyze --fatal-infos`, all
-  tests.
+- M1, Tasks 1.1–1.3: schema v8, habit domain/data/providers, plans and logs
+  keyed by `habit_id`.
+- M2 Task 2.1, committed and pushed (tree clean at handoff): `PeriodStats`,
+  `TriggerBreakdown`, `AllTimeSeries` and `ProgressCalculator.periodStats`,
+  `triggerBreakdown`, `allTime`. Format, `analyze --fatal-infos` and the
+  services tests (36) passed. The full suite was not run after it.
+- Choices fixed by the tests: `average7` is aligned to `counts` (trailing mean,
+  up to 7 days) and is null when `weekly`; weekly blocks are 7 days from the
+  start day; `daysOnTrack` counts days not over their limit; `logged` ignores
+  logs before the plan.
+
+- M2 Task 2.2, written, tests passing (Fawad ran them), not yet committed:
+  `HabitDashboard` + `DashboardHeaderKind`, `DashboardHeader`, `PlanCard`,
+  `TodayLogsCard`, `HabitDetailsPage` stub on `/habit/:habitId`,
+  `AppFormat.shortWeekdayDate`. Section order per spec §4.3; quote card kept
+  last. Home still uses `primaryHabitProvider` (not `singleHabitIdProvider`)
+  until the multi-habit list exists (M4). "See all logs" is plain text until
+  Task 2.5; money tile caption unchanged until 3.5; `stage_pill.dart`
+  unchanged (its wording is covered by existing tests).
 
 ## Next action
 
-1. Task 2.1 on branch `feat/dashboard-stats` is done and checked (2026-10-26):
-   `period_stats.dart`, `trigger_breakdown.dart`, `all_time_series.dart`, plus
-   `periodStats`, `triggerBreakdown`, `allTime` in `ProgressCalculator`.
-   Format, `analyze --fatal-infos` and the services tests (36) pass; the full
-   suite has not been run. `average7` is null when `weekly` (weekly sums are
-   already smoothed). Waiting on Fawad to commit; then start Task 2.2.
-   Commit message: `feat(stats): period stats, trigger breakdown, all-time series`.
-   Choices the plan left open, fixed by the tests: `average7` is aligned to
-   `counts` (trailing mean, window up to 7 days); weekly blocks are 7 days
-   counted from the start day; `daysOnTrack` counts tracked days not over
-   their limit (at limit counts); `logged` ignores logs before the plan.
-2. Then Tasks 2.2–2.5 (dashboard shell, ring card, History card, Logs page),
-   with an independent review at the end of M2.
+Task 2.3, Ring card (plan section "Task 2.3" only), on `feat/dashboard-stats`.
+Suggested: Sonnet 5.5, medium effort. Commit Task 2.2 first
+(`feat(home): habit dashboard as Home`).
+
+1. Read the Task 2.3 section and spec §4.4, then `day_card.dart` and the
+   matching design (`Main.dc.html`, `StateOver.dc.html`, `StateFirstDay.dc.html`,
+   `StatePastDay.dc.html`, `StateQuit.dc.html`).
+2. Write failing widget tests first, then implement. Ask Fawad before each
+   check (format, analyze, `fvm flutter test test/features/home`, then the
+   full suite).
+3. Then Tasks 2.4–2.5, then the M2 independent review (Opus 5.5, high) and a
+   full-suite run before merging.
+
+Test gotcha: never `await` a go_router `push` in a test (it completes on pop);
+use `unawaited`.

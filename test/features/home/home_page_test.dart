@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
@@ -6,6 +8,7 @@ import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/archive_habit.dart';
+import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/usecases/save_settings.dart';
@@ -15,6 +18,7 @@ import 'package:exhale/features/tracking/domain/repositories/habit_log_repositor
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../helpers/fixed_clock.dart';
 import '../../helpers/pump_app.dart';
@@ -583,6 +587,87 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('6 cigs'), findsOneWidget);
     expect(find.text('3 Days'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('one habit shows the dashboard sections in order', (
+    tester,
+  ) async {
+    await startPlan(LogicalDay(2026, 10, 14), reason: 'Breathe easier');
+    await tester.pumpAppPastSplash(height: 2400);
+
+    final sections = [
+      find.text("Today's Consumption"),
+      find.text('Streak'),
+      find.textContaining('History'),
+      find.text('Your plan'),
+      find.text('YOUR WHY'),
+      find.text("Today's logs"),
+    ];
+    final tops = [
+      for (final section in sections) tester.getTopLeft(section.first).dy,
+    ];
+    expect(tops, orderedEquals([...tops]..sort()));
+    expect(tops.toSet(), hasLength(sections.length));
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('your plan shows stage, next stage and quit date', (
+    tester,
+  ) async {
+    await startPlan(LogicalDay(2026, 10, 14));
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.text('Stage 1 · 9 a day (now)'), findsOneWidget);
+    expect(find.text('Stage 2 · 8 a day'), findsOneWidget);
+    expect(find.text('Starts Wed, Oct 21'), findsOneWidget);
+    expect(find.text('Smoke-free from Dec 16'), findsOneWidget);
+    expect(find.text('61 days to go'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets("today's logs shows 3 and a more link", (tester) async {
+    await startPlan(today);
+    await logOn(DateTime(2026, 10, 16, 9), times: 4);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.text('+1 more today · See all logs'), findsOneWidget);
+    expect(find.text('9:03 AM'), findsNothing);
+    expect(find.text('9:02 AM'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets("today's logs says so when nothing is logged", (tester) async {
+    await startPlan(today);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.text('Nothing logged today.'), findsOneWidget);
+    expect(find.textContaining('more today'), findsNothing);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('the habit route shows the dashboard with a back button', (
+    tester,
+  ) async {
+    await startPlan(LogicalDay(2026, 10, 14));
+    await tester.pumpAppPastSplash(height: 2400);
+
+    unawaited(
+      GoRouter.of(tester.element(find.byType(HomePage))).push('/habit/1'),
+    );
+    await tester.pumpInSteps(const Duration(milliseconds: 600));
+
+    expect(find.byTooltip('Back'), findsOneWidget);
+    expect(find.text('Your plan'), findsWidgets);
+
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpInSteps(const Duration(milliseconds: 600));
+    expect(find.byTooltip('Back'), findsNothing);
 
     await tester.disposeApp();
   });
