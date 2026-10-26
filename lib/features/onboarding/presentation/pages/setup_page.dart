@@ -9,6 +9,7 @@ import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/number_stepper.dart';
 import 'package:exhale/core/widgets/section_card.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/onboarding/presentation/providers/setup_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/projection_card.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/quit_date_card.dart';
@@ -359,7 +360,7 @@ class _CostCardState extends State<_CostCard> {
                     NumberStepper(
                       value: widget.unitsPerContainer,
                       min: 1,
-                      max: SettingsValidation.maxUnitsPerContainer,
+                      max: HabitValidation.maxUnitsPerContainer,
                       onChanged: widget.onUnitsPerContainerChanged,
                       unit: habit.shortUnits,
                       caption: 'per $container',

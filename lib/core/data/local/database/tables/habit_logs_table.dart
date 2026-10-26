@@ -1,15 +1,17 @@
 import 'package:drift/drift.dart';
+import 'package:exhale/core/data/local/database/tables/habits_table.dart';
 
 @DataClassName('HabitLogRow')
 @TableIndex(name: 'idx_habit_logs_logged_at', columns: {#loggedAt})
+@TableIndex(
+  name: 'idx_habit_logs_habit_id_logged_at',
+  columns: {#habitId, #loggedAt},
+)
 class HabitLogs extends Table {
   IntColumn get id => integer().autoIncrement()();
+  IntColumn get habitId =>
+      integer().named('habit_id').references(Habits, #id)();
   DateTimeColumn get loggedAt => dateTime().named('logged_at')();
-
-  /// HabitKind.name of the habit when it was logged; rows from before v7
-  /// were smoking.
-  TextColumn get habitKind =>
-      text().named('habit_kind').withDefault(const Constant('smoking'))();
 
   /// Trigger.name, or null when skipped.
   TextColumn get trigger => text().nullable()();

@@ -2,7 +2,6 @@ import 'package:exhale/core/domain/error/failure.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/clock.dart';
 import 'package:exhale/core/domain/usecase/usecase.dart';
-import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/repositories/habit_log_repository.dart';
@@ -11,13 +10,13 @@ import 'package:meta/meta.dart';
 @immutable
 class AddHabitLogInput {
   const AddHabitLogInput({
-    required this.habitKind,
+    required this.habitId,
     this.loggedAt,
     this.trigger,
     this.note,
   });
 
-  final HabitKind habitKind;
+  final int habitId;
 
   /// Defaults to now; set it to back-fill a missed log.
   final DateTime? loggedAt;
@@ -40,8 +39,8 @@ class AddHabitLog implements UseCase<HabitLog, AddHabitLogInput> {
       );
     }
     return await _repository.addLog(
+      habitId: input.habitId,
       loggedAt: loggedAt,
-      habitKind: input.habitKind,
       trigger: input.trigger,
       note: normalizeNote(input.note),
     );

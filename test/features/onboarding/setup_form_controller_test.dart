@@ -2,6 +2,8 @@ import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
+import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
 import 'package:exhale/features/onboarding/presentation/providers/setup_form_provider.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
@@ -107,7 +109,14 @@ void main() {
     expect(state().errorMessage, contains('valid price'));
   });
 
-  test('submit saves settings and the plan', () async {
+  Future<TrackedHabit> onlyHabit() async {
+    final habits =
+        (await sl<HabitRepository>().getActive() as Success<List<TrackedHabit>>)
+            .value;
+    return habits.single;
+  }
+
+  test('submit saves the name, then habit 1 and its plan', () async {
     controller()
       ..setName('  Fawad ')
       ..setStartLimit(12)
@@ -119,14 +128,18 @@ void main() {
 
     final settings =
         (await sl<SettingsRepository>().get() as Success<AppSettings>).value;
-    final history =
-        (await sl<PlanRepository>().getHistory() as Success<PlanHistory?>)
-            .value!;
     expect(settings.userName, 'Fawad');
-    expect(settings.priceCents, 1450);
-    expect(settings.unitsPerContainer, 25);
-    expect(settings.habitKind, HabitKind.vaping);
-    expect(settings.reason, isNull);
+
+    final habit = await onlyHabit();
+    expect(habit.id, 1);
+    expect(habit.habit, Habit.vaping);
+    expect(habit.priceCents, 1450);
+    expect(habit.unitsPerContainer, 25);
+    expect(habit.reason, isNull);
+
+    final history = (await sl<PlanRepository>().getHistory(
+      habit.id,
+    ) as Success<PlanHistory?>).value!;
     expect(
       history.current,
       ReductionPlan(
@@ -146,11 +159,29 @@ void main() {
 
     expect(await controller().submit(), isTrue);
 
-    final settings =
-        (await sl<SettingsRepository>().get() as Success<AppSettings>).value;
-    expect(settings.habitKind, HabitKind.custom);
-    expect(settings.customHabitName, 'Gaming');
-    expect(settings.customHabitUnit, 'match');
-    expect(settings.reason, 'More time with family');
+    final habit = await onlyHabit();
+    expect(habit.habit.kind, HabitKind.custom);
+    expect(habit.habit.name, 'Gaming');
+    expect(habit.habit.unit, 'match');
+    expect(habit.reason, 'More time with family');
+  });
+
+  test('a habit without cost stores no price', () async {
+    controller()
+      ..selectHabit(HabitKind.socialMedia)
+      ..setPriceText('5.00');
+
+    expect(await controller().submit(), isTrue);
+
+    expect((await onlyHabit()).priceCents, isNull);
+  });
+
+  test('a second submit adds no second habit', () async {
+    expect(await controller().submit(), isTrue);
+    controller().selectHabit(HabitKind.caffeine);
+
+    expect(await controller().submit(), isTrue);
+
+    expect((await onlyHabit()).habit, Habit.vaping);
   });
 }

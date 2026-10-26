@@ -16,15 +16,25 @@ class HabitLogLocalDataSource {
     _database.habitLogs,
   )..where((row) => row.id.equals(id))).go();
 
+  /// [habitId]'s logs, or every active habit's when null.
+  Expression<bool> _ofHabit($HabitLogsTable row, int? habitId) =>
+      habitId != null
+      ? row.habitId.equals(habitId)
+      : row.habitId.isInQuery(
+          _database.selectOnly(_database.habits)
+            ..addColumns([_database.habits.id])
+            ..where(_database.habits.archivedAt.isNull()),
+        );
+
   Stream<List<HabitLogRow>> watchLogs({
-    required String habitKind,
     required DateTime from,
     required DateTime to,
+    int? habitId,
   }) {
     final query = _database.select(_database.habitLogs)
       ..where(
         (row) =>
-            row.habitKind.equals(habitKind) &
+            _ofHabit(row, habitId) &
             row.loggedAt.isBiggerOrEqualValue(from) &
             row.loggedAt.isSmallerThanValue(to),
       )
@@ -35,14 +45,20 @@ class HabitLogLocalDataSource {
     return query.watch();
   }
 
-  Stream<HabitLogRow?> watchLatest({required String habitKind}) {
-    final query = _database.select(_database.habitLogs)
-      ..where((row) => row.habitKind.equals(habitKind))
-      ..orderBy([
-        (row) => OrderingTerm.desc(row.loggedAt),
-        (row) => OrderingTerm.desc(row.id),
-      ])
-      ..limit(1);
-    return query.watchSingleOrNull();
-  }
+  SimpleSelectStatement<$HabitLogsTable, HabitLogRow> _newest(
+    int? habitId,
+    int limit,
+  ) => _database.select(_database.habitLogs)
+    ..where((row) => _ofHabit(row, habitId))
+    ..orderBy([
+      (row) => OrderingTerm.desc(row.loggedAt),
+      (row) => OrderingTerm.desc(row.id),
+    ])
+    ..limit(limit);
+
+  Stream<HabitLogRow?> watchLatest({int? habitId}) =>
+      _newest(habitId, 1).watchSingleOrNull();
+
+  Stream<List<HabitLogRow>> watchRecent({required int limit}) =>
+      _newest(null, limit).watch();
 }

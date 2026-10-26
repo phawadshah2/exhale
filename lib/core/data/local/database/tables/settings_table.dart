@@ -13,25 +13,16 @@ class Settings extends Table {
       integer().named('accent_index').withDefault(const Constant(0))();
   TextColumn get appIcon =>
       text().named('app_icon').withDefault(const Constant('breath'))();
-
-  /// Per container when the habit has one, else per unit.
-  IntColumn get priceCents => integer().named('price_cents').nullable()();
-  IntColumn get unitsPerContainer =>
-      integer().named('units_per_container').withDefault(const Constant(20))();
   BoolColumn get askForTrigger =>
       boolean().named('ask_for_trigger').withDefault(const Constant(true))();
   BoolColumn get triggerPromptIntroSeen => boolean()
       .named('trigger_prompt_intro_seen')
       .withDefault(const Constant(false))();
 
-  /// HabitKind.name; rows from before v6 were smoking.
-  TextColumn get habitKind =>
-      text().named('habit_kind').withDefault(const Constant('smoking'))();
-  TextColumn get customHabitName =>
-      text().named('custom_habit_name').nullable()();
-  TextColumn get customHabitUnit =>
-      text().named('custom_habit_unit').nullable()();
-  TextColumn get reason => text().nullable()();
+  /// True once the one-time "Hold + for more" hint was shown.
+  BoolColumn get logHintSeen =>
+      boolean().named('log_hint_seen').withDefault(const Constant(false))();
+
   TextColumn get currencySymbol =>
       text().named('currency_symbol').withDefault(const Constant(r'$'))();
 

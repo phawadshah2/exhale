@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/domain/result/result.dart';
+import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
+import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/splash_scene.dart';
-import 'package:exhale/features/plan/domain/entities/plan_history.dart';
-import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -51,9 +51,10 @@ class _SplashPageState extends ConsumerState<SplashPage>
   }
 
   Future<void> _resolveDestination() async {
-    final history = await ref.read(planRepositoryProvider).getHistory();
-    final hasPlan = history is Success<PlanHistory?> && history.value != null;
-    _destination = hasPlan ? AppRoutes.home : AppRoutes.setup;
+    final habits = await ref.read(habitRepositoryProvider).getActive();
+    final hasHabit =
+        habits is Success<List<TrackedHabit>> && habits.value.isNotEmpty;
+    _destination = hasHabit ? AppRoutes.home : AppRoutes.setup;
     _maybeNavigate();
   }
 

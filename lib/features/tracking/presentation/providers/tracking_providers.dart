@@ -32,40 +32,43 @@ final todayProvider = Provider<LogicalDay>((ref) {
   return ref.watch(dayBoundaryProvider).dayOf(now);
 });
 
-/// The current habit's logs on [LogicalDay], oldest first.
-final StreamProviderFamily<List<HabitLog>, LogicalDay> logsForDayProvider =
-    StreamProvider.autoDispose.family<List<HabitLog>, LogicalDay>((ref, day) {
+/// A habit on one logical day.
+typedef HabitDay = ({int habitId, LogicalDay day});
+
+/// The habit's logs on the day, oldest first.
+final StreamProviderFamily<List<HabitLog>, HabitDay> logsForDayProvider =
+    StreamProvider.autoDispose.family<List<HabitLog>, HabitDay>((ref, key) {
       final boundary = ref.watch(dayBoundaryProvider);
       return ref
           .watch(habitLogRepositoryProvider)
           .watchLogs(
-            habitKind: ref.watch(habitProvider).kind,
-            from: boundary.startOf(day),
-            to: boundary.endOf(day),
+            habitId: key.habitId,
+            from: boundary.startOf(key.day),
+            to: boundary.endOf(key.day),
           );
     });
 
-/// The current habit's most recent log.
-final latestLogProvider = StreamProvider<HabitLog?>(
-  (ref) => ref
-      .watch(habitLogRepositoryProvider)
-      .watchLatest(habitKind: ref.watch(habitProvider).kind),
-);
+/// The habit's most recent log.
+final StreamProviderFamily<HabitLog?, int> latestLogProvider =
+    StreamProvider.family<HabitLog?, int>(
+      (ref, habitId) =>
+          ref.watch(habitLogRepositoryProvider).watchLatest(habitId: habitId),
+    );
 
-/// [LogicalDay]'s count against that day's limit; null before a plan exists.
-/// Days before the plan use the first plan's limit; callers decide whether
-/// to show it.
-final FutureProviderFamily<DailyProgress?, LogicalDay> dayProgressProvider =
-    FutureProvider.autoDispose.family<DailyProgress?, LogicalDay>((
+/// The day's count against that day's limit; null before the habit has a
+/// plan. Days before the plan use the first plan's limit; callers decide
+/// whether to show it.
+final FutureProviderFamily<DailyProgress?, HabitDay> dayProgressProvider =
+    FutureProvider.autoDispose.family<DailyProgress?, HabitDay>((
       ref,
-      day,
+      key,
     ) async {
-      final history = await ref.watch(planHistoryProvider.future);
+      final history = await ref.watch(planHistoryProvider(key.habitId).future);
       if (history == null) return null;
-      final logs = await ref.watch(logsForDayProvider(day).future);
+      final logs = await ref.watch(logsForDayProvider(key).future);
       return DailyProgress(
-        day: day,
+        day: key.day,
         count: logs.length,
-        limit: history.limitOn(day),
+        limit: history.limitOn(key.day),
       );
     });

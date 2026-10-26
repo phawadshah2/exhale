@@ -1,7 +1,7 @@
+import 'package:exhale/core/data/local/database/app_database.dart';
 import 'package:exhale/core/data/storage_guard.dart';
 import 'package:exhale/core/domain/error/failure.dart';
 import 'package:exhale/core/domain/result/result.dart';
-import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/tracking/data/datasources/habit_log_local_data_source.dart';
 import 'package:exhale/features/tracking/data/models/habit_log_model.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
@@ -16,15 +16,15 @@ class LocalHabitLogRepository implements HabitLogRepository {
 
   @override
   Future<Result<HabitLog>> addLog({
+    required int habitId,
     required DateTime loggedAt,
-    required HabitKind habitKind,
     Trigger? trigger,
     String? note,
   }) => guardStorage(_source, () async {
     final row = await _localDataSource.insertLog(
       habitLogCompanion(
+        habitId: habitId,
         loggedAt: loggedAt,
-        habitKind: habitKind,
         trigger: trigger,
         note: note,
       ),
@@ -39,8 +39,8 @@ class LocalHabitLogRepository implements HabitLogRepository {
       () => _localDataSource.updateLog(
         log.id,
         habitLogCompanion(
+          habitId: log.habitId,
           loggedAt: log.loggedAt,
-          habitKind: log.habitKind,
           trigger: log.trigger,
           note: log.note,
         ),
@@ -56,18 +56,24 @@ class LocalHabitLogRepository implements HabitLogRepository {
 
   @override
   Stream<List<HabitLog>> watchLogs({
-    required HabitKind habitKind,
     required DateTime from,
     required DateTime to,
+    int? habitId,
   }) => _localDataSource
-      .watchLogs(habitKind: habitKind.name, from: from, to: to)
-      .map((rows) => rows.map((row) => row.toEntity()).toList());
+      .watchLogs(habitId: habitId, from: from, to: to)
+      .map(_toEntities);
 
   @override
-  Stream<HabitLog?> watchLatest({required HabitKind habitKind}) =>
-      _localDataSource
-          .watchLatest(habitKind: habitKind.name)
-          .map((row) => row?.toEntity());
+  Stream<HabitLog?> watchLatest({int? habitId}) => _localDataSource
+      .watchLatest(habitId: habitId)
+      .map((row) => row?.toEntity());
+
+  @override
+  Stream<List<HabitLog>> watchRecent({required int limit}) =>
+      _localDataSource.watchRecent(limit: limit).map(_toEntities);
+
+  List<HabitLog> _toEntities(List<HabitLogRow> rows) =>
+      rows.map((row) => row.toEntity()).toList();
 
   Result<void> _requireRow(Result<int> result) => switch (result) {
     Success(value: 0) => const FailureResult<void>(NotFoundFailure()),

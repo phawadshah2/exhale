@@ -9,8 +9,8 @@ import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/core/widgets/status_badge.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
-import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
@@ -20,20 +20,25 @@ import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.d
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-Future<void> showDayDetailSheet(BuildContext context, LogicalDay day) =>
-    showAppDraggableSheet<void>(
-      context,
-      builder: (context, controller) =>
-          DayDetailSheet(day: day, scrollController: controller),
-    );
+Future<void> showDayDetailSheet(
+  BuildContext context, {
+  required int habitId,
+  required LogicalDay day,
+}) => showAppDraggableSheet<void>(
+  context,
+  builder: (context, controller) =>
+      DayDetailSheet(habitId: habitId, day: day, scrollController: controller),
+);
 
 class DayDetailSheet extends ConsumerWidget {
   const DayDetailSheet({
+    required this.habitId,
     required this.day,
     required this.scrollController,
     super.key,
   });
 
+  final int habitId;
   final LogicalDay day;
   final ScrollController scrollController;
 
@@ -46,7 +51,7 @@ class DayDetailSheet extends ConsumerWidget {
       context,
       title: 'Delete this log?',
       message:
-          'The ${ref.read(habitProvider).unit} at '
+          'The ${ref.read(habitProvider(habitId))?.habit.unit ?? 'log'} at '
           '${AppFormat.time(log.loggedAt)} will be removed '
           'from this day.',
       confirmLabel: 'Delete',
@@ -62,8 +67,11 @@ class DayDetailSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logs = ref.watch(logsForDayProvider(day)).value;
-    final history = ref.watch(planHistoryProvider).value;
+    final logs = ref
+        .watch(logsForDayProvider((habitId: habitId, day: day)))
+        .value;
+    final history = ref.watch(planHistoryProvider(habitId)).value;
+    final habit = ref.watch(habitProvider(habitId))?.habit;
     final today = ref.watch(todayProvider);
     final text = context.textTheme;
     final colors = context.colors;
@@ -106,13 +114,13 @@ class DayDetailSheet extends ConsumerWidget {
             ),
           ),
         ),
-        if (progress != null)
+        if (progress != null && habit != null)
           SliverPadding(
             padding: AppSpacing.page.copyWith(bottom: AppSpacing.md),
             sliver: SliverToBoxAdapter(
               child: _Summary(
                 progress: progress,
-                habit: ref.watch(habitProvider),
+                habit: habit,
                 beforePlan: day.isBefore(history!.firstDay),
               ),
             ),
@@ -147,8 +155,12 @@ class DayDetailSheet extends ConsumerWidget {
               itemBuilder: (context, index) => _LogTile(
                 log: logs[index],
                 dotColor: progress!.status.colors(context).foreground,
-                onEdit: () =>
-                    showLogEditorSheet(context, day: day, log: logs[index]),
+                onEdit: () => showLogEditorSheet(
+                  context,
+                  habitId: habitId,
+                  day: day,
+                  log: logs[index],
+                ),
                 onDelete: () => _confirmDelete(context, ref, logs[index]),
               ),
             ),
@@ -162,7 +174,8 @@ class DayDetailSheet extends ConsumerWidget {
             child: OutlinedButton.icon(
               onPressed: day.isAfter(today)
                   ? null
-                  : () => showLogEditorSheet(context, day: day),
+                  : () =>
+                        showLogEditorSheet(context, habitId: habitId, day: day),
               icon: const Icon(AppIcons.add),
               label: const Text('Add missed log'),
             ),

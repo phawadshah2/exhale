@@ -1,4 +1,5 @@
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
@@ -25,33 +26,38 @@ class ChartPeriodController extends Notifier<ChartPeriod> {
   void select(ChartPeriod period) => state = period;
 }
 
-/// The current habit's logs on the days in [PeriodRange], oldest first.
-final StreamProviderFamily<List<HabitLog>, PeriodRange> logsInRangeProvider =
-    StreamProvider.autoDispose.family<List<HabitLog>, PeriodRange>((
-      ref,
-      range,
-    ) {
+/// A habit, or every active habit when null, over a period.
+typedef LogsInRange = ({int? habitId, PeriodRange range});
+
+/// A habit over a period.
+typedef HabitPeriod = ({int habitId, PeriodRange range});
+
+/// Logs on the days in the range, oldest first.
+final StreamProviderFamily<List<HabitLog>, LogsInRange> logsInRangeProvider =
+    StreamProvider.autoDispose.family<List<HabitLog>, LogsInRange>((ref, key) {
       final boundary = ref.watch(dayBoundaryProvider);
       return ref
           .watch(habitLogRepositoryProvider)
           .watchLogs(
-            habitKind: ref.watch(habitProvider).kind,
-            from: boundary.startOf(range.from),
-            to: boundary.endOf(range.to),
+            habitId: key.habitId,
+            from: boundary.startOf(key.range.from),
+            to: boundary.endOf(key.range.to),
           );
     });
 
 /// How many days before the plan's first day Home can show and back-fill.
 const int backfillDays = 30;
 
-/// The earliest day Home can show: [backfillDays] before the first plan day.
-final Provider<LogicalDay> earliestDayProvider = Provider<LogicalDay>((ref) {
-  final today = ref.watch(todayProvider);
-  final firstDay = ref.watch(planHistoryProvider).value?.firstDay;
-  if (firstDay == null) return today;
-  final earliest = firstDay.addDays(-backfillDays);
-  return earliest.isAfter(today) ? today : earliest;
-});
+/// The earliest day Home can show for a habit: [backfillDays] before its
+/// first plan day.
+final ProviderFamily<LogicalDay, int> earliestDayProvider =
+    Provider.family<LogicalDay, int>((ref, habitId) {
+      final today = ref.watch(todayProvider);
+      final firstDay = ref.watch(planHistoryProvider(habitId)).value?.firstDay;
+      if (firstDay == null) return today;
+      final earliest = firstDay.addDays(-backfillDays);
+      return earliest.isAfter(today) ? today : earliest;
+    });
 
 final pickedDayProvider = NotifierProvider<PickedDayController, LogicalDay?>(
   PickedDayController.new,
@@ -68,28 +74,31 @@ class PickedDayController extends Notifier<LogicalDay?> {
   void showToday() => state = null;
 }
 
-/// The day the ring shows and the chart highlights, kept between
-/// [earliestDayProvider] and today.
-final Provider<LogicalDay> selectedDayProvider = Provider<LogicalDay>((ref) {
-  final today = ref.watch(todayProvider);
-  final picked = ref.watch(pickedDayProvider);
-  if (picked == null || !picked.isBefore(today)) return today;
-  final earliest = ref.watch(earliestDayProvider);
-  return picked.isBefore(earliest) ? earliest : picked;
-});
+/// The day the ring shows and the chart highlights, kept between the
+/// habit's [earliestDayProvider] and today.
+final ProviderFamily<LogicalDay, int> selectedDayProvider =
+    Provider.family<LogicalDay, int>((ref, habitId) {
+      final today = ref.watch(todayProvider);
+      final picked = ref.watch(pickedDayProvider);
+      if (picked == null || !picked.isBefore(today)) return today;
+      final earliest = ref.watch(earliestDayProvider(habitId));
+      return picked.isBefore(earliest) ? earliest : picked;
+    });
 
-/// The chart for one week or month; null before a plan exists.
-final FutureProviderFamily<PeriodSummary?, PeriodRange> periodSummaryProvider =
-    FutureProvider.autoDispose.family<PeriodSummary?, PeriodRange>((
+/// The chart for one week or month; null before the habit has a plan.
+final FutureProviderFamily<PeriodSummary?, HabitPeriod> periodSummaryProvider =
+    FutureProvider.autoDispose.family<PeriodSummary?, HabitPeriod>((
       ref,
-      range,
+      key,
     ) async {
       final today = ref.watch(todayProvider);
-      final history = await ref.watch(planHistoryProvider.future);
+      final history = await ref.watch(planHistoryProvider(key.habitId).future);
       if (history == null) return null;
-      final logs = await ref.watch(logsInRangeProvider(range).future);
+      final logs = await ref.watch(
+        logsInRangeProvider((habitId: key.habitId, range: key.range)).future,
+      );
       return ProgressCalculator.summarize(
-        range: range,
+        range: key.range,
         logs: logs,
         boundary: ref.watch(dayBoundaryProvider),
         history: history,
@@ -97,15 +106,18 @@ final FutureProviderFamily<PeriodSummary?, PeriodRange> periodSummaryProvider =
       );
     });
 
-/// Streak, baseline change, avoided and saved; null before a plan exists.
-final FutureProvider<HomeStats?> homeStatsProvider =
-    FutureProvider.autoDispose<HomeStats?>((ref) async {
+/// Streak, baseline change, avoided and saved; null before the habit has a
+/// plan.
+final FutureProviderFamily<HomeStats?, int> habitStatsProvider = FutureProvider
+    .autoDispose
+    .family<HomeStats?, int>((ref, habitId) async {
       final today = ref.watch(todayProvider);
-      final history = await ref.watch(planHistoryProvider.future);
+      final history = await ref.watch(planHistoryProvider(habitId).future);
       if (history == null) return null;
       final from = history.firstDay.isAfter(today) ? today : history.firstDay;
       final logs = await ref.watch(
-        logsInRangeProvider(PeriodRange(from, today)).future,
+        logsInRangeProvider((habitId: habitId, range: PeriodRange(from, today)))
+            .future,
       );
       final days = buildDailyProgress(
         logs: logs,
@@ -118,6 +130,6 @@ final FutureProvider<HomeStats?> homeStatsProvider =
         days: days,
         history: history,
         today: today,
-        unitPriceCents: ref.watch(currentSettingsProvider).unitPriceCents,
+        unitPriceCents: ref.watch(habitProvider(habitId))?.unitPriceCents,
       );
     });

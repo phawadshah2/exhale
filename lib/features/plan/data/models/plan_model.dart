@@ -11,7 +11,8 @@ extension PlanRowMapper on PlanRow {
 }
 
 extension ReductionPlanMapper on ReductionPlan {
-  PlansCompanion toCompanion() => PlansCompanion.insert(
+  PlansCompanion toCompanion(int habitId) => PlansCompanion.insert(
+    habitId: habitId,
     startDay: startDay.toString(),
     startLimit: startLimit,
     quitDay: quitDay.toString(),

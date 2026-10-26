@@ -1,4 +1,3 @@
-import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:meta/meta.dart';
 
@@ -6,17 +5,15 @@ import 'package:meta/meta.dart';
 class HabitLog {
   const HabitLog({
     required this.id,
+    required this.habitId,
     required this.loggedAt,
-    required this.habitKind,
     this.trigger,
     this.note,
   });
 
   final int id;
+  final int habitId;
   final DateTime loggedAt;
-
-  /// The habit this was logged for, kept if the habit later changes.
-  final HabitKind habitKind;
   final Trigger? trigger;
   final String? note;
 
@@ -24,28 +21,26 @@ class HabitLog {
     DateTime? loggedAt,
     Trigger? Function()? trigger,
     String? Function()? note,
-    HabitKind? habitKind,
   }) => HabitLog(
     id: id,
+    habitId: habitId,
     loggedAt: loggedAt ?? this.loggedAt,
     trigger: trigger != null ? trigger() : this.trigger,
     note: note != null ? note() : this.note,
-    habitKind: habitKind ?? this.habitKind,
   );
 
   @override
   bool operator ==(Object other) =>
       other is HabitLog &&
       other.id == id &&
+      other.habitId == habitId &&
       other.loggedAt == loggedAt &&
       other.trigger == trigger &&
-      other.note == note &&
-      other.habitKind == habitKind;
+      other.note == note;
 
   @override
-  int get hashCode => Object.hash(id, loggedAt, trigger, note, habitKind);
+  int get hashCode => Object.hash(id, habitId, loggedAt, trigger, note);
 
   @override
-  String toString() =>
-      'HabitLog(#$id ${habitKind.name} at $loggedAt, $trigger)';
+  String toString() => 'HabitLog(#$id habit $habitId at $loggedAt, $trigger)';
 }

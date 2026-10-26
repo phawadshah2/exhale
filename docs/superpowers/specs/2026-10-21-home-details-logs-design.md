@@ -242,8 +242,8 @@ Migration v7 → v8:
 
 1. Create `habits` and insert the current habit from settings (kind,
    custom name and unit, reason, price, units) as id 1.
-2. Point every plan and every log of that kind at habit 1. Logs of any other
-   kind (developer data only) get one archived habit per kind.
+2. Point every plan and every log at habit 1. A v7 log's `habit_kind` came
+   from the column default, so it is ignored.
 3. Rebuild `settings`, `plans` and `habit_logs` without the moved columns.
 
 Code: a `features/habit` data layer (repository, use cases: add, update,

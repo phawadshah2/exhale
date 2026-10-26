@@ -36,9 +36,10 @@ void main() {
       themePreference: ThemePreference.light,
       accentIndex: 2,
       appIcon: AppIconChoice.ember,
-      priceCents: 1450,
-      unitsPerContainer: 25,
       currencySymbol: 'AED',
+      askForTrigger: false,
+      triggerPromptIntroSeen: true,
+      logHintSeen: true,
     );
 
     await repository.save(settings);
@@ -55,12 +56,12 @@ void main() {
   });
 
   test('can clear optional fields', () async {
-    await repository.save(const AppSettings(priceCents: 1450));
+    await repository.save(const AppSettings(userName: 'Fawad'));
     final cleared = valueOf(await repository.get())
-        .copyWith(priceCents: () => null);
+        .copyWith(userName: () => null);
     await repository.save(cleared);
 
-    expect(valueOf(await repository.get()).priceCents, isNull);
+    expect(valueOf(await repository.get()).userName, isNull);
   });
 
   test('unknown stored enum names fall back to defaults', () async {

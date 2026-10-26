@@ -2,29 +2,30 @@ import 'dart:async';
 
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Two-column grid of the habit's trigger pills; tapping the selected one
 /// clears it. A selected trigger from another habit is still shown; a last
 /// pill left alone on its row spans the full width.
-class TriggerPicker extends ConsumerWidget {
+class TriggerPicker extends StatelessWidget {
   const TriggerPicker({
+    required this.habitKind,
     required this.selected,
     required this.onChanged,
     super.key,
   });
 
+  final HabitKind habitKind;
   final Trigger? selected;
   final ValueChanged<Trigger?> onChanged;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final habitTriggers = ref.watch(habitProvider).kind.triggers;
+  Widget build(BuildContext context) {
+    final habitTriggers = habitKind.triggers;
     final current = selected;
     final triggers = [
       ...habitTriggers,

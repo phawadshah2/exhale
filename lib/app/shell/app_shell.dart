@@ -4,6 +4,7 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/liquid_glass.dart';
+import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/tracking/presentation/log_flow.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.dart';
@@ -30,7 +31,14 @@ class AppShell extends ConsumerWidget {
     ),
   ];
 
+  void _logNow(BuildContext context, WidgetRef ref) {
+    final habitId = ref.read(primaryHabitProvider)?.id;
+    if (habitId != null) unawaited(logNow(context, ref, habitId: habitId));
+  }
+
   void _showLogMenu(BuildContext context, WidgetRef ref, Rect anchor) {
+    final habitId = ref.read(primaryHabitProvider)?.id;
+    if (habitId == null) return;
     final today = ref.read(todayProvider);
     unawaited(
       showGlassMenu(
@@ -40,12 +48,13 @@ class AppShell extends ConsumerWidget {
           GlassMenuItem(
             label: 'Log now',
             icon: AppIcons.add,
-            onSelected: () => logNow(context, ref),
+            onSelected: () => logNow(context, ref, habitId: habitId),
           ),
           GlassMenuItem(
             label: 'Add a missed log',
             icon: AppIcons.clock,
-            onSelected: () => showLogEditorSheet(context, day: today),
+            onSelected: () =>
+                showLogEditorSheet(context, habitId: habitId, day: today),
           ),
         ],
       ),
@@ -66,7 +75,7 @@ class AppShell extends ConsumerWidget {
           index,
           initialLocation: index == navigationShell.currentIndex,
         ),
-        onLog: () => logNow(context, ref),
+        onLog: () => _logNow(context, ref),
         onLogMenu: (anchor) => _showLogMenu(context, ref, anchor),
       ),
     );

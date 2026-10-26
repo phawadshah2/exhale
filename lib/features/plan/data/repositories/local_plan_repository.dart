@@ -14,20 +14,21 @@ class LocalPlanRepository implements PlanRepository {
   static const _source = 'LocalPlanRepository';
 
   @override
-  Stream<PlanHistory?> watchHistory() =>
-      _localDataSource.watchPlans().map(_toHistory);
+  Stream<PlanHistory?> watchHistory(int habitId) =>
+      _localDataSource.watchPlans(habitId).map(_toHistory);
 
   @override
-  Future<Result<PlanHistory?>> getHistory() => guardStorage(
+  Future<Result<PlanHistory?>> getHistory(int habitId) => guardStorage(
     _source,
-    () async => _toHistory(await _localDataSource.getPlans()),
+    () async => _toHistory(await _localDataSource.getPlans(habitId)),
   );
 
   @override
-  Future<Result<void>> savePlan(ReductionPlan plan) => guardStorage(
-    _source,
-    () => _localDataSource.replaceFrom(plan.toCompanion()),
-  );
+  Future<Result<void>> savePlan(int habitId, ReductionPlan plan) =>
+      guardStorage(
+        _source,
+        () => _localDataSource.replaceFrom(plan.toCompanion(habitId)),
+      );
 
   PlanHistory? _toHistory(List<PlanRow> rows) =>
       rows.isEmpty ? null : PlanHistory(rows.map((row) => row.toEntity()));

@@ -5,6 +5,7 @@ import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/presentation/providers/clock_providers.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
+import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
@@ -15,9 +16,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Asks for a trigger first (unless turned off), then saves the log.
-/// Dismissing the trigger sheet cancels the log.
-Future<void> logNow(BuildContext context, WidgetRef ref) async {
+/// Asks for a trigger first (unless turned off), then saves a log of
+/// [habitId]. Dismissing the trigger sheet cancels the log.
+Future<void> logNow(
+  BuildContext context,
+  WidgetRef ref, {
+  required int habitId,
+}) async {
+  final habit = ref.read(habitProvider(habitId));
+  if (habit == null) return;
   unawaited(HapticFeedback.mediumImpact());
   final loggedAt = ref.read(clockProvider).now();
   final settings = ref.read(currentSettingsProvider);
@@ -27,6 +34,7 @@ Future<void> logNow(BuildContext context, WidgetRef ref) async {
     final firstPrompt = !settings.triggerPromptIntroSeen;
     final answer = await showTriggerSheet(
       context,
+      habitKind: habit.habit.kind,
       offerToStopAsking: firstPrompt,
     );
     if (answer == null || !context.mounted) return;
@@ -45,11 +53,7 @@ Future<void> logNow(BuildContext context, WidgetRef ref) async {
   }
 
   final result = await ref.read(addHabitLogProvider)(
-    AddHabitLogInput(
-      habitKind: settings.habitKind,
-      loggedAt: loggedAt,
-      trigger: trigger,
-    ),
+    AddHabitLogInput(habitId: habitId, loggedAt: loggedAt, trigger: trigger),
   );
   if (!context.mounted) return;
   switch (result) {
