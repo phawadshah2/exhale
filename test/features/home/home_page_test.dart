@@ -234,17 +234,18 @@ void main() {
     await logOn(DateTime(2026, 10, 16, 9), times: 4);
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.ensureVisible(find.text('Smoking History'));
+    await tester.ensureVisible(find.text('History'));
     await tester.pumpAndSettle();
+    expect(find.text('21 / 45 allowed'), findsOneWidget);
+    expect(find.text('6 under'), findsOneWidget);
     expect(find.text('Avg 7.0/day'), findsOneWidget);
     expect(find.text('1 day over'), findsOneWidget);
-    expect(find.text('2 days within limit'), findsOneWidget);
-    expect(find.text('Limit 9'), findsOneWidget);
+    expect(find.text('2 days on track'), findsOneWidget);
 
     await tester.tap(find.text('Month'));
     await tester.pumpAndSettle();
     expect(find.text('Avg 7.0/day'), findsOneWidget);
-    expect(find.text('1'), findsWidgets);
+    expect(find.text('Before plan'), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -362,7 +363,7 @@ void main() {
     await tester.pumpAppPastSplash(height: 2400);
 
     expect(find.text('No sessions logged today. Nice start.'), findsOneWidget);
-    expect(find.text('Vaping History'), findsOneWidget);
+    expect(find.text('History'), findsOneWidget);
     expect(find.text('YOUR WHY'), findsOneWidget);
     expect(find.text('Breathe easier on my runs'), findsOneWidget);
 
@@ -449,7 +450,7 @@ void main() {
     await tester.pumpAppPastSplash(height: 2400);
 
     expect(countText(tester), '3 / 12');
-    expect(find.text('Vaping History'), findsOneWidget);
+    expect(find.text('History'), findsOneWidget);
 
     await tester.disposeApp();
   });

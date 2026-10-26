@@ -76,7 +76,7 @@ class HabitDashboard extends ConsumerWidget {
           ),
         ],
         const SizedBox(height: AppSpacing.md),
-        HistoryCard(habitId: habitId, habit: habit),
+        HistoryCard(habitId: habitId),
         if (history != null) ...[
           const SizedBox(height: AppSpacing.md),
           PlanCard(plan: history.current, today: today, habit: habit),
