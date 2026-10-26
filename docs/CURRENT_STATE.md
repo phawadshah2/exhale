@@ -36,19 +36,27 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
 
 ## Next action
 
-Task 2.3, Ring card (plan section "Task 2.3" only), on `feat/dashboard-stats`.
-Suggested: Sonnet 5.5, medium effort. Task 2.3 commit message:
-`feat(home): ring card states and trigger breakdown` (adjust to the plan's
-checkpoint line).
+Task 2.3, Ring card, on `feat/dashboard-stats`: done, uncommitted. Format
+(Fawad), analyze `--fatal-infos` clean, `test/features/home` (33) and the full
+suite (262) passed, observed. Next: Fawad commits as
+`feat(home): ring card with last entry and day triggers`, then Task 2.4.
 
-1. Read the Task 2.3 section and spec §4.4, then `day_card.dart` and the
-   matching design (`Main.dc.html`, `StateOver.dc.html`, `StateFirstDay.dc.html`,
-   `StatePastDay.dc.html`, `StateQuit.dc.html`).
-2. Write failing widget tests first, then implement. Ask Fawad before each
-   check (format, analyze, `fvm flutter test test/features/home`, then the
-   full suite).
-3. Then Tasks 2.4–2.5, then the M2 independent review (Opus 5.5, high) and a
-   full-suite run before merging.
+Task 2.3 changes: `day_card.dart` → `ring_card.dart` (`RingCard(habitId)`);
+new `day_triggers.dart` (`DayTriggers`, `onSelect` unset); `ringDayProvider`
+and `ringShownDayProvider` in `home_providers.dart`; ring tests moved to
+`test/features/home/ring_card_test.dart`. Today's details are now Last entry /
+Last trigger (the old "Time since last" / "Next target" cells are gone, per
+spec §4.4). History still uses `pickedDayProvider`/`selectedDayProvider` until
+Task 2.4 gives it its own anchor, so the ring and chart no longer move
+together (the old "ring and chart move together" test was removed).
+
+Left for later: trigger rows do not open Logs until Task 2.6 (wire `onSelect`
+with `LogsQuery` and add that test then); the over-limit note, before-plan and
+after-quit-date states from spec §4.4 are not built; the first-day triggers
+placeholder has a solid border, not dashed.
+
+Then Tasks 2.4–2.5, then the M2 independent review (Opus 5.5, high) and a
+full-suite run before merging.
 
 Test gotcha: never `await` a go_router `push` in a test (it completes on pop);
 use `unawaited`.

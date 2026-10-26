@@ -85,6 +85,38 @@ final ProviderFamily<LogicalDay, int> selectedDayProvider =
       return picked.isBefore(earliest) ? earliest : picked;
     });
 
+final NotifierProviderFamily<RingDayController, LogicalDay?, int>
+ringDayProvider = NotifierProvider.family<RingDayController, LogicalDay?, int>(
+  RingDayController.new,
+);
+
+/// The day picked on the ring card; null means today, which follows
+/// midnight.
+class RingDayController extends Notifier<LogicalDay?> {
+  RingDayController(this.habitId);
+
+  final int habitId;
+
+  @override
+  LogicalDay? build() => null;
+
+  void pick(LogicalDay day) =>
+      state = day == ref.read(todayProvider) ? null : day;
+
+  void showToday() => state = null;
+}
+
+/// The day the ring shows, kept between the habit's [earliestDayProvider]
+/// and today.
+final ProviderFamily<LogicalDay, int> ringShownDayProvider =
+    Provider.family<LogicalDay, int>((ref, habitId) {
+      final today = ref.watch(todayProvider);
+      final picked = ref.watch(ringDayProvider(habitId));
+      if (picked == null || !picked.isBefore(today)) return today;
+      final earliest = ref.watch(earliestDayProvider(habitId));
+      return picked.isBefore(earliest) ? earliest : picked;
+    });
+
 /// The chart for one week or month; null before the habit has a plan.
 final FutureProviderFamily<PeriodSummary?, HabitPeriod> periodSummaryProvider =
     FutureProvider.autoDispose.family<PeriodSummary?, HabitPeriod>((

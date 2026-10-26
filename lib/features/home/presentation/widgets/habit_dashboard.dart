@@ -3,10 +3,10 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
 import 'package:exhale/features/home/presentation/widgets/dashboard_header.dart';
-import 'package:exhale/features/home/presentation/widgets/day_card.dart';
 import 'package:exhale/features/home/presentation/widgets/history_card.dart';
 import 'package:exhale/features/home/presentation/widgets/plan_card.dart';
 import 'package:exhale/features/home/presentation/widgets/quote_card.dart';
+import 'package:exhale/features/home/presentation/widgets/ring_card.dart';
 import 'package:exhale/features/home/presentation/widgets/stage_pill.dart';
 import 'package:exhale/features/home/presentation/widgets/stats_grid.dart';
 import 'package:exhale/features/home/presentation/widgets/today_logs_card.dart';
@@ -66,7 +66,7 @@ class HabitDashboard extends ConsumerWidget {
         if (history != null)
           StagePill(plan: history.current, today: today, habit: habit),
         const SizedBox(height: AppSpacing.md),
-        DayCard(habitId: habitId, habit: habit),
+        RingCard(habitId: habitId),
         if (stats != null) ...[
           const SizedBox(height: AppSpacing.md),
           StatsGrid(
