@@ -28,7 +28,7 @@
 2. **Plan edited mid-period:** "allowed" sums each day's own limit from the plan in force that day, not today's limit. Test owner: Task 2.1.
 3. **Habit archived while its dashboard or Logs filter is open:** the app returns to Home and never throws. Test owner: Task 4.3.
 4. **Upgrading a real v7 database** with a null price, logs stamped with another kind and two plans keeps every plan and log on habit 1. Test owner: Task 1.2.
-5. **A period entirely before the plan or a plan starting tomorrow:** allowed is 0, average is null (shown as "—"), no division by zero. Test owner: Task 2.1.
+5. **A period entirely before the plan or a plan starting tomorrow:** a period entirely before the plan has allowed 0; a plan starting tomorrow gives the whole period's allowance with `allowedByToday` 0 (spec §5). Average is null (shown as "—"), no division by zero. Test owner: Task 2.1.
 
 ---
 
