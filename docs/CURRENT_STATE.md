@@ -53,7 +53,7 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
   tappable (a `Trigger?` filter cannot express it); no month/trigger
   dropdown from the design.
 
-- M2 Task 2.4 (History card), written, tree uncommitted. Observed by me:
+- M2 Task 2.4 (History card), committed (74aba14, tree clean at handoff). Observed by me:
   analyze clean, `test/features/home` 43 passed; format run once more after
   that (one file changed); full suite 281 passed after it (observed by me).
   Not checked on a simulator against the designs. `HistoryCard(habitId)` is rewritten
@@ -73,10 +73,31 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
 
 ## Next action
 
-Task 2.4 is checked; commit it.
-After that: the M2 independent review (Opus 5.5, high) and a simulator check
-of every Logs entry point (ask first). Visual match to `ChartB/C/All*.dc.html`
-is unverified until a simulator run.
+All M2 tasks (2.1-2.5) are committed. M2 independent review done 2026-10-26
+(code read only). Review Focus 1, 2, 5 hold in the code and are covered by
+the 2.1 tests.
+
+Review fixes written, uncommitted. Observed by me: format and
+`analyze --fatal-infos` clean; full suite 282 passed with 3 Home failures
+from one wrong assert (fixed: 4 logs collapse to 3); after the fix
+`test/features/home` 43 passed. The full suite was not rerun after the fix.
+Fixes:
+"See all logs" opens today's Logs; `DayGroup` keyed by day; the Logs pill
+matches History ("N under" / "N over", hidden when nothing is tracked); the
+Logs previous-week arrow stops at `earliestDayProvider`; `logsInRangeProvider`,
+`backfillDays` and `earliestDayProvider` moved to `tracking_providers.dart`
+(one copy for Home and Logs); `DayGroup._summary` non-null;
+`HabitWording.historyTitle` removed. Tests: one in `home_page_test.dart`
+extended, four added to `logs_page_test.dart`.
+
+Still open from the review: Logs spins forever if the log stream or plan
+history fails (M5 states); the plan's Review Focus 5 wording says a plan
+starting tomorrow has allowed 0, but code, test and spec §5 give the whole
+period's allowance with `allowedByToday` 0.
+
+Then, asking first, a simulator check of every Logs entry point and of the
+History card against `ChartB/C/All*.dc.html` (not yet compared). Afterwards
+start M3 (Task 3.1).
 
 Test gotcha: never `await` a go_router `push` in a test (it completes on pop);
 use `unawaited`.

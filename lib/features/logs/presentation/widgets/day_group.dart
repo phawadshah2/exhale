@@ -45,7 +45,7 @@ class _DayGroupState extends State<DayGroup> {
     return day == widget.today ? 'Today · $date' : date;
   }
 
-  String? get _summary {
+  String get _summary {
     final entry = widget.entry;
     final limit = entry.limit;
     if (limit == null) return 'Before your plan';
@@ -86,7 +86,7 @@ class _DayGroupState extends State<DayGroup> {
                 ),
               ),
               Text(
-                _summary!,
+                _summary,
                 style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
               ),
             ],

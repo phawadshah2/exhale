@@ -32,7 +32,9 @@ class LogsPeriodCard extends StatelessWidget {
   /// Whether the range is a calendar week that the arrows step through.
   final bool weekly;
   final Trigger? trigger;
-  final VoidCallback onPrevious;
+
+  /// Null when [range] already starts at the earliest day Logs can show.
+  final VoidCallback? onPrevious;
 
   /// Null when [range] already reaches today.
   final VoidCallback? onNext;
@@ -57,11 +59,10 @@ class LogsPeriodCard extends StatelessWidget {
     final text = context.textTheme;
     final stats = view.stats;
     final under = stats.underBy;
-    final badge = under > 0
+    final badge = under >= 0
         ? ('$under under', context.exhale.success)
-        : under == 0
-        ? ('At limit', context.exhale.warning)
         : ('${-under} over', context.exhale.danger);
+    final showBadge = stats.allowedByToday > 0 || stats.logged > 0;
     final fill = stats.allowed == 0
         ? (stats.logged > 0 ? 1.0 : 0.0)
         : (stats.logged / stats.allowed).clamp(0.0, 1.0);
@@ -130,7 +131,7 @@ class LogsPeriodCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                StatusBadge(label: badge.$1, colors: badge.$2),
+                if (showBadge) StatusBadge(label: badge.$1, colors: badge.$2),
               ],
             ),
             ClipRRect(

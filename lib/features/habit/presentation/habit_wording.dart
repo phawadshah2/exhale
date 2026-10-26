@@ -10,7 +10,4 @@ extension HabitWording on Habit {
 
   /// "Vape-free day" / "Zero day".
   String get freeDayTitle => freeLabel == null ? 'Zero day' : '$freeTitle day';
-
-  /// "Vaping History"; a custom name is used as typed.
-  String get historyTitle => '$name History';
 }

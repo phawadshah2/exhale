@@ -52,18 +52,6 @@ class LogsView {
   final List<LogsDay> days;
 }
 
-final StreamProviderFamily<List<HabitLog>, LogsScope> logsInRangeProvider =
-    StreamProvider.autoDispose.family<List<HabitLog>, LogsScope>((ref, scope) {
-      final boundary = ref.watch(dayBoundaryProvider);
-      return ref
-          .watch(habitLogRepositoryProvider)
-          .watchLogs(
-            habitId: scope.habitId,
-            from: boundary.startOf(scope.range.from),
-            to: boundary.endOf(scope.range.to),
-          );
-    });
-
 final ProviderFamily<LogsView?, LogsScope> logsViewProvider = Provider
     .autoDispose
     .family<LogsView?, LogsScope>((ref, scope) {

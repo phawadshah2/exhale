@@ -502,6 +502,14 @@ void main() {
     expect(find.text('9:03 AM'), findsOneWidget);
     expect(find.text('9:02 AM'), findsOneWidget);
 
+    await tester.scrollAndTap(find.text('+1 more today · See all logs'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Logs'), findsOneWidget);
+    expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
+    expect(find.byType(Dismissible), findsNWidgets(3));
+    expect(find.text('Show 1 more'), findsOneWidget);
+
     await tester.disposeApp();
   });
 

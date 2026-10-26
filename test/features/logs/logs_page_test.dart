@@ -158,6 +158,86 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('Show more stays with its day when paging weeks', (tester) async {
+    await startPlan();
+    await logAt(DateTime(2026, 10, 16, 9), times: 5);
+    await logAt(DateTime(2026, 10, 9, 9), times: 5);
+    await openPage(tester, const LogsQuery(habitId: 1));
+
+    await tester.tap(find.text('Show 2 more'));
+    await tester.pumpAndSettle();
+    expect(find.byType(Dismissible), findsNWidgets(5));
+
+    await tester.tap(find.byTooltip('Previous week'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fri, Oct 9'), findsOneWidget);
+    expect(find.byType(Dismissible), findsNWidgets(3));
+    expect(find.text('Show 2 more'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('a week with nothing tracked shows no under or over pill', (
+    tester,
+  ) async {
+    await startPlan();
+    await logAt(DateTime(2026, 10, 9, 9), times: 2);
+    await openPage(
+      tester,
+      LogsQuery(
+        habitId: 1,
+        from: LogicalDay(2026, 10, 5),
+        to: LogicalDay(2026, 10, 11),
+      ),
+    );
+
+    expect(find.text('0 logged'), findsOneWidget);
+    expect(find.textContaining(' under'), findsNothing);
+    expect(find.textContaining(' over'), findsNothing);
+    expect(find.text('At limit'), findsNothing);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('the period pill reads under at the limit, like History', (
+    tester,
+  ) async {
+    await startPlan();
+    // 9 a day on the 14th to the 16th: 27 allowed by today.
+    await logAt(DateTime(2026, 10, 15, 9), times: 27);
+    await openPage(tester, const LogsQuery(habitId: 1));
+
+    expect(find.text('0 under'), findsOneWidget);
+    expect(find.text('At limit'), findsNothing);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('previous week stops 30 days before the plan', (tester) async {
+    await startPlan();
+    await openPage(tester, const LogsQuery(habitId: 1));
+
+    IconButton previous() => tester.widget<IconButton>(
+      find.ancestor(
+        of: find.byTooltip('Previous week'),
+        matching: find.byType(IconButton),
+      ),
+    );
+
+    // The plan starts Wed 14 Oct; the earliest day is Mon 14 Sep.
+    for (var i = 0; i < 4; i++) {
+      expect(previous().onPressed, isNotNull);
+      await tester.tap(find.byTooltip('Previous week'));
+      await tester.pumpAndSettle();
+    }
+
+    expect(find.text('Sep 14 – 20'), findsOneWidget);
+    expect(previous().onPressed, isNull);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('day before the plan shows no limit', (tester) async {
     await startPlan();
     await logAt(DateTime(2026, 10, 13, 9), times: 2);

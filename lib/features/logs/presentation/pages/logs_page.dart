@@ -112,6 +112,9 @@ class _LogsPageState extends ConsumerState<LogsPage> {
         ? null
         : ref.watch(logsViewProvider((habitId: habitId, range: _range)));
     final addDay = _range.to.isAfter(today) ? today : _range.to;
+    final earliest = habitId == null
+        ? today
+        : ref.watch(earliestDayProvider(habitId));
 
     return Scaffold(
       body: SafeArea(
@@ -195,7 +198,9 @@ class _LogsPageState extends ConsumerState<LogsPage> {
                         today: today,
                         weekly: _weekly,
                         trigger: _trigger,
-                        onPrevious: () => _step(-1),
+                        onPrevious: _range.from.isAfter(earliest)
+                            ? () => _step(-1)
+                            : null,
                         onNext: _range.to.isBefore(today)
                             ? () => _step(1)
                             : null,
@@ -235,6 +240,7 @@ class _LogsPageState extends ConsumerState<LogsPage> {
         Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.md),
           child: DayGroup(
+            key: ValueKey(entry.day),
             entry: entry,
             rows: rows,
             today: today,
