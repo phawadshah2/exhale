@@ -6,8 +6,7 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/liquid_glass.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/tracking/presentation/log_flow.dart';
-import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
-import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.dart';
+import 'package:exhale/features/tracking/presentation/widgets/log_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,35 +30,18 @@ class AppShell extends ConsumerWidget {
     ),
   ];
 
-  void _logNow(BuildContext context, WidgetRef ref) {
-    final habitId = ref.read(primaryHabitProvider)?.id;
-    if (habitId != null) unawaited(logNow(context, ref, habitId: habitId));
+  /// One habit: log it. Several: pick which in the menu.
+  void _onLog(BuildContext context, WidgetRef ref, Rect anchor) {
+    final habitId = ref.read(singleHabitIdProvider);
+    if (habitId != null) {
+      unawaited(logNow(context, ref, habitId: habitId));
+    } else {
+      unawaited(showLogMenu(context, ref, anchor: anchor));
+    }
   }
 
-  void _showLogMenu(BuildContext context, WidgetRef ref, Rect anchor) {
-    final habitId = ref.read(primaryHabitProvider)?.id;
-    if (habitId == null) return;
-    final today = ref.read(todayProvider);
-    unawaited(
-      showGlassMenu(
-        context,
-        anchor: anchor,
-        items: [
-          GlassMenuItem(
-            label: 'Log now',
-            icon: AppIcons.add,
-            onSelected: () => logNow(context, ref, habitId: habitId),
-          ),
-          GlassMenuItem(
-            label: 'Add a missed log',
-            icon: AppIcons.clock,
-            onSelected: () =>
-                showLogEditorSheet(context, habitId: habitId, day: today),
-          ),
-        ],
-      ),
-    );
-  }
+  void _showLogMenu(BuildContext context, WidgetRef ref, Rect anchor) =>
+      unawaited(showLogMenu(context, ref, anchor: anchor));
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -75,7 +57,7 @@ class AppShell extends ConsumerWidget {
           index,
           initialLocation: index == navigationShell.currentIndex,
         ),
-        onLog: () => _logNow(context, ref),
+        onLog: (anchor) => _onLog(context, ref, anchor),
         onLogMenu: (anchor) => _showLogMenu(context, ref, anchor),
       ),
     );
@@ -109,7 +91,7 @@ class FloatingTabBar extends StatelessWidget {
   final List<FloatingTab> tabs;
   final int currentIndex;
   final ValueChanged<int> onSelected;
-  final VoidCallback onLog;
+  final ValueChanged<Rect> onLog;
   final ValueChanged<Rect> onLogMenu;
 
   static const double _tabWidth = 76;
@@ -191,8 +173,13 @@ class FloatingTabBar extends StatelessWidget {
 class _LogButton extends StatelessWidget {
   const _LogButton({required this.onTap, required this.onLongPress});
 
-  final VoidCallback onTap;
+  final ValueChanged<Rect> onTap;
   final ValueChanged<Rect> onLongPress;
+
+  static Rect _anchor(BuildContext context) {
+    final box = context.findRenderObject()! as RenderBox;
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -206,11 +193,8 @@ class _LogButton extends StatelessWidget {
         excludeSemantics: true,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: onTap,
-          onLongPress: () {
-            final box = context.findRenderObject()! as RenderBox;
-            onLongPress(box.localToGlobal(Offset.zero) & box.size);
-          },
+          onTap: () => onTap(_anchor(context)),
+          onLongPress: () => onLongPress(_anchor(context)),
           child: AppGlass(
             tint: colors.primaryContainer.withValues(alpha: 0.6),
             child: SizedBox.square(

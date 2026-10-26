@@ -181,11 +181,17 @@ class GlassMenuItem {
     required this.label,
     required this.icon,
     required this.onSelected,
+    this.detail,
+    this.detailColor,
   });
 
   final String label;
   final IconData icon;
   final VoidCallback onSelected;
+
+  /// Trailing secondary text, e.g. "4 of 9 today".
+  final String? detail;
+  final Color? detailColor;
 }
 
 /// iOS pull-down menu in glass, growing from [anchor] (a global rect).
@@ -276,7 +282,21 @@ class _GlassMenuRoute extends PopupRoute<GlassMenuItem> {
                                         size: 20,
                                         color: colors.primary,
                                       ),
-                                      Text(item.label, style: text.bodyLarge),
+                                      Expanded(
+                                        child: Text(
+                                          item.label,
+                                          style: text.bodyLarge,
+                                        ),
+                                      ),
+                                      if (item.detail != null)
+                                        Text(
+                                          item.detail!,
+                                          style: text.bodyMedium?.copyWith(
+                                            color:
+                                                item.detailColor ??
+                                                colors.onSurfaceVariant,
+                                          ),
+                                        ),
                                     ],
                                   ),
                                 ),
