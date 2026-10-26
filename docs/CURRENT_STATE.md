@@ -71,33 +71,35 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
   the shown period; "Since ... day N of D" uses quit day minus first day.
   `AllTimeChart` also takes `quitDay`.
 
-## Next action
+## M2 review (2026-10-26)
 
-All M2 tasks (2.1-2.5) are committed. M2 independent review done 2026-10-26
-(code read only). Review Focus 1, 2, 5 hold in the code and are covered by
-the 2.1 tests.
-
-Review fixes written, uncommitted. Observed by me: format and
-`analyze --fatal-infos` clean; full suite 282 passed with 3 Home failures
-from one wrong assert (fixed: 4 logs collapse to 3); after the fix
-`test/features/home` 43 passed. The full suite was not rerun after the fix.
-Fixes:
+Independent review done (code read). Review Focus 1, 2, 5 hold and are
+covered by the 2.1 tests. Fixes committed and pushed (26f58d0, tree clean):
 "See all logs" opens today's Logs; `DayGroup` keyed by day; the Logs pill
 matches History ("N under" / "N over", hidden when nothing is tracked); the
 Logs previous-week arrow stops at `earliestDayProvider`; `logsInRangeProvider`,
-`backfillDays` and `earliestDayProvider` moved to `tracking_providers.dart`
-(one copy for Home and Logs); `DayGroup._summary` non-null;
-`HabitWording.historyTitle` removed. Tests: one in `home_page_test.dart`
-extended, four added to `logs_page_test.dart`.
+`backfillDays`, `earliestDayProvider` moved to `tracking_providers.dart`;
+`HabitWording.historyTitle` removed. Tests: 1 extended in
+`home_page_test.dart`, 4 added in `logs_page_test.dart`.
 
-Still open from the review: Logs spins forever if the log stream or plan
-history fails (M5 states); the plan's Review Focus 5 wording says a plan
-starting tomorrow has allowed 0, but code, test and spec §5 give the whole
-period's allowance with `allowedByToday` 0.
+Checks observed by me: format and `analyze --fatal-infos` clean; full suite
+282 passed, 3 Home failures from one wrong assert (fixed); after the fix
+`test/features/home` 43 passed. The full suite was not rerun after the fix.
 
-Then, asking first, a simulator check of every Logs entry point and of the
-History card against `ChartB/C/All*.dc.html` (not yet compared). Afterwards
-start M3 (Task 3.1).
+Open: Logs spins forever if the log stream or plan history fails (M5
+states); the plan's Review Focus 5 says a plan starting tomorrow has allowed
+0, but code, test and spec §5 give the whole period's allowance with
+`allowedByToday` 0. Reword that line.
 
-Test gotcha: never `await` a go_router `push` in a test (it completes on pop);
-use `unawaited`.
+## Next action
+
+Asking before each command: a simulator check of every Logs entry point
+(ring View logs and trigger rows, History days, chips and All triggers,
+"See all logs") and of the History card against
+`design/6._home_details_logs/ChartB/C/All*.dc.html`. Record it for the M2 PR,
+then M2 goes to Fawad's review and merge. After that, start M3 (Task 3.1).
+Read first: roadmap M2/M3 sections, `design/6._home_details_logs/README.md`.
+
+Test gotchas: never `await` a go_router `push` in a test (use `unawaited`);
+a failed assert skips `disposeApp()` and the test then hangs to the 10 min
+timeout, so run a single failing test with `--timeout 60s`.
