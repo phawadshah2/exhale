@@ -9,16 +9,19 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/status_badge.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/habit_wording.dart';
+import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
 import 'package:exhale/features/home/presentation/widgets/backward_pager.dart';
+import 'package:exhale/features/home/presentation/widgets/day_triggers.dart';
 import 'package:exhale/features/home/presentation/widgets/progress_ring.dart';
+import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
-import 'package:exhale/features/tracking/presentation/widgets/day_detail_sheet.dart';
+import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
 import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,18 +29,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// The selected day's count against its limit. Swipe the ring, or use the
 /// arrows, to move between days from [earliestDayProvider] up to today.
-class DayCard extends ConsumerWidget {
-  const DayCard({required this.habitId, required this.habit, super.key});
+class RingCard extends ConsumerWidget {
+  const RingCard({required this.habitId, super.key});
 
   final int habitId;
-  final Habit habit;
 
   static const double _ringSize = 220;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final history = ref.watch(planHistoryProvider(habitId)).value;
-    if (history == null) {
+    final habit = ref.watch(habitProvider(habitId))?.habit;
+    if (history == null || habit == null) {
       return const SizedBox(
         height: 360,
         child: Center(child: CircularProgressIndicator.adaptive()),
@@ -48,7 +51,7 @@ class DayCard extends ConsumerWidget {
     final text = context.textTheme;
     final today = ref.watch(todayProvider);
     final earliest = ref.watch(earliestDayProvider(habitId));
-    final day = ref.watch(selectedDayProvider(habitId));
+    final day = ref.watch(ringShownDayProvider(habitId));
     final progress = ref
         .watch(dayProgressProvider((habitId: habitId, day: day)))
         .value;
@@ -56,7 +59,7 @@ class DayCard extends ConsumerWidget {
     final beforePlan = day.isBefore(history.firstDay);
     final page = today.daysSince(day);
     final pageCount = today.daysSince(earliest) + 1;
-    final picker = ref.read(pickedDayProvider.notifier);
+    final picker = ref.read(ringDayProvider(habitId).notifier);
 
     void step(int days) {
       unawaited(HapticFeedback.selectionClick());
@@ -127,6 +130,12 @@ class DayCard extends ConsumerWidget {
                 ],
               ),
             ),
+            if (isToday &&
+                progress != null &&
+                progress.status == LimitStatus.over) ...[
+              const SizedBox(height: AppSpacing.md),
+              _OverNote(tomorrowLimit: history.limitOn(day.addDays(1))),
+            ],
             if (isToday && progress != null && progress.count == 0) ...[
               const SizedBox(height: AppSpacing.md),
               _Note(
@@ -149,11 +158,12 @@ class DayCard extends ConsumerWidget {
               )
             else if (beforePlan)
               _Details(
-                left: (AppIcons.trendDown, 'Limit', 'None yet'),
+                left: (AppIcons.trendDown, 'Limit', 'None yet', null),
                 right: (
                   AppIcons.calendar,
                   'Plan started',
                   AppFormat.monthDay(history.firstDay),
+                  null,
                 ),
               )
             else if (progress != null)
@@ -161,21 +171,41 @@ class DayCard extends ConsumerWidget {
                 left: (
                   AppIcons.trendDown,
                   'Limit that day',
-                  '${progress.limit}',
+                  '${progress.limit} ${habit.units}',
+                  null,
                 ),
                 right: (
                   AppIcons.checkCircle,
                   'Status',
                   progress.badgeLabel(habit),
+                  null,
                 ),
               ),
+            if (!beforePlan) ...[
+              const SizedBox(height: AppSpacing.md),
+              DayTriggers(
+                habitId: habitId,
+                day: day,
+                onSelect: (trigger) => openLogs(
+                  context,
+                  LogsQuery(
+                    habitId: habitId,
+                    from: day,
+                    to: day,
+                    trigger: trigger,
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.sm),
             Row(
               children: [
                 Expanded(
                   child: TextButton.icon(
-                    onPressed: () =>
-                        showDayDetailSheet(context, habitId: habitId, day: day),
+                    onPressed: () => openLogs(
+                      context,
+                      LogsQuery(habitId: habitId, from: day, to: day),
+                    ),
                     icon: const Icon(AppIcons.clock, size: 18),
                     label: const Text('View logs'),
                   ),
@@ -311,45 +341,57 @@ class _TodayDetails extends ConsumerWidget {
   final LogicalDay today;
   final Habit habit;
 
+  String _nextTarget() {
+    final plan = history.planOn(today);
+    final days = plan.daysUntilNextDrop(today);
+    if (days == null) return habit.freeTitle;
+    final next = plan.limitOn(plan.nextDropOn(today)!);
+    return next == 0
+        ? (days == 1 ? 'Quit day tomorrow' : 'Quit day in ${days}d')
+        : (days == 1
+              ? 'Drops to $next tomorrow'
+              : 'Drops to $next in ${days}d');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = ref.watch(nowProvider).value ?? ref.watch(clockProvider).now();
     final latest = ref.watch(latestLogProvider(habitId)).value;
-    final plan = history.planOn(today);
 
-    final String sinceLast;
+    final String entry;
+    final String? entryDetail;
     if (latest == null) {
-      sinceLast = today == history.firstDay
-          ? 'Plan started today'
-          : 'No logs yet';
+      entry = today == history.firstDay ? 'Plan started today' : 'No logs yet';
+      entryDetail = null;
     } else {
       final elapsed = now.difference(latest.loggedAt);
-      sinceLast = AppFormat.elapsed(
-        elapsed.isNegative ? Duration.zero : elapsed,
+      final since = elapsed.isNegative ? Duration.zero : elapsed;
+      entry = since.inMinutes < 1
+          ? AppFormat.elapsed(since)
+          : '${AppFormat.elapsed(since)} ago';
+      entryDetail = AppFormat.time(latest.loggedAt);
+    }
+
+    final _Cell right;
+    if (latest == null) {
+      right = (AppIcons.trendDown, 'Next target', _nextTarget(), null);
+    } else {
+      final note = latest.note;
+      right = (
+        AppIcons.stress,
+        'Last trigger',
+        latest.trigger?.label ?? 'None',
+        note == null || note.isEmpty ? null : note,
       );
     }
-
-    final String nextTarget;
-    final days = plan.daysUntilNextDrop(today);
-    if (days == null) {
-      nextTarget = habit.freeTitle;
-    } else {
-      final next = plan.limitOn(plan.nextDropOn(today)!);
-      nextTarget = next == 0
-          ? (days == 1 ? 'Quit day tomorrow' : 'Quit day in ${days}d')
-          : (days == 1
-                ? 'Drops to $next tomorrow'
-                : 'Drops to $next in ${days}d');
-    }
-
     return _Details(
-      left: (AppIcons.clock, 'Time since last', sinceLast),
-      right: (AppIcons.trendDown, 'Next target', nextTarget),
+      left: (AppIcons.clock, 'Last entry', entry, entryDetail),
+      right: right,
     );
   }
 }
 
-typedef _Cell = (IconData icon, String label, String value);
+typedef _Cell = (IconData icon, String label, String value, String? detail);
 
 class _Details extends StatelessWidget {
   const _Details({required this.left, required this.right});
@@ -398,7 +440,7 @@ class _RingCentre extends StatelessWidget {
         isToday
             ? '${progress.remaining} left today'
             : '${progress.remaining} under limit',
-        '$percent% of daily limit',
+        '$percent% of ${isToday ? 'daily' : "that day's"} limit',
         colors.primary,
       ),
       LimitStatus.at => (
@@ -410,7 +452,7 @@ class _RingCentre extends StatelessWidget {
         '${progress.overBy} over limit',
         percent == null
             ? (isToday ? 'Target is 0 today' : 'Target was 0')
-            : '$percent% of daily limit',
+            : '$percent% of ${isToday ? 'daily' : "that day's"} limit',
         context.exhale.danger.foreground,
       ),
     };
@@ -470,6 +512,31 @@ class _BeforePlanCentre extends StatelessWidget {
   }
 }
 
+class _OverNote extends StatelessWidget {
+  const _OverNote({required this.tomorrowLimit});
+
+  final int tomorrowLimit;
+
+  @override
+  Widget build(BuildContext context) {
+    final danger = context.exhale.danger.foreground;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: danger.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: danger.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        'A harder day. Tomorrow starts fresh at $tomorrowLimit, and your '
+        'streak picks up again from there.',
+        style: context.textTheme.bodyMedium,
+      ),
+    );
+  }
+}
+
 class _Note extends StatelessWidget {
   const _Note({required this.label});
 
@@ -514,7 +581,7 @@ class _InfoCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.textTheme;
-    final (icon, label, value) = cell;
+    final (icon, label, value, detail) = cell;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: AppSpacing.sm,
@@ -529,6 +596,15 @@ class _InfoCell extends StatelessWidget {
                 style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
               ),
               Text(value, style: text.titleMedium),
+              if (detail != null)
+                Text(
+                  detail,
+                  style: text.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
             ],
           ),
         ),

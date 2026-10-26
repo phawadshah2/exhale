@@ -5,6 +5,7 @@ import 'package:exhale/features/plan/presentation/providers/plan_providers.dart'
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
+import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/repositories/habit_log_repository.dart';
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:exhale/features/tracking/domain/usecases/delete_habit_log.dart';
@@ -46,6 +47,37 @@ final StreamProviderFamily<List<HabitLog>, HabitDay> logsForDayProvider =
             from: boundary.startOf(key.day),
             to: boundary.endOf(key.day),
           );
+    });
+
+/// A habit, or every active habit when null, over a period.
+typedef LogsInRange = ({int? habitId, PeriodRange range});
+
+/// Logs on the days in the range, oldest first.
+final StreamProviderFamily<List<HabitLog>, LogsInRange> logsInRangeProvider =
+    StreamProvider.autoDispose.family<List<HabitLog>, LogsInRange>((ref, key) {
+      final boundary = ref.watch(dayBoundaryProvider);
+      return ref
+          .watch(habitLogRepositoryProvider)
+          .watchLogs(
+            habitId: key.habitId,
+            from: boundary.startOf(key.range.from),
+            to: boundary.endOf(key.range.to),
+          );
+    });
+
+/// How many days before the plan's first day Home and Logs can show and
+/// back-fill.
+const int backfillDays = 30;
+
+/// The earliest day Home and Logs can show for a habit: [backfillDays]
+/// before its first plan day.
+final ProviderFamily<LogicalDay, int> earliestDayProvider =
+    Provider.family<LogicalDay, int>((ref, habitId) {
+      final today = ref.watch(todayProvider);
+      final firstDay = ref.watch(planHistoryProvider(habitId)).value?.firstDay;
+      if (firstDay == null) return today;
+      final earliest = firstDay.addDays(-backfillDays);
+      return earliest.isAfter(today) ? today : earliest;
     });
 
 /// The habit's most recent log.

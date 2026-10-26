@@ -76,13 +76,6 @@ void main() {
   Future<List<Trigger?>> storedTriggers(WidgetTester tester) async =>
       (await storedLogs(tester)).map((log) => log.trigger).toList();
 
-  IconButton button(WidgetTester tester, String tooltip) => tester.widget(
-    find.ancestor(
-      of: find.byTooltip(tooltip),
-      matching: find.byType(IconButton),
-    ),
-  );
-
   Future<void> tapAndSettle(WidgetTester tester, Finder finder) async {
     await tester.ensureVisible(finder);
     await tester.pumpAndSettle();
@@ -227,7 +220,7 @@ void main() {
     expect(find.text('Over limit'), findsOneWidget);
     expect(find.text('2 over limit'), findsOneWidget);
     expect(find.text('167% of daily limit'), findsOneWidget);
-    expect(find.text('6h 38m'), findsOneWidget);
+    expect(find.text('6h 38m ago'), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -241,32 +234,30 @@ void main() {
     await logOn(DateTime(2026, 10, 16, 9), times: 4);
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.ensureVisible(find.text('Smoking History'));
+    await tester.ensureVisible(find.text('History'));
     await tester.pumpAndSettle();
+    expect(find.text('21 / 45 allowed'), findsOneWidget);
+    expect(find.text('6 under'), findsOneWidget);
     expect(find.text('Avg 7.0/day'), findsOneWidget);
     expect(find.text('1 day over'), findsOneWidget);
-    expect(find.text('2 days within limit'), findsOneWidget);
-    expect(find.text('Limit 9'), findsOneWidget);
+    expect(find.text('2 days on track'), findsOneWidget);
 
     await tester.tap(find.text('Month'));
     await tester.pumpAndSettle();
     expect(find.text('Avg 7.0/day'), findsOneWidget);
-    expect(find.text('1'), findsWidgets);
+    expect(find.text('Before plan'), findsOneWidget);
 
     await tester.disposeApp();
   });
 
-  testWidgets('tapping a bar selects the day; its logs can be deleted', (
+  testWidgets('a past day on the ring has logs that can be deleted', (
     tester,
   ) async {
     await startPlan(LogicalDay(2026, 10, 14));
     await logOn(DateTime(2026, 10, 15, 9), times: 2);
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.ensureVisible(find.text('Smoking History'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.bySemanticsLabel('Thursday, Oct 15: 2 of 9'));
-    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.byTooltip('Previous day'));
 
     expect(find.text('Thursday, Oct 15'), findsOneWidget);
     expect(countText(tester), '2 / 9');
@@ -274,38 +265,35 @@ void main() {
     await tester.scrollAndTap(find.text('View logs'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Day Detail'), findsOneWidget);
-    expect(find.text('2 of 9 logged'), findsOneWidget);
+    expect(find.text('Logs'), findsOneWidget);
+    expect(find.text('2 logged'), findsOneWidget);
 
-    await tester.tap(find.byTooltip('Delete').first);
+    await tester.drag(find.byType(Dismissible).first, const Offset(-500, 0));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
 
-    expect(find.text('1 of 9 logged'), findsOneWidget);
+    expect(find.text('1 logged'), findsOneWidget);
 
     await tester.disposeApp();
   });
 
-  testWidgets('a missed log can be added from the day sheet', (tester) async {
+  testWidgets('a missed log can be added from the logs page', (tester) async {
     await startPlan(LogicalDay(2026, 10, 14));
     await logOn(DateTime(2026, 10, 15, 9));
     await tester.pumpAppPastSplash(height: 2400);
 
-    await tester.ensureVisible(find.text('Smoking History'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.bySemanticsLabel('Thursday, Oct 15: 1 of 9'));
-    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.byTooltip('Previous day'));
     await tester.scrollAndTap(find.text('View logs'));
     await tester.pumpAndSettle();
-    await tester.scrollAndTap(find.text('Add missed log').last);
+    await tester.tap(find.byTooltip('Add a missed log'));
     await tester.pumpAndSettle();
 
     expect(find.text('12:00 PM'), findsOneWidget);
     await tester.scrollAndTap(find.text('Add log'));
     await tester.pumpAndSettle();
 
-    expect(find.text('2 of 9 logged'), findsOneWidget);
+    expect(find.text('2 logged'), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -375,7 +363,7 @@ void main() {
     await tester.pumpAppPastSplash(height: 2400);
 
     expect(find.text('No sessions logged today. Nice start.'), findsOneWidget);
-    expect(find.text('Vaping History'), findsOneWidget);
+    expect(find.text('History'), findsOneWidget);
     expect(find.text('YOUR WHY'), findsOneWidget);
     expect(find.text('Breathe easier on my runs'), findsOneWidget);
 
@@ -462,131 +450,7 @@ void main() {
     await tester.pumpAppPastSplash(height: 2400);
 
     expect(countText(tester), '3 / 12');
-    expect(find.text('Vaping History'), findsOneWidget);
-
-    await tester.disposeApp();
-  });
-
-  testWidgets('the ring steps back a day and returns to today', (tester) async {
-    await startPlan(LogicalDay(2026, 10, 14));
-    await logOn(DateTime(2026, 10, 15, 9), times: 3);
-    await tester.pumpAppPastSplash(height: 2400);
-
-    expect(button(tester, 'Next day').onPressed, isNull);
-
-    await tapAndSettle(tester, find.byTooltip('Previous day'));
-    expect(find.text('Thursday, Oct 15'), findsOneWidget);
-    expect(countText(tester), '3 / 9');
-    expect(find.text('6 under limit'), findsOneWidget);
-    expect(find.text('Limit that day'), findsOneWidget);
-
-    await tapAndSettle(tester, find.text('Today'));
-    expect(find.text("Today's Consumption"), findsOneWidget);
-    expect(countText(tester), '0 / 9');
-
-    await tester.disposeApp();
-  });
-
-  testWidgets('swiping the ring right goes to the day before', (tester) async {
-    await startPlan(LogicalDay(2026, 10, 14));
-    await logOn(DateTime(2026, 10, 15, 9), times: 2);
-    await tester.pumpAppPastSplash(height: 2400);
-
-    await tester.fling(
-      find.byKey(const Key('day-count')),
-      const Offset(300, 0),
-      1000,
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Thursday, Oct 15'), findsOneWidget);
-    expect(countText(tester), '2 / 9');
-
-    await tester.disposeApp();
-  });
-
-  testWidgets('the ring and chart move together', (tester) async {
-    await startPlan(LogicalDay(2026, 10, 1));
-    await tester.pumpAppPastSplash(height: 2400);
-    await tester.ensureVisible(find.text('This week'));
-    await tester.pumpAndSettle();
-
-    // Mon 12 Oct is this week; one more day back is last week.
-    for (var i = 0; i < 4; i++) {
-      await tapAndSettle(tester, find.byTooltip('Previous day'));
-    }
-    expect(find.text('Monday, Oct 12'), findsOneWidget);
-    expect(find.text('This week'), findsOneWidget);
-
-    await tapAndSettle(tester, find.byTooltip('Previous day'));
-    expect(find.text('Oct 5 – 11'), findsOneWidget);
-
-    await tapAndSettle(tester, find.byTooltip('Previous week'));
-    expect(find.text('Sep 28 – Oct 4'), findsOneWidget);
-    expect(find.text('Sunday, Oct 4'), findsOneWidget);
-
-    await tapAndSettle(tester, find.text('Month'));
-    expect(find.text('This month'), findsOneWidget);
-    expect(find.text('Sunday, Oct 4'), findsOneWidget);
-
-    await tapAndSettle(tester, find.byTooltip('Previous month'));
-    expect(find.text('September 2026'), findsOneWidget);
-    expect(find.text('Friday, Sep 4'), findsOneWidget);
-
-    await tester.disposeApp();
-  });
-
-  testWidgets('going back stops 30 days before the plan', (tester) async {
-    await startPlan(today);
-    await tester.pumpAppPastSplash(height: 2400);
-    await tester.ensureVisible(find.text('This week'));
-    await tester.pumpAndSettle();
-
-    // Fri 16 Oct back four weeks is Fri 18 Sep, in the earliest week.
-    for (var i = 0; i < 4; i++) {
-      await tapAndSettle(tester, find.byTooltip('Previous week'));
-    }
-    expect(find.text('Friday, Sep 18'), findsOneWidget);
-    expect(button(tester, 'Previous week').onPressed, isNull);
-
-    await tapAndSettle(tester, find.byTooltip('Previous day'));
-    await tapAndSettle(tester, find.byTooltip('Previous day'));
-    expect(find.text('Wednesday, Sep 16'), findsOneWidget);
-    expect(button(tester, 'Previous day').onPressed, isNull);
-    expect(find.text('Before your plan'), findsOneWidget);
-
-    await tester.disposeApp();
-  });
-
-  testWidgets('a back-filled day before the plan leaves stats alone', (
-    tester,
-  ) async {
-    await startPlan(LogicalDay(2026, 10, 14));
-    await logOn(DateTime(2026, 10, 14, 9), times: 6);
-    await logOn(DateTime(2026, 10, 15, 9), times: 6);
-    await tester.pumpAppPastSplash(height: 2400);
-
-    for (var i = 0; i < 4; i++) {
-      await tapAndSettle(tester, find.byTooltip('Previous day'));
-    }
-    expect(find.text('Monday, Oct 12'), findsOneWidget);
-    expect(countText(tester), '0');
-    expect(find.text('Before your plan'), findsWidgets);
-
-    await tapAndSettle(tester, find.text('Add missed log'));
-    await tester.scrollAndTap(find.text('Add log'));
-    await tester.pumpAndSettle();
-
-    expect(countText(tester), '1');
-    expect(
-      find.bySemanticsLabel('Monday, Oct 12: 1 before your plan'),
-      findsOneWidget,
-    );
-
-    await tester.ensureVisible(find.text('Avoided'));
-    await tester.pumpAndSettle();
-    expect(find.text('6 cigs'), findsOneWidget);
-    expect(find.text('3 Days'), findsOneWidget);
+    expect(find.text('History'), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -635,8 +499,16 @@ void main() {
     await tester.pumpAppPastSplash(height: 2400);
 
     expect(find.text('+1 more today · See all logs'), findsOneWidget);
-    expect(find.text('9:03 AM'), findsNothing);
+    expect(find.text('9:03 AM'), findsOneWidget);
     expect(find.text('9:02 AM'), findsOneWidget);
+
+    await tester.scrollAndTap(find.text('+1 more today · See all logs'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Logs'), findsOneWidget);
+    expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
+    expect(find.byType(Dismissible), findsNWidgets(3));
+    expect(find.text('Show 1 more'), findsOneWidget);
 
     await tester.disposeApp();
   });
