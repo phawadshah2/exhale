@@ -1,9 +1,12 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/widgets/glass_surface.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/settings/presentation/pages/settings_page.dart';
+import 'package:exhale/features/tracking/domain/repositories/habit_log_repository.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/fixed_clock.dart';
@@ -77,6 +80,69 @@ void main() {
     expect(find.byTooltip('Close'), findsNothing);
 
     await tester.disposeApp();
+  });
+
+  // The menu reads today's counts from drift before it opens, so real time
+  // has to pass between fake-clock pumps.
+  Future<void> tapLogAndWaitForMenu(WidgetTester tester) async {
+    await tester.tap(find.byTooltip('Log'));
+    for (var i = 0; i < 4; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await tester.pumpAndSettle();
+  }
+
+  group('with two habits', () {
+    setUp(() async {
+      await seedHabit(
+        PlanDraft(
+          startDay: LogicalDay(2026, 10, 16),
+          startLimit: 5,
+          quitDay: LogicalDay(2026, 10, 16).addDays(63),
+        ),
+        habit: Habit.vaping,
+      );
+      await sl<HabitLogRepository>().addLog(
+        habitId: 1,
+        loggedAt: DateTime(2026, 10, 16, 9),
+      );
+    });
+
+    testWidgets("tap opens the menu listing both with today's counts", (
+      tester,
+    ) async {
+      await tester.pumpAppPastSplash(height: 2400);
+
+      await tapLogAndWaitForMenu(tester);
+
+      expect(find.widgetWithText(InkWell, '1 of 9 today'), findsOneWidget);
+      expect(find.widgetWithText(InkWell, '0 of 5 today'), findsOneWidget);
+      expect(find.text('Add a missed log'), findsOneWidget);
+      expect(find.text('What triggered this one?'), findsNothing);
+
+      await tester.tap(find.text('Add a missed log'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+      await tester.disposeApp();
+    });
+
+    testWidgets('menu habit opens its trigger sheet', (tester) async {
+      await tester.pumpAppPastSplash(height: 2400);
+
+      await tapLogAndWaitForMenu(tester);
+      await tester.tap(find.widgetWithText(InkWell, '0 of 5 today'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('What triggered this one?'), findsOneWidget);
+
+      await tester.tap(find.text('Save without trigger'));
+      await tester.pumpAndSettle();
+      await tester.disposeApp();
+    });
   });
 
   testWidgets('sheets float above the tab bar on the root navigator', (

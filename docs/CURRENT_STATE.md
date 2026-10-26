@@ -87,18 +87,27 @@ Checks observed by me: format and `analyze --fatal-infos` clean; full suite
 `test/features/home` 43 passed. The full suite was not rerun after the fix.
 
 Open: Logs spins forever if the log stream or plan history fails (M5
-states); the plan's Review Focus 5 says a plan starting tomorrow has allowed
-0, but code, test and spec §5 give the whole period's allowance with
-`allowedByToday` 0. Reword that line.
+states). The plan's Review Focus 5 wording was corrected (uncommitted doc edit).
 
 ## Next action
 
-Asking before each command: a simulator check of every Logs entry point
-(ring View logs and trigger rows, History days, chips and All triggers,
-"See all logs") and of the History card against
-`design/6._home_details_logs/ChartB/C/All*.dc.html`. Record it for the M2 PR,
-then M2 goes to Fawad's review and merge. After that, start M3 (Task 3.1).
-Read first: roadmap M2/M3 sections, `design/6._home_details_logs/README.md`.
+M3 Task 3.1 is written on branch `feat/log-button-menu` (stacked on
+`feat/dashboard-stats`, uncommitted). Observed by me: `test/app/ios_shell_test.dart`
+6 passed. Format, analyze and the full suite have not run. The two-habit tests
+use `tapLogAndWaitForMenu` (real waits between fake pumps, since the menu reads
+drift before opening). New `widgets/log_menu.dart` (`showLogMenu`: one habit → Log
+now / Add a missed log; several → a row per habit with "N of L today", amber
+at limit, then Add a missed log). `GlassMenuItem` gains `detail` and
+`detailColor`. `app_shell.dart`: tap logs when `singleHabitIdProvider` is set,
+else opens the menu; long-press always opens it. "Add a habit" is left out
+until 4.1. Counts are read from the repositories (`.first`), not stream
+providers. Tests: group "with two habits" in `test/app/ios_shell_test.dart`.
+With several habits "Add a missed log" targets the first habit; revisit in
+3.4. Fawad skipped the M2 simulator check for now (still owed before the M2
+PR).
+
+Do next: format and analyze (ask before each), then checkpoint `feat(log): plus button tap and hold with habit menu`.
+Then Task 3.2 (trigger sheet habit chip).
 
 Test gotchas: never `await` a go_router `push` in a test (use `unawaited`);
 a failed assert skips `disposeApp()` and the test then hangs to the 10 min
