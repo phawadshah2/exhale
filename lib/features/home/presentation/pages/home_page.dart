@@ -1,5 +1,6 @@
 import 'package:exhale/core/presentation/providers/clock_providers.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
+import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
 import 'package:exhale/features/home/presentation/widgets/day_card.dart';
 import 'package:exhale/features/home/presentation/widgets/history_card.dart';
@@ -22,10 +23,15 @@ class HomePage extends ConsumerWidget {
     final today = ref.watch(todayProvider);
     final now = ref.watch(nowProvider).value ?? ref.watch(clockProvider).now();
     final settings = ref.watch(currentSettingsProvider);
-    final history = ref.watch(planHistoryProvider).value;
-    final stats = ref.watch(homeStatsProvider).value;
-    final habit = settings.habit;
-    final reason = settings.reason;
+    final tracked = ref.watch(primaryHabitProvider);
+    if (tracked == null) {
+      return const Center(child: CircularProgressIndicator.adaptive());
+    }
+    final habitId = tracked.id;
+    final habit = tracked.habit;
+    final reason = tracked.reason;
+    final history = ref.watch(planHistoryProvider(habitId)).value;
+    final stats = ref.watch(habitStatsProvider(habitId)).value;
 
     // Edge to edge: content scrolls under the status bar and the floating
     // tab bar (reported as bottom padding).
@@ -46,13 +52,13 @@ class HomePage extends ConsumerWidget {
         if (history != null)
           StagePill(plan: history.current, today: today, habit: habit),
         const SizedBox(height: AppSpacing.md),
-        const DayCard(),
+        DayCard(habitId: habitId, habit: habit),
         if (reason != null) ...[
           const SizedBox(height: AppSpacing.md),
           WhyCard(reason: reason),
         ],
         const SizedBox(height: AppSpacing.md),
-        const HistoryCard(),
+        HistoryCard(habitId: habitId, habit: habit),
         if (stats != null) ...[
           const SizedBox(height: AppSpacing.md),
           StatsGrid(

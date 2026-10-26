@@ -1,5 +1,8 @@
 import 'package:exhale/core/data/local/database/app_database.dart';
+import 'package:exhale/core/data/local/database/drift_transaction_runner.dart';
 import 'package:exhale/core/domain/time/clock.dart';
+import 'package:exhale/core/domain/transaction/transaction_runner.dart';
+import 'package:exhale/features/habit/habit_injection.dart';
 import 'package:exhale/features/plan/plan_injection.dart';
 import 'package:exhale/features/settings/settings_injection.dart';
 import 'package:exhale/features/tracking/tracking_injection.dart';
@@ -20,7 +23,11 @@ abstract final class InjectionContainer {
         () => database ?? AppDatabase(),
         dispose: (db) => db.close(),
       )
-      ..registerSingleton<Clock>(clock);
+      ..registerSingleton<Clock>(clock)
+      ..registerLazySingleton<TransactionRunner>(
+        () => DriftTransactionRunner(sl<AppDatabase>()),
+      );
+    initHabitDependencies(sl);
     initPlanDependencies(sl);
     initTrackingDependencies(sl);
     initSettingsDependencies(sl);

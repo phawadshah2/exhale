@@ -1,7 +1,6 @@
 import 'package:exhale/core/data/local/database/app_database.dart';
 import 'package:exhale/core/domain/error/failure.dart';
 import 'package:exhale/core/domain/result/result.dart';
-import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/settings/data/datasources/settings_local_data_source.dart';
 import 'package:exhale/features/settings/data/repositories/local_settings_repository.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
@@ -38,9 +37,6 @@ void main() {
     const invalid = [
       AppSettings(dayResetHour: 24),
       AppSettings(dayResetHour: -1),
-      AppSettings(unitsPerContainer: 0),
-      AppSettings(unitsPerContainer: 101),
-      AppSettings(priceCents: -1),
       AppSettings(accentIndex: -1),
     ];
 
@@ -59,37 +55,5 @@ void main() {
     final result = await saveSettings(AppSettings(userName: 'x' * 41));
 
     expect((result as FailureResult<void>).failure, isA<ValidationFailure>());
-  });
-
-  test('unit price follows the container when the habit has one', () {
-    const settings = AppSettings(priceCents: 1450);
-
-    expect(settings.unitPriceCents, 72.5);
-    expect(const AppSettings().unitPriceCents, isNull);
-    expect(
-      const AppSettings(
-        habitKind: HabitKind.caffeine,
-        priceCents: 450,
-      ).unitPriceCents,
-      450,
-    );
-    expect(
-      const AppSettings(
-        habitKind: HabitKind.socialMedia,
-        priceCents: 450,
-      ).unitPriceCents,
-      isNull,
-    );
-  });
-
-  test('a custom habit is built from its stored name and unit', () {
-    const settings = AppSettings(
-      habitKind: HabitKind.custom,
-      customHabitName: 'Gaming',
-      customHabitUnit: 'match',
-    );
-
-    expect(settings.habit.name, 'Gaming');
-    expect(settings.habit.units, 'matches');
   });
 }

@@ -9,6 +9,8 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_sheet.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
@@ -19,14 +21,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Adds a missed log on [day], or edits [log] when given.
+/// Adds a missed log of [habitId] on [day], or edits [log] when given.
 Future<void> showLogEditorSheet(
   BuildContext context, {
+  required int habitId,
   required LogicalDay day,
   HabitLog? log,
 }) => showAppSheet<void>(
   context,
-  builder: (context) => LogEditorSheet(day: day, log: log),
+  builder: (context) => LogEditorSheet(habitId: habitId, day: day, log: log),
 );
 
 /// The moment on [day] that [time] refers to, honouring the reset hour:
@@ -41,8 +44,14 @@ DateTime instantOnLogicalDay(
 }
 
 class LogEditorSheet extends ConsumerStatefulWidget {
-  const LogEditorSheet({required this.day, this.log, super.key});
+  const LogEditorSheet({
+    required this.habitId,
+    required this.day,
+    this.log,
+    super.key,
+  });
 
+  final int habitId;
   final LogicalDay day;
   final HabitLog? log;
 
@@ -106,7 +115,7 @@ class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
     final Result<Object?> result = log == null
         ? await ref.read(addHabitLogProvider)(
             AddHabitLogInput(
-              habitKind: ref.read(currentSettingsProvider).habitKind,
+              habitId: widget.habitId,
               loggedAt: loggedAt,
               trigger: _trigger,
               note: _note.text,
@@ -177,6 +186,9 @@ class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
           Text('Trigger', style: text.titleMedium),
           const SizedBox(height: AppSpacing.sm),
           TriggerPicker(
+            habitKind:
+                ref.watch(habitProvider(widget.habitId))?.habit.kind ??
+                HabitKind.custom,
             selected: _trigger,
             onChanged: (trigger) => setState(() => _trigger = trigger),
           ),

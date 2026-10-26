@@ -1,6 +1,5 @@
 import 'package:exhale/core/domain/time/day_boundary.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
-import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
@@ -28,7 +27,7 @@ void main() {
       HabitLog(
         id: nextId++,
         loggedAt: DateTime(day.year, day.month, day.day, 9 + i),
-        habitKind: HabitKind.smoking,
+        habitId: 1,
       ),
   ];
 

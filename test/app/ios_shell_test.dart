@@ -3,7 +3,6 @@ import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/widgets/glass_surface.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
-import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
 import 'package:exhale/features/settings/presentation/pages/settings_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -13,7 +12,7 @@ import '../helpers/pump_app.dart';
 void main() {
   setUp(() async {
     await setUpTestDependencies(FixedClock(DateTime(2026, 10, 16, 15, 42)));
-    await sl<SavePlan>()(
+    await seedHabit(
       PlanDraft(
         startDay: LogicalDay(2026, 10, 16),
         startLimit: 9,

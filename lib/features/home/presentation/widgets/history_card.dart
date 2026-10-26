@@ -6,11 +6,11 @@ import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/pill_segmented_control.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
 import 'package:exhale/features/home/presentation/widgets/backward_pager.dart';
 import 'package:exhale/features/home/presentation/widgets/history_chart.dart';
-import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/period_summary.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
@@ -21,19 +21,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Week or month bars for the selected day's period. Swipe the chart, or
 /// use the arrows, to move by a period; tap a bar to select that day.
 class HistoryCard extends ConsumerWidget {
-  const HistoryCard({super.key});
+  const HistoryCard({required this.habitId, required this.habit, super.key});
+
+  final int habitId;
+  final Habit habit;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final period = ref.watch(chartPeriodProvider);
     final today = ref.watch(todayProvider);
-    final earliest = ref.watch(earliestDayProvider);
-    final selected = ref.watch(selectedDayProvider);
+    final earliest = ref.watch(earliestDayProvider(habitId));
+    final selected = ref.watch(selectedDayProvider(habitId));
     final picker = ref.read(pickedDayProvider.notifier);
     final page = period.periodsBetween(selected, today);
     final pageCount = period.periodsBetween(earliest, today) + 1;
     final range = PeriodRange.of(period, selected);
-    final summary = ref.watch(periodSummaryProvider(range)).value;
+    final summary = ref
+        .watch(periodSummaryProvider((habitId: habitId, range: range)))
+        .value;
     final text = context.textTheme;
     final colors = context.colors;
 
@@ -69,10 +74,7 @@ class HistoryCard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        ref.watch(habitProvider).historyTitle,
-                        style: text.headlineSmall,
-                      ),
+                      Text(habit.historyTitle, style: text.headlineSmall),
                       Text(
                         'Paced tapering progress',
                         style: text.bodySmall?.copyWith(
@@ -140,6 +142,7 @@ class HistoryCard extends ConsumerWidget {
                   page: page,
                   onPageChanged: moveToPage,
                   itemBuilder: (context, index) => _ChartPage(
+                    habitId: habitId,
                     range: PeriodRange.of(period, period.shift(today, -index)),
                     selected: selected,
                     canSelect: (day) =>
@@ -162,12 +165,14 @@ class HistoryCard extends ConsumerWidget {
 
 class _ChartPage extends ConsumerWidget {
   const _ChartPage({
+    required this.habitId,
     required this.range,
     required this.selected,
     required this.canSelect,
     required this.onSelect,
   });
 
+  final int habitId;
   final PeriodRange range;
   final LogicalDay selected;
   final bool Function(LogicalDay day) canSelect;
@@ -175,7 +180,9 @@ class _ChartPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final summary = ref.watch(periodSummaryProvider(range)).value;
+    final summary = ref
+        .watch(periodSummaryProvider((habitId: habitId, range: range)))
+        .value;
     if (summary == null) {
       return const Center(child: CircularProgressIndicator.adaptive());
     }

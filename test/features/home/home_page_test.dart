@@ -1,8 +1,12 @@
 import 'package:exhale/core/di/injection_container.dart';
+import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
+import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
+import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
+import 'package:exhale/features/habit/domain/usecases/archive_habit.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
-import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/usecases/save_settings.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
@@ -23,23 +27,28 @@ void main() {
   setUp(() => setUpTestDependencies(FixedClock(now)));
   tearDown(InjectionContainer.reset);
 
-  Future<void> startPlan(LogicalDay start, {int limit = 9}) => sl<SavePlan>()(
+  Future<int> startPlan(
+    LogicalDay start, {
+    int limit = 9,
+    Habit habit = Habit.smoking,
+    String? reason,
+    int? priceCents,
+  }) => seedHabit(
     PlanDraft(
       startDay: start,
       startLimit: limit,
       quitDay: start.addDays(limit * 7),
     ),
+    habit: habit,
+    reason: reason,
+    priceCents: priceCents,
   );
 
-  Future<void> logOn(
-    DateTime at, {
-    int times = 1,
-    HabitKind habitKind = HabitKind.smoking,
-  }) async {
+  Future<void> logOn(DateTime at, {int times = 1, int habitId = 1}) async {
     for (var i = 0; i < times; i++) {
       await sl<AddHabitLog>()(
         AddHabitLogInput(
-          habitKind: habitKind,
+          habitId: habitId,
           loggedAt: at.add(Duration(minutes: i)),
         ),
       );
@@ -51,17 +60,10 @@ void main() {
     return text.textSpan?.toPlainText() ?? text.data!;
   }
 
-  Future<List<HabitLog>> storedLogs(
-    WidgetTester tester, {
-    HabitKind habitKind = HabitKind.smoking,
-  }) async {
+  Future<List<HabitLog>> storedLogs(WidgetTester tester) async {
     final logs = await tester.runAsync(
       () => sl<HabitLogRepository>()
-          .watchLogs(
-            habitKind: habitKind,
-            from: DateTime(2026),
-            to: DateTime(2027),
-          )
+          .watchLogs(habitId: 1, from: DateTime(2026), to: DateTime(2027))
           .first,
     );
     return logs!;
@@ -305,8 +307,7 @@ void main() {
   });
 
   testWidgets('stats reflect completed days and the price', (tester) async {
-    await sl<SaveSettings>()(const AppSettings(priceCents: 1450));
-    await startPlan(LogicalDay(2026, 10, 14));
+    await startPlan(LogicalDay(2026, 10, 14), priceCents: 1450);
     await logOn(DateTime(2026, 10, 14, 9), times: 6);
     await logOn(DateTime(2026, 10, 15, 9), times: 6);
     await tester.pumpAppPastSplash(height: 2400);
@@ -323,7 +324,7 @@ void main() {
   });
 
   testWidgets('counts down to quit day on the last stage', (tester) async {
-    await sl<SavePlan>()(
+    await seedHabit(
       PlanDraft(
         startDay: today.addDays(-10),
         startLimit: 3,
@@ -341,7 +342,7 @@ void main() {
   testWidgets('after the quit date the limit is 0 and the day is smoke-free', (
     tester,
   ) async {
-    await sl<SavePlan>()(
+    await seedHabit(
       PlanDraft(
         startDay: today.addDays(-20),
         startLimit: 4,
@@ -361,13 +362,12 @@ void main() {
   testWidgets("a vaping plan uses the habit's words and triggers", (
     tester,
   ) async {
-    await sl<SaveSettings>()(
-      const AppSettings(
-        habitKind: HabitKind.vaping,
-        reason: 'Breathe easier on my runs',
-      ),
+    await startPlan(
+      today,
+      limit: 12,
+      habit: Habit.vaping,
+      reason: 'Breathe easier on my runs',
     );
-    await startPlan(today, limit: 12);
     await tester.pumpAppPastSplash(height: 2400);
 
     expect(find.text('No sessions logged today. Nice start.'), findsOneWidget);
@@ -384,21 +384,21 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('Save'));
     await tester.pumpInSteps(const Duration(milliseconds: 900));
-    final logs = await storedLogs(tester, habitKind: HabitKind.vaping);
+    final logs = await storedLogs(tester);
     expect(logs.single.trigger, Trigger.work);
-    expect(logs.single.habitKind, HabitKind.vaping);
+    expect(logs.single.habitId, 1);
 
     await tester.disposeApp();
   });
 
   testWidgets('a vape-free day after the quit date', (tester) async {
-    await sl<SaveSettings>()(const AppSettings(habitKind: HabitKind.vaping));
-    await sl<SavePlan>()(
+    await seedHabit(
       PlanDraft(
         startDay: today.addDays(-20),
         startLimit: 4,
         quitDay: today.addDays(-2),
       ),
+      habit: Habit.vaping,
     );
     await tester.pumpAppPastSplash(height: 2400);
 
@@ -410,15 +410,13 @@ void main() {
   });
 
   testWidgets('social media has no money tile', (tester) async {
-    await sl<SaveSettings>()(
-      const AppSettings(habitKind: HabitKind.socialMedia, priceCents: 500),
+    await startPlan(
+      LogicalDay(2026, 10, 14),
+      limit: 20,
+      habit: Habit.socialMedia,
+      priceCents: 500,
     );
-    await startPlan(LogicalDay(2026, 10, 14), limit: 20);
-    await logOn(
-      DateTime(2026, 10, 14, 9),
-      times: 15,
-      habitKind: HabitKind.socialMedia,
-    );
+    await logOn(DateTime(2026, 10, 14, 9), times: 15);
     await tester.pumpAppPastSplash(height: 2400);
 
     await tester.ensureVisible(find.text('Avoided'));
@@ -430,14 +428,16 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets("another habit's logs don't count on Home", (tester) async {
-    const vaping = HabitKind.vaping;
-    await sl<SaveSettings>()(const AppSettings(habitKind: HabitKind.vaping));
-    await startPlan(LogicalDay(2026, 10, 15), limit: 12);
-    await logOn(DateTime(2026, 10, 15, 9), times: 4, habitKind: vaping);
-    await logOn(DateTime(2026, 10, 16, 9), times: 2, habitKind: vaping);
-    await logOn(DateTime(2026, 10, 15, 10), times: 9);
-    await logOn(DateTime(2026, 10, 16, 10), times: 5);
+  testWidgets("a stopped habit's logs don't count on Home", (tester) async {
+    await startPlan(LogicalDay(2026, 10, 15), limit: 12, habit: Habit.vaping);
+    final smoking = (await sl<AddHabit>()(
+      const HabitDraft(habit: Habit.smoking),
+    ) as Success<TrackedHabit>).value.id;
+    await logOn(DateTime(2026, 10, 15, 9), times: 4);
+    await logOn(DateTime(2026, 10, 16, 9), times: 2);
+    await logOn(DateTime(2026, 10, 15, 10), times: 9, habitId: smoking);
+    await logOn(DateTime(2026, 10, 16, 10), times: 5, habitId: smoking);
+    await sl<ArchiveHabit>()(smoking);
     await tester.pumpAppPastSplash(height: 2400);
 
     expect(countText(tester), '2 / 12');
@@ -445,6 +445,20 @@ void main() {
     await tester.ensureVisible(find.text('Avoided'));
     await tester.pumpAndSettle();
     expect(find.text('8 sessions'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('with two habits Home shows the oldest until it lists them', (
+    tester,
+  ) async {
+    await startPlan(today, limit: 12, habit: Habit.vaping);
+    await startPlan(today, limit: 4, habit: Habit.caffeine);
+    await logOn(DateTime(2026, 10, 16, 9), times: 3);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(countText(tester), '3 / 12');
+    expect(find.text('Vaping History'), findsOneWidget);
 
     await tester.disposeApp();
   });

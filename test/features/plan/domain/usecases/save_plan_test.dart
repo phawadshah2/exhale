@@ -26,27 +26,33 @@ void main() {
     quitDay: today.addDays(days),
   );
 
-  setUp(() {
+  late int habit;
+
+  setUp(() async {
     database = createTestDatabase();
     repository = LocalPlanRepository(PlanLocalDataSource(database));
     savePlan = SavePlan(repository);
+    habit = await insertTestHabit(database);
   });
+
+  Future<Result<ReductionPlan>> save(PlanDraft draft) =>
+      savePlan((habitId: habit, draft: draft));
 
   tearDown(() => database.close());
 
   Future<String> rejection(PlanDraft draft) async {
-    final result = await savePlan(draft);
+    final result = await save(draft);
     return ((result as FailureResult<ReductionPlan>).failure
             as ValidationFailure)
         .message;
   }
 
   test('saves a valid draft as the current plan', () async {
-    final result = await savePlan(draft());
+    final result = await save(draft());
 
     final plan = (result as Success<ReductionPlan>).value;
     final history =
-        (await repository.getHistory() as Success<PlanHistory?>).value!;
+        (await repository.getHistory(habit) as Success<PlanHistory?>).value!;
     expect(
       plan,
       ReductionPlan(startDay: today, startLimit: 9, quitDay: today.addDays(56)),
@@ -60,14 +66,14 @@ void main() {
     expect(await rejection(draft(days: 0)), contains('after your start'));
     expect(await rejection(draft(days: -1)), contains('after your start'));
     expect(
-      (await repository.getHistory() as Success<PlanHistory?>).value,
+      (await repository.getHistory(habit) as Success<PlanHistory?>).value,
       isNull,
     );
   });
 
   test('accepts a next-day quit date and any later one', () async {
-    expect(await savePlan(draft(days: 1)), isA<Success<ReductionPlan>>());
-    expect(await savePlan(draft(days: 3650)), isA<Success<ReductionPlan>>());
+    expect(await save(draft(days: 1)), isA<Success<ReductionPlan>>());
+    expect(await save(draft(days: 3650)), isA<Success<ReductionPlan>>());
   });
 
   test('steep plans are allowed but flagged', () {

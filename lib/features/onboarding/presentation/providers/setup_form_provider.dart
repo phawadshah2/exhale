@@ -3,11 +3,12 @@ import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
+import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
+import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
-import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
-import 'package:exhale/features/settings/domain/validation/settings_validation.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:flutter/foundation.dart';
@@ -110,7 +111,7 @@ class SetupFormState {
 
   bool get hasInvalidPrice =>
       priceText.trim().isNotEmpty &&
-      (priceCents == null || priceCents! > SettingsValidation.maxPriceCents);
+      (priceCents == null || priceCents! > HabitValidation.maxPriceCents);
 
   /// The plan this form would create, or null while it is invalid.
   ReductionPlan? get preview => PlanValidation.validate(draft) == null
@@ -219,10 +220,11 @@ class SetupFormController extends Notifier<SetupFormState> {
       state = state.copyWith(priceText: text, errorMessage: () => null);
 
   void setUnitsPerContainer(int value) => state = state.copyWith(
-    unitsPerContainer: value.clamp(1, SettingsValidation.maxUnitsPerContainer),
+    unitsPerContainer: value.clamp(1, HabitValidation.maxUnitsPerContainer),
   );
 
-  /// Saves settings and the plan. Returns true when both are stored.
+  /// Saves the name, then the habit with its plan. Returns true when all
+  /// are stored.
   Future<bool> submit() async {
     if (state.isSubmitting) return false;
     if (state.hasInvalidPrice) {
@@ -231,47 +233,46 @@ class SetupFormController extends Notifier<SetupFormState> {
       );
       return false;
     }
-
-    state = state.copyWith(isSubmitting: true, errorMessage: () => null);
     final form = state;
+    state = state.copyWith(isSubmitting: true, errorMessage: () => null);
+
+    // A second submit (setup reached again) must not add a second habit.
+    final existing = await ref.read(habitRepositoryProvider).getActive();
+    if (!ref.mounted) return false;
+    if (existing case Success(value: [_, ...])) {
+      state = state.copyWith(isSubmitting: false);
+      return true;
+    }
 
     final settingsResult = await ref
         .read(settingsActionsProvider)
-        .update(
-          (current) => current.copyWith(
-            userName: () => form.name,
-            habitKind: form.habitKind,
-            customHabitName: () =>
-                form.habitKind == HabitKind.custom ? form.habit.name : null,
-            customHabitUnit: () =>
-                form.habitKind == HabitKind.custom ? form.habit.unit : null,
-            reason: () =>
-                form.reason.trim().isEmpty ? null : form.reason.trim(),
-            priceCents: () => form.habit.tracksCost ? form.priceCents : null,
-            unitsPerContainer: form.unitsPerContainer,
-          ),
-        );
+        .update((current) => current.copyWith(userName: () => form.name));
     if (!ref.mounted) return false;
     if (settingsResult case FailureResult(:final failure)) {
-      state = state.copyWith(
-        isSubmitting: false,
-        errorMessage: () => failureMessage(failure),
-      );
-      return false;
+      return _fail(failureMessage(failure));
     }
 
-    final planResult = await ref.read(savePlanProvider)(form.draft);
+    final result = await ref.read(startTrackingProvider)((
+      habit: HabitDraft(
+        habit: form.habit,
+        reason: form.reason,
+        priceCents: form.habit.tracksCost ? form.priceCents : null,
+        unitsPerContainer: form.unitsPerContainer,
+      ),
+      plan: form.draft,
+    ));
     if (!ref.mounted) return false;
-    if (planResult case FailureResult(:final failure)) {
-      state = state.copyWith(
-        isSubmitting: false,
-        errorMessage: () => failureMessage(failure),
-      );
-      return false;
+    if (result case FailureResult(:final failure)) {
+      return _fail(failureMessage(failure));
     }
 
     state = state.copyWith(isSubmitting: false);
     return true;
+  }
+
+  bool _fail(String message) {
+    state = state.copyWith(isSubmitting: false, errorMessage: () => message);
+    return false;
   }
 
   /// Keeps the quit date tied to the chosen preset, or after the start for

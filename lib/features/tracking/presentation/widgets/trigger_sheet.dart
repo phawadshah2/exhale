@@ -1,6 +1,7 @@
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_sheet.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/presentation/widgets/trigger_picker.dart';
 import 'package:flutter/material.dart';
@@ -22,15 +23,21 @@ class TriggerAnswer {
 /// off for future logs (shown on the first log).
 Future<TriggerAnswer?> showTriggerSheet(
   BuildContext context, {
+  required HabitKind habitKind,
   bool offerToStopAsking = false,
 }) => showAppSheet<TriggerAnswer>(
   context,
-  builder: (context) => _TriggerSheet(offerToStopAsking: offerToStopAsking),
+  builder: (context) =>
+      _TriggerSheet(habitKind: habitKind, offerToStopAsking: offerToStopAsking),
 );
 
 class _TriggerSheet extends StatefulWidget {
-  const _TriggerSheet({required this.offerToStopAsking});
+  const _TriggerSheet({
+    required this.habitKind,
+    required this.offerToStopAsking,
+  });
 
+  final HabitKind habitKind;
   final bool offerToStopAsking;
 
   @override
@@ -68,6 +75,7 @@ class _TriggerSheetState extends State<_TriggerSheet> {
           ),
           const SizedBox(height: AppSpacing.lg),
           TriggerPicker(
+            habitKind: widget.habitKind,
             selected: _selected,
             onChanged: (trigger) => setState(() => _selected = trigger),
           ),

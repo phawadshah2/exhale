@@ -6,12 +6,15 @@ import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/repositories/plan_repository.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
 
-class SavePlan implements UseCase<ReductionPlan, PlanDraft> {
+typedef SavePlanInput = ({int habitId, PlanDraft draft});
+
+class SavePlan implements UseCase<ReductionPlan, SavePlanInput> {
   const SavePlan(this._repository);
   final PlanRepository _repository;
 
   @override
-  Future<Result<ReductionPlan>> call(PlanDraft draft) async {
+  Future<Result<ReductionPlan>> call(SavePlanInput input) async {
+    final draft = input.draft;
     final error = PlanValidation.validate(draft);
     if (error != null) {
       return FailureResult<ReductionPlan>(ValidationFailure(error));
@@ -22,7 +25,7 @@ class SavePlan implements UseCase<ReductionPlan, PlanDraft> {
       startLimit: draft.startLimit,
       quitDay: draft.quitDay,
     );
-    return switch (await _repository.savePlan(plan)) {
+    return switch (await _repository.savePlan(input.habitId, plan)) {
       Success() => Success<ReductionPlan>(plan),
       FailureResult(:final failure) => FailureResult<ReductionPlan>(failure),
     };

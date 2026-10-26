@@ -14,7 +14,6 @@ import 'package:exhale/features/home/presentation/widgets/backward_pager.dart';
 import 'package:exhale/features/home/presentation/widgets/progress_ring.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
-import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
@@ -28,13 +27,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// The selected day's count against its limit. Swipe the ring, or use the
 /// arrows, to move between days from [earliestDayProvider] up to today.
 class DayCard extends ConsumerWidget {
-  const DayCard({super.key});
+  const DayCard({required this.habitId, required this.habit, super.key});
+
+  final int habitId;
+  final Habit habit;
 
   static const double _ringSize = 220;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final history = ref.watch(planHistoryProvider).value;
+    final history = ref.watch(planHistoryProvider(habitId)).value;
     if (history == null) {
       return const SizedBox(
         height: 360,
@@ -45,10 +47,11 @@ class DayCard extends ConsumerWidget {
     final colors = context.colors;
     final text = context.textTheme;
     final today = ref.watch(todayProvider);
-    final earliest = ref.watch(earliestDayProvider);
-    final day = ref.watch(selectedDayProvider);
-    final habit = ref.watch(habitProvider);
-    final progress = ref.watch(dayProgressProvider(day)).value;
+    final earliest = ref.watch(earliestDayProvider(habitId));
+    final day = ref.watch(selectedDayProvider(habitId));
+    final progress = ref
+        .watch(dayProgressProvider((habitId: habitId, day: day)))
+        .value;
     final isToday = day == today;
     final beforePlan = day.isBefore(history.firstDay);
     final page = today.daysSince(day);
@@ -99,6 +102,7 @@ class DayCard extends ConsumerWidget {
                     onPageChanged: (index) =>
                         picker.pick(today.addDays(-index)),
                     itemBuilder: (context, index) => _DayRing(
+                      habitId: habitId,
                       day: today.addDays(-index),
                       history: history,
                       habit: habit,
@@ -137,7 +141,12 @@ class DayCard extends ConsumerWidget {
             Divider(color: colors.outlineVariant.withValues(alpha: 0.4)),
             const SizedBox(height: AppSpacing.md),
             if (isToday)
-              _TodayDetails(history: history, today: today, habit: habit)
+              _TodayDetails(
+                habitId: habitId,
+                history: history,
+                today: today,
+                habit: habit,
+              )
             else if (beforePlan)
               _Details(
                 left: (AppIcons.trendDown, 'Limit', 'None yet'),
@@ -165,14 +174,16 @@ class DayCard extends ConsumerWidget {
               children: [
                 Expanded(
                   child: TextButton.icon(
-                    onPressed: () => showDayDetailSheet(context, day),
+                    onPressed: () =>
+                        showDayDetailSheet(context, habitId: habitId, day: day),
                     icon: const Icon(AppIcons.clock, size: 18),
                     label: const Text('View logs'),
                   ),
                 ),
                 Expanded(
                   child: TextButton.icon(
-                    onPressed: () => showLogEditorSheet(context, day: day),
+                    onPressed: () =>
+                        showLogEditorSheet(context, habitId: habitId, day: day),
                     icon: const Icon(AppIcons.add, size: 18),
                     label: const Text('Add missed log'),
                   ),
@@ -189,18 +200,22 @@ class DayCard extends ConsumerWidget {
 /// One page of the pager: the ring for [day].
 class _DayRing extends ConsumerWidget {
   const _DayRing({
+    required this.habitId,
     required this.day,
     required this.history,
     required this.habit,
   });
 
+  final int habitId;
   final LogicalDay day;
   final PlanHistory history;
   final Habit habit;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progress = ref.watch(dayProgressProvider(day)).value;
+    final progress = ref
+        .watch(dayProgressProvider((habitId: habitId, day: day)))
+        .value;
     if (progress == null) {
       return const Center(child: CircularProgressIndicator.adaptive());
     }
@@ -285,11 +300,13 @@ class _TodayChip extends StatelessWidget {
 
 class _TodayDetails extends ConsumerWidget {
   const _TodayDetails({
+    required this.habitId,
     required this.history,
     required this.today,
     required this.habit,
   });
 
+  final int habitId;
   final PlanHistory history;
   final LogicalDay today;
   final Habit habit;
@@ -297,7 +314,7 @@ class _TodayDetails extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = ref.watch(nowProvider).value ?? ref.watch(clockProvider).now();
-    final latest = ref.watch(latestLogProvider).value;
+    final latest = ref.watch(latestLogProvider(habitId)).value;
     final plan = history.planOn(today);
 
     final String sinceLast;

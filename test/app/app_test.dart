@@ -4,7 +4,6 @@ import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/theme/app_palette.dart';
 import 'package:exhale/core/theme/app_theme.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
-import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
@@ -64,7 +63,7 @@ void main() {
   testWidgets('a returning user lands on home and can log and undo', (
     tester,
   ) async {
-    await sl<SavePlan>()(
+    await seedHabit(
       PlanDraft(
         startDay: LogicalDay(2026, 10, 16),
         startLimit: 2,
@@ -95,7 +94,7 @@ void main() {
   });
 
   testWidgets('theme choice in settings is saved and applied', (tester) async {
-    await sl<SavePlan>()(
+    await seedHabit(
       PlanDraft(
         startDay: LogicalDay(2026, 10, 16),
         startLimit: 9,
@@ -123,7 +122,7 @@ void main() {
   testWidgets('the trigger prompt can be turned off in settings', (
     tester,
   ) async {
-    await sl<SavePlan>()(
+    await seedHabit(
       PlanDraft(
         startDay: LogicalDay(2026, 10, 16),
         startLimit: 9,
@@ -151,7 +150,7 @@ void main() {
   });
 
   testWidgets('a new accent re-tints the app and is saved', (tester) async {
-    await sl<SavePlan>()(
+    await seedHabit(
       PlanDraft(
         startDay: LogicalDay(2026, 10, 16),
         startLimit: 9,

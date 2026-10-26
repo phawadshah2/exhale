@@ -27,7 +27,7 @@
 1. **Logs between midnight and the reset hour (4 AM)** belong to the previous logical day in period stats, trigger breakdowns, Logs day groups and the All-time series. Test owner: Task 2.1.
 2. **Plan edited mid-period:** "allowed" sums each day's own limit from the plan in force that day, not today's limit. Test owner: Task 2.1.
 3. **Habit archived while its dashboard or Logs filter is open:** the app returns to Home and never throws. Test owner: Task 4.3.
-4. **Upgrading a real v7 database** with a null price, logs of another kind (developer data) and two plans keeps every plan and log. Test owner: Task 1.2.
+4. **Upgrading a real v7 database** with a null price, logs stamped with another kind and two plans keeps every plan and log on habit 1. Test owner: Task 1.2.
 5. **A period entirely before the plan or a plan starting tomorrow:** allowed is 0, average is null (shown as "—"), no division by zero. Test owner: Task 2.1.
 
 ---
@@ -73,11 +73,11 @@
 - Test: `test/core/data/app_database_migration_test.dart`
 
 **Interfaces:**
-- Produces: schema v8 as in spec §6. Migration `from < 8`, in one transaction: create `habits`; insert habit id 1 from the settings row; insert one archived habit per other distinct `habit_logs.habit_kind`; rebuild `plans` with `habit_id = 1`; rebuild `habit_logs` mapping `habit_kind` → that habit's id; rebuild `settings` without the moved columns. Older versions run their existing steps first, then this one.
+- Produces: schema v8 as in spec §6. Migration `from < 8`, in one transaction: create `habits`; insert habit id 1 from the settings row; rebuild `plans` and `habit_logs` with `habit_id = 1` (v7's `habit_kind` came from the column default and is ignored); rebuild `settings` without the moved columns. Older versions run their existing steps first, then this one.
 
 - [ ] **Step 1: Write failing tests** in `app_database_migration_test.dart`:
   - `upgrade from v7 keeps the habit, plans and logs`: open the fixture copy; expect `user_version` 8; one active habit whose kind and reason match the fixture's settings; plan count unchanged and all `habit_id = 1`; log count unchanged.
-  - `logs of another kind become an archived habit` (in-memory v7 schema built in the test with one `smoking` and one `vaping` log while settings say `vaping`): two habits, the smoking one archived, each log points at its kind's habit.
+  - `logs of every kind join habit 1` (in-memory v7 schema built in the test with one `smoking` and two `vaping` logs while settings say `vaping`): one active vaping habit; every log has `habit_id = 1`.
   - `null price survives`: price null → `priceCents` null.
   - Existing v1, v2 and v5 upgrade tests now expect v8 and assert plans and logs carry `habit_id` 1.
 - [ ] **Step 2: Run** `fvm flutter test test/core/data/app_database_migration_test.dart` — expect FAIL.
