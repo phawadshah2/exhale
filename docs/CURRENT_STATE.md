@@ -22,7 +22,10 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
   start day; `daysOnTrack` counts days not over their limit; `logged` ignores
   logs before the plan.
 
-- M2 Task 2.2, written, tests passing (Fawad ran them), not yet committed:
+- M2 Task 2.2, committed (tree clean at handoff). Checks: `fvm flutter test
+  test/features/home` 29 passed; analyze and format were clean before the
+  last test edit (not rerun after); full suite run by Fawad, passed (his
+  report, not observed by me). Built:
   `HabitDashboard` + `DashboardHeaderKind`, `DashboardHeader`, `PlanCard`,
   `TodayLogsCard`, `HabitDetailsPage` stub on `/habit/:habitId`,
   `AppFormat.shortWeekdayDate`. Section order per spec §4.3; quote card kept
@@ -34,8 +37,9 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
 ## Next action
 
 Task 2.3, Ring card (plan section "Task 2.3" only), on `feat/dashboard-stats`.
-Suggested: Sonnet 5.5, medium effort. Commit Task 2.2 first
-(`feat(home): habit dashboard as Home`).
+Suggested: Sonnet 5.5, medium effort. Task 2.3 commit message:
+`feat(home): ring card states and trigger breakdown` (adjust to the plan's
+checkpoint line).
 
 1. Read the Task 2.3 section and spec §4.4, then `day_card.dart` and the
    matching design (`Main.dc.html`, `StateOver.dc.html`, `StateFirstDay.dc.html`,
