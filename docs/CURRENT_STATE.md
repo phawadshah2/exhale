@@ -40,32 +40,26 @@ In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
   `ringDayProvider`/`ringShownDayProvider`; ring tests in
   `test/features/home/ring_card_test.dart`; matched to the canvas designs.
 
+- M2 Task 2.5 (Logs page), written and awaiting commit. Logs tests (9) passed as observed by me; format, analyze and the full suite were run by Fawad and passed (his report, not observed by me). Added
+  `lib/features/logs/` (`LogsQuery` + `openLogs`, `logs_providers.dart`,
+  `LogsPage`, `LogsPeriodCard`, `LogsDayCard`, `DayGroup`, `LogRow`), route
+  `/logs`, tests in `test/features/logs/`. Ring "View logs" and the ring's
+  trigger rows now call `openLogs` (header gains "· TAP TO SEE LOGS");
+  `day_detail_sheet.dart` deleted; two `home_page_test.dart` day-sheet tests
+  and two `ring_card_test.dart` header asserts migrated, one ring test added.
+  Choices: single habit only (habit tabs and All come in 4.4; `habitId`
+  null falls back to the primary habit); swipe delete confirms, deletes and
+  snaps back (the stream removes the row); "No trigger" chip is not
+  tappable (a `Trigger?` filter cannot express it); no month/trigger
+  dropdown from the design.
+
 ## Next action
 
-Task 2.3 is done. Start Task 2.5 now (see below); no work is in progress.
-
-**Do Task 2.5 (Logs page) before Task 2.4 (History card).** 2.4's taps, and the
-ring's trigger rows, all need `LogsQuery` / `openLogs` from 2.5. The plan's
-"Task 2.6" references mean 2.5. Suggested: Sonnet 5.5, medium effort (new
-feature, so a fresh session). Commit message per the plan:
-`feat(logs): logs page with filters, allowed counts and swipe delete`.
-
-Read first: plan "Task 2.5", spec §4.6, designs `Logs.dc.html` and
-`LogsFiltered.dc.html` (canvas
-https://claude.ai/artifact/Es7ju6TWmMj5pkNon4tbHu is the source of truth).
-Reuse from `day_detail_sheet.dart` (to be deleted): the confirm-delete flow
-(`showAppConfirm`, `deleteHabitLogProvider`, `failureMessage`). The router has
-no `/logs` yet (`app_router.dart`, `app_routes.dart`). The ring's "View logs"
-button (`ring_card.dart`) calls `showDayDetailSheet`: switch it to `openLogs`.
-
-After 2.5: wire `DayTriggers.onSelect` in `ring_card.dart` to `openLogs`
-(this also adds "· TAP TO SEE LOGS" to its header; add that test), then Task
-2.4 with its taps wired, then the M2 independent review (Opus 5.5, high) and
-the full suite. Once the one-habit Home is complete, ask Fawad before running
-the simulator to review it against the canvas.
-
-Not built, deliberately: the after-quit-date ring state and "You reached your
-quit date" card (`StateQuit`), because Edit plan does not exist yet.
+Commit Task 2.5 (`feat(logs): logs page with filters, allowed counts and
+swipe delete`). Then Task 2.4 (History card): give it its own anchor and wire
+its taps to `openLogs`; then the M2 independent review (Opus 5.5, high) and a
+simulator check of every Logs entry point (ask first). Suggested: Sonnet 5.5,
+medium, fresh session.
 
 Ring/History decoupling: History still uses `pickedDayProvider` /
 `selectedDayProvider` until 2.4 gives it its own anchor.

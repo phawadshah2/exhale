@@ -172,7 +172,7 @@ void main() {
     await logAt(DateTime(2026, 10, 16, 11), trigger: Trigger.coffee);
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text("TODAY'S TRIGGERS"), findsOneWidget);
+    expect(find.text("TODAY'S TRIGGERS · TAP TO SEE LOGS"), findsOneWidget);
     expect(find.text('2 · 40%'), findsOneWidget);
     expect(find.text('1 · 20%'), findsNWidgets(2));
     expect(
@@ -186,6 +186,28 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets("a trigger row opens that day's logs for the trigger", (
+    tester,
+  ) async {
+    await startPlan(LogicalDay(2026, 10, 14));
+    await logAt(DateTime(2026, 10, 16, 8), times: 2, trigger: Trigger.stress);
+    await logAt(DateTime(2026, 10, 16, 10), trigger: Trigger.work);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tapAndSettle(
+      tester,
+      find.descendant(
+        of: find.byType(DayTriggers),
+        matching: find.text('Stress'),
+      ),
+    );
+
+    expect(find.text('Logs'), findsOneWidget);
+    expect(find.text('2 of 3 logs today · 67%'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
   testWidgets("a past day shows that day's triggers", (tester) async {
     await startPlan(LogicalDay(2026, 10, 14));
     await logAt(DateTime(2026, 10, 15, 9), trigger: Trigger.work);
@@ -193,7 +215,7 @@ void main() {
 
     await tapAndSettle(tester, find.byTooltip('Previous day'));
 
-    expect(find.text("THAT DAY'S TRIGGERS"), findsOneWidget);
+    expect(find.text("THAT DAY'S TRIGGERS · TAP TO SEE LOGS"), findsOneWidget);
     expect(find.text('Work'), findsOneWidget);
     expect(find.text('1 · 100%'), findsOneWidget);
 

@@ -3,6 +3,8 @@ import 'package:exhale/app/shell/app_shell.dart';
 import 'package:exhale/features/design_system/presentation/design_system_page.dart';
 import 'package:exhale/features/home/presentation/pages/habit_details_page.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
+import 'package:exhale/features/logs/presentation/logs_query.dart';
+import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/habit_picker_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/setup_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
@@ -34,6 +36,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => HabitDetailsPage(
           habitId: int.parse(state.pathParameters['habitId']!),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.logs,
+        builder: (context, state) =>
+            LogsPage(query: LogsQuery.fromUri(state.uri)),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>

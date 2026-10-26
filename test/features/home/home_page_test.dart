@@ -264,20 +264,20 @@ void main() {
     await tester.scrollAndTap(find.text('View logs'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Day Detail'), findsOneWidget);
-    expect(find.text('2 of 9 logged'), findsOneWidget);
+    expect(find.text('Logs'), findsOneWidget);
+    expect(find.text('2 logged'), findsOneWidget);
 
-    await tester.tap(find.byTooltip('Delete').first);
+    await tester.drag(find.byType(Dismissible).first, const Offset(-500, 0));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
 
-    expect(find.text('1 of 9 logged'), findsOneWidget);
+    expect(find.text('1 logged'), findsOneWidget);
 
     await tester.disposeApp();
   });
 
-  testWidgets('a missed log can be added from the day sheet', (tester) async {
+  testWidgets('a missed log can be added from the logs page', (tester) async {
     await startPlan(LogicalDay(2026, 10, 14));
     await logOn(DateTime(2026, 10, 15, 9));
     await tester.pumpAppPastSplash(height: 2400);
@@ -285,14 +285,14 @@ void main() {
     await tapAndSettle(tester, find.byTooltip('Previous day'));
     await tester.scrollAndTap(find.text('View logs'));
     await tester.pumpAndSettle();
-    await tester.scrollAndTap(find.text('Add missed log').last);
+    await tester.tap(find.byTooltip('Add a missed log'));
     await tester.pumpAndSettle();
 
     expect(find.text('12:00 PM'), findsOneWidget);
     await tester.scrollAndTap(find.text('Add log'));
     await tester.pumpAndSettle();
 
-    expect(find.text('2 of 9 logged'), findsOneWidget);
+    expect(find.text('2 logged'), findsOneWidget);
 
     await tester.disposeApp();
   });

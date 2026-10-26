@@ -14,6 +14,7 @@ import 'package:exhale/features/home/presentation/providers/home_providers.dart'
 import 'package:exhale/features/home/presentation/widgets/backward_pager.dart';
 import 'package:exhale/features/home/presentation/widgets/day_triggers.dart';
 import 'package:exhale/features/home/presentation/widgets/progress_ring.dart';
+import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
@@ -21,7 +22,6 @@ import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
-import 'package:exhale/features/tracking/presentation/widgets/day_detail_sheet.dart';
 import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -183,15 +183,29 @@ class RingCard extends ConsumerWidget {
               ),
             if (!beforePlan) ...[
               const SizedBox(height: AppSpacing.md),
-              DayTriggers(habitId: habitId, day: day),
+              DayTriggers(
+                habitId: habitId,
+                day: day,
+                onSelect: (trigger) => openLogs(
+                  context,
+                  LogsQuery(
+                    habitId: habitId,
+                    from: day,
+                    to: day,
+                    trigger: trigger,
+                  ),
+                ),
+              ),
             ],
             const SizedBox(height: AppSpacing.sm),
             Row(
               children: [
                 Expanded(
                   child: TextButton.icon(
-                    onPressed: () =>
-                        showDayDetailSheet(context, habitId: habitId, day: day),
+                    onPressed: () => openLogs(
+                      context,
+                      LogsQuery(habitId: habitId, from: day, to: day),
+                    ),
                     icon: const Icon(AppIcons.clock, size: 18),
                     label: const Text('View logs'),
                   ),
