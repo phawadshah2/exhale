@@ -22,8 +22,12 @@ log each use with one tap (logging is always allowed, even over the limit).
 ## Working rules (Fawad's preferences)
 
 - **Git:** you create branches and edit files only. Fawad commits and pushes.
-  At each checkpoint, give him a Conventional Commit message
-  (`.githooks/commit-msg` enforces it). Never add Co-Authored-By trailers.
+  At each checkpoint, give him the git commands in order with a Conventional
+  Commit message (`.githooks/commit-msg` enforces it), as set out in his
+  global session rhythm. Branches are `feat/<name>` off an up-to-date `main`.
+  Never add Co-Authored-By trailers.
+- **Model per task:** the global default applies. Use Opus 5.5 (high) for each
+  milestone-end independent review and for Task 4.1–4.4 (multi-habit).
 - **Toolchain:** only `fvm flutter` / `fvm dart` (Flutter 3.47.2, Dart 3.13).
   Never `gem install`, `fvm global` or Homebrew node.
 - **Style:** no tutorials, teaching comments or learning notes. Keep
