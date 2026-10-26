@@ -130,6 +130,12 @@ class RingCard extends ConsumerWidget {
                 ],
               ),
             ),
+            if (isToday &&
+                progress != null &&
+                progress.status == LimitStatus.over) ...[
+              const SizedBox(height: AppSpacing.md),
+              _OverNote(tomorrowLimit: history.limitOn(day.addDays(1))),
+            ],
             if (isToday && progress != null && progress.count == 0) ...[
               const SizedBox(height: AppSpacing.md),
               _Note(
@@ -144,7 +150,12 @@ class RingCard extends ConsumerWidget {
             Divider(color: colors.outlineVariant.withValues(alpha: 0.4)),
             const SizedBox(height: AppSpacing.md),
             if (isToday)
-              _TodayDetails(habitId: habitId, history: history, today: today)
+              _TodayDetails(
+                habitId: habitId,
+                history: history,
+                today: today,
+                habit: habit,
+              )
             else if (beforePlan)
               _Details(
                 left: (AppIcons.trendDown, 'Limit', 'None yet', null),
@@ -160,7 +171,7 @@ class RingCard extends ConsumerWidget {
                 left: (
                   AppIcons.trendDown,
                   'Limit that day',
-                  '${progress.limit}',
+                  '${progress.limit} ${habit.units}',
                   null,
                 ),
                 right: (
@@ -308,11 +319,25 @@ class _TodayDetails extends ConsumerWidget {
     required this.habitId,
     required this.history,
     required this.today,
+    required this.habit,
   });
 
   final int habitId;
   final PlanHistory history;
   final LogicalDay today;
+  final Habit habit;
+
+  String _nextTarget() {
+    final plan = history.planOn(today);
+    final days = plan.daysUntilNextDrop(today);
+    if (days == null) return habit.freeTitle;
+    final next = plan.limitOn(plan.nextDropOn(today)!);
+    return next == 0
+        ? (days == 1 ? 'Quit day tomorrow' : 'Quit day in ${days}d')
+        : (days == 1
+              ? 'Drops to $next tomorrow'
+              : 'Drops to $next in ${days}d');
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -333,16 +358,21 @@ class _TodayDetails extends ConsumerWidget {
       entryDetail = AppFormat.time(latest.loggedAt);
     }
 
-    final trigger = latest?.trigger;
-    final note = latest?.note;
+    final _Cell right;
+    if (latest == null) {
+      right = (AppIcons.trendDown, 'Next target', _nextTarget(), null);
+    } else {
+      final note = latest.note;
+      right = (
+        AppIcons.stress,
+        'Last trigger',
+        latest.trigger?.label ?? 'None',
+        note == null || note.isEmpty ? null : note,
+      );
+    }
     return _Details(
       left: (AppIcons.clock, 'Last entry', entry, entryDetail),
-      right: (
-        AppIcons.trendDown,
-        'Last trigger',
-        trigger?.label ?? 'None',
-        note == null || note.isEmpty ? null : note,
-      ),
+      right: right,
     );
   }
 }
@@ -396,7 +426,7 @@ class _RingCentre extends StatelessWidget {
         isToday
             ? '${progress.remaining} left today'
             : '${progress.remaining} under limit',
-        '$percent% of daily limit',
+        '$percent% of ${isToday ? 'daily' : "that day's"} limit',
         colors.primary,
       ),
       LimitStatus.at => (
@@ -408,7 +438,7 @@ class _RingCentre extends StatelessWidget {
         '${progress.overBy} over limit',
         percent == null
             ? (isToday ? 'Target is 0 today' : 'Target was 0')
-            : '$percent% of daily limit',
+            : '$percent% of ${isToday ? 'daily' : "that day's"} limit',
         context.exhale.danger.foreground,
       ),
     };
@@ -464,6 +494,31 @@ class _BeforePlanCentre extends StatelessWidget {
           style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
         ),
       ],
+    );
+  }
+}
+
+class _OverNote extends StatelessWidget {
+  const _OverNote({required this.tomorrowLimit});
+
+  final int tomorrowLimit;
+
+  @override
+  Widget build(BuildContext context) {
+    final danger = context.exhale.danger.foreground;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: danger.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: danger.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        'A harder day. Tomorrow starts fresh at $tomorrowLimit, and your '
+        'streak picks up again from there.',
+        style: context.textTheme.bodyMedium,
+      ),
     );
   }
 }

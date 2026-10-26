@@ -50,10 +50,18 @@ spec §4.4). History still uses `pickedDayProvider`/`selectedDayProvider` until
 Task 2.4 gives it its own anchor, so the ring and chart no longer move
 together (the old "ring and chart move together" test was removed).
 
+Matched to `design/6._home_details_logs` (`Main`, `StateOver`, `StateFirstDay`,
+`StatePastDay`): tinted triggers box with uppercase header and rank-coloured
+bars, bolt icon on Last trigger, Next target kept when nothing is logged
+(restored), "that day's limit" caption and "N units" on past days, over-limit
+note (today only), dashed first-day placeholder. Format, analyze and the
+full suite (263) were rerun after this.
+
 Left for later: trigger rows do not open Logs until Task 2.6 (wire `onSelect`
-with `LogsQuery` and add that test then); the over-limit note, before-plan and
-after-quit-date states from spec §4.4 are not built; the first-day triggers
-placeholder has a solid border, not dashed.
+with `LogsQuery`, which also adds "· TAP TO SEE LOGS" to the header, and add
+that test then); the after-quit-date state (`StateQuit`: full green ring,
+"N days vape-free", "You reached your quit date" card with Keep at zero / New
+goal) is not built because Edit plan does not exist yet.
 
 Then Tasks 2.4–2.5, then the M2 independent review (Opus 5.5, high) and a
 full-suite run before merging.

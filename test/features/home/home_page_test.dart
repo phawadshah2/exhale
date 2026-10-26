@@ -96,7 +96,7 @@ void main() {
     );
     expect(find.text('Stage 1 of 9 · Daily limit: 9'), findsOneWidget);
     expect(find.text('Plan started today'), findsOneWidget);
-    expect(find.text('Last trigger'), findsOneWidget);
+    expect(find.text('Drops to 8 in 7d'), findsOneWidget);
     expect(find.text('D1'), findsOneWidget);
 
     await tester.disposeApp();
@@ -324,6 +324,7 @@ void main() {
     );
     await tester.pumpAppPastSplash(height: 2400);
 
+    expect(find.text('Quit day in 3d'), findsOneWidget);
     expect(find.text('Stage 3 of 3 · Daily limit: 1'), findsOneWidget);
 
     await tester.disposeApp();

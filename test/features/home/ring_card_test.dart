@@ -172,7 +172,7 @@ void main() {
     await logAt(DateTime(2026, 10, 16, 11), trigger: Trigger.coffee);
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text("Today's triggers"), findsOneWidget);
+    expect(find.text("TODAY'S TRIGGERS"), findsOneWidget);
     expect(find.text('2 · 40%'), findsOneWidget);
     expect(find.text('1 · 20%'), findsNWidgets(2));
     expect(
@@ -193,7 +193,7 @@ void main() {
 
     await tapAndSettle(tester, find.byTooltip('Previous day'));
 
-    expect(find.text("That day's triggers"), findsOneWidget);
+    expect(find.text("THAT DAY'S TRIGGERS"), findsOneWidget);
     expect(find.text('Work'), findsOneWidget);
     expect(find.text('1 · 100%'), findsOneWidget);
 
@@ -204,7 +204,10 @@ void main() {
     await startPlan(today);
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text('Triggers show up here as you log.'), findsOneWidget);
+    expect(
+      find.text("Today's triggers show here once you log."),
+      findsOneWidget,
+    );
 
     await tester.disposeApp();
   });
@@ -224,6 +227,19 @@ void main() {
     await tester.ensureVisible(find.text('This week'));
     await tester.pumpAndSettle();
     expect(find.text('This week'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('going over the limit shows a supportive note', (tester) async {
+    await startPlan(LogicalDay(2026, 10, 14), limit: 3);
+    await logAt(DateTime(2026, 10, 16, 9), times: 5);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(
+      find.textContaining('A harder day. Tomorrow starts fresh at'),
+      findsOneWidget,
+    );
 
     await tester.disposeApp();
   });
