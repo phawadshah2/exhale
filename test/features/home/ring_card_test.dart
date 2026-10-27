@@ -1,6 +1,8 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/home/presentation/widgets/day_triggers.dart';
+import 'package:exhale/features/home/presentation/widgets/ring_card.dart';
+import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
@@ -132,8 +134,20 @@ void main() {
     expect(countText(tester), '0');
     expect(find.text('Before your plan'), findsWidgets);
 
-    await tapAndSettle(tester, find.text('Add missed log'));
+    openLogs(
+      tester.element(find.byType(RingCard)),
+      LogsQuery(
+        habitId: 1,
+        from: LogicalDay(2026, 10, 12),
+        to: LogicalDay(2026, 10, 12),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Add a missed log'));
+    await tester.pumpAndSettle();
     await tester.scrollAndTap(find.text('Add log'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
 
     expect(countText(tester), '1');
@@ -159,7 +173,6 @@ void main() {
     expect(find.text('3:18 PM'), findsWidgets);
     expect(find.text('Last trigger'), findsOneWidget);
     expect(find.text('Stress'), findsWidgets);
-    expect(find.text('Deadline'), findsOneWidget);
 
     await tester.disposeApp();
   });

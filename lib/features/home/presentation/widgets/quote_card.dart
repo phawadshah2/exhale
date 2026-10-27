@@ -23,9 +23,9 @@ class QuoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
+        color: colors.surfaceContainerHigh,
         borderRadius: AppRadius.inner,
         border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.4)),
       ),

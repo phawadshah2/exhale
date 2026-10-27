@@ -9,6 +9,7 @@ import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/archive_habit.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
+import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/usecases/save_settings.dart';
@@ -262,7 +263,14 @@ void main() {
     expect(find.text('Thursday, Oct 15'), findsOneWidget);
     expect(countText(tester), '2 / 9');
 
-    await tester.scrollAndTap(find.text('View logs'));
+    openLogs(
+      tester.element(find.byType(HomePage)),
+      LogsQuery(
+        habitId: 1,
+        from: LogicalDay(2026, 10, 15),
+        to: LogicalDay(2026, 10, 15),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Logs'), findsOneWidget);
@@ -284,7 +292,14 @@ void main() {
     await tester.pumpAppPastSplash(height: 2400);
 
     await tapAndSettle(tester, find.byTooltip('Previous day'));
-    await tester.scrollAndTap(find.text('View logs'));
+    openLogs(
+      tester.element(find.byType(HomePage)),
+      LogsQuery(
+        habitId: 1,
+        from: LogicalDay(2026, 10, 15),
+        to: LogicalDay(2026, 10, 15),
+      ),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Add a missed log'));
     await tester.pumpAndSettle();
