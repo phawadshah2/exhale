@@ -65,12 +65,17 @@ void main() {
 
     expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
     expect(find.text('4 of 9 allowed'), findsOneWidget);
-    expect(find.text('Thu, Oct 15'), findsOneWidget);
+    expect(find.text('Yesterday · Thu, Oct 15'), findsOneWidget);
     expect(find.text('3 of 9 allowed'), findsOneWidget);
     expect(find.text('Wed, Oct 14'), findsOneWidget);
     expect(find.text('0 of 9 allowed'), findsOneWidget);
     expect(find.text('Add a missed log for this day'), findsOneWidget);
     expect(find.text('7 logged'), findsOneWidget);
+    expect(find.text('No trigger'), findsWidgets);
+    expect(
+      find.text('Tap a log to edit · swipe left to delete'),
+      findsOneWidget,
+    );
 
     await tester.disposeApp();
   });
@@ -128,7 +133,7 @@ void main() {
 
     await tester.drag(find.byType(Dismissible).first, const Offset(-500, 0));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Delete'));
+    await tester.tap(find.text('Delete').last);
     await tester.pumpAndSettle();
 
     expect(find.text('1 of 9 allowed'), findsOneWidget);

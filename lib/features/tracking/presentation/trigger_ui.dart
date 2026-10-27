@@ -1,4 +1,5 @@
 import 'package:exhale/core/presentation/app_icons.dart';
+import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:flutter/widgets.dart';
 
@@ -47,5 +48,17 @@ extension TriggerUi on Trigger {
     Trigger.watchingTv => AppIcons.watchingTv,
     Trigger.notification => AppIcons.notification,
     Trigger.avoidingTasks => AppIcons.avoidingTasks,
+  };
+
+  /// Stress and its kin read coral, work and fatigue amber, the rest teal.
+  Color tint(BuildContext context) => switch (this) {
+    Trigger.stress ||
+    Trigger.lonely ||
+    Trigger.avoidingTasks => context.exhale.danger.foreground,
+    Trigger.work ||
+    Trigger.tired ||
+    Trigger.lateNight ||
+    Trigger.bedtime => context.exhale.warning.foreground,
+    _ => context.colors.primary,
   };
 }

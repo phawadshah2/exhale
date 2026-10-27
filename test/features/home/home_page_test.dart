@@ -124,6 +124,21 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('trigger sheet names the habit and the count after this log', (
+    tester,
+  ) async {
+    await startPlan(today);
+    await logOn(DateTime(2026, 10, 16, 9), times: 4);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.scrollAndTap(find.byTooltip('Log'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Smoking · 5 of 9 after this'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('skipping the trigger still logs', (tester) async {
     await startPlan(today);
     await tester.pumpAppPastSplash(height: 2400);
@@ -278,7 +293,7 @@ void main() {
 
     await tester.drag(find.byType(Dismissible).first, const Offset(-500, 0));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Delete'));
+    await tester.tap(find.text('Delete').last);
     await tester.pumpAndSettle();
 
     expect(find.text('1 logged'), findsOneWidget);
@@ -499,6 +514,10 @@ void main() {
     await startPlan(LogicalDay(2026, 10, 14));
     await tester.pumpAppPastSplash(height: 2400);
 
+    expect(find.text('Stage 1 / 9'), findsOneWidget);
+    expect(find.text('Oct 14'), findsOneWidget);
+    expect(find.text('Dec 16'), findsOneWidget);
+    expect(find.text('Since Wed, Oct 14'), findsOneWidget);
     expect(find.text('Stage 1 · 9 a day (now)'), findsOneWidget);
     expect(find.text('Stage 2 · 8 a day'), findsOneWidget);
     expect(find.text('Starts Wed, Oct 21'), findsOneWidget);

@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-10-26. Roadmap:
+Updated 2026-10-27. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`; tasks in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`.
 
@@ -91,34 +91,37 @@ states). The plan's Review Focus 5 wording was corrected (uncommitted doc edit).
 
 ## Next action
 
-Handoff 2026-10-26. **M3 Task 3.1 is done**: Fawad reports the full suite
-passed and that it is committed, pushed and merged (his report; I observed
-only the 6 shell tests, format and analyze clean). Added `widgets/log_menu.dart`
-(`showLogMenu`), `GlassMenuItem.detail/detailColor`, shell tap/hold wiring;
-two-habit tests use `tapLogAndWaitForMenu` (drift needs real waits between
-fake pumps). Known gap: with several habits "Add a missed log" targets the
-first habit; revisit in 3.4.
+Handoff 2026-10-27. Branch `feat/plan-logs-design-fix`, tree clean (Fawad
+committed; push status not checked). **M3 Task 3.1 is merged** (PR #18).
 
-**New issue (Fawad, not yet investigated): the Home page's plan card and
-Logs page look totally different from the Figma / canvas designs.** I have
-not compared them yet. Do this first, before Task 3.2:
-1. Read `design/6._home_details_logs/README.md`, then compare `PlanCard`
-   (`lib/features/home/presentation/widgets/plan_card.dart`), `TodayLogsCard`
-   and `lib/features/logs/` against the canvas
-   (https://claude.ai/artifact/Es7ju6TWmMj5pkNon4tbHu), Figma
-   (https://www.figma.com/design/KMF3WeQgfFv5g2MhOiwXMM) and the `design/`
-   HTML files. A simulator run is the best way to see the real screens
-   (ask before running).
-2. List the differences, fix them as a task before 3.2, with Fawad's OK.
-The M2 simulator check (Logs entry points, History card) is still owed and
-fits here.
+Done this session (Fawad's ring card edits, reviewed and finished):
+- `ring_card.dart`: edge-to-edge pager, spacing only when the day has logs,
+  "View logs" / "Add missed log" buttons and the info-cell detail text removed
+  on purpose; dead `detail` and unused import removed; null-safe `logs.value`.
+- `today_logs_card.dart`: shows the newest 3 logs (`logsForDayProvider` is
+  oldest first; the old test was masked by the ring's "Last entry" time).
+- Tests updated to open Logs via `openLogs`. Observed by me: format and
+  `analyze --fatal-infos` clean, full suite 287 passed (analyze/format ran
+  before the one-line `.reversed` edit).
 
-Working tree at handoff: `ring_card.dart` and `quote_card.dart` show as
-modified; I did not make those edits this session (Fawad's, uncommitted?
-check `git diff` before touching them).
+**Plan card and Logs design fixes are edited (2026-10-27), uncommitted.**
+Observed by me: format (0 changed), `analyze --fatal-infos` clean, full suite
+287 passed. Not seen on a simulator.
+Plan card: "Stage N / M" pill, start date / % / quit date labels, stages in an
+inner panel with check / arrow / flag markers, "Since <date>". Logs: 44px
+circle back/add buttons, trigger-tinted icon tile and chip (`TriggerUi.tint`),
+84px red "Delete" swipe panel, "Yesterday" label, red "N over", footer hint,
+"No trigger" pill. Tests updated in `home_page_test.dart` and
+`logs_page_test.dart` (the swipe test taps `find.text('Delete').last`).
 
-Then Task 3.2 (trigger sheet habit chip), per the implementation plan.
+**M3 Task 3.2 (trigger sheet habit chip), uncommitted.** `showTriggerSheet`
+takes `habitId`; the sheet is a `ConsumerStatefulWidget` showing a chip
+"<Habit> · N of L after this" (name only when there is no plan). Test
+`trigger sheet names the habit and the count after this log` in
+`home_page_test.dart`. Observed by me: format, `analyze --fatal-infos` clean,
+full suite 288 passed. Not seen on a simulator.
 
-Test gotchas: never `await` a go_router `push` in a test (use `unawaited`);
-a failed assert skips `disposeApp()` and the test then hangs to the 10 min
-timeout, so run a single failing test with `--timeout 60s`.
+**Next:** Task 3.3 (one-time hold hint). Test gotchas: never `await` a
+go_router `push` in a test (use `unawaited`); a failed assert skips
+`disposeApp()` and the test hangs to the 10 min timeout, so run a single
+failing test with `--timeout 60s`.
