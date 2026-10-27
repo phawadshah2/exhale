@@ -91,23 +91,33 @@ states). The plan's Review Focus 5 wording was corrected (uncommitted doc edit).
 
 ## Next action
 
-M3 Task 3.1 is written on branch `feat/log-button-menu` (stacked on
-`feat/dashboard-stats`, uncommitted). Observed by me: `test/app/ios_shell_test.dart`
-6 passed. Format, analyze and the full suite have not run. The two-habit tests
-use `tapLogAndWaitForMenu` (real waits between fake pumps, since the menu reads
-drift before opening). New `widgets/log_menu.dart` (`showLogMenu`: one habit → Log
-now / Add a missed log; several → a row per habit with "N of L today", amber
-at limit, then Add a missed log). `GlassMenuItem` gains `detail` and
-`detailColor`. `app_shell.dart`: tap logs when `singleHabitIdProvider` is set,
-else opens the menu; long-press always opens it. "Add a habit" is left out
-until 4.1. Counts are read from the repositories (`.first`), not stream
-providers. Tests: group "with two habits" in `test/app/ios_shell_test.dart`.
-With several habits "Add a missed log" targets the first habit; revisit in
-3.4. Fawad skipped the M2 simulator check for now (still owed before the M2
-PR).
+Handoff 2026-10-26. **M3 Task 3.1 is done**: Fawad reports the full suite
+passed and that it is committed, pushed and merged (his report; I observed
+only the 6 shell tests, format and analyze clean). Added `widgets/log_menu.dart`
+(`showLogMenu`), `GlassMenuItem.detail/detailColor`, shell tap/hold wiring;
+two-habit tests use `tapLogAndWaitForMenu` (drift needs real waits between
+fake pumps). Known gap: with several habits "Add a missed log" targets the
+first habit; revisit in 3.4.
 
-Do next: format and analyze (ask before each), then checkpoint `feat(log): plus button tap and hold with habit menu`.
-Then Task 3.2 (trigger sheet habit chip).
+**New issue (Fawad, not yet investigated): the Home page's plan card and
+Logs page look totally different from the Figma / canvas designs.** I have
+not compared them yet. Do this first, before Task 3.2:
+1. Read `design/6._home_details_logs/README.md`, then compare `PlanCard`
+   (`lib/features/home/presentation/widgets/plan_card.dart`), `TodayLogsCard`
+   and `lib/features/logs/` against the canvas
+   (https://claude.ai/artifact/Es7ju6TWmMj5pkNon4tbHu), Figma
+   (https://www.figma.com/design/KMF3WeQgfFv5g2MhOiwXMM) and the `design/`
+   HTML files. A simulator run is the best way to see the real screens
+   (ask before running).
+2. List the differences, fix them as a task before 3.2, with Fawad's OK.
+The M2 simulator check (Logs entry points, History card) is still owed and
+fits here.
+
+Working tree at handoff: `ring_card.dart` and `quote_card.dart` show as
+modified; I did not make those edits this session (Fawad's, uncommitted?
+check `git diff` before touching them).
+
+Then Task 3.2 (trigger sheet habit chip), per the implementation plan.
 
 Test gotchas: never `await` a go_router `push` in a test (use `unawaited`);
 a failed assert skips `disposeApp()` and the test then hangs to the 10 min
