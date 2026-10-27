@@ -1,9 +1,12 @@
 import 'package:exhale/core/di/injection_container.dart';
+import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/widgets/glass_surface.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
+import 'package:exhale/features/settings/domain/entities/app_settings.dart';
+import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:exhale/features/settings/presentation/pages/settings_page.dart';
 import 'package:exhale/features/tracking/domain/repositories/habit_log_repository.dart';
 import 'package:flutter/material.dart';
@@ -141,6 +144,56 @@ void main() {
 
       await tester.tap(find.text('Save without trigger'));
       await tester.pumpAndSettle();
+      await tester.disposeApp();
+    });
+  });
+
+  group('hold hint', () {
+    setUp(() async {
+      final repository = sl<SettingsRepository>();
+      final current = await repository.get() as Success<AppSettings>;
+      await repository.save(current.value.copyWith(logHintSeen: false));
+    });
+
+    Future<void> logOnce(WidgetTester tester) async {
+      await tester.tap(find.byTooltip('Log'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Save without trigger'));
+      await tester.pumpInSteps(const Duration(milliseconds: 900));
+    }
+
+    testWidgets('hint shows once after the first log', (tester) async {
+      await tester.pumpAppPastSplash(height: 2400);
+      expect(find.text('Hold + for more'), findsNothing);
+
+      await logOnce(tester);
+      expect(find.text('Hold + for more'), findsOneWidget);
+      expect(
+        find.text('Add a missed log, or start tracking another habit.'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Got it'));
+      await tester.pumpAndSettle();
+      await logOnce(tester);
+      expect(find.text('Hold + for more'), findsNothing);
+
+      await tester.disposeApp();
+    });
+
+    testWidgets('Got it hides it for good', (tester) async {
+      await tester.pumpAppPastSplash(height: 2400);
+      await logOnce(tester);
+
+      await tester.tap(find.text('Got it'));
+      await tester.pumpAndSettle();
+      expect(find.text('Hold + for more'), findsNothing);
+
+      final settings = await tester.runAsync(
+        () => sl<SettingsRepository>().get(),
+      );
+      expect((settings! as Success<AppSettings>).value.logHintSeen, isTrue);
+
       await tester.disposeApp();
     });
   });

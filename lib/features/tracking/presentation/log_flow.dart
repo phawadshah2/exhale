@@ -17,14 +17,15 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Asks for a trigger first (unless turned off), then saves a log of
-/// [habitId]. Dismissing the trigger sheet cancels the log.
-Future<void> logNow(
+/// [habitId]. Dismissing the trigger sheet cancels the log. Returns whether a
+/// log was saved.
+Future<bool> logNow(
   BuildContext context,
   WidgetRef ref, {
   required int habitId,
 }) async {
   final habit = ref.read(habitProvider(habitId));
-  if (habit == null) return;
+  if (habit == null) return false;
   unawaited(HapticFeedback.mediumImpact());
   final loggedAt = ref.read(clockProvider).now();
   final settings = ref.read(currentSettingsProvider);
@@ -37,7 +38,7 @@ Future<void> logNow(
       habitId: habitId,
       offerToStopAsking: firstPrompt,
     );
-    if (answer == null || !context.mounted) return;
+    if (answer == null || !context.mounted) return false;
     trigger = answer.trigger;
     if (firstPrompt) {
       await ref
@@ -48,14 +49,14 @@ Future<void> logNow(
               askForTrigger: answer.keepAsking,
             ),
           );
-      if (!context.mounted) return;
+      if (!context.mounted) return false;
     }
   }
 
   final result = await ref.read(addHabitLogProvider)(
     AddHabitLogInput(habitId: habitId, loggedAt: loggedAt, trigger: trigger),
   );
-  if (!context.mounted) return;
+  if (!context.mounted) return false;
   switch (result) {
     case Success(value: final HabitLog log):
       showAppSnackBar(
@@ -65,11 +66,13 @@ Future<void> logNow(
         onAction: () => ref.read(deleteHabitLogProvider)(log.id),
         duration: const Duration(seconds: 2),
       );
+      return true;
     case FailureResult(:final failure):
       showAppSnackBar(
         context,
         message: failureMessage(failure),
         tone: SnackTone.danger,
       );
+      return false;
   }
 }

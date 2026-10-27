@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:exhale/app/shell/log_hint.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/liquid_glass.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
+import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/presentation/log_flow.dart';
 import 'package:exhale/features/tracking/presentation/widgets/log_menu.dart';
 import 'package:flutter/material.dart';
@@ -34,10 +36,26 @@ class AppShell extends ConsumerWidget {
   void _onLog(BuildContext context, WidgetRef ref, Rect anchor) {
     final habitId = ref.read(singleHabitIdProvider);
     if (habitId != null) {
-      unawaited(logNow(context, ref, habitId: habitId));
+      unawaited(_logAndHint(context, ref, habitId));
     } else {
       unawaited(showLogMenu(context, ref, anchor: anchor));
     }
+  }
+
+  /// After the first saved log with one habit, explains the + button's menu.
+  Future<void> _logAndHint(
+    BuildContext context,
+    WidgetRef ref,
+    int habitId,
+  ) async {
+    final logged = await logNow(context, ref, habitId: habitId);
+    if (!logged || !context.mounted) return;
+    if (ref.read(currentSettingsProvider).logHintSeen) return;
+    await ref
+        .read(settingsActionsProvider)
+        .update((s) => s.copyWith(logHintSeen: true));
+    if (!context.mounted) return;
+    await showLogHint(context);
   }
 
   void _showLogMenu(BuildContext context, WidgetRef ref, Rect anchor) =>
