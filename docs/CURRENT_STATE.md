@@ -104,22 +104,17 @@ Done this session (Fawad's ring card edits, reviewed and finished):
   `analyze --fatal-infos` clean, full suite 287 passed (analyze/format ran
   before the one-line `.reversed` edit).
 
-**Next: fix the Plan card and Logs page against the designs, then Task 3.2**
-(trigger sheet habit chip). Not yet seen on a simulator (ask before running).
-Differences found by reading code vs `design/6._home_details_logs/`
-(`Main.dc.html` plan card, `Logs.dc.html`):
-- Plan card: "Stage N / M" pill beside the title; progress labels are start
-  date, "% of the way", quit date (code shows "N a day" / "0"); stages in a
-  darker inner panel with 26px circle markers (teal check now, arrow next,
-  amber flag final), current title teal; "Since <date>" not "Until".
-- Logs: 44px circle back/add buttons; trigger-coloured icon tile and chip per
-  log row; swipe reveals an 84px red "Delete" panel; "Yesterday" day label;
-  red "N over" text; footer hint line. Skip habit tabs (4.4) and the
-  All-triggers dropdown.
-Get Fawad's OK on the list, then do it as one task. Recommended: Sonnet 5.5,
-medium. Read only `plan_card.dart`, `lib/features/logs/presentation/`, the two
-design files.
+**Plan card and Logs design fixes are edited (2026-10-27), uncommitted.**
+Observed by me: format (0 changed), `analyze --fatal-infos` clean, full suite
+287 passed. Not seen on a simulator.
+Plan card: "Stage N / M" pill, start date / % / quit date labels, stages in an
+inner panel with check / arrow / flag markers, "Since <date>". Logs: 44px
+circle back/add buttons, trigger-tinted icon tile and chip (`TriggerUi.tint`),
+84px red "Delete" swipe panel, "Yesterday" label, red "N over", footer hint,
+"No trigger" pill. Tests updated in `home_page_test.dart` and
+`logs_page_test.dart` (the swipe test taps `find.text('Delete').last`).
 
-Test gotchas: never `await` a go_router `push` in a test (use `unawaited`);
-a failed assert skips `disposeApp()` and the test then hangs to the 10 min
-timeout, so run a single failing test with `--timeout 60s`.
+**Next:** Task 3.2 (trigger sheet habit chip). Test gotchas: never `await` a
+go_router `push` in a test (use `unawaited`); a failed assert skips
+`disposeApp()` and the test hangs to the 10 min timeout, so run a single
+failing test with `--timeout 60s`.

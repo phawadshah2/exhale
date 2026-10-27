@@ -19,6 +19,7 @@ class LogRow extends StatelessWidget {
     final text = context.textTheme;
     final trigger = log.trigger;
     final note = log.note;
+    final tint = trigger?.tint(context) ?? colors.onSurfaceVariant;
 
     return InkWell(
       onTap: onTap,
@@ -39,7 +40,7 @@ class LogRow extends StatelessWidget {
               child: Icon(
                 trigger?.icon ?? AppIcons.clock,
                 size: 20,
-                color: colors.onSurfaceVariant,
+                color: tint,
               ),
             ),
             Expanded(
@@ -64,17 +65,44 @@ class LogRow extends StatelessWidget {
                 ],
               ),
             ),
-            if (trigger != null)
+            if (trigger == null)
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 3,
                 ),
                 decoration: ShapeDecoration(
-                  color: colors.surfaceContainerHighest,
-                  shape: const StadiumBorder(),
+                  shape: StadiumBorder(
+                    side: BorderSide(color: colors.outlineVariant),
+                  ),
                 ),
-                child: Text(trigger.label, style: text.labelMedium),
+                child: Text(
+                  'No trigger',
+                  style: text.labelMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              )
+            else
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 3,
+                ),
+                decoration: ShapeDecoration(
+                  color: tint.withValues(alpha: 0.1),
+                  shape: StadiumBorder(
+                    side: BorderSide(color: tint.withValues(alpha: 0.35)),
+                  ),
+                ),
+                child: Text(
+                  trigger.label,
+                  style: text.labelMedium?.copyWith(
+                    color: tint,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
           ],
         ),

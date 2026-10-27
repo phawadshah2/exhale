@@ -42,16 +42,23 @@ class _DayGroupState extends State<DayGroup> {
   String get _title {
     final day = widget.entry.day;
     final date = AppFormat.shortWeekdayDate(day);
-    return day == widget.today ? 'Today · $date' : date;
+    final offset = day.daysSince(widget.today);
+    if (offset == 0) return 'Today · $date';
+    if (offset == -1) return 'Yesterday · $date';
+    return date;
+  }
+
+  int get _over {
+    final limit = widget.entry.limit;
+    return limit == null ? 0 : widget.entry.count - limit;
   }
 
   String get _summary {
     final entry = widget.entry;
     final limit = entry.limit;
     if (limit == null) return 'Before your plan';
-    final over = entry.count - limit;
     return '${entry.count} of $limit allowed'
-        '${over > 0 ? ' · $over over' : ''}';
+        '${_over > 0 ? ' · $_over over' : ''}';
   }
 
   @override
@@ -87,7 +94,11 @@ class _DayGroupState extends State<DayGroup> {
               ),
               Text(
                 _summary,
-                style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                style: text.bodySmall?.copyWith(
+                  color: _over > 0
+                      ? context.exhale.danger.foreground
+                      : colors.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -115,13 +126,29 @@ class _DayGroupState extends State<DayGroup> {
                         await widget.onDelete(log);
                         return false;
                       },
-                      background: Container(
+                      background: Align(
                         alignment: Alignment.centerRight,
-                        color: context.exhale.danger.soft,
-                        padding: const EdgeInsets.only(right: AppSpacing.md),
-                        child: Icon(
-                          AppIcons.delete,
-                          color: context.exhale.danger.foreground,
+                        child: Container(
+                          width: 84,
+                          color: context.exhale.danger.solid,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            spacing: 4,
+                            children: [
+                              Icon(
+                                AppIcons.delete,
+                                size: 18,
+                                color: context.exhale.danger.onSolid,
+                              ),
+                              Text(
+                                'Delete',
+                                style: text.labelMedium?.copyWith(
+                                  color: context.exhale.danger.onSolid,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       child: ColoredBox(

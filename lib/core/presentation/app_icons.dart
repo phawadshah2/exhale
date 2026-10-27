@@ -29,6 +29,7 @@ abstract final class AppIcons {
   static const IconData check = CupertinoIcons.checkmark;
   static const IconData checkCircle = CupertinoIcons.checkmark_circle_fill;
   static const IconData forward = CupertinoIcons.arrow_right;
+  static const IconData flag = CupertinoIcons.flag_fill;
   static const IconData back = CupertinoIcons.chevron_left;
   static const IconData chevronRight = CupertinoIcons.chevron_right;
   static const IconData backToToday = CupertinoIcons.arrow_uturn_right;
