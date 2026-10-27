@@ -9,6 +9,8 @@ import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
+import 'package:exhale/features/settings/domain/entities/app_settings.dart';
+import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -31,12 +33,22 @@ Future<int> seedHabit(
   return added.value.id;
 }
 
-/// Registers real dependencies on an in-memory database.
-Future<void> setUpTestDependencies(FixedClock clock) =>
-    InjectionContainer.setupDependencies(
-      database: createTestDatabase(),
-      clock: clock,
-    );
+/// Registers real dependencies on an in-memory database. The one-time "Hold +"
+/// hint is marked seen unless [logHintSeen] is false, so it does not cover
+/// the screen in tests that tap +.
+Future<void> setUpTestDependencies(
+  FixedClock clock, {
+  bool logHintSeen = true,
+}) async {
+  await InjectionContainer.setupDependencies(
+    database: createTestDatabase(),
+    clock: clock,
+  );
+  if (!logHintSeen) return;
+  final repository = sl<SettingsRepository>();
+  final current = await repository.get() as Success<AppSettings>;
+  await repository.save(current.value.copyWith(logHintSeen: true));
+}
 
 void mockPackageInfo() => PackageInfo.setMockInitialValues(
   appName: 'Exhale',
