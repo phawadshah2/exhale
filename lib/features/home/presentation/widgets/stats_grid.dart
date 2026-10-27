@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
@@ -5,15 +8,18 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/tracking/domain/entities/home_stats.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class StatsGrid extends StatelessWidget {
   const StatsGrid({
+    required this.habitId,
     required this.stats,
     required this.currencySymbol,
     required this.habit,
     super.key,
   });
 
+  final int habitId;
   final HomeStats stats;
   final String currencySymbol;
   final Habit habit;
@@ -64,8 +70,11 @@ class StatsGrid extends StatelessWidget {
           value: saved == null
               ? '—'
               : AppFormat.money(saved, symbol: currencySymbol),
-          caption: saved == null ? 'Add a price in Settings' : 'Since Day 1',
-          captionColor: saved == null ? muted : success,
+          caption: saved == null ? 'Add a price ›' : 'Since Day 1',
+          captionColor: saved == null ? context.colors.primary : success,
+          onTap: saved == null
+              ? () => unawaited(context.push(AppRoutes.editPlanFor(habitId)))
+              : null,
         ),
       _StatTile(
         label: 'Avoided',
@@ -110,6 +119,7 @@ class _StatTile extends StatelessWidget {
     required this.caption,
     required this.captionColor,
     this.valueColor,
+    this.onTap,
   });
 
   final String label;
@@ -119,39 +129,47 @@ class _StatTile extends StatelessWidget {
   final Color? valueColor;
   final String caption;
   final Color captionColor;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final text = context.textTheme;
     return Card(
-      child: Padding(
-        padding: AppSpacing.card,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    label,
-                    style: text.labelMedium?.copyWith(
-                      color: context.colors.onSurfaceVariant,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: AppSpacing.card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: text.labelMedium?.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ),
-                Icon(icon, size: 20, color: iconColor),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              value,
-              style: text.headlineMedium?.copyWith(color: valueColor),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 2),
-            Text(caption, style: text.bodySmall?.copyWith(color: captionColor)),
-          ],
+                  Icon(icon, size: 20, color: iconColor),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                value,
+                style: text.headlineMedium?.copyWith(color: valueColor),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                caption,
+                style: text.bodySmall?.copyWith(color: captionColor),
+              ),
+            ],
+          ),
         ),
       ),
     );

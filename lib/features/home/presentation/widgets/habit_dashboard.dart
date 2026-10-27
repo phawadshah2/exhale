@@ -55,6 +55,7 @@ class HabitDashboard extends ConsumerWidget {
       ),
       children: [
         DashboardHeader(
+          habitId: habitId,
           kind: header,
           habitName: habit.name,
           today: today,
@@ -70,6 +71,7 @@ class HabitDashboard extends ConsumerWidget {
         if (stats != null) ...[
           const SizedBox(height: AppSpacing.md),
           StatsGrid(
+            habitId: habitId,
             stats: stats,
             currencySymbol: settings.currencySymbol,
             habit: habit,

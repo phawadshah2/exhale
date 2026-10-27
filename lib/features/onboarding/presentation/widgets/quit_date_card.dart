@@ -7,25 +7,46 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/section_card.dart';
-import 'package:exhale/features/onboarding/presentation/providers/setup_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/projection_card.dart';
+import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// One quick quit-date choice shown as a pill.
+class QuitPresetOption {
+  const QuitPresetOption({
+    required this.label,
+    required this.selected,
+    required this.onSelect,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onSelect;
+}
+
 class QuitDateCard extends StatelessWidget {
   const QuitDateCard({
-    required this.form,
+    required this.startDay,
+    required this.quitDay,
+    required this.plan,
+    required this.isSteep,
     required this.earliest,
+    required this.presets,
     required this.onPickDate,
-    required this.onSelectPreset,
     super.key,
   });
 
-  final SetupFormState form;
+  final LogicalDay startDay;
+  final LogicalDay quitDay;
+
+  /// Null while the dates are invalid.
+  final ReductionPlan? plan;
+  final bool isSteep;
   final LogicalDay earliest;
+  final List<QuitPresetOption> presets;
   final ValueChanged<LogicalDay> onPickDate;
-  final ValueChanged<QuitPreset> onSelectPreset;
 
   /// "in 23 days" / "in 8 weeks" / "in about 5 months" / "in about 2 years"
   static String relative(LogicalDay from, LogicalDay to) {
@@ -45,7 +66,7 @@ class QuitDateCard extends StatelessWidget {
       context,
       title: 'Quit date',
       mode: CupertinoDatePickerMode.date,
-      initial: form.quitDay.toLocalDate(),
+      initial: quitDay.toLocalDate(),
       minimum: earliest.toLocalDate(),
     );
     if (picked != null) onPickDate(LogicalDay.fromDate(picked));
@@ -55,7 +76,7 @@ class QuitDateCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.textTheme;
-    final preview = form.preview;
+    final preview = plan;
 
     return SectionCard(
       title: 'Quit date',
@@ -93,13 +114,13 @@ class QuitDateCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            AppFormat.fullDate(form.quitDay),
+                            AppFormat.fullDate(quitDay),
                             style: text.headlineSmall?.copyWith(
                               color: colors.primary,
                             ),
                           ),
                           Text(
-                            relative(form.startDay, form.quitDay),
+                            relative(startDay, quitDay),
                             style: text.bodySmall?.copyWith(
                               color: colors.onSurfaceVariant,
                             ),
@@ -118,13 +139,13 @@ class QuitDateCard extends StatelessWidget {
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
             children: [
-              for (final preset in QuitPreset.values)
+              for (final preset in presets)
                 _PresetPill(
                   label: preset.label,
-                  selected: form.quitPreset == preset,
+                  selected: preset.selected,
                   onTap: () {
                     unawaited(HapticFeedback.selectionClick());
-                    onSelectPreset(preset);
+                    preset.onSelect();
                   },
                 ),
             ],
@@ -132,11 +153,11 @@ class QuitDateCard extends StatelessWidget {
           if (preview != null) ...[
             const SizedBox(height: AppSpacing.gutterSm),
             _Hint(
-              icon: form.isSteep ? AppIcons.stress : AppIcons.info,
-              color: form.isSteep
+              icon: isSteep ? AppIcons.stress : AppIcons.info,
+              color: isSteep
                   ? context.exhale.warning.foreground
                   : colors.primary,
-              text: form.isSteep
+              text: isSteep
                   ? "That's more than one fewer a day. A later date may "
                         'feel easier.'
                   : paceSentence(preview),

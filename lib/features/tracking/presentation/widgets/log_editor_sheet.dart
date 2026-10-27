@@ -200,10 +200,7 @@ class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
             style: text.headlineSmall,
           ),
           Text(
-            [
-              ?habitName,
-              AppFormat.shortWeekdayDate(widget.day),
-            ].join(' · '),
+            [?habitName, AppFormat.shortWeekdayDate(widget.day)].join(' · '),
             style: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
           ),
           const SizedBox(height: AppSpacing.lg),

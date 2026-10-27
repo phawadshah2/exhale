@@ -8,9 +8,8 @@ import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/number_stepper.dart';
 import 'package:exhale/core/widgets/section_card.dart';
-import 'package:exhale/features/habit/domain/entities/habit.dart';
-import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/onboarding/presentation/providers/setup_form_provider.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/cost_card.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/projection_card.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/quit_date_card.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/setup_chrome.dart';
@@ -21,7 +20,6 @@ import 'package:exhale/features/settings/presentation/providers/settings_provide
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -113,10 +111,20 @@ class SetupPage extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         QuitDateCard(
-          form: form,
+          startDay: form.startDay,
+          quitDay: form.quitDay,
+          plan: form.preview,
+          isSteep: form.isSteep,
           earliest: controller.earliestQuitDay,
           onPickDate: controller.setQuitDay,
-          onSelectPreset: controller.selectQuitPreset,
+          presets: [
+            for (final preset in QuitPreset.values)
+              QuitPresetOption(
+                label: preset.label,
+                selected: form.quitPreset == preset,
+                onSelect: () => controller.selectQuitPreset(preset),
+              ),
+          ],
         ),
         const SizedBox(height: AppSpacing.md),
         ProjectionCard(
@@ -127,7 +135,7 @@ class SetupPage extends ConsumerWidget {
         ),
         if (habit.tracksCost) ...[
           const SizedBox(height: AppSpacing.md),
-          _CostCard(
+          CostCard(
             habit: habit,
             currencySymbol: currency,
             unitsPerContainer: form.unitsPerContainer,
@@ -263,113 +271,6 @@ class _StartDateCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _CostCard extends StatefulWidget {
-  const _CostCard({
-    required this.habit,
-    required this.currencySymbol,
-    required this.unitsPerContainer,
-    required this.showPriceError,
-    required this.onPriceChanged,
-    required this.onUnitsPerContainerChanged,
-  });
-
-  final Habit habit;
-  final String currencySymbol;
-  final int unitsPerContainer;
-  final bool showPriceError;
-  final ValueChanged<String> onPriceChanged;
-  final ValueChanged<int> onUnitsPerContainerChanged;
-
-  @override
-  State<_CostCard> createState() => _CostCardState();
-}
-
-class _CostCardState extends State<_CostCard> {
-  bool _expanded = true;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final text = context.textTheme;
-    final habit = widget.habit;
-    final container = habit.container;
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          InkWell(
-            onTap: () => setState(() => _expanded = !_expanded),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                spacing: AppSpacing.gutterSm,
-                children: [
-                  Icon(AppIcons.savings, color: colors.primary),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('What it costs', style: text.titleLarge),
-                        Text(
-                          'Optional. Used to show money saved.',
-                          style: text.bodyMedium?.copyWith(
-                            color: colors.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    _expanded ? AppIcons.chevronUp : AppIcons.chevronDown,
-                    color: colors.onSurfaceVariant,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (_expanded)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: Column(
-                spacing: AppSpacing.gutterSm,
-                children: [
-                  TextField(
-                    onChanged: widget.onPriceChanged,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),
-                    ],
-                    decoration: InputDecoration(
-                      labelText: 'Price per ${container ?? habit.unit}',
-                      prefixText: '${widget.currencySymbol} ',
-                      hintText: container == null ? '3.50' : '14.50',
-                      errorText: widget.showPriceError
-                          ? 'Enter a valid price'
-                          : null,
-                    ),
-                  ),
-                  if (container != null)
-                    NumberStepper(
-                      value: widget.unitsPerContainer,
-                      min: 1,
-                      max: HabitValidation.maxUnitsPerContainer,
-                      onChanged: widget.onUnitsPerContainerChanged,
-                      unit: habit.shortUnits,
-                      caption: 'per $container',
-                      semanticLabel: '${habit.units} per $container',
-                    ),
-                ],
-              ),
-            ),
-        ],
       ),
     );
   }
