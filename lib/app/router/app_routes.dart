@@ -4,6 +4,9 @@ abstract final class AppRoutes {
   static const setupPlan = '/setup/plan';
   static const home = '/home';
   static const habit = '/habit/:habitId';
+  static const editPlan = '/habit/:habitId/plan';
+
+  static String editPlanFor(int habitId) => '/habit/$habitId/plan';
   static const logs = '/logs';
   static const settings = '/settings';
   static const designSystem = '/design-system';

@@ -125,19 +125,36 @@ full suite 288 passed. Not seen on a simulator.
 commit and merge (locally). Not authorized: pushing without being asked, and
 Co-Authored-By trailers. Push status of f4033a9 not checked.
 
-**M3 Task 3.3 (one-time hold hint), edited on `feat/log-hold-hint` (off
-`main` after PR #20), uncommitted, NOT run.** `lib/app/shell/log_hint.dart`
-(`showLogHint`, glass bubble above +, "Got it"); `logNow` now returns `bool`
-(saved); `AppShell._logAndHint` marks `logHintSeen` then shows the hint after
-the first saved single-habit log. `setUpTestDependencies` marks the hint seen
-by default (`logHintSeen: false` to opt out); new `hold hint` group in
-`test/app/ios_shell_test.dart` (2 tests). Format, analyze and tests have not
-been run. Seen-flag is set when the hint is shown, not only on "Got it".
+**M3 Task 3.3 (one-time hold hint), merged (PR #21).** `log_hint.dart`,
+`logNow` returns `bool`, `AppShell._logAndHint`, `setUpTestDependencies` marks
+the hint seen by default (`logHintSeen: false` to opt out). Checks passed per
+Fawad's report (not observed by me). The seen flag is set when the hint is
+shown.
 
-**Next:** run format, `analyze --fatal-infos`, then `fvm flutter test
-test/app/ios_shell_test.dart` and the full suite (each needs Fawad's OK), fix
-failures, commit `feat(log): one-time hold hint`. Then Task 3.4 (edit log
-sheet).
+**M3 Task 3.4 (edit log sheet), committed e031f11 and pushed** (Fawad's
+report). Subtitle "<Habit> · Fri, Oct 16", "Delete this log" with confirm and
+Undo. Time via the wheel picker is untested.
+
+**M3 Task 3.5 (edit plan page), edited on `feat/log-edit-sheet`, uncommitted,
+NOT run, never compiled.** New: `plan/presentation/pages/edit_plan_page.dart`,
+`providers/edit_plan_provider.dart` (`editPlanProvider(habitId)`,
+`EditPlanController`: `setDailyLimit`, `selectQuitPreset` (Keep current /
+Suggested / 8 / 16 weeks), `setQuitDay`, `setPriceText`,
+`setUnitsPerContainer`, `setReason`, `save()` = `UpdateHabit` then `SavePlan`
+from today), `onboarding/.../widgets/cost_card.dart` (was private `_CostCard`
+in `setup_page.dart`, now takes `initialPriceText`). `QuitDateCard` now takes
+primitives plus `List<QuitPresetOption>` (setup page updated). Route
+`/habit/:habitId/plan` (`AppRoutes.editPlan`, `editPlanFor`). Entry points: a
+tune button in `DashboardHeader` (both kinds, tooltip "Edit plan") and the
+money tile caption "Add a price ›" in `StatsGrid` (both now take `habitId`).
+Tests: `test/features/plan/edit_plan_page_test.dart` (3). "Stop tracking" is
+Task 4.3, not here. Likely compile/format issues: provider type annotation of
+`editPlanProvider`, `stats_grid.dart` indentation (formatter will fix).
+
+**Next:** format, `analyze --fatal-infos`, `fvm flutter test
+test/features/plan test/features/home test/features/onboarding`, then the full
+suite (each needs Fawad's OK); commit `feat(plan): edit plan page`; then the
+M3 independent review (Opus 5.5, high) and merge. Then M4 (Task 4.1).
 
 Test gotchas: never `await` a go_router `push` in a test (use `unawaited`); a
 failed assert skips `disposeApp()` and the test hangs to the 10 min timeout,

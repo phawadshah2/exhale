@@ -147,6 +147,56 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('edit sheet names the habit and saves trigger and note', (
+    tester,
+  ) async {
+    await startPlan();
+    await logAt(DateTime(2026, 10, 16, 9));
+    await openPage(tester, const LogsQuery(habitId: 1));
+
+    await tester.tap(find.text('9:00 AM'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit log'), findsOneWidget);
+    expect(find.text('Smoking · Fri, Oct 16'), findsOneWidget);
+
+    await tester.tap(find.text('Stress').last);
+    await tester.enterText(find.byType(TextField), 'After the meeting');
+    await tester.scrollAndTap(find.text('Save changes'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit log'), findsNothing);
+    expect(find.text('After the meeting'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('delete from the sheet asks to confirm, and Undo restores', (
+    tester,
+  ) async {
+    await startPlan();
+    await logAt(DateTime(2026, 10, 16, 9), times: 2);
+    await openPage(tester, const LogsQuery(habitId: 1));
+
+    await tester.tap(find.text('9:00 AM'));
+    await tester.pumpAndSettle();
+    await tester.scrollAndTap(find.text('Delete this log'));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete this log?'), findsOneWidget);
+
+    await tester.tap(find.text('Delete').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit log'), findsNothing);
+    expect(find.text('1 of 9 allowed'), findsOneWidget);
+    expect(find.text('Log deleted'), findsOneWidget);
+
+    await tester.tap(find.text('Undo'));
+    await tester.pumpAndSettle();
+    expect(find.text('2 of 9 allowed'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('long day collapses to 3 with Show more', (tester) async {
     await startPlan();
     await logAt(DateTime(2026, 10, 16, 9), times: 5);
