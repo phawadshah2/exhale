@@ -6,8 +6,8 @@ Updated 2026-10-27. Roadmap:
 
 ## Goal
 
-Home, Details and Logs redesign. **M1 (Habits foundation)** is merged to main.
-In **M2 (Dashboard and Logs)** on branch `feat/dashboard-stats`.
+Home, Details and Logs redesign. M1 and M2 are merged; **M3 (Log flow)** is in
+progress on branch `feat/plan-logs-design-fix` (tree clean at handoff).
 
 ## Done
 
@@ -104,7 +104,7 @@ Done this session (Fawad's ring card edits, reviewed and finished):
   `analyze --fatal-infos` clean, full suite 287 passed (analyze/format ran
   before the one-line `.reversed` edit).
 
-**Plan card and Logs design fixes are edited (2026-10-27), uncommitted.**
+**Plan card and Logs design fixes (2026-10-27), committed 4edc90c.**
 Observed by me: format (0 changed), `analyze --fatal-infos` clean, full suite
 287 passed. Not seen on a simulator.
 Plan card: "Stage N / M" pill, start date / % / quit date labels, stages in an
@@ -114,14 +114,24 @@ circle back/add buttons, trigger-tinted icon tile and chip (`TriggerUi.tint`),
 "No trigger" pill. Tests updated in `home_page_test.dart` and
 `logs_page_test.dart` (the swipe test taps `find.text('Delete').last`).
 
-**M3 Task 3.2 (trigger sheet habit chip), uncommitted.** `showTriggerSheet`
+**M3 Task 3.2 (trigger sheet habit chip), committed f4033a9.** `showTriggerSheet`
 takes `habitId`; the sheet is a `ConsumerStatefulWidget` showing a chip
 "<Habit> · N of L after this" (name only when there is no plan). Test
 `trigger sheet names the habit and the count after this log` in
 `home_page_test.dart`. Observed by me: format, `analyze --fatal-infos` clean,
 full suite 288 passed. Not seen on a simulator.
 
-**Next:** Task 3.3 (one-time hold hint). Test gotchas: never `await` a
-go_router `push` in a test (use `unawaited`); a failed assert skips
-`disposeApp()` and the test hangs to the 10 min timeout, so run a single
-failing test with `--timeout 60s`.
+**Git (changed 2026-10-27):** Fawad now lets Claude decide when to branch,
+commit and merge (locally). Not authorized: pushing without being asked, and
+Co-Authored-By trailers. Push status of f4033a9 not checked.
+
+**Next:** Task 3.3, one-time hold hint (plan: `docs/superpowers/plans/
+2026-10-21-home-details-logs.md`, section "Task 3.3"). Files: create
+`lib/app/shell/log_hint.dart`; modify `app_shell.dart`, `log_flow.dart`; test
+`test/app/ios_shell_test.dart`. Check whether the 3.1/3.2 branch is merged to
+`main` first and branch `feat/log-hold-hint` off it. Recommended: Sonnet 5.5,
+medium. Checks (format, analyze, full suite) need Fawad's OK each.
+
+Test gotchas: never `await` a go_router `push` in a test (use `unawaited`); a
+failed assert skips `disposeApp()` and the test hangs to the 10 min timeout,
+so run a single failing test with `--timeout 60s`.
