@@ -9,6 +9,7 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_sheet.dart';
+import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
@@ -140,10 +141,47 @@ class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
     }
   }
 
+  Future<void> _delete(HabitLog log) async {
+    final unit = ref.read(habitProvider(widget.habitId))?.habit.unit ?? 'log';
+    final confirmed = await showAppConfirm(
+      context,
+      title: 'Delete this log?',
+      message:
+          'The $unit at ${AppFormat.time(log.loggedAt)} will be removed '
+          'from this day.',
+      confirmLabel: 'Delete',
+      destructive: true,
+    );
+    if (!confirmed || !mounted) return;
+    final add = ref.read(addHabitLogProvider);
+    final result = await ref.read(deleteHabitLogProvider)(log.id);
+    if (!mounted) return;
+    switch (result) {
+      case Success():
+        showAppSnackBar(
+          context,
+          message: 'Log deleted',
+          actionLabel: 'Undo',
+          onAction: () => add(
+            AddHabitLogInput(
+              habitId: log.habitId,
+              loggedAt: log.loggedAt,
+              trigger: log.trigger,
+              note: log.note,
+            ),
+          ),
+        );
+        Navigator.of(context).pop();
+      case FailureResult(:final failure):
+        setState(() => _error = failureMessage(failure));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final text = context.textTheme;
     final colors = context.colors;
+    final habitName = ref.watch(habitProvider(widget.habitId))?.habit.name;
     final time = AppFormat.time(DateTime(2000, 1, 1, _time.hour, _time.minute));
 
     return SingleChildScrollView(
@@ -162,7 +200,10 @@ class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
             style: text.headlineSmall,
           ),
           Text(
-            AppFormat.weekdayDate(widget.day),
+            [
+              ?habitName,
+              AppFormat.shortWeekdayDate(widget.day),
+            ].join(' · '),
             style: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -216,6 +257,14 @@ class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
             onPressed: _saving ? null : _save,
             child: Text(_isEdit ? 'Save changes' : 'Add log'),
           ),
+          if (widget.log case final log?)
+            TextButton(
+              onPressed: _saving ? null : () => _delete(log),
+              style: TextButton.styleFrom(
+                foregroundColor: context.exhale.danger.foreground,
+              ),
+              child: const Text('Delete this log'),
+            ),
         ],
       ),
     );

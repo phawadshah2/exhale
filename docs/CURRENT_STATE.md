@@ -125,19 +125,24 @@ full suite 288 passed. Not seen on a simulator.
 commit and merge (locally). Not authorized: pushing without being asked, and
 Co-Authored-By trailers. Push status of f4033a9 not checked.
 
-**M3 Task 3.3 (one-time hold hint), edited on `feat/log-hold-hint` (off
-`main` after PR #20), uncommitted, NOT run.** `lib/app/shell/log_hint.dart`
-(`showLogHint`, glass bubble above +, "Got it"); `logNow` now returns `bool`
-(saved); `AppShell._logAndHint` marks `logHintSeen` then shows the hint after
-the first saved single-habit log. `setUpTestDependencies` marks the hint seen
-by default (`logHintSeen: false` to opt out); new `hold hint` group in
-`test/app/ios_shell_test.dart` (2 tests). Format, analyze and tests have not
-been run. Seen-flag is set when the hint is shown, not only on "Got it".
+**M3 Task 3.3 (one-time hold hint), merged (PR #21).** `log_hint.dart`,
+`logNow` returns `bool`, `AppShell._logAndHint`, `setUpTestDependencies` marks
+the hint seen by default (`logHintSeen: false` to opt out). Checks passed per
+Fawad's report (not observed by me). The seen flag is set when the hint is
+shown.
 
-**Next:** run format, `analyze --fatal-infos`, then `fvm flutter test
-test/app/ios_shell_test.dart` and the full suite (each needs Fawad's OK), fix
-failures, commit `feat(log): one-time hold hint`. Then Task 3.4 (edit log
-sheet).
+**M3 Task 3.4 (edit log sheet), edited on `feat/log-edit-sheet` (off `main`
+after PR #21), uncommitted, NOT run.** `log_editor_sheet.dart`: subtitle is
+"<Habit> · Fri, Oct 16"; an edit shows "Delete this log" (confirm, delete,
+Undo snackbar, pop). Trigger grid, note and "Save changes" already existed.
+Tests in `logs_page_test.dart`: edit saves trigger and note; delete from the
+sheet confirms and Undo restores. Not tested: changing the time through the
+wheel picker; "add missed log on a past day" is already covered by
+`home_page_test.dart`.
+
+**Next:** format, `analyze --fatal-infos`, `fvm flutter test
+test/features/logs`, then the full suite (each needs Fawad's OK); commit
+`feat(log): restyled edit log sheet`. Then Task 3.5 (edit plan page).
 
 Test gotchas: never `await` a go_router `push` in a test (use `unawaited`); a
 failed assert skips `disposeApp()` and the test hangs to the 10 min timeout,
