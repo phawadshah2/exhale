@@ -114,7 +114,14 @@ circle back/add buttons, trigger-tinted icon tile and chip (`TriggerUi.tint`),
 "No trigger" pill. Tests updated in `home_page_test.dart` and
 `logs_page_test.dart` (the swipe test taps `find.text('Delete').last`).
 
-**Next:** Task 3.2 (trigger sheet habit chip). Test gotchas: never `await` a
+**M3 Task 3.2 (trigger sheet habit chip), uncommitted.** `showTriggerSheet`
+takes `habitId`; the sheet is a `ConsumerStatefulWidget` showing a chip
+"<Habit> · N of L after this" (name only when there is no plan). Test
+`trigger sheet names the habit and the count after this log` in
+`home_page_test.dart`. Observed by me: format, `analyze --fatal-infos` clean,
+full suite 288 passed. Not seen on a simulator.
+
+**Next:** Task 3.3 (one-time hold hint). Test gotchas: never `await` a
 go_router `push` in a test (use `unawaited`); a failed assert skips
 `disposeApp()` and the test hangs to the 10 min timeout, so run a single
 failing test with `--timeout 60s`.

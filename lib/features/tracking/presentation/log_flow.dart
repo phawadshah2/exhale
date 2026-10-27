@@ -34,7 +34,7 @@ Future<void> logNow(
     final firstPrompt = !settings.triggerPromptIntroSeen;
     final answer = await showTriggerSheet(
       context,
-      habitKind: habit.habit.kind,
+      habitId: habitId,
       offerToStopAsking: firstPrompt,
     );
     if (answer == null || !context.mounted) return;

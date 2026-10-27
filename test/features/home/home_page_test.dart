@@ -124,6 +124,21 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('trigger sheet names the habit and the count after this log', (
+    tester,
+  ) async {
+    await startPlan(today);
+    await logOn(DateTime(2026, 10, 16, 9), times: 4);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.scrollAndTap(find.byTooltip('Log'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Smoking · 5 of 9 after this'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('skipping the trigger still logs', (tester) async {
     await startPlan(today);
     await tester.pumpAppPastSplash(height: 2400);
