@@ -22,7 +22,6 @@ import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
-import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -60,6 +59,7 @@ class RingCard extends ConsumerWidget {
     final page = today.daysSince(day);
     final pageCount = today.daysSince(earliest) + 1;
     final picker = ref.read(ringDayProvider(habitId).notifier);
+    final logs = ref.watch(logsForDayProvider((habitId: habitId, day: day)));
 
     void step(int days) {
       unawaited(HapticFeedback.selectionClick());
@@ -68,31 +68,34 @@ class RingCard extends ConsumerWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: [
-            Row(
-              children: [
-                Icon(AppIcons.breath, color: colors.primary, size: 22),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    isToday
-                        ? "Today's Consumption"
-                        : AppFormat.weekdayDate(day),
-                    style: text.titleLarge,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Icon(AppIcons.breath, color: colors.primary, size: 22),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      isToday
+                          ? "Today's Consumption"
+                          : AppFormat.weekdayDate(day),
+                      style: text.titleLarge,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-                if (!isToday)
-                  _TodayChip(onTap: picker.showToday)
-                else if (progress != null)
-                  StatusBadge(
-                    label: progress.badgeLabel(habit),
-                    colors: progress.status.colors(context),
-                  ),
-              ],
+                  if (!isToday)
+                    _TodayChip(onTap: picker.showToday)
+                  else if (progress != null)
+                    StatusBadge(
+                      label: progress.badgeLabel(habit),
+                      colors: progress.status.colors(context),
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
             SizedBox(
@@ -130,95 +133,78 @@ class RingCard extends ConsumerWidget {
                 ],
               ),
             ),
-            if (isToday &&
-                progress != null &&
-                progress.status == LimitStatus.over) ...[
-              const SizedBox(height: AppSpacing.md),
-              _OverNote(tomorrowLimit: history.limitOn(day.addDays(1))),
-            ],
-            if (isToday && progress != null && progress.count == 0) ...[
-              const SizedBox(height: AppSpacing.md),
-              _Note(
-                label: progress.limit == 0
-                    ? habit.freeLabel == null
-                          ? 'None so far today.'
-                          : '${habit.freeTitle} so far today.'
-                    : 'No ${habit.units} logged today. Nice start.',
-              ),
-            ],
-            const SizedBox(height: AppSpacing.lg),
-            Divider(color: colors.outlineVariant.withValues(alpha: 0.4)),
-            const SizedBox(height: AppSpacing.md),
-            if (isToday)
-              _TodayDetails(
-                habitId: habitId,
-                history: history,
-                today: today,
-                habit: habit,
-              )
-            else if (beforePlan)
-              _Details(
-                left: (AppIcons.trendDown, 'Limit', 'None yet', null),
-                right: (
-                  AppIcons.calendar,
-                  'Plan started',
-                  AppFormat.monthDay(history.firstDay),
-                  null,
-                ),
-              )
-            else if (progress != null)
-              _Details(
-                left: (
-                  AppIcons.trendDown,
-                  'Limit that day',
-                  '${progress.limit} ${habit.units}',
-                  null,
-                ),
-                right: (
-                  AppIcons.checkCircle,
-                  'Status',
-                  progress.badgeLabel(habit),
-                  null,
-                ),
-              ),
-            if (!beforePlan) ...[
-              const SizedBox(height: AppSpacing.md),
-              DayTriggers(
-                habitId: habitId,
-                day: day,
-                onSelect: (trigger) => openLogs(
-                  context,
-                  LogsQuery(
-                    habitId: habitId,
-                    from: day,
-                    to: day,
-                    trigger: trigger,
-                  ),
-                ),
-              ),
-            ],
-            const SizedBox(height: AppSpacing.sm),
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: () => openLogs(
-                      context,
-                      LogsQuery(habitId: habitId, from: day, to: day),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isToday &&
+                      progress != null &&
+                      progress.status == LimitStatus.over) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    _OverNote(tomorrowLimit: history.limitOn(day.addDays(1))),
+                  ],
+                  if (isToday && progress != null && progress.count == 0) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    _Note(
+                      label: progress.limit == 0
+                          ? habit.freeLabel == null
+                                ? 'None so far today.'
+                                : '${habit.freeTitle} so far today.'
+                          : 'No ${habit.units} logged today. Nice start.',
                     ),
-                    icon: const Icon(AppIcons.clock, size: 18),
-                    label: const Text('View logs'),
-                  ),
-                ),
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: () =>
-                        showLogEditorSheet(context, habitId: habitId, day: day),
-                    icon: const Icon(AppIcons.add, size: 18),
-                    label: const Text('Add missed log'),
-                  ),
-                ),
-              ],
+                  ],
+                  const SizedBox(height: AppSpacing.lg),
+                  Divider(color: colors.outlineVariant.withValues(alpha: 0.4)),
+                  const SizedBox(height: AppSpacing.md),
+                  if (isToday)
+                    _TodayDetails(
+                      habitId: habitId,
+                      history: history,
+                      today: today,
+                      habit: habit,
+                    )
+                  else if (beforePlan)
+                    _Details(
+                      left: (AppIcons.trendDown, 'Limit', 'None yet'),
+                      right: (
+                        AppIcons.calendar,
+                        'Plan started',
+                        AppFormat.monthDay(history.firstDay),
+                      ),
+                    )
+                  else if (progress != null)
+                    _Details(
+                      left: (
+                        AppIcons.trendDown,
+                        'Limit that day',
+                        '${progress.limit} ${habit.units}',
+                      ),
+                      right: (
+                        AppIcons.checkCircle,
+                        'Status',
+                        progress.badgeLabel(habit),
+                      ),
+                    ),
+                  if (!beforePlan) ...[
+                    if (logs.value?.isNotEmpty ?? false)
+                      const SizedBox(height: AppSpacing.md),
+                    DayTriggers(
+                      habitId: habitId,
+                      day: day,
+                      onSelect: (trigger) => openLogs(
+                        context,
+                        LogsQuery(
+                          habitId: habitId,
+                          from: day,
+                          to: day,
+                          trigger: trigger,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ],
         ),
@@ -359,39 +345,31 @@ class _TodayDetails extends ConsumerWidget {
     final latest = ref.watch(latestLogProvider(habitId)).value;
 
     final String entry;
-    final String? entryDetail;
     if (latest == null) {
       entry = today == history.firstDay ? 'Plan started today' : 'No logs yet';
-      entryDetail = null;
     } else {
       final elapsed = now.difference(latest.loggedAt);
       final since = elapsed.isNegative ? Duration.zero : elapsed;
       entry = since.inMinutes < 1
           ? AppFormat.elapsed(since)
           : '${AppFormat.elapsed(since)} ago';
-      entryDetail = AppFormat.time(latest.loggedAt);
     }
 
     final _Cell right;
     if (latest == null) {
-      right = (AppIcons.trendDown, 'Next target', _nextTarget(), null);
+      right = (AppIcons.trendDown, 'Next target', _nextTarget());
     } else {
-      final note = latest.note;
       right = (
         AppIcons.stress,
         'Last trigger',
         latest.trigger?.label ?? 'None',
-        note == null || note.isEmpty ? null : note,
       );
     }
-    return _Details(
-      left: (AppIcons.clock, 'Last entry', entry, entryDetail),
-      right: right,
-    );
+    return _Details(left: (AppIcons.clock, 'Last entry', entry), right: right);
   }
 }
 
-typedef _Cell = (IconData icon, String label, String value, String? detail);
+typedef _Cell = (IconData icon, String label, String value);
 
 class _Details extends StatelessWidget {
   const _Details({required this.left, required this.right});
@@ -581,7 +559,7 @@ class _InfoCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.textTheme;
-    final (icon, label, value, detail) = cell;
+    final (icon, label, value) = cell;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: AppSpacing.sm,
@@ -596,15 +574,6 @@ class _InfoCell extends StatelessWidget {
                 style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
               ),
               Text(value, style: text.titleMedium),
-              if (detail != null)
-                Text(
-                  detail,
-                  style: text.bodySmall?.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
             ],
           ),
         ),

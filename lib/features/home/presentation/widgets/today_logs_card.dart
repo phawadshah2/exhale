@@ -40,7 +40,7 @@ class TodayLogsCard extends ConsumerWidget {
                   color: colors.onSurfaceVariant,
                 ),
               ),
-            for (final log in logs.take(_shown))
+            for (final log in logs.reversed.take(_shown))
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
                 child: Row(
