@@ -7,9 +7,10 @@ Updated 2026-10-28. Roadmap:
 ## Goal
 
 Home, Details and Logs redesign. M1, M2, M3 and the Home design fixes are
-merged to `main` (PR #23, 50bef85). M3 review done and merged locally
-(not pushed). Next: redesign onboarding (and maybe splash) from scratch,
-then revise the plan; M4 waits for that.
+merged to `main` (PR #23, 50bef85). M3 review done: `fix/m3-review`
+pushed, PR not opened yet (no `gh` on this Mac; Fawad opens it from
+GitHub). Next: redesign onboarding (and maybe splash) from scratch, then
+revise the plan; M4 waits for that.
 
 ## Done
 
@@ -173,11 +174,15 @@ Onboarding redesign spec (Opus 5.5 high): use
 with Fawad, write the spec under `docs/superpowers/specs/`, then mockups,
 then revise `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`
 (M4 Task 4.1 Add a habit should reuse the new onboarding steps). Branch
-`feat/onboarding-redesign` off `main`.
+`feat/onboarding-redesign` off `main` once the M3 PR is merged.
 
 **Git:** Claude may branch, commit and merge locally; push only when asked;
-no Co-Authored-By trailers. `main` is ahead of `origin/main` by the M3
-review merge until Fawad asks to push.
+no Co-Authored-By trailers. GitHub `main` is protected (PR plus the
+"Analyze & test" check), so pushing `main` directly fails. Local `main`
+holds a local merge of `fix/m3-review` (aaf7d36, not on GitHub); after the
+PR merges, reset it: `git fetch origin`, then `git reset --hard
+origin/main` (ask Fawad first). Not run: nothing since the full suite
+(307 passed) before the commits. Untracked `todo.md` is Fawad's.
 
 Test gotchas: never `await` a go_router `push` in a test (use `unawaited`);
 a failed assert skips `disposeApp()`, so run a failing test with
