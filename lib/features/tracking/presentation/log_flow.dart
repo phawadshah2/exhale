@@ -31,6 +31,7 @@ Future<bool> logNow(
   final settings = ref.read(currentSettingsProvider);
 
   Trigger? trigger;
+  String? note;
   if (settings.askForTrigger) {
     final firstPrompt = !settings.triggerPromptIntroSeen;
     final answer = await showTriggerSheet(
@@ -40,6 +41,7 @@ Future<bool> logNow(
     );
     if (answer == null || !context.mounted) return false;
     trigger = answer.trigger;
+    note = answer.note;
     if (firstPrompt) {
       await ref
           .read(settingsActionsProvider)
@@ -54,7 +56,12 @@ Future<bool> logNow(
   }
 
   final result = await ref.read(addHabitLogProvider)(
-    AddHabitLogInput(habitId: habitId, loggedAt: loggedAt, trigger: trigger),
+    AddHabitLogInput(
+      habitId: habitId,
+      loggedAt: loggedAt,
+      trigger: trigger,
+      note: note,
+    ),
   );
   if (!context.mounted) return false;
   switch (result) {
