@@ -154,6 +154,27 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('a note typed while logging is saved with the log', (
+    tester,
+  ) async {
+    await startPlan(today);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.scrollAndTap(find.byTooltip('Log'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Coffee'));
+    await tester.pump();
+    await tester.enterText(find.byType(TextField), '  Morning rush  ');
+    await tester.tap(find.text('Save'));
+    await tester.pumpInSteps(const Duration(milliseconds: 900));
+
+    final logs = await storedLogs(tester);
+    expect(logs.single.trigger, Trigger.coffee);
+    expect(logs.single.note, 'Morning rush');
+
+    await tester.disposeApp();
+  });
+
   testWidgets('dismissing the trigger sheet logs nothing', (tester) async {
     await startPlan(today);
     await tester.pumpAppPastSplash(height: 2400);
@@ -166,6 +187,43 @@ void main() {
     expect(find.text('What triggered this one?'), findsNothing);
     expect(countText(tester), '0 / 9');
     expect(await storedTriggers(tester), isEmpty);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('closing the log sheet does not replay Home', (tester) async {
+    await startPlan(today);
+    await tester.pumpAppPastSplash(height: 2400);
+    final before = tester.element(find.byKey(const Key('day-count')));
+
+    await tester.scrollAndTap(find.byTooltip('Log'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save without trigger'));
+    await tester.pumpInSteps(const Duration(milliseconds: 900));
+
+    expect(countText(tester), '1 / 9');
+    expect(tester.element(find.byKey(const Key('day-count'))), same(before));
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('closing a pushed page replays Home', (tester) async {
+    await startPlan(today);
+    await tester.pumpAppPastSplash(height: 2400);
+    final before = tester.element(find.byKey(const Key('day-count')));
+
+    openLogs(
+      tester.element(find.byType(HomePage)),
+      LogsQuery(habitId: 1, from: today, to: today),
+    );
+    await tester.pumpAndSettle();
+    GoRouter.of(tester.element(find.text('Logs'))).pop();
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.element(find.byKey(const Key('day-count'))),
+      isNot(same(before)),
+    );
 
     await tester.disposeApp();
   });
@@ -514,29 +572,55 @@ void main() {
     await startPlan(LogicalDay(2026, 10, 14));
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text('Stage 1 / 9'), findsOneWidget);
-    expect(find.text('Oct 14'), findsOneWidget);
-    expect(find.text('Dec 16'), findsOneWidget);
-    expect(find.text('Since Wed, Oct 14'), findsOneWidget);
-    expect(find.text('Stage 1 · 9 a day (now)'), findsOneWidget);
+    expect(find.text('Stage 1 of 9 · 3% of the way'), findsOneWidget);
+    expect(find.text('Stage 1 · 9 a day · now'), findsOneWidget);
+    expect(find.text('Since Wed, Oct 14 · day 3 of 7'), findsOneWidget);
     expect(find.text('Stage 2 · 8 a day'), findsOneWidget);
-    expect(find.text('Starts Wed, Oct 21'), findsOneWidget);
+    expect(find.text('Starts Wed, Oct 21 · then 7 more'), findsOneWidget);
     expect(find.text('Smoke-free from Dec 16'), findsOneWidget);
     expect(find.text('61 days to go'), findsOneWidget);
+    expect(find.text('Edit'), findsOneWidget);
 
     await tester.disposeApp();
   });
 
-  testWidgets("today's logs shows 3 and a more link", (tester) async {
+  testWidgets('your plan marks the stage before as done', (tester) async {
+    await startPlan(LogicalDay(2026, 10, 1));
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.text('Stage 3 of 9 · 23% of the way'), findsOneWidget);
+    expect(find.text('Stage 2 · 8 a day'), findsOneWidget);
+    expect(find.text('Oct 8 – 14 · done'), findsOneWidget);
+    expect(find.text('Stage 3 · 7 a day · now'), findsOneWidget);
+    expect(find.text('Since Thu, Oct 15 · day 2 of 7'), findsOneWidget);
+    expect(find.text('Starts Thu, Oct 22 · then 5 more'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets("today's logs shows 3 and expands to the rest in place", (
+    tester,
+  ) async {
     await startPlan(today);
     await logOn(DateTime(2026, 10, 16, 9), times: 4);
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text('+1 more today · See all logs'), findsOneWidget);
+    expect(find.text('+1 more today'), findsOneWidget);
     expect(find.text('9:03 AM'), findsOneWidget);
     expect(find.text('9:02 AM'), findsOneWidget);
+    expect(find.text('9:00 AM'), findsNothing);
 
-    await tester.scrollAndTap(find.text('+1 more today · See all logs'));
+    await tester.scrollAndTap(find.text('+1 more today'));
+    await tester.pumpAndSettle();
+    expect(find.text('9:00 AM'), findsOneWidget);
+    expect(find.text('Logs'), findsNothing);
+
+    await tester.scrollAndTap(find.text('Show less'));
+    await tester.pumpAndSettle();
+    expect(find.text('9:00 AM'), findsNothing);
+    expect(find.text('+1 more today'), findsOneWidget);
+
+    await tester.scrollAndTap(find.text('See all logs'));
     await tester.pumpAndSettle();
 
     expect(find.text('Logs'), findsOneWidget);

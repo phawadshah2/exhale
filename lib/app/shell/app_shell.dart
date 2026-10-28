@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:exhale/app/shell/log_hint.dart';
+import 'package:exhale/app/shell/page_visits.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
@@ -63,20 +64,29 @@ class AppShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      // Lets pages scroll behind the floating bar; Scaffold reports the bar's
-      // height as bottom padding to the body.
-      extendBody: true,
-      body: navigationShell,
-      bottomNavigationBar: FloatingTabBar(
-        tabs: _tabs,
-        currentIndex: navigationShell.currentIndex,
-        onSelected: (index) => navigationShell.goBranch(
-          index,
-          initialLocation: index == navigationShell.currentIndex,
+    void bumpVisit(int tab) => ref.read(pageVisitProvider(tab).notifier).bump();
+
+    return ShellReturnListener(
+      onReturn: () => bumpVisit(navigationShell.currentIndex),
+      child: Scaffold(
+        // Lets pages scroll behind the floating bar; Scaffold reports the
+        // bar's height as bottom padding to the body.
+        extendBody: true,
+        body: navigationShell,
+        bottomNavigationBar: FloatingTabBar(
+          tabs: _tabs,
+          currentIndex: navigationShell.currentIndex,
+          onSelected: (index) {
+            // Coming back to a tab replays its entrance animations.
+            if (index != navigationShell.currentIndex) bumpVisit(index);
+            navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            );
+          },
+          onLog: (anchor) => _onLog(context, ref, anchor),
+          onLogMenu: (anchor) => _showLogMenu(context, ref, anchor),
         ),
-        onLog: (anchor) => _onLog(context, ref, anchor),
-        onLogMenu: (anchor) => _showLogMenu(context, ref, anchor),
       ),
     );
   }

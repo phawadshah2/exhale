@@ -1,12 +1,15 @@
 import 'dart:math' as math;
 
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:flutter/material.dart';
 
-/// A day's ring: fills toward the limit, then shows the overflow in red.
-/// With no [progress] (a day before the plan) only the track is drawn.
+/// A day's ring: fills toward the limit. While it fills it is the safe
+/// green; once it has filled, the whole ring takes the colour of the day's
+/// status (amber at the limit, red over it). With no [progress] (a day before
+/// the plan) only the track is drawn.
 class ProgressRing extends StatelessWidget {
   const ProgressRing({
     required this.progress,
@@ -26,43 +29,31 @@ class ProgressRing extends StatelessWidget {
     final colors = context.colors;
     final status = context.exhale;
     final progress = this.progress;
-    final overflow = progress == null
-        ? 0.0
-        : progress.limit == 0
-        ? (progress.count > 0 ? 1.0 : 0.0)
-        : math.min(1, progress.overBy / progress.limit).toDouble();
+    final target = progress?.usedFraction ?? 0;
+    final finalColor = switch (progress?.status) {
+      LimitStatus.at => status.warning.solid,
+      LimitStatus.over => status.danger.solid,
+      _ => null,
+    };
 
     return SizedBox.square(
       dimension: size,
       child: TweenAnimationBuilder<double>(
-        tween: Tween(end: progress?.usedFraction ?? 0),
-        duration: const Duration(milliseconds: 700),
-        curve: Curves.easeOutCubic,
-        builder: (context, fill, _) => TweenAnimationBuilder<double>(
-          tween: Tween(end: overflow),
-          duration: const Duration(milliseconds: 700),
-          curve: Curves.easeOutCubic,
-          builder: (context, over, _) => CustomPaint(
-            painter: _RingPainter(
-              fill: fill,
-              overflow: over,
-              strokeWidth: strokeWidth,
-              track: colors.surfaceContainerHigh,
-              gradient: switch (progress?.status ?? LimitStatus.under) {
-                LimitStatus.under => [
-                  colors.secondaryContainer,
-                  colors.primaryContainer,
-                ],
-                LimitStatus.at => [status.warning.solid, status.warning.solid],
-                LimitStatus.over => [
-                  colors.primaryContainer.withValues(alpha: 0.35),
-                  colors.primaryContainer.withValues(alpha: 0.35),
-                ],
-              },
-              overflowColor: status.danger.solid,
-            ),
-            child: Center(child: child),
+        tween: Tween(begin: 0, end: target),
+        duration: AppMotion.fill,
+        curve: AppMotion.fillCurve,
+        builder: (context, fill, _) => CustomPaint(
+          painter: _RingPainter(
+            fill: fill,
+            // How close the arc is to its end: the status colour fades in
+            // over the last quarter.
+            settle: target == 0 ? 1 : (fill / target).clamp(0.0, 1.0),
+            strokeWidth: strokeWidth,
+            track: colors.surfaceContainerHigh,
+            gradient: [colors.secondaryContainer, colors.primaryContainer],
+            finalColor: finalColor,
           ),
+          child: Center(child: child),
         ),
       ),
     );
@@ -72,19 +63,21 @@ class ProgressRing extends StatelessWidget {
 class _RingPainter extends CustomPainter {
   const _RingPainter({
     required this.fill,
-    required this.overflow,
+    required this.settle,
     required this.strokeWidth,
     required this.track,
     required this.gradient,
-    required this.overflowColor,
+    required this.finalColor,
   });
 
   final double fill;
-  final double overflow;
+  final double settle;
   final double strokeWidth;
   final Color track;
   final List<Color> gradient;
-  final Color overflowColor;
+
+  /// The colour the whole ring ends in; null keeps the gradient.
+  final Color? finalColor;
 
   static const double _start = -math.pi / 2;
 
@@ -101,39 +94,46 @@ class _RingPainter extends CustomPainter {
 
     canvas.drawCircle(center, radius, stroke()..color = track);
 
-    if (fill > 0) {
-      final sweep = 2 * math.pi * fill.clamp(0.0, 1.0);
-      final shader = SweepGradient(
-        colors: gradient,
-        endAngle: math.max(sweep, 0.01),
-        transform: const GradientRotation(_start),
-      ).createShader(rect);
-      // Faint halo: the arc blurred and drawn at low opacity.
-      canvas
-        ..saveLayer(
-          rect.inflate(strokeWidth * 2),
-          Paint()..color = const Color(0x2E000000),
-        )
-        ..drawArc(
-          rect,
-          _start,
-          sweep,
-          false,
-          stroke()
-            ..shader = shader
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
-        )
-        ..restore()
-        ..drawArc(rect, _start, sweep, false, stroke()..shader = shader);
-    }
+    if (fill <= 0) return;
+    final sweep = 2 * math.pi * fill.clamp(0.0, 1.0);
+    // The round caps reach past both ends of the arc. The gradient starts a
+    // cap's width early (the sweep shader has no negative angles) so the
+    // start cap is the first colour, not the last.
+    final cap = (strokeWidth / 2) / radius;
+    final shader = SweepGradient(
+      endAngle: sweep + 2 * cap,
+      colors: gradient,
+      transform: GradientRotation(_start - cap),
+    ).createShader(rect);
+    // Faint halo: the arc blurred and drawn at low opacity.
+    canvas
+      ..saveLayer(
+        rect.inflate(strokeWidth * 2),
+        Paint()..color = const Color(0x2E000000),
+      )
+      ..drawArc(
+        rect,
+        _start,
+        sweep,
+        false,
+        stroke()
+          ..shader = shader
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
+      )
+      ..restore()
+      ..drawArc(rect, _start, sweep, false, stroke()..shader = shader);
 
-    if (overflow > 0) {
+    final end = finalColor;
+    final blend = Curves.easeInOut.transform(
+      ((settle - 0.75) / 0.25).clamp(0.0, 1.0),
+    );
+    if (end != null && blend > 0) {
       canvas.drawArc(
         rect,
         _start,
-        2 * math.pi * overflow.clamp(0.0, 1.0),
+        sweep,
         false,
-        stroke()..color = overflowColor,
+        stroke()..color = end.withValues(alpha: blend),
       );
     }
   }
@@ -141,10 +141,10 @@ class _RingPainter extends CustomPainter {
   @override
   bool shouldRepaint(_RingPainter old) =>
       old.fill != fill ||
-      old.overflow != overflow ||
+      old.settle != settle ||
       old.strokeWidth != strokeWidth ||
       old.track != track ||
-      old.overflowColor != overflowColor ||
+      old.finalColor != finalColor ||
       !_sameColors(old.gradient, gradient);
 
   static bool _sameColors(List<Color> a, List<Color> b) =>

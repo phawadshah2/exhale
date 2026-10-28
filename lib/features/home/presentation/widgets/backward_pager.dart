@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 
 /// A horizontal pager whose page 0 is the newest; swiping right goes back.
 ///
-/// It follows [page] when that changes from outside: one step animates and
-/// longer moves jump, so no in-between page is ever reported.
+/// It follows [page] when that changes from outside by animating there; no
+/// in-between page is ever reported.
 class BackwardPager extends StatefulWidget {
   const BackwardPager({
     required this.pageCount,
@@ -30,6 +30,7 @@ class _BackwardPagerState extends State<BackwardPager> {
     initialPage: widget.page,
   );
   late int _current = widget.page;
+  bool _animating = false;
 
   @override
   void didUpdateWidget(BackwardPager oldWidget) {
@@ -37,15 +38,21 @@ class _BackwardPagerState extends State<BackwardPager> {
     final target = widget.page;
     if (target == _current || !_controller.hasClients) return;
     _current = target;
-    if ((target - (_controller.page ?? target).round()).abs() == 1) {
-      _controller.animateToPage(
-        target,
-        duration: const Duration(milliseconds: 320),
-        curve: Curves.easeOutCubic,
-      );
-    } else {
-      _controller.jumpToPage(target);
-    }
+    final distance = (target - (_controller.page ?? target).round()).abs();
+    _animating = true;
+    unawaited(
+      _controller
+          .animateToPage(
+            target,
+            duration: Duration(
+              milliseconds: distance == 1
+                  ? 380
+                  : (360 + distance * 60).clamp(0, 800),
+            ),
+            curve: Curves.easeInOutCubic,
+          )
+          .whenComplete(() => _animating = false),
+    );
   }
 
   @override
@@ -61,7 +68,7 @@ class _BackwardPagerState extends State<BackwardPager> {
       reverse: true,
       itemCount: widget.pageCount,
       onPageChanged: (page) {
-        if (page == _current) return;
+        if (_animating || page == _current) return;
         _current = page;
         unawaited(HapticFeedback.selectionClick());
         widget.onPageChanged(page);

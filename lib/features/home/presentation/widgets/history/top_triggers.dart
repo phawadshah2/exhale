@@ -27,11 +27,6 @@ class TopTriggers extends StatelessWidget {
 
     final colors = context.colors;
     final text = context.textTheme;
-    final rank = [
-      context.exhale.danger.foreground,
-      context.exhale.warning.foreground,
-      colors.primary,
-    ];
 
     return Container(
       padding: const EdgeInsets.only(top: 12),
@@ -82,7 +77,7 @@ class TopTriggers extends StatelessWidget {
                   label:
                       '${top[i].trigger.label} · '
                       '${(top[i].fraction * 100).round()}% ›',
-                  color: rank[i],
+                  color: top[i].trigger.tint(context),
                   onTap: () => onTrigger(top[i].trigger),
                 ),
             ],

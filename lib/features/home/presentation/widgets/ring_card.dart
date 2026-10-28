@@ -4,8 +4,10 @@ import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/presentation/providers/clock_providers.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/core/widgets/status_badge.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/habit_wording.dart';
@@ -73,28 +75,33 @@ class RingCard extends ConsumerWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Icon(AppIcons.breath, color: colors.primary, size: 22),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      isToday
-                          ? "Today's Consumption"
-                          : AppFormat.weekdayDate(day),
-                      style: text.titleLarge,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+              // Today shows a badge and other days a chip; a fixed height
+              // keeps the card from shifting when switching between them.
+              child: SizedBox(
+                height: 40,
+                child: Row(
+                  children: [
+                    Icon(AppIcons.breath, color: colors.primary, size: 22),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        isToday
+                            ? "Today's Consumption"
+                            : AppFormat.weekdayDate(day),
+                        style: text.titleLarge,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                  if (!isToday)
-                    _TodayChip(onTap: picker.showToday)
-                  else if (progress != null)
-                    StatusBadge(
-                      label: progress.badgeLabel(habit),
-                      colors: progress.status.colors(context),
-                    ),
-                ],
+                    if (!isToday)
+                      _TodayChip(onTap: picker.showToday)
+                    else if (progress != null)
+                      StatusBadge(
+                        label: progress.badgeLabel(habit),
+                        colors: progress.status.colors(context),
+                      ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -135,75 +142,107 @@ class RingCard extends ConsumerWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (isToday &&
-                      progress != null &&
-                      progress.status == LimitStatus.over) ...[
-                    const SizedBox(height: AppSpacing.md),
-                    _OverNote(tomorrowLimit: history.limitOn(day.addDays(1))),
-                  ],
-                  if (isToday && progress != null && progress.count == 0) ...[
-                    const SizedBox(height: AppSpacing.md),
-                    _Note(
-                      label: progress.limit == 0
-                          ? habit.freeLabel == null
-                                ? 'None so far today.'
-                                : '${habit.freeTitle} so far today.'
-                          : 'No ${habit.units} logged today. Nice start.',
-                    ),
-                  ],
-                  const SizedBox(height: AppSpacing.lg),
-                  Divider(color: colors.outlineVariant.withValues(alpha: 0.4)),
-                  const SizedBox(height: AppSpacing.md),
-                  if (isToday)
-                    _TodayDetails(
-                      habitId: habitId,
-                      history: history,
-                      today: today,
-                      habit: habit,
-                    )
-                  else if (beforePlan)
-                    _Details(
-                      left: (AppIcons.trendDown, 'Limit', 'None yet'),
-                      right: (
-                        AppIcons.calendar,
-                        'Plan started',
-                        AppFormat.monthDay(history.firstDay),
-                      ),
-                    )
-                  else if (progress != null)
-                    _Details(
-                      left: (
-                        AppIcons.trendDown,
-                        'Limit that day',
-                        '${progress.limit} ${habit.units}',
-                      ),
-                      right: (
-                        AppIcons.checkCircle,
-                        'Status',
-                        progress.badgeLabel(habit),
-                      ),
-                    ),
-                  if (!beforePlan) ...[
-                    if (logs.value?.isNotEmpty ?? false)
-                      const SizedBox(height: AppSpacing.md),
-                    DayTriggers(
-                      habitId: habitId,
-                      day: day,
-                      onSelect: (trigger) => openLogs(
-                        context,
-                        LogsQuery(
-                          habitId: habitId,
-                          from: day,
-                          to: day,
-                          trigger: trigger,
+              // Days with more or fewer triggers ease the card to its height.
+              child: AnimatedSize(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeInOutCubic,
+                alignment: Alignment.topCenter,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Only once the ring has finished filling.
+                    _Reveal(
+                      delay: AppMotion.fill + const Duration(milliseconds: 200),
+                      show:
+                          isToday &&
+                          progress != null &&
+                          progress.status == LimitStatus.over,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.md),
+                        child: _OverNote(
+                          tomorrowLimit: history.limitOn(day.addDays(1)),
                         ),
                       ),
                     ),
+                    _Reveal(
+                      show: isToday && progress != null && progress.count == 0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.md),
+                        child: _Note(
+                          label: progress == null
+                              ? ''
+                              : progress.limit == 0
+                              ? habit.freeLabel == null
+                                    ? 'None so far today.'
+                                    : '${habit.freeTitle} so far today.'
+                              : 'No ${habit.units} logged today. Nice start.',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Divider(
+                      color: colors.outlineVariant.withValues(alpha: 0.4),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    _Fade(
+                      id: isToday
+                          ? 'today'
+                          : '${day.year}-${day.month}-${day.day}',
+                      child: Column(
+                        children: [
+                          if (isToday)
+                            _TodayDetails(
+                              habitId: habitId,
+                              history: history,
+                              today: today,
+                              habit: habit,
+                            )
+                          else if (beforePlan)
+                            _Details(
+                              left: (AppIcons.trendDown, 'Limit', 'None yet'),
+                              right: (
+                                AppIcons.calendar,
+                                'Plan started',
+                                AppFormat.monthDay(history.firstDay),
+                              ),
+                            )
+                          else if (progress != null)
+                            _Details(
+                              left: (
+                                AppIcons.trendDown,
+                                'Limit that day',
+                                '${progress.limit} ${habit.units}',
+                              ),
+                              right: (
+                                AppIcons.checkCircle,
+                                'Status',
+                                progress.badgeLabel(habit),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    if (!beforePlan) ...[
+                      _Reveal(
+                        show: logs.value?.isNotEmpty ?? false,
+                        child: const SizedBox(height: AppSpacing.md),
+                      ),
+                      DayTriggers(
+                        habitId: habitId,
+                        day: day,
+                        onSelect: (trigger) => openLogs(
+                          context,
+                          LogsQuery(
+                            habitId: habitId,
+                            from: day,
+                            to: day,
+                            trigger: trigger,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ],
@@ -580,4 +619,88 @@ class _InfoCell extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Eases [child] in and out: the space opens or closes while it fades, so
+/// nothing pops in. With a [delay], showing waits that long (hiding does
+/// not), e.g. for a ring to finish filling first.
+class _Reveal extends StatefulWidget {
+  const _Reveal({
+    required this.show,
+    required this.child,
+    this.delay = Duration.zero,
+  });
+
+  final bool show;
+  final Widget child;
+  final Duration delay;
+
+  @override
+  State<_Reveal> createState() => _RevealState();
+}
+
+class _RevealState extends State<_Reveal> {
+  Timer? _timer;
+  late bool _visible = widget.show && widget.delay == Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.show && !_visible) _scheduleShow();
+  }
+
+  @override
+  void didUpdateWidget(_Reveal oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.show == oldWidget.show) return;
+    _timer?.cancel();
+    if (!widget.show) {
+      _visible = false;
+    } else if (widget.delay == Duration.zero) {
+      _visible = true;
+    } else {
+      _scheduleShow();
+    }
+  }
+
+  void _scheduleShow() => _timer = Timer(widget.delay, () {
+    if (mounted) setState(() => _visible = true);
+  });
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedSize(
+    duration: const Duration(milliseconds: 500),
+    curve: Curves.easeInOutCubic,
+    alignment: Alignment.topCenter,
+    child: AnimatedSwitcher(
+      duration: const Duration(milliseconds: 500),
+      switchInCurve: Curves.easeInOut,
+      switchOutCurve: Curves.easeInOut,
+      layoutBuilder: smoothSwitcherLayout,
+      child: _visible
+          ? KeyedSubtree(key: const ValueKey('shown'), child: widget.child)
+          : const SizedBox(key: ValueKey('hidden'), width: double.infinity),
+    ),
+  );
+}
+
+/// Cross-fades [child] when [id] changes, for content that differs by day.
+class _Fade extends StatelessWidget {
+  const _Fade({required this.id, required this.child});
+
+  final String id;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => AnimatedSwitcher(
+    duration: const Duration(milliseconds: 400),
+    layoutBuilder: smoothSwitcherLayout,
+    child: KeyedSubtree(key: ValueKey(id), child: child),
+  );
 }

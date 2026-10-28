@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/home/presentation/widgets/history/chart_paint.dart';
 import 'package:exhale/features/tracking/domain/entities/all_time_series.dart';
@@ -24,26 +25,33 @@ class AllTimeChart extends StatelessWidget {
     return SizedBox(
       height: height,
       width: double.infinity,
-      child: CustomPaint(
-        painter: _AllTimePainter(
-          series: series,
-          quitDay: quitDay,
-          accent: colors.primaryContainer,
-          marker: colors.primary,
-          flag: context.exhale.warning.solid,
-          plan: colors.onSurface.withValues(alpha: 0.7),
-          grid: colors.outlineVariant.withValues(alpha: 0.35),
-          surface: colors.surfaceContainer,
-          labelStyle: context.textTheme.labelMedium!.copyWith(
-            color: colors.onSurfaceVariant,
-          ),
-          markerStyle: context.textTheme.labelSmall!.copyWith(
-            color: colors.primary,
-            fontWeight: FontWeight.w700,
-          ),
-          flagStyle: context.textTheme.labelSmall!.copyWith(
-            color: context.exhale.warning.solid,
-            fontWeight: FontWeight.w700,
+      // The line draws from the first day onward when the chart appears.
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: 1),
+        duration: AppMotion.fill,
+        curve: AppMotion.fillCurve,
+        builder: (context, reveal, _) => CustomPaint(
+          painter: _AllTimePainter(
+            reveal: reveal,
+            series: series,
+            quitDay: quitDay,
+            accent: colors.primaryContainer,
+            marker: colors.primary,
+            flag: context.exhale.warning.solid,
+            plan: colors.onSurface.withValues(alpha: 0.7),
+            grid: colors.outlineVariant.withValues(alpha: 0.35),
+            surface: colors.surfaceContainerHigh,
+            labelStyle: context.textTheme.labelMedium!.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+            markerStyle: context.textTheme.labelSmall!.copyWith(
+              color: colors.primary,
+              fontWeight: FontWeight.w700,
+            ),
+            flagStyle: context.textTheme.labelSmall!.copyWith(
+              color: context.exhale.warning.solid,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),
@@ -110,6 +118,7 @@ class AllTimeLegend extends StatelessWidget {
 
 class _AllTimePainter extends CustomPainter {
   const _AllTimePainter({
+    required this.reveal,
     required this.series,
     required this.quitDay,
     required this.accent,
@@ -123,6 +132,7 @@ class _AllTimePainter extends CustomPainter {
     required this.flagStyle,
   });
 
+  final double reveal;
   final AllTimeSeries series;
   final LogicalDay quitDay;
   final Color accent;
@@ -178,6 +188,13 @@ class _AllTimePainter extends CustomPainter {
         ..strokeCap = StrokeCap.round,
     );
 
+    // The line runs from the first day to today, not to the quit day, so it
+    // arrives as the ring on the day card finishes.
+    final tipX = xAt(math.max(counts.length - 1, 0));
+    final clipX = reveal >= 1 ? size.width : left + (tipX - left) * reveal + 2;
+    canvas
+      ..save()
+      ..clipRect(Rect.fromLTRB(0, 0, clipX, size.height));
     final daily = [
       for (var i = 0; i < counts.length; i++) Offset(xAt(i), yFor(counts[i])),
     ];
@@ -233,7 +250,11 @@ class _AllTimePainter extends CustomPainter {
       );
     }
 
+    canvas.restore();
+
+    // The Today marker stays put; its dot fades in as the line reaches it.
     final todayPoint = main.isEmpty ? Offset(xAt(0), bottom) : main.last;
+    final dot = ((clipX - todayPoint.dx + 12) / 12).clamp(0.0, 1.0);
     canvas
       ..drawLine(
         Offset(todayPoint.dx, _top - 4),
@@ -242,12 +263,16 @@ class _AllTimePainter extends CustomPainter {
           ..color = marker
           ..strokeWidth = 1,
       )
-      ..drawCircle(todayPoint, 4, Paint()..color = surface)
+      ..drawCircle(
+        todayPoint,
+        4,
+        Paint()..color = surface.withValues(alpha: surface.a * dot),
+      )
       ..drawCircle(
         todayPoint,
         4,
         Paint()
-          ..color = accent
+          ..color = accent.withValues(alpha: accent.a * dot)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2.5,
       );

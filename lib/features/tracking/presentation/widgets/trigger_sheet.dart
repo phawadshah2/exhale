@@ -9,13 +9,14 @@ import 'package:exhale/features/tracking/presentation/widgets/trigger_picker.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// What the trigger sheet answered: a trigger (or none when skipped), and
-/// whether to keep asking on future logs.
+/// What the trigger sheet answered: a trigger (or none when skipped), an
+/// optional note, and whether to keep asking on future logs.
 @immutable
 class TriggerAnswer {
-  const TriggerAnswer({this.trigger, this.keepAsking = true});
+  const TriggerAnswer({this.trigger, this.note, this.keepAsking = true});
 
   final Trigger? trigger;
+  final String? note;
   final bool keepAsking;
 }
 
@@ -48,10 +49,17 @@ class _TriggerSheet extends ConsumerStatefulWidget {
 class _TriggerSheetState extends ConsumerState<_TriggerSheet> {
   Trigger? _selected;
   bool _keepAsking = true;
+  final TextEditingController _note = TextEditingController();
 
-  void _finish(Trigger? trigger) =>
-      Navigator.of(context)
-          .pop(TriggerAnswer(trigger: trigger, keepAsking: _keepAsking));
+  @override
+  void dispose() {
+    _note.dispose();
+    super.dispose();
+  }
+
+  void _finish(Trigger? trigger) => Navigator.of(context).pop(
+    TriggerAnswer(trigger: trigger, note: _note.text, keepAsking: _keepAsking),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +134,16 @@ class _TriggerSheetState extends ConsumerState<_TriggerSheet> {
             habitKind: habit.kind,
             selected: _selected,
             onChanged: (trigger) => setState(() => _selected = trigger),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          TextField(
+            controller: _note,
+            maxLength: 80,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: const InputDecoration(
+              labelText: 'Note (optional)',
+              counterText: '',
+            ),
           ),
           if (widget.offerToStopAsking) ...[
             const SizedBox(height: AppSpacing.md),

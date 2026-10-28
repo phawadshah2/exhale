@@ -1,6 +1,8 @@
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger_breakdown.dart';
@@ -25,27 +27,34 @@ class DayTriggers extends ConsumerWidget {
   final ValueChanged<Trigger>? onSelect;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context, WidgetRef ref) => AnimatedSize(
+    duration: const Duration(milliseconds: 500),
+    curve: Curves.easeInOutCubic,
+    alignment: Alignment.topCenter,
+    child: AnimatedSwitcher(
+      duration: const Duration(milliseconds: 500),
+      layoutBuilder: smoothSwitcherLayout,
+      child: _content(context, ref),
+    ),
+  );
+
+  Widget _content(BuildContext context, WidgetRef ref) {
     final logs = ref.watch(logsForDayProvider((habitId: habitId, day: day)));
     final firstDay = ref.watch(planHistoryProvider(habitId)).value?.firstDay;
     final loaded = logs.value;
-    if (loaded == null) return const SizedBox.shrink();
+    if (loaded == null) return const SizedBox.shrink(key: ValueKey('none'));
 
     final top = ProgressCalculator.triggerBreakdown(loaded).top(3);
     final isToday = day == ref.watch(todayProvider);
     if (top.isEmpty) {
       return loaded.isEmpty && day == firstDay
-          ? const _Placeholder()
-          : const SizedBox.shrink();
+          ? const _Placeholder(key: ValueKey('placeholder'))
+          : const SizedBox.shrink(key: ValueKey('none'));
     }
 
     final colors = context.colors;
-    final rankColors = [
-      context.exhale.danger.foreground,
-      colors.primary,
-      context.exhale.warning.foreground,
-    ];
     return Container(
+      key: ValueKey('panel-$day'),
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -65,8 +74,13 @@ class DayTriggers extends ConsumerWidget {
               letterSpacing: 0.9,
             ),
           ),
-          for (var i = 0; i < top.length; i++)
-            _TriggerRow(share: top[i], color: rankColors[i], onTap: onSelect),
+          for (final share in top)
+            _TriggerRow(
+              key: ValueKey('$day-${share.trigger.name}'),
+              share: share,
+              color: share.trigger.tint(context),
+              onTap: onSelect,
+            ),
         ],
       ),
     );
@@ -75,6 +89,7 @@ class DayTriggers extends ConsumerWidget {
 
 class _TriggerRow extends StatelessWidget {
   const _TriggerRow({
+    required super.key,
     required this.share,
     required this.color,
     required this.onTap,
@@ -108,11 +123,17 @@ class _TriggerRow extends StatelessWidget {
             Expanded(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(99),
-                child: LinearProgressIndicator(
-                  value: share.fraction,
-                  minHeight: 8,
-                  color: color,
-                  backgroundColor: colors.outlineVariant,
+                // Keyed by day, so each day's bars fill from empty.
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: share.fraction),
+                  duration: AppMotion.fill,
+                  curve: AppMotion.fillCurve,
+                  builder: (context, value, _) => LinearProgressIndicator(
+                    value: value,
+                    minHeight: 8,
+                    color: color,
+                    backgroundColor: colors.outlineVariant,
+                  ),
                 ),
               ),
             ),
@@ -137,7 +158,7 @@ class _TriggerRow extends StatelessWidget {
 }
 
 class _Placeholder extends StatelessWidget {
-  const _Placeholder();
+  const _Placeholder({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,6 @@
 import 'package:exhale/core/presentation/app_icons.dart';
-import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 extension TriggerUi on Trigger {
   String get label => switch (this) {
@@ -50,15 +49,32 @@ extension TriggerUi on Trigger {
     Trigger.avoidingTasks => AppIcons.avoidingTasks,
   };
 
-  /// Stress and its kin read coral, work and fatigue amber, the rest teal.
-  Color tint(BuildContext context) => switch (this) {
-    Trigger.stress ||
-    Trigger.lonely ||
-    Trigger.avoidingTasks => context.exhale.danger.foreground,
-    Trigger.work ||
-    Trigger.tired ||
-    Trigger.lateNight ||
-    Trigger.bedtime => context.exhale.warning.foreground,
-    _ => context.colors.primary,
+  /// Each trigger keeps its own hue wherever it is shown, whatever its rank.
+  Color tint(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return HSLColor.fromAHSL(1, _hue, 0.62, dark ? 0.66 : 0.46).toColor();
+  }
+
+  double get _hue => switch (this) {
+    Trigger.stress => 4,
+    Trigger.coffee => 22,
+    Trigger.afterMeal => 38,
+    Trigger.work => 52,
+    Trigger.morning => 70,
+    Trigger.workout => 90,
+    Trigger.habit => 112,
+    Trigger.commute => 136,
+    Trigger.social => 156,
+    Trigger.drinks => 174,
+    Trigger.boredom => 190,
+    Trigger.watchingTv => 204,
+    Trigger.studying => 218,
+    Trigger.bedtime => 234,
+    Trigger.lateNight => 250,
+    Trigger.tired => 268,
+    Trigger.notification => 286,
+    Trigger.celebrating => 304,
+    Trigger.lonely => 322,
+    Trigger.avoidingTasks => 340,
   };
 }
