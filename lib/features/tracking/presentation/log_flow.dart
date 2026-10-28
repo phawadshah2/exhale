@@ -12,20 +12,20 @@ import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:exhale/features/tracking/presentation/widgets/trigger_sheet.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Asks for a trigger first (unless turned off), then saves a log of
-/// [habitId]. Dismissing the trigger sheet cancels the log. Returns whether a
-/// log was saved.
-Future<bool> logNow(
+/// [habitId]. Dismissing the trigger sheet cancels the log. Returns the
+/// snackbar offering Undo, or null when nothing was logged.
+Future<ScaffoldFeatureController<SnackBar, SnackBarClosedReason>?> logNow(
   BuildContext context,
   WidgetRef ref, {
   required int habitId,
 }) async {
   final habit = ref.read(habitProvider(habitId));
-  if (habit == null) return false;
+  if (habit == null) return null;
   unawaited(HapticFeedback.mediumImpact());
   final loggedAt = ref.read(clockProvider).now();
   final settings = ref.read(currentSettingsProvider);
@@ -39,7 +39,7 @@ Future<bool> logNow(
       habitId: habitId,
       offerToStopAsking: firstPrompt,
     );
-    if (answer == null || !context.mounted) return false;
+    if (answer == null || !context.mounted) return null;
     trigger = answer.trigger;
     note = answer.note;
     if (firstPrompt) {
@@ -51,7 +51,7 @@ Future<bool> logNow(
               askForTrigger: answer.keepAsking,
             ),
           );
-      if (!context.mounted) return false;
+      if (!context.mounted) return null;
     }
   }
 
@@ -63,23 +63,22 @@ Future<bool> logNow(
       note: note,
     ),
   );
-  if (!context.mounted) return false;
+  if (!context.mounted) return null;
   switch (result) {
     case Success(value: final HabitLog log):
-      showAppSnackBar(
+      return showAppSnackBar(
         context,
         message: 'Logged at ${AppFormat.time(log.loggedAt)}',
         actionLabel: 'Undo',
         onAction: () => ref.read(deleteHabitLogProvider)(log.id),
         duration: const Duration(seconds: 2),
       );
-      return true;
     case FailureResult(:final failure):
       showAppSnackBar(
         context,
         message: failureMessage(failure),
         tone: SnackTone.danger,
       );
-      return false;
+      return null;
   }
 }

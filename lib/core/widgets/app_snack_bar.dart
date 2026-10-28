@@ -7,7 +7,7 @@ enum SnackTone { info, success, warning, danger }
 
 /// Shows the app's floating capsule snackbar: it springs up from below,
 /// pops its status dot, and runs a countdown bar until it closes.
-void showAppSnackBar(
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showAppSnackBar(
   BuildContext context, {
   required String message,
   SnackTone tone = SnackTone.info,
@@ -23,30 +23,29 @@ void showAppSnackBar(
 
   // Clear rather than queue, so the visible snackbar (and its action) is
   // always the latest one.
-  ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        padding: EdgeInsets.zero,
-        clipBehavior: Clip.none,
-        behavior: SnackBarBehavior.floating,
+  final messenger = ScaffoldMessenger.of(context)..clearSnackBars();
+  return messenger.showSnackBar(
+    SnackBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      padding: EdgeInsets.zero,
+      clipBehavior: Clip.none,
+      behavior: SnackBarBehavior.floating,
+      duration: visibleFor,
+      persist: false,
+      content: AppSnackBarContent(
+        message: message,
+        tone: tone,
         duration: visibleFor,
-        persist: false,
-        content: AppSnackBarContent(
-          message: message,
-          tone: tone,
-          duration: visibleFor,
-          actionLabel: hasAction ? actionLabel : null,
-          onAction: hasAction ? onAction : null,
-        ),
+        actionLabel: hasAction ? actionLabel : null,
+        onAction: hasAction ? onAction : null,
       ),
-      snackBarAnimationStyle: const AnimationStyle(
-        duration: Duration(milliseconds: 300),
-        reverseDuration: Duration(milliseconds: 220),
-      ),
-    );
+    ),
+    snackBarAnimationStyle: const AnimationStyle(
+      duration: Duration(milliseconds: 300),
+      reverseDuration: Duration(milliseconds: 220),
+    ),
+  );
 }
 
 class AppSnackBarContent extends StatefulWidget {
