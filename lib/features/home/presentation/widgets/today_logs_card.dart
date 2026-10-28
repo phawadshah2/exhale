@@ -1,22 +1,43 @@
-import 'package:exhale/core/presentation/formatting/app_format.dart';
-import 'package:exhale/core/theme/app_spacing.dart';
+import 'dart:async';
+
+import 'package:exhale/core/presentation/app_icons.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
+import 'package:exhale/features/logs/presentation/widgets/log_row.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
-import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
+import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// The first few logs of today; the rest are behind "See all logs".
-class TodayLogsCard extends ConsumerWidget {
+/// The newest few logs of today; the rest expand in place. "See all logs"
+/// opens Logs.
+class TodayLogsCard extends ConsumerStatefulWidget {
   const TodayLogsCard({required this.habitId, super.key});
-
-  static const _shown = 3;
 
   final int habitId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TodayLogsCard> createState() => _TodayLogsCardState();
+}
+
+class _TodayLogsCardState extends ConsumerState<TodayLogsCard> {
+  static const _shown = 3;
+
+  bool _expanded = false;
+
+  int get habitId => widget.habitId;
+
+  void _toggle() {
+    unawaited(HapticFeedback.selectionClick());
+    setState(() => _expanded = !_expanded);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.textTheme;
     final today = ref.watch(todayProvider);
@@ -25,62 +46,128 @@ class TodayLogsCard extends ConsumerWidget {
         const [];
     final more = logs.length - _shown;
 
-    return Card(
-      child: Padding(
-        padding: AppSpacing.card,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Today's logs", style: text.titleMedium),
-            const SizedBox(height: AppSpacing.sm),
-            if (logs.isEmpty)
-              Text(
-                'Nothing logged today.',
-                style: text.bodyMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
-                ),
-              ),
-            for (final log in logs.reversed.take(_shown))
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        AppFormat.time(log.loggedAt),
-                        style: text.titleSmall,
-                      ),
-                    ),
-                    if (log.trigger case final trigger?)
+    void seeAll() =>
+        openLogs(context, LogsQuery(habitId: habitId, from: today, to: today));
+
+    final divider = Divider(
+      height: 1,
+      color: colors.outlineVariant.withValues(alpha: 0.5),
+    );
+    final newest = logs.reversed.toList();
+    final shown = newest.take(_shown).toList();
+    final extra = newest.skip(_shown).toList();
+
+    Widget row(HabitLog log) => LogRow(
+      log: log,
+      onTap: () =>
+          showLogEditorSheet(context, habitId: habitId, day: today, log: log),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 6, 4, 8),
+          child: Row(
+            children: [
+              Expanded(child: Text("Today's logs", style: text.titleLarge)),
+              InkWell(
+                onTap: seeAll,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  child: Row(
+                    spacing: 4,
+                    children: [
                       Text(
-                        trigger.label,
-                        style: text.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
+                        'See all logs',
+                        style: text.labelLarge?.copyWith(
+                          color: colors.primary,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                  ],
-                ),
-              ),
-            if (more > 0) ...[
-              const SizedBox(height: AppSpacing.xs),
-              TextButton(
-                onPressed: () => openLogs(
-                  context,
-                  LogsQuery(habitId: habitId, from: today, to: today),
-                ),
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: const Size(0, 44),
-                ),
-                child: Text(
-                  '+$more more today · See all logs',
-                  style: text.labelLarge?.copyWith(color: colors.primary),
+                      Icon(
+                        AppIcons.chevronRight,
+                        size: 14,
+                        color: colors.primary,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
-          ],
+          ),
         ),
-      ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            child: Column(
+              children: [
+                if (shown.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Text(
+                      'Nothing logged today.',
+                      style: text.bodyMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                for (var i = 0; i < shown.length; i++) ...[
+                  if (i > 0) divider,
+                  row(shown[i]),
+                ],
+                SmoothSwitcher(
+                  resize: true,
+                  child: _expanded && extra.isNotEmpty
+                      ? Column(
+                          key: const ValueKey('more'),
+                          children: [
+                            for (final log in extra) ...[divider, row(log)],
+                          ],
+                        )
+                      : const SizedBox(
+                          key: ValueKey('less'),
+                          width: double.infinity,
+                        ),
+                ),
+                if (more > 0) ...[
+                  divider,
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _toggle,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 44),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        spacing: 6,
+                        children: [
+                          Text(
+                            _expanded ? 'Show less' : '+$more more today',
+                            style: text.labelLarge?.copyWith(
+                              color: colors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          AnimatedRotation(
+                            turns: _expanded ? 0.5 : 0,
+                            duration: AppMotion.swap,
+                            curve: AppMotion.swapCurve,
+                            child: Icon(
+                              AppIcons.chevronDown,
+                              size: 14,
+                              color: colors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
