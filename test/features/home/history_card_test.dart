@@ -97,6 +97,24 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('a toggle swaps to stats loaded ahead, then settles on one', (
+    tester,
+  ) async {
+    await seedWeek();
+    await showHistory(tester);
+
+    await tester.tap(find.text('Month'));
+    await tester.pump();
+    // The total counts up from 0; its allowance is the new period's at once.
+    expect(find.textContaining('/ 147 allowed'), findsOneWidget);
+
+    await tester.pumpAndSettle();
+    expect(find.text('16 / 45 allowed'), findsNothing);
+    expect(find.text('TOP TRIGGERS'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('all shows since-day-1 label', (tester) async {
     await seedWeek();
     await showHistory(tester);

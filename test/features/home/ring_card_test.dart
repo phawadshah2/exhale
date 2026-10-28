@@ -1,5 +1,6 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/features/home/presentation/widgets/day_triggers.dart';
 import 'package:exhale/features/home/presentation/widgets/ring_card.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
@@ -270,6 +271,9 @@ void main() {
     await startPlan(LogicalDay(2026, 10, 14), limit: 3);
     await logAt(DateTime(2026, 10, 16, 9), times: 5);
     await tester.pumpAppPastSplash(height: 2400);
+    // The note waits for the ring to finish filling.
+    await tester.pump(AppMotion.fill + const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
 
     expect(
       find.textContaining('A harder day. Tomorrow starts fresh at'),

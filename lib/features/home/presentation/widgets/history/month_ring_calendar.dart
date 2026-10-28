@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/home/presentation/widgets/history/chart_paint.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
@@ -44,6 +45,22 @@ class MonthRingCalendar extends StatelessWidget {
       color: context.colors.onSurfaceVariant,
     );
 
+    // Rings fill from empty, left to right and top to bottom.
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: AppMotion.fill,
+      curve: AppMotion.fillCurve,
+      builder: (context, reveal, _) => _grid(cells, label, reveal),
+    );
+  }
+
+  Widget _grid(List<DaySlot?> cells, TextStyle label, double reveal) {
+    // The wave ends on the last shown day (today in this month), so its ring
+    // finishes with the ring on the day card.
+    final last = math.max(
+      cells.lastIndexWhere((c) => c != null && c.kind != DaySlotKind.future),
+      1,
+    );
     return Column(
       children: [
         SizedBox(
@@ -69,6 +86,9 @@ class MonthRingCalendar extends StatelessWidget {
                         : _DayCell(
                             slot: cells[row * 7 + col]!,
                             onTap: onDayTap,
+                            reveal:
+                                (reveal * 1.6 - (row * 7 + col) / last * 0.6)
+                                    .clamp(0.0, 1.0),
                           ),
                   ),
               ],
@@ -80,10 +100,17 @@ class MonthRingCalendar extends StatelessWidget {
 }
 
 class _DayCell extends StatelessWidget {
-  const _DayCell({required this.slot, required this.onTap});
+  const _DayCell({
+    required this.slot,
+    required this.onTap,
+    required this.reveal,
+  });
 
   final DaySlot slot;
   final ValueChanged<LogicalDay> onTap;
+
+  /// 0 to 1: how much of the ring is drawn while it animates in.
+  final double reveal;
 
   @override
   Widget build(BuildContext context) {
@@ -119,9 +146,11 @@ class _DayCell extends StatelessWidget {
                 progress: progress == null
                     ? null
                     : (
-                        fraction: progress.limit == 0 && progress.count == 0
-                            ? 1
-                            : progress.usedFraction,
+                        fraction:
+                            (progress.limit == 0 && progress.count == 0
+                                ? 1.0
+                                : progress.usedFraction) *
+                            reveal,
                         color: progress.status.barColor(context),
                       ),
                 dashed: future,

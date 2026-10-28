@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/fill_in.dart';
 import 'package:exhale/core/widgets/pill_segmented_control.dart';
+import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
 import 'package:exhale/features/home/presentation/widgets/backward_pager.dart';
 import 'package:exhale/features/home/presentation/widgets/history/all_time_chart.dart';
@@ -26,13 +29,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Week line, month rings or the whole plan so far. Swipe the chart, or use
 /// the arrows, to move by a period; tap a day to see its logs.
-class HistoryCard extends ConsumerWidget {
+class HistoryCard extends ConsumerStatefulWidget {
   const HistoryCard({required this.habitId, super.key});
 
   final int habitId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HistoryCard> createState() => _HistoryCardState();
+}
+
+class _HistoryCardState extends ConsumerState<HistoryCard> {
+  /// The last stats that loaded, with the period and range they belong to.
+  /// Kept while the next period's load, so the card does not collapse and
+  /// regrow on every swipe, and keyed by their own range so the swap to new
+  /// stats animates once they arrive.
+  ({HistoryPeriod period, String key, HistoryStats stats})? _shownStats;
+
+  int get habitId => widget.habitId;
+
+  @override
+  Widget build(BuildContext context) {
     final period = ref.watch(historyPeriodProvider(habitId));
     final today = ref.watch(todayProvider);
     final earliest = ref.watch(earliestDayProvider(habitId));
@@ -43,15 +59,33 @@ class HistoryCard extends ConsumerWidget {
 
     final paged = period.chartPeriod;
     final firstDay = history?.firstDay;
-    final range = paged != null
-        ? PeriodRange.of(paged, shown)
-        : PeriodRange(
-            firstDay == null || firstDay.isAfter(today) ? today : firstDay,
-            today,
-          );
-    final stats = ref
+    PeriodRange rangeOf(HistoryPeriod kind) => switch (kind.chartPeriod) {
+      final chart? => PeriodRange.of(chart, shown),
+      null => PeriodRange(
+        firstDay == null || firstDay.isAfter(today) ? today : firstDay,
+        today,
+      ),
+    };
+    final range = rangeOf(period);
+    // Every period is loaded ahead, so a toggle finds its chart and stats
+    // ready and both swap together.
+    for (final other in HistoryPeriod.values) {
+      final key = (habitId: habitId, range: rangeOf(other));
+      ref.watch(historyStatsProvider(key));
+      if (other.chartPeriod != null) ref.watch(periodSummaryProvider(key));
+    }
+    ref.watch(allTimeSeriesProvider(habitId));
+    final loaded = ref
         .watch(historyStatsProvider((habitId: habitId, range: range)))
         .value;
+    if (loaded != null) {
+      _shownStats = (
+        period: period,
+        key: '$period-${range.from}-${range.to}',
+        stats: loaded,
+      );
+    }
+    final shownStats = _shownStats;
 
     void openDay(LogicalDay day) {
       unawaited(HapticFeedback.selectionClick());
@@ -71,81 +105,132 @@ class HistoryCard extends ConsumerWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(child: Text('History', style: text.headlineSmall)),
-                SizedBox(
-                  width: 216,
-                  child: PillSegmentedControl<HistoryPeriod>(
-                    selected: period,
-                    onChanged: ref
-                        .read(historyPeriodProvider(habitId).notifier)
-                        .select,
-                    segments: const [
-                      PillSegment(value: HistoryPeriod.week, label: 'Week'),
-                      PillSegment(value: HistoryPeriod.month, label: 'Month'),
-                      PillSegment(value: HistoryPeriod.all, label: 'All'),
-                    ],
+        // Month length, empty periods and the All view change the height;
+        // it eases rather than jumps.
+        child: AnimatedSize(
+          duration: AppMotion.swap,
+          curve: AppMotion.swapCurve,
+          alignment: Alignment.topCenter,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(child: Text('History', style: text.headlineSmall)),
+                  SizedBox(
+                    width: 216,
+                    child: PillSegmentedControl<HistoryPeriod>(
+                      selected: period,
+                      onChanged: ref
+                          .read(historyPeriodProvider(habitId).notifier)
+                          .select,
+                      segments: const [
+                        PillSegment(value: HistoryPeriod.week, label: 'Week'),
+                        PillSegment(value: HistoryPeriod.month, label: 'Month'),
+                        PillSegment(value: HistoryPeriod.all, label: 'All'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              SmoothSwitcher(
+                child: paged != null
+                    ? _PeriodNav(
+                        key: ValueKey('nav-${paged.name}'),
+                        period: paged,
+                        range: range,
+                        today: today,
+                        earliest: earliest,
+                        shown: shown,
+                        onMove: anchor.pick,
+                      )
+                    : Container(
+                        key: const ValueKey('since'),
+                        // As tall as the arrows row, so toggling does not
+                        // change the height.
+                        height: 48,
+                        alignment: Alignment.center,
+                        child: Text(
+                          _sinceLabel(history, today),
+                          textAlign: TextAlign.center,
+                          style: text.titleSmall,
+                        ),
+                      ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              if (shownStats != null) ...[
+                SmoothSwitcher(
+                  child: KeyedSubtree(
+                    key: ValueKey('total-${shownStats.key}'),
+                    child: _Total(stats: shownStats.stats.stats),
                   ),
                 ),
+                const SizedBox(height: AppSpacing.gutterSm),
               ],
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            if (paged != null)
-              _PeriodNav(
-                period: paged,
-                range: range,
-                today: today,
-                earliest: earliest,
-                shown: shown,
-                onMove: anchor.pick,
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                child: Text(
-                  _sinceLabel(history, today),
-                  textAlign: TextAlign.center,
-                  style: text.titleSmall,
+              SmoothSwitcher(
+                sequential: true,
+                resize: true,
+                child: KeyedSubtree(
+                  key: ValueKey(period),
+                  child: paged != null
+                      ? _PagedChart(
+                          habitId: habitId,
+                          period: paged,
+                          range: range,
+                          shown: shown,
+                          today: today,
+                          earliest: earliest,
+                          onMove: anchor.pick,
+                          onDayTap: openDay,
+                        )
+                      : _AllChart(habitId: habitId, onTap: openPeriod),
                 ),
               ),
-            const SizedBox(height: AppSpacing.sm),
-            if (stats != null) ...[
-              _Total(stats: stats.stats),
               const SizedBox(height: AppSpacing.gutterSm),
-            ],
-            if (paged != null)
-              _PagedChart(
-                habitId: habitId,
-                period: paged,
-                range: range,
-                shown: shown,
-                today: today,
-                earliest: earliest,
-                onMove: anchor.pick,
-                onDayTap: openDay,
-              )
-            else
-              _AllChart(habitId: habitId, onTap: openPeriod),
-            const SizedBox(height: AppSpacing.gutterSm),
-            if (period == HistoryPeriod.month) ...[
-              const MonthRingKey(),
-              const SizedBox(height: AppSpacing.gutterSm),
-            ],
-            if (stats != null) ...[
-              HistoryStatsLine(stats: stats.stats),
-              const SizedBox(height: AppSpacing.gutterSm),
-              TopTriggers(
-                breakdown: stats.breakdown,
-                sinceStart: paged == null,
-                onTrigger: openPeriod,
-                onAll: openPeriod,
+              SmoothSwitcher(
+                sequential: true,
+                resize: true,
+                child: period == HistoryPeriod.month
+                    ? const Padding(
+                        key: ValueKey('ring-key'),
+                        padding: EdgeInsets.only(bottom: AppSpacing.gutterSm),
+                        child: MonthRingKey(),
+                      )
+                    : const SizedBox(
+                        key: ValueKey('no-key'),
+                        width: double.infinity,
+                      ),
               ),
+              if (shownStats != null)
+                // A toggle fades the stats and triggers out, then in; a swipe
+                // within one period cross-fades them.
+                SmoothSwitcher(
+                  sequential: true,
+                  resize: true,
+                  child: KeyedSubtree(
+                    key: ValueKey('stats-${shownStats.period}'),
+                    child: SmoothSwitcher(
+                      resize: true,
+                      child: Column(
+                        key: ValueKey('stats-${shownStats.key}'),
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          HistoryStatsLine(stats: shownStats.stats.stats),
+                          const SizedBox(height: AppSpacing.gutterSm),
+                          TopTriggers(
+                            breakdown: shownStats.stats.breakdown,
+                            sinceStart: shownStats.period == HistoryPeriod.all,
+                            onTrigger: openPeriod,
+                            onAll: openPeriod,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -168,6 +253,7 @@ class _PeriodNav extends StatelessWidget {
     required this.earliest,
     required this.shown,
     required this.onMove,
+    super.key,
   });
 
   final ChartPeriod period;
@@ -243,31 +329,27 @@ class _Total extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: '${stats.logged}',
-                      style: text.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
+              CountUp(
+                value: stats.logged,
+                builder: (context, logged) => Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '$logged',
+                        style: text.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
-                    TextSpan(
-                      text: ' / ${stats.allowed} allowed',
-                      style: text.titleMedium?.copyWith(
-                        color: colors.onSurfaceVariant,
+                      TextSpan(
+                        text: ' / ${stats.allowed} allowed',
+                        style: text.titleMedium?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              if (stats.allowedByToday != stats.allowed)
-                Text(
-                  '${stats.allowedByToday} allowed by today',
-                  style: text.labelMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
+                    ],
                   ),
                 ),
+              ),
             ],
           ),
         ),
@@ -330,7 +412,7 @@ class _PagedChart extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
       decoration: BoxDecoration(
-        color: context.colors.surfaceContainer.withValues(alpha: 0.6),
+        color: context.colors.surfaceContainerHigh,
         borderRadius: AppRadius.inner,
       ),
       child: AnimatedSize(
@@ -374,9 +456,7 @@ class _ChartPage extends ConsumerWidget {
     final summary = ref
         .watch(periodSummaryProvider((habitId: habitId, range: range)))
         .value;
-    if (summary == null) {
-      return const Center(child: CircularProgressIndicator.adaptive());
-    }
+    if (summary == null) return const SizedBox.shrink();
     return period == ChartPeriod.week
         ? WeekLineChart(summary: summary, onDayTap: onDayTap)
         : MonthRingCalendar(summary: summary, onDayTap: onDayTap);
@@ -398,10 +478,7 @@ class _AllChart extends ConsumerWidget {
         ?.current
         .quitDay;
     if (series == null || quitDay == null) {
-      return const SizedBox(
-        height: AllTimeChart.height,
-        child: Center(child: CircularProgressIndicator.adaptive()),
-      );
+      return const SizedBox(height: AllTimeChart.height);
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -412,7 +489,7 @@ class _AllChart extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              color: context.colors.surfaceContainer.withValues(alpha: 0.6),
+              color: context.colors.surfaceContainerHigh,
               borderRadius: AppRadius.inner,
             ),
             child: AllTimeChart(series: series, quitDay: quitDay),

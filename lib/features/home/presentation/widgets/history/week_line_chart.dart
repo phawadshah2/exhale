@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/home/presentation/widgets/history/chart_paint.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
@@ -33,24 +34,32 @@ class WeekLineChart extends StatelessWidget {
     return Stack(
       children: [
         Positioned.fill(
-          child: CustomPaint(
-            painter: _WeekPainter(
-              summary: summary,
-              accent: colors.primaryContainer,
-              warning: context.exhale.warning.solid,
-              danger: context.exhale.danger.solid,
-              neutral: colors.onSurfaceVariant,
-              guide: colors.outlineVariant.withValues(alpha: 0.35),
-              limitLine: colors.onSurface.withValues(alpha: 0.7),
-              fillBase: colors.surfaceContainer,
-              labelStyle: label,
-              valueStyle: context.textTheme.labelMedium!.copyWith(
-                color: colors.onSurface,
-                fontWeight: FontWeight.w600,
-              ),
-              overStyle: context.textTheme.labelMedium!.copyWith(
-                color: context.exhale.danger.foreground,
-                fontWeight: FontWeight.w600,
+          // The line draws from the first day to the last each time a week
+          // appears.
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: AppMotion.fill,
+            curve: AppMotion.fillCurve,
+            builder: (context, reveal, _) => CustomPaint(
+              painter: _WeekPainter(
+                reveal: reveal,
+                summary: summary,
+                accent: colors.primaryContainer,
+                warning: context.exhale.warning.solid,
+                danger: context.exhale.danger.solid,
+                neutral: colors.onSurfaceVariant,
+                guide: colors.onSurfaceVariant.withValues(alpha: 0.45),
+                limitLine: colors.onSurface.withValues(alpha: 0.7),
+                fillBase: colors.surfaceContainerHigh,
+                labelStyle: label,
+                valueStyle: context.textTheme.labelMedium!.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+                overStyle: context.textTheme.labelMedium!.copyWith(
+                  color: context.exhale.danger.foreground,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -104,6 +113,7 @@ class _DayColumn extends StatelessWidget {
 
 class _WeekPainter extends CustomPainter {
   const _WeekPainter({
+    required this.reveal,
     required this.summary,
     required this.accent,
     required this.warning,
@@ -117,6 +127,8 @@ class _WeekPainter extends CustomPainter {
     required this.overStyle,
   });
 
+  /// 0 to 1: how far the line has been drawn from the first day on.
+  final double reveal;
   final PeriodSummary summary;
   final Color accent;
   final Color warning;
@@ -156,10 +168,10 @@ class _WeekPainter extends CustomPainter {
         ..moveTo(x, 24)
         ..lineTo(x, bottom);
       canvas.drawPath(
-        slots[i].kind == DaySlotKind.future
-            ? dashedPath(line, dash: 3, gap: 3)
-            : line,
-        guidePaint..style = PaintingStyle.stroke,
+        dashedPath(line, dash: 2),
+        guidePaint
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round,
       );
     }
 
@@ -202,6 +214,16 @@ class _WeekPainter extends CustomPainter {
       );
     }
 
+    // The line runs from the first day to the last shown day (today in this
+    // week), arriving as the ring on the day card finishes.
+    final lastShown = slots.lastIndexWhere((s) => s.kind != DaySlotKind.future);
+    final tipX = xFor(math.max(lastShown, 0));
+    final clipX = reveal >= 1
+        ? size.width
+        : xFor(0) + (tipX - xFor(0)) * reveal + 2;
+    canvas
+      ..save()
+      ..clipRect(Rect.fromLTWH(0, 0, clipX, size.height));
     final segments = <List<int>>[];
     for (var i = 0; i < slots.length; i++) {
       if (slots[i].count == null) continue;
@@ -244,6 +266,7 @@ class _WeekPainter extends CustomPainter {
           );
       }
     }
+    canvas.restore();
 
     for (var i = 0; i < slots.length; i++) {
       final slot = slots[i];
@@ -261,6 +284,10 @@ class _WeekPainter extends CustomPainter {
         continue;
       }
       if (count == null) continue;
+      // Each point fades in as the line reaches it, so a point is never cut
+      // in half by the reveal.
+      final shown = ((clipX - x + 12) / 12).clamp(0.0, 1.0);
+      if (shown == 0) continue;
       final status = slot.progress?.status;
       final color = switch (status) {
         LimitStatus.under => accent,
@@ -268,14 +295,20 @@ class _WeekPainter extends CustomPainter {
         LimitStatus.over => danger,
         null => neutral,
       };
+      final style = status == LimitStatus.over ? overStyle : valueStyle;
+      final textColor = style.color!;
       final center = Offset(x, yFor(count));
       canvas
-        ..drawCircle(center, 5, Paint()..color = fillBase)
+        ..drawCircle(
+          center,
+          5,
+          Paint()..color = fillBase.withValues(alpha: fillBase.a * shown),
+        )
         ..drawCircle(
           center,
           5,
           Paint()
-            ..color = color
+            ..color = color.withValues(alpha: color.a * shown)
             ..style = PaintingStyle.stroke
             ..strokeWidth = 3,
         );
@@ -283,7 +316,7 @@ class _WeekPainter extends CustomPainter {
         canvas,
         '$count',
         center.translate(0, -14),
-        status == LimitStatus.over ? overStyle : valueStyle,
+        style.copyWith(color: textColor.withValues(alpha: textColor.a * shown)),
       );
     }
   }

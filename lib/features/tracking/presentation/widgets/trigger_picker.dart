@@ -104,7 +104,7 @@ class _TriggerPill extends StatelessWidget {
             child: Row(
               spacing: 10,
               children: [
-                Icon(trigger.icon, size: 20, color: foreground),
+                Icon(trigger.icon, size: 20, color: trigger.tint(context)),
                 Expanded(
                   child: Text(
                     trigger.label,
@@ -113,8 +113,6 @@ class _TriggerPill extends StatelessWidget {
                     ),
                   ),
                 ),
-                // if (isSelected)
-                // Icon(AppIcons.check, size: 18, color: foreground),
               ],
             ),
           ),
