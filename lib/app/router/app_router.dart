@@ -1,5 +1,6 @@
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/app/shell/app_shell.dart';
+import 'package:exhale/app/shell/page_visits.dart';
 import 'package:exhale/features/design_system/presentation/design_system_page.dart';
 import 'package:exhale/features/home/presentation/pages/habit_details_page.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
@@ -16,6 +17,7 @@ import 'package:go_router/go_router.dart';
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: AppRoutes.splash,
+    observers: [shellRouteObserver],
     routes: [
       GoRoute(
         path: AppRoutes.splash,

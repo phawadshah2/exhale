@@ -1,3 +1,4 @@
+import 'package:exhale/app/shell/page_visits.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/home/presentation/widgets/habit_dashboard.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +13,12 @@ class HomePage extends ConsumerWidget {
     if (habitId == null) {
       return const Center(child: CircularProgressIndicator.adaptive());
     }
-    return HabitDashboard(
-      habitId: habitId,
-      header: DashboardHeaderKind.greeting,
+    return ReplayOnVisit(
+      tab: 0,
+      child: HabitDashboard(
+        habitId: habitId,
+        header: DashboardHeaderKind.greeting,
+      ),
     );
   }
 }
