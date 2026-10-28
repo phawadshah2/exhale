@@ -170,6 +170,29 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('add missed log on a past day lands on that day', (tester) async {
+    await startPlan();
+    await logAt(DateTime(2026, 10, 15, 9), times: 3);
+    await logAt(DateTime(2026, 10, 16, 9), times: 2);
+    await openPage(tester, const LogsQuery(habitId: 1));
+    expect(find.text('0 of 9 allowed'), findsOneWidget);
+
+    await tester.tap(find.text('Add a missed log for this day'));
+    await tester.pumpAndSettle();
+    expect(find.text('Add missed log'), findsOneWidget);
+    expect(find.text('Smoking · Wed, Oct 14'), findsOneWidget);
+
+    await tester.scrollAndTap(find.text('Add log'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Add missed log'), findsNothing);
+    expect(find.text('0 of 9 allowed'), findsNothing);
+    expect(find.text('1 of 9 allowed'), findsOneWidget);
+    expect(find.text('12:00 PM'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('delete from the sheet asks to confirm, and Undo restores', (
     tester,
   ) async {
