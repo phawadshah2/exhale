@@ -44,14 +44,20 @@ class AppShell extends ConsumerWidget {
   }
 
   /// After the first saved log with one habit, explains the + button's menu.
+  /// The hint waits for the Undo snackbar so it never covers it, and is
+  /// skipped (until the next log) when the log was undone or something else
+  /// is on screen by then.
   Future<void> _logAndHint(
     BuildContext context,
     WidgetRef ref,
     int habitId,
   ) async {
-    final logged = await logNow(context, ref, habitId: habitId);
-    if (!logged || !context.mounted) return;
+    final snack = await logNow(context, ref, habitId: habitId);
+    if (snack == null || !context.mounted) return;
     if (ref.read(currentSettingsProvider).logHintSeen) return;
+    final closed = await snack.closed;
+    if (closed == SnackBarClosedReason.action || !context.mounted) return;
+    if (!(ModalRoute.of(context)?.isCurrent ?? true)) return;
     await ref
         .read(settingsActionsProvider)
         .update((s) => s.copyWith(logHintSeen: true));

@@ -155,18 +155,35 @@ void main() {
       await repository.save(current.value.copyWith(logHintSeen: false));
     });
 
-    Future<void> logOnce(WidgetTester tester) async {
+    Future<void> saveLog(WidgetTester tester) async {
       await tester.tap(find.byTooltip('Log'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Save without trigger'));
       await tester.pumpInSteps(const Duration(milliseconds: 900));
     }
 
+    // The hint waits for the 2 s Undo snackbar to close.
+    Future<void> logOnce(WidgetTester tester) async {
+      await saveLog(tester);
+      await tester.pumpInSteps(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+    }
+
+    Future<bool> hintSeen(WidgetTester tester) async {
+      final settings = await tester.runAsync(
+        () => sl<SettingsRepository>().get(),
+      );
+      return (settings! as Success<AppSettings>).value.logHintSeen;
+    }
+
     testWidgets('hint shows once after the first log', (tester) async {
       await tester.pumpAppPastSplash(height: 2400);
       expect(find.text('Hold + for more'), findsNothing);
 
-      await logOnce(tester);
+      await saveLog(tester);
+      expect(find.text('Hold + for more'), findsNothing);
+      await tester.pumpInSteps(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
       expect(find.text('Hold + for more'), findsOneWidget);
       expect(
         find.text('Add a missed log, or start tracking another habit.'),
@@ -188,12 +205,36 @@ void main() {
       await tester.tap(find.text('Got it'));
       await tester.pumpAndSettle();
       expect(find.text('Hold + for more'), findsNothing);
+      expect(await hintSeen(tester), isTrue);
 
-      final settings = await tester.runAsync(
-        () => sl<SettingsRepository>().get(),
+      await tester.disposeApp();
+    });
+
+    testWidgets('the first log can be undone, and the hint waits', (
+      tester,
+    ) async {
+      await tester.pumpAppPastSplash(height: 2400);
+      await saveLog(tester);
+
+      await tester.tap(find.text('Undo'));
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
       );
-      expect((settings! as Success<AppSettings>).value.logHintSeen, isTrue);
+      await tester.pumpInSteps(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
+      expect(find.text('Hold + for more'), findsNothing);
+      expect(await hintSeen(tester), isFalse);
+      final logs = await tester.runAsync(
+        () => sl<HabitLogRepository>().watchRecent(limit: 10).first,
+      );
+      expect(logs, isEmpty);
+
+      await logOnce(tester);
+      expect(find.text('Hold + for more'), findsOneWidget);
+
+      await tester.tap(find.text('Got it'));
+      await tester.pumpAndSettle();
       await tester.disposeApp();
     });
   });
