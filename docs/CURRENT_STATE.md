@@ -6,8 +6,9 @@ Updated 2026-10-27. Roadmap:
 
 ## Goal
 
-Home, Details and Logs redesign. M1 and M2 are merged; **M3 (Log flow)** is in
-progress on branch `feat/plan-logs-design-fix` (tree clean at handoff).
+Home, Details and Logs redesign. M1, M2 and M3 are merged; M3's independent
+review is pending. In progress: Home design fixes on `feat/home-design-fixes`
+(see the handoff section at the end). Next milestone: M4.
 
 ## Done
 
@@ -125,36 +126,90 @@ full suite 288 passed. Not seen on a simulator.
 commit and merge (locally). Not authorized: pushing without being asked, and
 Co-Authored-By trailers. Push status of f4033a9 not checked.
 
-**M3 Task 3.3 (one-time hold hint), merged (PR #21).** `log_hint.dart`,
-`logNow` returns `bool`, `AppShell._logAndHint`, `setUpTestDependencies` marks
-the hint seen by default (`logHintSeen: false` to opt out). Checks passed per
-Fawad's report (not observed by me). The seen flag is set when the hint is
-shown.
+**M3 (Log flow) is merged to `main`:** Tasks 3.1 to 3.5 (PRs #20, #21, #22).
+Checks passed per Fawad's reports, not observed by me for 3.3 to 3.5. The
+independent M3 review (Opus 5.5, high) has NOT been done.
 
-**M3 Task 3.4 (edit log sheet), committed e031f11 and pushed** (Fawad's
-report). Subtitle "<Habit> · Fri, Oct 16", "Delete this log" with confirm and
-Undo. Time via the wheel picker is untested.
+## Home design fixes: handoff 2026-10-27
 
-**M3 Task 3.5 (edit plan page), edited on `feat/log-edit-sheet`, uncommitted,
-NOT run, never compiled.** New: `plan/presentation/pages/edit_plan_page.dart`,
-`providers/edit_plan_provider.dart` (`editPlanProvider(habitId)`,
-`EditPlanController`: `setDailyLimit`, `selectQuitPreset` (Keep current /
-Suggested / 8 / 16 weeks), `setQuitDay`, `setPriceText`,
-`setUnitsPerContainer`, `setReason`, `save()` = `UpdateHabit` then `SavePlan`
-from today), `onboarding/.../widgets/cost_card.dart` (was private `_CostCard`
-in `setup_page.dart`, now takes `initialPriceText`). `QuitDateCard` now takes
-primitives plus `List<QuitPresetOption>` (setup page updated). Route
-`/habit/:habitId/plan` (`AppRoutes.editPlan`, `editPlanFor`). Entry points: a
-tune button in `DashboardHeader` (both kinds, tooltip "Edit plan") and the
-money tile caption "Add a price ›" in `StatsGrid` (both now take `habitId`).
-Tests: `test/features/plan/edit_plan_page_test.dart` (3). "Stop tracking" is
-Task 4.3, not here. Likely compile/format issues: provider type annotation of
-`editPlanProvider`, `stats_grid.dart` indentation (formatter will fix).
+Branch `feat/home-design-fixes` (off `main` at f141543). **All uncommitted.
+Format, analyze and tests have NOT been run since the first edit, and nothing
+was seen on a simulator.** Expect compile errors and test edits.
 
-**Next:** format, `analyze --fatal-infos`, `fvm flutter test
-test/features/plan test/features/home test/features/onboarding`, then the full
-suite (each needs Fawad's OK); commit `feat(plan): edit plan page`; then the
-M3 independent review (Opus 5.5, high) and merge. Then M4 (Task 4.1).
+Done in code (Fawad's correction lists, rounds 1 to 7):
+- Ring (`progress_ring.dart`): fills from zero in green, then the whole ring
+  fades to amber (at limit) or red (over) over the last quarter; start-cap
+  gradient fixed by rotating the sweep a cap early; slow, with a 15% hold.
+- Ring card (`ring_card.dart`, `day_triggers.dart`): fixed 40 px header;
+  notes, details and the trigger panel fade and resize (`_Reveal`, `_Fade`);
+  the over note waits for the ring to finish (`AppMotion.fill` + 200 ms).
+- Triggers: 20 fixed hues via `TriggerUi.tint` (not by rank); bars fill slowly.
+- History (`history_card.dart`, `history/*`): keeps the last stats while
+  loading; "allowed by today" removed; dotted, visible guides; week and All
+  draw left to right; month rings fill in sequence; total counts up; every
+  swap (nav row, since label, ring key, chart, stats) is a `SmoothSwitcher`;
+  All series prefetched. Chart, trigger panel and plan stage panel share
+  `surfaceContainerHigh`.
+- History toggle (round 8): every period's stats and chart summary are
+  prefetched; the stats block is keyed by the range it shows (old stats stay
+  until new ones load, then swap); chart, ring key and stats/triggers use
+  `SmoothSwitcher(sequential: true, resize: true)` on a toggle (fade out,
+  then in, height eased so nothing below jumps); swipes still cross-fade.
+  New test in `history_card_test.dart`.
+- One fill speed (round 9): the week line and the All line reveal from the
+  first day to today (not to Sunday / the quit day), and the month ring wave
+  ends on today's cell, so all arrive with the day ring at `AppMotion.fill`.
+  Week points and the All "Today" dot fade in as the line reaches them.
+  `history_chart.dart` is unused (dead since 2.4); not removed.
+- Replay only on navigation (round 10): `shellRouteObserver` reports only
+  `PageRoute` pops, so closing the log sheet, the hold hint, dialogs or
+  menus no longer replays Home. Tests in `home_page_test.dart`: closing the
+  log sheet keeps Home's elements; closing Logs replays it.
+- Round 11 (approved from inline mockups, not yet in the design canvas):
+  plan card is a vertical stepper (stage before "done", current with
+  "day d of n" bar, next with "then N more" and a dashed connector, quit
+  flag); header subtitle "Stage n of m · p% of the way"; Edit is an
+  outlined pencil pill (semantics "Edit plan"). Trigger sheet has the Edit
+  log note field (`TriggerAnswer.note`, saved by `logNow`). Today's logs
+  keeps its design; the bottom row expands the rest in place ("+N more
+  today" / "Show less", rotating chevron, `SmoothSwitcher(resize: true)`);
+  "See all logs" opens Logs. Tests updated/added in `home_page_test.dart`.
+- Format and analyze clean (Fawad, 2026-10-28, before the dashboard
+  change below). Full suite observed by me after it: 299 passed, 3 failed,
+  all test-side (count-up total on the first frame, `bySemanticsLabel`
+  without semantics, the over note's delayed reveal). Fixed; those three
+  files rerun: 49 passed. Format/analyze not rerun after the last edits. Home jumped at the bottom with logs expanded: the lazy `ListView`
+  disposed off-screen cards and rebuilt them at another height. The
+  dashboard is now a `SingleChildScrollView` + `Column` (all cards built
+  once).
+- Plan card: "Edit ›" link to Edit plan. Today's logs rebuilt as in
+  `Main.dc.html`.
+- Shared motion: `core/theme/app_motion.dart`, `core/widgets/fill_in.dart`,
+  `core/widgets/smooth_switcher.dart`.
+- Home entrance: `DashboardSkeleton`, `ScrollReveal` on every section,
+  `BackwardPager` animates all external moves, and `app/shell/page_visits.dart`
+  replays Home's entrance on tab return and on closing a pushed page
+  (`ReplayOnVisit(tab: 0)`; reuse it for other tabs).
+- New test: `test/features/tracking/presentation/trigger_ui_test.dart`.
+
+Open / known risks:
+- Tests likely needing edits: ones expecting a spinner, the old Today's logs
+  layout, the total text (now counts up), or the over note (needs about a 2 s
+  pump; `pumpAndSettle` may end first).
+- Unverified: replay after popping Logs / Edit plan (a test now covers
+  Logs, not yet run); the exact cause of the earlier missing All toggle
+  animation.
+- A separate plan roadmap page is a later design decision.
+
+## Next action
+
+Fawad runs, one command per message (the hook rejects batches):
+`fvm dart format .`, then `fvm flutter analyze --fatal-infos`, then
+`fvm flutter test`. Fix failures, commit (for example
+`fix(home): animations, per-trigger colours and design fixes`), merge, then
+run the M3 review and start M4 (Task 4.1, add a habit; Opus 5.5 high per
+CLAUDE.md). Read first: this file, `lib/core/theme/app_motion.dart`, and
+Task 4.1 in `docs/superpowers/plans/2026-10-21-home-details-logs.md`.
 
 Test gotchas: never `await` a go_router `push` in a test (use `unawaited`); a
 failed assert skips `disposeApp()` and the test hangs to the 10 min timeout,
