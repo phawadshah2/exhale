@@ -7,6 +7,7 @@ import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/amount_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/cost_step.dart';
+import 'package:exhale/features/onboarding/presentation/steps/day_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/habit_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/exhale_bubble.dart';
@@ -132,6 +133,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                             OnboardingStep.habit => const HabitStep(),
                             OnboardingStep.amount => const AmountStep(),
                             OnboardingStep.cost => const CostStep(),
+                            OnboardingStep.day => const DayStep(),
                             _ => _PendingStep(step),
                           },
                         ),
@@ -247,10 +249,10 @@ class _PendingStep extends StatelessWidget {
   Widget build(BuildContext context) => OnboardingStepFrame(
     body: Align(
       alignment: Alignment.topLeft,
-      child: Text(switch (step) {
-        OnboardingStep.day => OnboardingCopy.dayTitle,
-        _ => OnboardingCopy.dealPrompt,
-      }, style: Theme.of(context).textTheme.headlineMedium),
+      child: Text(
+        OnboardingCopy.dealPrompt,
+        style: Theme.of(context).textTheme.headlineMedium,
+      ),
     ),
     footer: SizedBox(
       width: double.infinity,

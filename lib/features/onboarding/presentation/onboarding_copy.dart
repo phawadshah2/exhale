@@ -87,7 +87,12 @@ abstract final class OnboardingCopy {
   static const dayPrompt =
       "When are you awake? I'll spread your limit across it.";
   static const dayTitle = 'When does your day run?';
-  static String hoursAwake(int hours) => '$hours h awake';
+  static String awakeDuration(int minutes) {
+    final rest = minutes % 60;
+    return rest == 0 ? '${minutes ~/ 60} h' : '${minutes ~/ 60} h $rest min';
+  }
+
+  static const awake = 'awake';
   static const wakeUp = 'Wake up';
   static const bedtime = 'Bedtime';
   static const dayNote = 'Used to pace your limit. Never to lock you out.';
