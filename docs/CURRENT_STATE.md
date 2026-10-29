@@ -203,12 +203,17 @@ set (no dismiss flag); first launch skips the long splash intro and shows
 
 ## Next action
 
-Fawad reviews the plan, then Task 1.1 (emphasis role) on
-`feat/onboarding-redesign` with `superpowers:executing-plans` (Sonnet 5.5
-medium; Opus 5.5 high for each milestone review).
+Task 1.1 done (04b699b): `ExhaleColors.emphasis` / `onEmphasis`
+(`AppPalette.ink` in light, the accent in dark) on filled buttons, the
++ button, the wheel picker's Done; the GlowButton halo shows in dark only.
+Checks observed by me: full suite 314 passed, then format (2 files
+reflowed) and `analyze --fatal-infos` clean. Not seen on a simulator.
 
-Checks: none run (docs only); `main` code unchanged since the 307-test
-full suite.
+Next: the Milestone O1 review (Opus 5.5 high, read-only: every
+`primaryContainer` use under `lib/` is state, not a primary action), then
+Task 2.1 with `superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
+`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
+via `.git/info/exclude`).
 
 **Git:** Claude may branch, commit and merge locally; push only when asked;
 no Co-Authored-By trailers. GitHub `main` is protected (PR plus the
