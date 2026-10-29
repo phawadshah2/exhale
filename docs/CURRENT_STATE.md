@@ -1,7 +1,7 @@
 # Current state
 
-Updated 2026-10-29 (handoff after Task 2.1, HEAD 2dde171, tree clean).
-Onboarding plan, Phase O2: next is Task 2.2. Roadmap:
+Updated 2026-10-29 (after Task 2.2, HEAD a49c35c).
+Onboarding plan, Phase O2: next is Task 2.3. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`; tasks in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`.
 
@@ -228,8 +228,14 @@ so v1–v7 upgrades reach v9. Checks observed by me: red first, Task 2.1
 files 48 passed, format (2 test files), `analyze --fatal-infos` clean,
 full suite 331 passed.
 
-Next: Task 2.2 (`CurrencyChoices`) with `superpowers:executing-plans`
-(Sonnet 5.5 medium). Ledger:
+Task 2.2 done (a49c35c): `CurrencyChoices` (28 entries, `$` first and
+the fallback, case-insensitive region match) and `deviceRegionProvider`
+in `settings_providers.dart`. Checks observed by me: red first, 8 new
+tests passed, format clean, `analyze --fatal-infos` clean, full suite 339
+passed.
+
+Next: Task 2.3 (clamp the suggested quit date) with
+`superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
 
