@@ -1,7 +1,7 @@
 # Current state
 
-Updated 2026-10-29 (after Task 2.2, HEAD a49c35c).
-Onboarding plan, Phase O2: next is Task 2.3. Roadmap:
+Updated 2026-10-29 (after Task 2.3, HEAD 4f768d9).
+Onboarding plan, Phase O2 built: next is the O2 milestone review. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`; tasks in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`.
 
@@ -234,8 +234,15 @@ in `settings_providers.dart`. Checks observed by me: red first, 8 new
 tests passed, format clean, `analyze --fatal-infos` clean, full suite 339
 passed.
 
-Next: Task 2.3 (clamp the suggested quit date) with
-`superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
+Task 2.3 done (4f768d9): `ReductionPlan.suggestedQuitDay` is
+`startLimit × 7` days clamped to `minSuggestedDays` (14) and
+`maxSuggestedDays` (90). Checks observed by me: red first (limit 1 gave
+7 days), format (1 file), `analyze --fatal-infos` clean, full suite 340
+passed. No onboarding or Edit plan test needed new dates.
+
+Next: Milestone O2 review (Opus 5.5 high). Focus: every upgrade path
+(v3–v8 and a fresh install) ends on v9 with the same columns. Then Task
+3.1 with `superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
 
