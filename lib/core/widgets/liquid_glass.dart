@@ -164,7 +164,7 @@ class GlassIconButton extends StatelessWidget {
                   size: size * 0.45,
                   color: tint == null
                       ? colors.onSurface
-                      : colors.onPrimaryContainer,
+                      : context.exhale.onEmphasis,
                 ),
               ),
             ),

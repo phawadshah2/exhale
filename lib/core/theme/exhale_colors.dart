@@ -1,3 +1,4 @@
+import 'package:exhale/core/theme/app_palette.dart';
 import 'package:flutter/material.dart';
 
 /// One status colour family (success, warning or danger).
@@ -40,6 +41,8 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
     required this.danger,
     required this.glow,
     required this.inset,
+    required this.emphasis,
+    required this.onEmphasis,
   });
 
   /// Derived from the scheme so there is a single source of truth.
@@ -67,6 +70,9 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
       inset: isDark
           ? scheme.surfaceContainerHigh
           : scheme.surfaceContainerLow.withValues(alpha: 0.6),
+      // Light mode leads with ink so the accent is left for state.
+      emphasis: isDark ? scheme.primaryContainer : AppPalette.ink,
+      onEmphasis: isDark ? scheme.onPrimaryContainer : Colors.white,
     );
   }
 
@@ -85,6 +91,13 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
   /// Fill for boxes inside a card (steppers, date rows, chips).
   final Color inset;
 
+  /// Primary actions and Exhale's voice: filled buttons, chat bubbles, the
+  /// onboarding stepper. The accent stays for state (selection, ring).
+  final Color emphasis;
+
+  /// Text and icons placed on [emphasis].
+  final Color onEmphasis;
+
   List<BoxShadow> get accentGlow => [
     BoxShadow(color: glow, blurRadius: 14, spreadRadius: -4),
   ];
@@ -96,12 +109,16 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
     StatusColors? danger,
     Color? glow,
     Color? inset,
+    Color? emphasis,
+    Color? onEmphasis,
   }) => ExhaleColors(
     success: success ?? this.success,
     warning: warning ?? this.warning,
     danger: danger ?? this.danger,
     glow: glow ?? this.glow,
     inset: inset ?? this.inset,
+    emphasis: emphasis ?? this.emphasis,
+    onEmphasis: onEmphasis ?? this.onEmphasis,
   );
 
   // Called by AnimatedTheme while switching light <-> dark, so colours
@@ -115,6 +132,8 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
       danger: StatusColors.lerp(danger, other.danger, t),
       glow: Color.lerp(glow, other.glow, t)!,
       inset: Color.lerp(inset, other.inset, t)!,
+      emphasis: Color.lerp(emphasis, other.emphasis, t)!,
+      onEmphasis: Color.lerp(onEmphasis, other.onEmphasis, t)!,
     );
   }
 }

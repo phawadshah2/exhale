@@ -31,6 +31,7 @@ abstract final class AppTheme {
       displayColor: colors.onSurface,
     );
     final isDark = brightness == Brightness.dark;
+    final exhale = ExhaleColors.fromScheme(colors);
 
     // Cards sit one step above the page: slate in dark, white in light.
     final cardColor = isDark
@@ -46,7 +47,7 @@ abstract final class AppTheme {
       textTheme: text,
       fontFamily: AppFonts.body,
       scaffoldBackgroundColor: colors.surface,
-      extensions: [ExhaleColors.fromScheme(colors)],
+      extensions: [exhale],
       // iOS conventions: no ink ripples, swipe-back page transitions.
       splashFactory: NoSplash.splashFactory,
       highlightColor: colors.onSurface.withValues(alpha: 0.06),
@@ -76,11 +77,11 @@ abstract final class AppTheme {
           side: isDark ? hairline : BorderSide.none,
         ),
       ),
-      // Primary CTA: solid accent pill ("Start my plan").
+      // Primary CTA: solid emphasis pill ("Make a plan").
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: colors.primaryContainer,
-          foregroundColor: colors.onPrimaryContainer,
+          backgroundColor: exhale.emphasis,
+          foregroundColor: exhale.onEmphasis,
           // Opaque so a disabled floating button doesn't show content behind.
           disabledBackgroundColor: colors.surfaceContainerHighest,
           disabledForegroundColor: colors.onSurfaceVariant.withValues(

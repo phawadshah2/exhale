@@ -1,6 +1,7 @@
 import 'package:exhale/core/platform/native_ui.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
+import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/core/widgets/liquid_glass.dart';
 import 'package:flutter/cupertino.dart';
@@ -97,8 +98,7 @@ Future<DateTime?> showWheelPicker(
               GlassIconButton(
                 icon: AppIcons.check,
                 tooltip: 'Done',
-                tint: Theme.of(context).colorScheme.primaryContainer
-                    .withValues(alpha: 0.6),
+                tint: context.exhale.emphasis.withValues(alpha: 0.6),
                 onPressed: () => Navigator.of(context).pop(selected),
               ),
             ],
