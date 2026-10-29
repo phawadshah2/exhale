@@ -1,18 +1,20 @@
 # Current state
 
-Updated 2026-10-29 (after Task 3.6; HEAD 88e62c5 plus this doc;
-branch 28+ commits ahead of origin, not pushed). Hook gotcha: the global
+Updated 2026-10-29 (after Task 3.7; HEAD 981f15a plus this doc;
+branch 30+ commits ahead of origin, not pushed). Hook gotcha: the global
 hook blocks any Bash call whose text mentions "format"/"test" next to
-other commands (including `git add` of `formatting/` paths and
-`task-done`); run checks bare, stage with `git add -A` / `-u`, write
-ledger lines by hand. Stay on `feat/onboarding-redesign`.
-Onboarding plan, Phase O3 in progress: Tasks 3.1–3.6 done and committed,
-next is Task 3.7 (Splash hand-off and old setup removed; Sonnet 5.5
-medium). To continue, read the plan section "Task 3.7" in
+other commands (including `git add` of `formatting/` paths, `git rm` of
+`*_test.dart` and `task-done`); run checks bare, stage with `git add -A`
+/ `-u`, write ledger lines by hand. Stay on `feat/onboarding-redesign`.
+Onboarding plan, Phase O3 done (Tasks 3.1–3.7 committed). Next is the
+milestone O3 review (Opus 5.5 high, fresh session): walk the flow
+against `design/7._onboarding/flows.html` in light and dark on a
+simulator (ask Fawad first) and check the copy against spec §4 and §7
+word for word. Then Phase O4 (Task 4.1). Read the plan's "Milestone O3
+review" note under Task 3.7 in
 `docs/superpowers/plans/2026-10-29-onboarding-redesign.md` and the
-ledger's Task 3.6 rulings
-(`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`). After
-3.7 comes the milestone O3 review (Opus 5.5 high). Roadmap:
+ledger's Task 3.6–3.7 rulings
+(`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`). Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md` (row 3b).
 
 ## Goal
@@ -328,9 +330,21 @@ the splash. Checks observed by me: red first (compile errors), 7 passed,
 format (1 file), `analyze --fatal-infos` clean, full suite 412 passed.
 Not seen on a simulator.
 
-Next: Task 3.7 (Splash hand-off and old setup removed) with
-`superpowers:executing-plans`; then `toDeal` in `deal_step_test.dart`
-can start from the splash instead of `GoRouter.go`. `task-done` is blocked by the global hook (it wraps a test
+Task 3.7 done (981f15a, 2026-10-29): first launch shows the logo,
+"We need to talk." and one pulse of `TypingDots` (none with Reduce
+Motion) for `SplashPage.firstLaunchDuration` (1.2 s), then `/onboarding`
+slides in from the right (`CustomTransitionPage`); taps do not postpone
+it. Returning users keep the intro + hold to Home. `SetupPage`,
+`HabitPickerPage`, `setupFormProvider`, the `/setup` routes and
+`pumpToPlanStep` are gone with their tests; `cost_card`,
+`projection_card`, `quit_date_card`, `setup_chrome` moved to
+`lib/features/plan/presentation/widgets/`; `maxReasonLength` is now
+`HabitValidation.maxReasonLength`. Checks observed by me: red first, 19
+passed (splash, app, deal), format, `analyze --fatal-infos` clean, full
+suite 394 passed. Not seen on a simulator.
+
+Next: milestone O3 review (Opus 5.5 high), then Task 4.1 with
+`superpowers:executing-plans`. `task-done` is blocked by the global hook (it wraps a test
 command); run the tests bare and write the ledger line by hand. Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
