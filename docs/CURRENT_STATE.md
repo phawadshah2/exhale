@@ -1,6 +1,7 @@
 # Current state
 
-Updated 2026-10-29 (after Task 2.3, HEAD 4f768d9).
+Updated 2026-10-29 (handoff after Task 2.3, HEAD 27af8d3, tree clean
+apart from this line).
 Onboarding plan, Phase O2 built: next is the O2 milestone review. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`; tasks in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`.
