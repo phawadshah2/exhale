@@ -1,6 +1,6 @@
 # Onboarding redesign and pace guide: design spec
 
-Date: 29 Oct 2026 · Branch: `feat/onboarding-redesign` · Status: awaiting review
+Date: 29 Oct 2026 · Branch: `feat/onboarding-redesign` · Status: approved 29 Oct 2026
 
 ## 1. Why
 
@@ -254,17 +254,19 @@ Settings gets a "Your day" row (the same arc and wheel in a sheet).
 Multi-habit Home cards get a compact "next in N min" in M4, from the same
 function.
 
-## 9. Open question
+## 9. Suggested quit date
 
-**Suggested quit date.** `ReductionPlan.suggestedQuitDay` is
-`max(7, startLimit × 7)` days. For 120 puffs that is 840 days, which reads
-as a joke. Recommendation: clamp it to 14–90 days. To be settled before
-the plan is written.
+`ReductionPlan.suggestedQuitDay` was `max(7, startLimit × 7)` days, which
+gives 840 days for 120 puffs. It becomes `startLimit × 7` days clamped to
+14–90 (decided 29 Oct 2026). Existing plans are unchanged; only new
+suggestions (onboarding, Add a habit, the Suggested chip in Edit plan) use
+it. Part of phase 2.
 
 ## 10. Phases
 
 1. **Emphasis role**: `ExhaleColors`, then primary buttons app-wide.
-2. **Data**: schema v9, `AppSettings`, `CurrencyChoices`.
+2. **Data**: schema v9, `AppSettings`, `CurrencyChoices`, the
+   suggested quit date clamp.
 3. **Onboarding flow**: steps, copy, stepper, splash hand-off, saving,
    old setup removed.
 4. **Pace guide**: `PaceGuide`, the ring line, the prompt and the Settings
@@ -280,8 +282,8 @@ prompt on Home, reminders and notifications, onboarding analytics.
 
 ## 12. Testing
 
-- Unit: form rules (Cost skip and `n/5`, dots scale, suggested date and
-  presets, monthly and yearly cost), `CurrencyChoices` locale default, the
+- Unit: form rules (Cost skip and `n/5`, dots scale, suggested date
+  clamp at 14 and 90 days, presets, monthly and yearly cost), `CurrencyChoices` locale default, the
   v8 → v9 migration, `PaceGuide.compute` (midnight bedtime, cut at the
   reset hour, limit 0, over the limit, outside the window, no logs today).
 - Widget: each step (defaults, Continue, replies, custom habit fields,

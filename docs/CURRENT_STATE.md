@@ -150,7 +150,7 @@ price only.
 
 Fawad wants onboarding redone from scratch before M4, because onboarding
 may change Home; the roadmap gets revised once the spec is settled.
-Spec written (awaiting Fawad's review):
+Spec approved 2026-10-29:
 `docs/superpowers/specs/2026-10-29-onboarding-redesign-design.md`.
 
 Decided with Fawad (2026-10-29):
@@ -183,13 +183,14 @@ Decided with Fawad (2026-10-29):
   advice." on Welcome).
 
 Data, reuse and the pace guide (spec §5, §8) were approved in chat.
-Open: the suggested quit date rule (spec §9).
+Suggested quit date: `startLimit × 7` days clamped to 14–90 (spec §9).
 
 ## Next action
 
-Fawad reviews the onboarding spec and settles its open question (suggested
-quit date, spec §9). Then `superpowers:writing-plans` for the four phases
-in spec §10, then revise
+Write the implementation plan (Opus 5.5 high, fresh session):
+`superpowers:writing-plans` for the four phases in spec §10 of
+`docs/superpowers/specs/2026-10-29-onboarding-redesign-design.md`, saved
+under `docs/superpowers/plans/`. Then revise
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md` (M4 Task
 4.1 Add a habit reuses the onboarding steps). Work on
 `feat/onboarding-redesign`.
