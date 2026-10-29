@@ -7,6 +7,7 @@ import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/habit_picker_page.dart';
+import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/setup_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
 import 'package:exhale/features/plan/presentation/pages/edit_plan_page.dart';
@@ -29,6 +30,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(path: 'plan', builder: (context, state) => const SetupPage()),
         ],
+      ),
+      GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (context, state) => const OnboardingPage(),
       ),
       GoRoute(
         path: AppRoutes.designSystem,
