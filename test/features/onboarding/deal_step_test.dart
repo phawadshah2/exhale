@@ -1,4 +1,3 @@
-import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/data/storage_guard.dart';
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
@@ -10,7 +9,6 @@ import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
-import 'package:exhale/features/onboarding/presentation/pages/habit_picker_page.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/cost_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/deal_step.dart';
@@ -23,7 +21,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../helpers/fixed_clock.dart';
 import '../../helpers/pump_app.dart';
@@ -51,9 +48,6 @@ void main() {
   /// defaults; [price] is typed on the Cost step when given.
   Future<void> toDeal(WidgetTester tester, {String? price}) async {
     await tester.pumpAppPastSplash(height: 2400);
-    GoRouter.of(tester.element(find.byType(HabitPickerPage)))
-        .go(AppRoutes.onboarding);
-    await tester.pumpAndSettle();
     await tester.tap(find.byType(WelcomeStep));
     await tester.pump();
     await tester.tap(find.text(OnboardingCopy.welcomeButton));

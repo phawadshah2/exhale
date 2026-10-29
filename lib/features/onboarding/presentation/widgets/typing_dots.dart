@@ -5,9 +5,17 @@ import 'package:flutter/material.dart';
 
 /// Three dots that pulse in turn while Exhale "types".
 class TypingDots extends StatefulWidget {
-  const TypingDots({this.animate = true, this.color, super.key});
+  const TypingDots({
+    this.animate = true,
+    this.once = false,
+    this.color,
+    super.key,
+  });
 
   final bool animate;
+
+  /// Pulse through one cycle, then rest.
+  final bool once;
 
   /// Defaults to the emphasis colour.
   final Color? color;
@@ -28,14 +36,22 @@ class _TypingDotsState extends State<TypingDots>
   @override
   void initState() {
     super.initState();
-    if (widget.animate) _controller.repeat();
+    if (widget.animate) _start();
+  }
+
+  void _start() {
+    if (widget.once) {
+      _controller.forward(from: 0);
+    } else {
+      _controller.repeat();
+    }
   }
 
   @override
   void didUpdateWidget(TypingDots oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.animate && !_controller.isAnimating) {
-      _controller.repeat();
+    if (widget.animate && !widget.once && !_controller.isAnimating) {
+      _start();
     } else if (!widget.animate) {
       _controller.stop();
     }

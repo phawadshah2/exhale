@@ -5,15 +5,15 @@ import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/number_stepper.dart';
 import 'package:exhale/core/widgets/section_card.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
-import 'package:exhale/features/onboarding/presentation/pages/habit_picker_page.dart';
-import 'package:exhale/features/onboarding/presentation/widgets/cost_card.dart';
-import 'package:exhale/features/onboarding/presentation/widgets/projection_card.dart';
-import 'package:exhale/features/onboarding/presentation/widgets/quit_date_card.dart';
-import 'package:exhale/features/onboarding/presentation/widgets/setup_chrome.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
 import 'package:exhale/features/plan/presentation/providers/edit_plan_provider.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
+import 'package:exhale/features/plan/presentation/widgets/cost_card.dart';
+import 'package:exhale/features/plan/presentation/widgets/projection_card.dart';
+import 'package:exhale/features/plan/presentation/widgets/quit_date_card.dart';
+import 'package:exhale/features/plan/presentation/widgets/setup_chrome.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -174,7 +174,7 @@ class _EditPlanForm extends ConsumerWidget {
             onChanged: controller.setReason,
             textCapitalization: TextCapitalization.sentences,
             textInputAction: TextInputAction.done,
-            maxLength: HabitPickerPage.maxReasonLength,
+            maxLength: HabitValidation.maxReasonLength,
             decoration: const InputDecoration(
               hintText: 'More energy for the people I love',
               counterText: '',

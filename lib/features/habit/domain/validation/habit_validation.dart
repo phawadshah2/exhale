@@ -1,4 +1,5 @@
 abstract final class HabitValidation {
+  static const int maxReasonLength = 80;
   static const int maxUnitsPerContainer = 100;
   static const int maxPriceCents = 100000;
 

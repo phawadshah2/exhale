@@ -78,15 +78,6 @@ extension PumpApp on WidgetTester {
     await pumpAndSettle();
   }
 
-  /// Launches a first-run app and moves past the habit step to the plan.
-  Future<void> pumpToPlanStep({double height = 844}) async {
-    await pumpAppPastSplash(height: height);
-    await tap(find.text('Smoking'));
-    await pump();
-    await tap(find.text('Continue'));
-    await pumpAndSettle();
-  }
-
   /// Advances [duration] in 50 ms frames so chained animations play out.
   Future<void> pumpInSteps(Duration duration) async {
     const step = Duration(milliseconds: 50);

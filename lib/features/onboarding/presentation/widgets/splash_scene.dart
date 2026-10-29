@@ -5,19 +5,29 @@ import 'package:exhale/core/presentation/providers/app_info_providers.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_logo.dart';
+import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/drifting_particles.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/typing_dots.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Splash visuals. [intro] (0 → 1) drives the staggered entrance; the scene
 /// runs its own ambient loops (breathing, dot pulse, drifting dust).
 class SplashScene extends StatefulWidget {
-  const SplashScene({required this.intro, required this.animate, super.key});
+  const SplashScene({
+    required this.intro,
+    required this.animate,
+    this.talking = false,
+    super.key,
+  });
 
   final Animation<double> intro;
 
   /// False when the platform asks for reduced motion.
   final bool animate;
+
+  /// First launch: "We need to talk." and typing dots replace the tagline.
+  final bool talking;
 
   @override
   State<SplashScene> createState() => _SplashSceneState();
@@ -225,13 +235,20 @@ class _SplashSceneState extends State<SplashScene>
           child: Transform.translate(
             offset: Offset(40 * (1 - tagIn), 0),
             child: Text(
-              'Breathe easier, one day at a time',
+              widget.talking
+                  ? OnboardingCopy.splashLine
+                  : 'Breathe easier, one day at a time',
               style: text.bodyLarge?.copyWith(color: colors.onSurfaceVariant),
             ),
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
-        _dots(context),
+        if (!widget.talking)
+          _dots(context)
+        else if (widget.animate)
+          Opacity(opacity: tagIn, child: const TypingDots(once: true))
+        else
+          const SizedBox(height: 8),
       ],
     );
   }

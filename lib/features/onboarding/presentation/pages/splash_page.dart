@@ -17,6 +17,12 @@ class SplashPage extends ConsumerStatefulWidget {
   /// Pause after the intro finishes before leaving the splash.
   static const holdDuration = Duration(milliseconds: 700);
 
+  /// First launch: how long "We need to talk." shows before Welcome.
+  static const firstLaunchDuration = Duration(milliseconds: 1200);
+
+  /// First launch: the entrance, shortened from [introDuration].
+  static const firstLaunchEntrance = Duration(milliseconds: 450);
+
   @override
   ConsumerState<SplashPage> createState() => _SplashPageState();
 }
@@ -29,6 +35,8 @@ class _SplashPageState extends ConsumerState<SplashPage>
   );
 
   String? _destination;
+  Timer? _leave;
+  bool _talking = false;
   bool _introFinished = false;
   bool _navigated = false;
   bool _started = false;
@@ -54,8 +62,33 @@ class _SplashPageState extends ConsumerState<SplashPage>
     final habits = await ref.read(habitRepositoryProvider).getActive();
     final hasHabit =
         habits is Success<List<TrackedHabit>> && habits.value.isNotEmpty;
-    _destination = hasHabit ? AppRoutes.home : AppRoutes.setup;
-    _maybeNavigate();
+    if (hasHabit) {
+      _destination = AppRoutes.home;
+      _maybeNavigate();
+    } else {
+      _startTalking();
+    }
+  }
+
+  /// First launch: no long intro, a short line, then onboarding.
+  void _startTalking() {
+    if (!mounted) return;
+    _playId++;
+    setState(() => _talking = true);
+    if (_reduceMotion) {
+      _intro.value = 1;
+    } else {
+      _intro.animateTo(
+        1,
+        duration: SplashPage.firstLaunchEntrance,
+        curve: Curves.easeOut,
+      );
+    }
+    _leave = Timer(SplashPage.firstLaunchDuration, () {
+      if (!mounted || _navigated) return;
+      _navigated = true;
+      context.go(AppRoutes.onboarding);
+    });
   }
 
   /// Plays the entrance from the start. Navigation waits for the latest
@@ -88,12 +121,13 @@ class _SplashPageState extends ConsumerState<SplashPage>
   }
 
   void _replay() {
-    if (_navigated) return;
+    if (_navigated || _talking) return;
     unawaited(_playIntro());
   }
 
   @override
   void dispose() {
+    _leave?.cancel();
     _intro.dispose();
     super.dispose();
   }
@@ -104,7 +138,11 @@ class _SplashPageState extends ConsumerState<SplashPage>
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _replay,
-        child: SplashScene(intro: _intro, animate: !_reduceMotion),
+        child: SplashScene(
+          intro: _intro,
+          animate: !_reduceMotion,
+          talking: _talking,
+        ),
       ),
     );
   }
