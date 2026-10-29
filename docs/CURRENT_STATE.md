@@ -6,14 +6,14 @@ origin, not pushed). Hook gotcha: the global hook blocks any Bash call
 whose text mentions "format"/"test" next to other commands (including
 `git add` of `formatting/` paths and `task-done`); run checks bare, stage
 with `git add -u`, write ledger lines by hand.
-Onboarding plan, Phase O3 in progress: Tasks 3.1–3.4 done, next is Task 3.5
-(Your day step and `DayWindowPicker`). To continue, read the plan section
-"Task 3.5" in `docs/superpowers/plans/2026-10-29-onboarding-redesign.md`,
-the ledger's Task 3.3–3.4 rulings
+Onboarding plan, Phase O3 in progress: Tasks 3.1–3.5 done (3.5 uncommitted),
+next is Task 3.6 (The deal step and saving). To continue, read the plan
+section "Task 3.6" in `docs/superpowers/plans/2026-10-29-onboarding-redesign.md`,
+the ledger's Task 3.3–3.5 rulings
 (`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`),
 `lib/features/onboarding/presentation/pages/onboarding_page.dart`
 (`OnboardingStepFrame`, `OnboardingStepHeader`, `_PendingStep`) and
-`steps/cost_step.dart` as the pattern for a step. Roadmap:
+`steps/day_step.dart` as the pattern for a step. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md` (row 3b).
 
 ## Goal
@@ -304,9 +304,21 @@ Checks observed by me: red first, 7 new tests passed, format (3 files),
 `analyze --fatal-infos` clean, full suite 395 passed. Not seen on a
 simulator.
 
-Next: Task 3.5 (Your day step and `DayWindowPicker`) with
-`superpowers:executing-plans` (Sonnet 5.5 medium). Its tests cover Review
-Focus 2 (bedtime after midnight). `task-done` is blocked by the global hook (it wraps a test
+Task 3.5 done (uncommitted, 2026-10-29): `DayWindowPicker`
+(`lib/features/settings/presentation/widgets/day_window_picker.dart`: arc
+with dots, Wake up / Bedtime tiles, inline `CupertinoDatePicker` at 15-min
+steps; a window under 4 h is not reported and the wheel snaps back when
+scrolling ends) and `DayStep` (wired into `OnboardingPage`; `_PendingStep`
+now only stands in for The deal). `OnboardingCopy.hoursAwake` became
+`awakeDuration(minutes)` + `awake`. Review Focus 2 is tested (1:00 AM bed =
+17 h 30 min; wake 23:00 refused). Tests: 4 picker + 4 step. Checks observed
+by me: format (3 files), `analyze --fatal-infos` clean, full suite 405
+passed. Red was not observed first; the scroll-end snap-back has no test;
+not seen on a simulator.
+
+Next: Task 3.6 (The deal step and saving) with
+`superpowers:executing-plans` (Sonnet 5.5 medium; Opus 5.5 high is worth it
+for the save/retry logic, Review Focus 4). `task-done` is blocked by the global hook (it wraps a test
 command); run the tests bare and write the ledger line by hand. Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
