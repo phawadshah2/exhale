@@ -2,12 +2,11 @@ import 'dart:async';
 
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/core/widgets/glow_button.dart';
-import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/amount_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/cost_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/day_step.dart';
+import 'package:exhale/features/onboarding/presentation/steps/deal_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/habit_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/exhale_bubble.dart';
@@ -134,7 +133,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                             OnboardingStep.amount => const AmountStep(),
                             OnboardingStep.cost => const CostStep(),
                             OnboardingStep.day => const DayStep(),
-                            _ => _PendingStep(step),
+                            OnboardingStep.deal => const DealStep(),
                           },
                         ),
                     ],
@@ -237,29 +236,4 @@ class OnboardingStepHeader extends StatelessWidget {
       ],
     );
   }
-}
-
-/// Placeholder for a step not built yet.
-class _PendingStep extends StatelessWidget {
-  const _PendingStep(this.step);
-
-  final OnboardingStep step;
-
-  @override
-  Widget build(BuildContext context) => OnboardingStepFrame(
-    body: Align(
-      alignment: Alignment.topLeft,
-      child: Text(
-        OnboardingCopy.dealPrompt,
-        style: Theme.of(context).textTheme.headlineMedium,
-      ),
-    ),
-    footer: SizedBox(
-      width: double.infinity,
-      child: GlowButton(
-        label: OnboardingCopy.continueButton,
-        onPressed: () => OnboardingScope.of(context).next(),
-      ),
-    ),
-  );
 }

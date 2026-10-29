@@ -102,8 +102,12 @@ abstract final class OnboardingCopy {
   static String dealTitle(int amount, String date) =>
       '$amount today. Zero by $date.';
   static const pick = 'Pick';
+  static const quitDate = 'Quit date';
+  static const steepWarning =
+      "That's more than one fewer a day. A later date may feel easier.";
   static const tomorrow = 'Tomorrow';
   static const quitIn = 'Quit in';
+  static String days(int count) => count == 1 ? '1 day' : '$count days';
   static const backAYear = 'Back a year';
   static String paceLine(int minutes) =>
       "Today that's about one every $minutes min. It gets slower from here.";
