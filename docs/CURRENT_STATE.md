@@ -1,7 +1,7 @@
 # Current state
 
 Updated 2026-10-29 (after the O2 milestone review).
-Onboarding plan, Phase O3 in progress: Task 3.1 done, next is Task 3.2. Roadmap:
+Onboarding plan, Phase O3 in progress: Tasks 3.1–3.2 done, next is Task 3.3. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`; tasks in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`.
 
@@ -258,7 +258,19 @@ yearly cost after a switch). The old setup pages still use
 25 new tests passed, format, `analyze --fatal-infos` clean, full suite 373
 passed.
 
-Next: Task 3.2 (onboarding page, stepper, bubbles, Welcome) with
+Task 3.2 done (bdd0950): `/onboarding` route (not reached from the
+splash until 3.7), `OnboardingPage` + `OnboardingScope` (next/back),
+`OnboardingStepFrame` (scrollable body with min height, pinned footer;
+bodies use `Column` `spaceBetween`, not `IntrinsicHeight`, which
+overflowed), `OnboardingStepper`, `ExhaleBubble`, `YouBubble`,
+`TypingDots`, `WelcomeStep` (3.4 s timeline, tap skips, Reduce Motion
+starts at the end, kept alive so back does not replay). Steps 2–6 are
+`_PendingStep` placeholders. Helper `test/helpers/onboarding.dart`.
+Checks observed by me: red first, 7 new tests passed, format,
+`analyze --fatal-infos` clean, full suite 380 passed. Not seen on a
+simulator.
+
+Next: Task 3.3 (Habit and Daily amount steps) with
 `superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
