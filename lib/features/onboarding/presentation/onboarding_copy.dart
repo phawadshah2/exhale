@@ -72,8 +72,10 @@ abstract final class OnboardingCopy {
   static String costTitleContainer(String container) =>
       'What does a $container cost?';
   static String costTitleUnit(String unit) => 'What does one $unit cost?';
+  static String priceOf(String thing) => 'Price of one $thing';
   static String perContainer(String units, String container) =>
-      '$units per $container';
+      '${units[0].toUpperCase()}${units.substring(1)} per $container';
+  static const currency = 'Currency';
   static const perContainerHint = "Check the box. Or guess, we won't tell.";
   static const aMonth = 'A month';
   static const aYear = 'A year';

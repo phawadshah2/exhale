@@ -75,48 +75,133 @@ Future<DateTime?> showWheelPicker(
   return showAppSheet<DateTime>(
     context,
     showClose: false,
-    builder: (context) => Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-          child: Row(
-            children: [
-              GlassIconButton(
-                icon: AppIcons.close,
-                tooltip: 'Cancel',
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              Expanded(
-                child: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-              GlassIconButton(
-                icon: AppIcons.check,
-                tooltip: 'Done',
-                tint: context.exhale.emphasis.withValues(alpha: 0.6),
-                onPressed: () => Navigator.of(context).pop(selected),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 216,
-          child: CupertinoDatePicker(
-            mode: mode,
-            initialDateTime: initial,
-            minimumDate: minimum,
-            maximumDate: maximum,
-            use24hFormat: MediaQuery.alwaysUse24HourFormatOf(context),
-            onDateTimeChanged: (value) => selected = value,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-      ],
+    builder: (context) => _WheelSheet(
+      title: title,
+      onDone: () => Navigator.of(context).pop(selected),
+      wheel: CupertinoDatePicker(
+        mode: mode,
+        initialDateTime: initial,
+        minimumDate: minimum,
+        maximumDate: maximum,
+        use24hFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+        onDateTimeChanged: (value) => selected = value,
+      ),
     ),
+  );
+}
+
+/// iOS wheel of [options] in a floating sheet. Resolves to the chosen
+/// index, or null when dismissed.
+Future<int?> showOptionWheel(
+  BuildContext context, {
+  required String title,
+  required List<String> options,
+  required int initialIndex,
+  required double itemExtent,
+}) {
+  var selected = initialIndex;
+  return showAppSheet<int>(
+    context,
+    showClose: false,
+    builder: (context) => _WheelSheet(
+      title: title,
+      onDone: () => Navigator.of(context).pop(selected),
+      wheel: _OptionWheel(
+        options: options,
+        initialIndex: initialIndex,
+        itemExtent: itemExtent,
+        onChanged: (index) => selected = index,
+      ),
+    ),
+  );
+}
+
+/// Cancel, title and Done above a wheel.
+class _WheelSheet extends StatelessWidget {
+  const _WheelSheet({
+    required this.title,
+    required this.onDone,
+    required this.wheel,
+  });
+
+  final String title;
+  final VoidCallback onDone;
+  final Widget wheel;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+        child: Row(
+          children: [
+            GlassIconButton(
+              icon: AppIcons.close,
+              tooltip: 'Cancel',
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            Expanded(
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            GlassIconButton(
+              icon: AppIcons.check,
+              tooltip: 'Done',
+              tint: context.exhale.emphasis.withValues(alpha: 0.6),
+              onPressed: onDone,
+            ),
+          ],
+        ),
+      ),
+      SizedBox(height: 216, child: wheel),
+      const SizedBox(height: AppSpacing.md),
+    ],
+  );
+}
+
+class _OptionWheel extends StatefulWidget {
+  const _OptionWheel({
+    required this.options,
+    required this.initialIndex,
+    required this.itemExtent,
+    required this.onChanged,
+  });
+
+  final List<String> options;
+  final int initialIndex;
+  final double itemExtent;
+  final ValueChanged<int> onChanged;
+
+  @override
+  State<_OptionWheel> createState() => _OptionWheelState();
+}
+
+class _OptionWheelState extends State<_OptionWheel> {
+  late final FixedExtentScrollController _scroll = FixedExtentScrollController(
+    initialItem: widget.initialIndex,
+  );
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => CupertinoPicker(
+    scrollController: _scroll,
+    itemExtent: widget.itemExtent,
+    onSelectedItemChanged: widget.onChanged,
+    children: [
+      for (final option in widget.options)
+        Center(
+          child: Text(option, style: Theme.of(context).textTheme.titleLarge),
+        ),
+    ],
   );
 }

@@ -6,6 +6,7 @@ import 'package:exhale/core/widgets/glow_button.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/amount_step.dart';
+import 'package:exhale/features/onboarding/presentation/steps/cost_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/habit_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/exhale_bubble.dart';
@@ -130,6 +131,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                             OnboardingStep.welcome => const WelcomeStep(),
                             OnboardingStep.habit => const HabitStep(),
                             OnboardingStep.amount => const AmountStep(),
+                            OnboardingStep.cost => const CostStep(),
                             _ => _PendingStep(step),
                           },
                         ),
@@ -246,7 +248,6 @@ class _PendingStep extends StatelessWidget {
     body: Align(
       alignment: Alignment.topLeft,
       child: Text(switch (step) {
-        OnboardingStep.cost => OnboardingCopy.costPrompt,
         OnboardingStep.day => OnboardingCopy.dayTitle,
         _ => OnboardingCopy.dealPrompt,
       }, style: Theme.of(context).textTheme.headlineMedium),

@@ -11,6 +11,7 @@ import 'package:exhale/features/onboarding/presentation/providers/onboarding_for
 import 'package:exhale/features/onboarding/presentation/widgets/amount_ruler.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/dots_grid.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/exhale_bubble.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/round_icon_button.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -59,7 +60,7 @@ class AmountStep extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 26,
             children: [
-              _RoundButton(
+              RoundIconButton(
                 icon: AppIcons.remove,
                 label: OnboardingCopy.fewer,
                 onTap: amount > _min ? () => step(-1) : null,
@@ -100,7 +101,7 @@ class AmountStep extends ConsumerWidget {
                   ),
                 ),
               ),
-              _RoundButton(
+              RoundIconButton(
                 icon: AppIcons.add,
                 label: OnboardingCopy.more,
                 onTap: amount < _max ? () => step(1) : null,
@@ -130,52 +131,6 @@ class AmountStep extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.md),
         ],
-      ),
-    );
-  }
-}
-
-class _RoundButton extends StatelessWidget {
-  const _RoundButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback? onTap;
-
-  static const double _size = 48;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final enabled = onTap != null;
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: label,
-      onTap: onTap,
-      excludeSemantics: true,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: AnimatedOpacity(
-          opacity: enabled ? 1 : 0.4,
-          duration: const Duration(milliseconds: 150),
-          child: Container(
-            width: _size,
-            height: _size,
-            decoration: BoxDecoration(
-              color:
-                  context.theme.cardTheme.color ?? colors.surfaceContainerLow,
-              shape: BoxShape.circle,
-              border: Border.all(color: colors.outlineVariant),
-            ),
-            child: Icon(icon, size: 20, color: colors.onSurface),
-          ),
-        ),
       ),
     );
   }
