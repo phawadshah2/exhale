@@ -80,3 +80,43 @@ class ExhaleBubble extends StatelessWidget {
     );
   }
 }
+
+/// Exhale's one-line reaction to an answer, right aligned without an
+/// avatar.
+class ExhaleReply extends StatelessWidget {
+  const ExhaleReply({required this.text, super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final exhale = context.exhale;
+    return Align(
+      alignment: Alignment.centerRight,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 280),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: exhale.emphasis,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+              bottomRight: Radius.circular(6),
+              bottomLeft: Radius.circular(20),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Text(
+              text,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: exhale.onEmphasis,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

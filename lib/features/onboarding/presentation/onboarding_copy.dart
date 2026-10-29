@@ -31,6 +31,10 @@ abstract final class OnboardingCopy {
   static const habitTitle = 'What are we quitting?';
   static const habitLead = 'Pick the main one. You can add another later.';
   static const somethingElse = 'Something else';
+  static const customNameLabel = 'Habit';
+  static const customNameHint = 'Gaming';
+  static const customUnitLabel = 'One log is a…';
+  static const customUnitHint = 'game';
 
   static String habitReply(HabitKind kind) => switch (kind) {
     HabitKind.vaping => 'Ah. The USB stick you inhale.',
@@ -48,6 +52,9 @@ abstract final class OnboardingCopy {
   static const amountPrompt =
       "Be honest. I can't help with a number you made up.";
   static String amountTitle(String units) => 'How many $units on a normal day?';
+  static String perDay(String units) => '$units a day';
+  static const fewer = 'Fewer';
+  static const more = 'More';
   static String dotCaption(int unit, String units) =>
       'Each dot is $unit $units';
 

@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:exhale/core/theme/app_spacing.dart';
+import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/glow_button.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
+import 'package:exhale/features/onboarding/presentation/steps/amount_step.dart';
+import 'package:exhale/features/onboarding/presentation/steps/habit_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/exhale_bubble.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/onboarding_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -124,6 +128,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           key: ValueKey(step),
                           child: switch (step) {
                             OnboardingStep.welcome => const WelcomeStep(),
+                            OnboardingStep.habit => const HabitStep(),
+                            OnboardingStep.amount => const AmountStep(),
                             _ => _PendingStep(step),
                           },
                         ),
@@ -185,6 +191,50 @@ class OnboardingStepFrame extends StatelessWidget {
   );
 }
 
+/// Exhale's prompt bubble above a step's title and optional lead.
+class OnboardingStepHeader extends StatelessWidget {
+  const OnboardingStepHeader({
+    required this.prompt,
+    required this.title,
+    this.lead,
+    super.key,
+  });
+
+  final String prompt;
+  final String title;
+  final String? lead;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = context.textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: AppSpacing.sm),
+        ExhaleBubble(text: prompt),
+        const SizedBox(height: AppSpacing.md + 2),
+        Text(
+          title,
+          style: text.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+            height: 1.15,
+          ),
+        ),
+        if (lead != null) ...[
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            lead!,
+            style: text.bodyLarge?.copyWith(
+              color: context.colors.onSurfaceVariant,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
 /// Placeholder for a step not built yet.
 class _PendingStep extends StatelessWidget {
   const _PendingStep(this.step);
@@ -196,12 +246,9 @@ class _PendingStep extends StatelessWidget {
     body: Align(
       alignment: Alignment.topLeft,
       child: Text(switch (step) {
-        OnboardingStep.habit => OnboardingCopy.habitTitle,
-        OnboardingStep.amount => OnboardingCopy.amountPrompt,
         OnboardingStep.cost => OnboardingCopy.costPrompt,
         OnboardingStep.day => OnboardingCopy.dayTitle,
-        OnboardingStep.welcome ||
-        OnboardingStep.deal => OnboardingCopy.dealPrompt,
+        _ => OnboardingCopy.dealPrompt,
       }, style: Theme.of(context).textTheme.headlineMedium),
     ),
     footer: SizedBox(
