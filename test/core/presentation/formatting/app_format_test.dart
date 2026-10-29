@@ -40,6 +40,29 @@ void main() {
     expect(AppFormat.money(1450, symbol: 'AED '), 'AED 14.50');
   });
 
+  test('money spaces a letter symbol once', () {
+    expect(AppFormat.money(1450, symbol: 'AED'), 'AED 14.50');
+    expect(AppFormat.money(15000, symbol: 'Rs', wholeUnits: true), 'Rs 150');
+    expect(AppFormat.money(500, symbol: 'kr'), 'kr 5.00');
+    expect(AppFormat.money(1450, symbol: '£'), '£14.50');
+    expect(AppFormat.money(1450, symbol: r'A$'), r'A$14.50');
+  });
+
+  test('money groups thousands', () {
+    expect(
+      AppFormat.money(182500, symbol: 'AED', wholeUnits: true),
+      'AED 1,825',
+    );
+    expect(AppFormat.money(264625, symbol: '£'), '£2,646.25');
+    expect(
+      AppFormat.money(123456789, symbol: r'$', wholeUnits: true),
+      r'$1,234,568',
+    );
+    expect(AppFormat.money(99999, symbol: r'$'), r'$999.99');
+    expect(AppFormat.money(0, symbol: r'$', wholeUnits: true), r'$0');
+    expect(AppFormat.money(-123450, symbol: r'$'), r'-$1,234.50');
+  });
+
   test('parseCents', () {
     expect(AppFormat.parseCents('14.50'), 1450);
     expect(AppFormat.parseCents(' 14,5 '), 1450);

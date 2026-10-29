@@ -57,16 +57,26 @@ abstract final class AppFormat {
     return '$hour:$minute ${time.hour < 12 ? 'AM' : 'PM'}';
   }
 
-  /// $14.50, or $183 with [wholeUnits].
+  /// $1,014.50, or $183 with [wholeUnits]. A symbol ending in a letter
+  /// gets a space: AED 14.50.
   static String money(
     num cents, {
     required String symbol,
     bool wholeUnits = false,
   }) {
-    final units = cents / 100;
-    return wholeUnits
-        ? '$symbol${units.round()}'
-        : '$symbol${units.toStringAsFixed(2)}';
+    final units = cents.abs() / 100;
+    final fixed = wholeUnits ? '${units.round()}' : units.toStringAsFixed(2);
+    final dot = fixed.indexOf('.');
+    final whole = dot < 0 ? fixed : fixed.substring(0, dot);
+    final fraction = dot < 0 ? '' : fixed.substring(dot);
+    final grouped = whole.replaceAllMapped(
+      RegExp(r'\B(?=(\d{3})+$)'),
+      (_) => ',',
+    );
+    final spaced = RegExp(r'\p{L}$', unicode: true).hasMatch(symbol)
+        ? '$symbol '
+        : symbol;
+    return '${cents < 0 ? '-' : ''}$spaced$grouped$fraction';
   }
 
   /// Parses user input like "14.50" or "14,5" into cents.
