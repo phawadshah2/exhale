@@ -34,8 +34,8 @@ log each use with one tap (logging is always allowed, even over the limit).
   summaries short. Match the surrounding code.
 - **Checks:** `fvm dart format .`, `fvm flutter analyze --fatal-infos`,
   `fvm flutter test` (the same checks CI runs in
-  `.github/workflows/app-ci.yml`). Ask Fawad before running each one, and
-  before builds or simulator runs.
+  `.github/workflows/app-ci.yml`). These three run without asking; ask
+  Fawad before codegen, builds or simulator runs.
 - **Codegen:** run `fvm dart run build_runner build -d` after changing drift
   tables.
 - **iOS look for every new screen:** Cupertino icons via `AppIcons`, glass
