@@ -1,7 +1,7 @@
 # Current state
 
 Updated 2026-10-29 (after the O2 milestone review).
-Onboarding plan, Phase O2 built and reviewed: next is Task 3.1. Roadmap:
+Onboarding plan, Phase O3 in progress: Task 3.1 done, next is Task 3.2. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`; tasks in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`.
 
@@ -249,7 +249,17 @@ had no test). Seen catching a mutation (bed_minute add removed on the v8
 path). Checks observed by me: format (1 file), `analyze --fatal-infos`
 clean, full suite 348 passed. 2.2 and 2.3 held as fine.
 
-Next: Task 3.1 with `superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
+Task 3.1 done (df1f03b): `OnboardingFormState` / `OnboardingFormController`
+/ `onboardingFormProvider` (`onboarding_form_provider.dart`; its own
+`QuitPreset`, Suggested first; `OnboardingStep`), `OnboardingCopy`. A
+price is ignored for a habit that does not track cost (no stale error or
+yearly cost after a switch). The old setup pages still use
+`setupFormProvider`. Checks observed by me: red first (compile errors),
+25 new tests passed, format, `analyze --fatal-infos` clean, full suite 373
+passed.
+
+Next: Task 3.2 (onboarding page, stepper, bubbles, Welcome) with
+`superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
 
