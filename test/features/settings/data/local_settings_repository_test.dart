@@ -47,6 +47,32 @@ void main() {
     expect(valueOf(await repository.get()), settings);
   });
 
+  test('saves and reads back wake and bed times', () async {
+    await repository.save(const AppSettings(wakeMinute: 420, bedMinute: 60));
+
+    final settings = valueOf(await repository.get());
+    expect(settings.wakeMinute, 420);
+    expect(settings.bedMinute, 60);
+  });
+
+  test('wake and bed times are unset by default', () async {
+    await repository.save(const AppSettings());
+
+    final settings = valueOf(await repository.get());
+    expect(settings.wakeMinute, isNull);
+    expect(settings.bedMinute, isNull);
+    expect(settings.dayWindow, isNull);
+  });
+
+  test('can clear wake and bed times', () async {
+    await repository.save(const AppSettings(wakeMinute: 420, bedMinute: 60));
+    final cleared = valueOf(await repository.get())
+        .copyWith(wakeMinute: () => null, bedMinute: () => null);
+    await repository.save(cleared);
+
+    expect(valueOf(await repository.get()).dayWindow, isNull);
+  });
+
   test('saving twice keeps a single row', () async {
     await repository.save(const AppSettings(userName: 'A'));
     await repository.save(const AppSettings(userName: 'B'));

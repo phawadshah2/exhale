@@ -14,7 +14,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? _createConnection());
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -26,6 +26,11 @@ class AppDatabase extends _$AppDatabase {
         await migrator.create(idxHabitLogsLoggedAt);
       }
       if (from < 8) await _moveHabitsToTheirOwnTable(migrator, from);
+      // Older versions get these from the v8 settings rebuild.
+      if (from == 8) {
+        await migrator.addColumn(settings, settings.wakeMinute);
+        await migrator.addColumn(settings, settings.bedMinute);
+      }
       // drift writes the version only after the migration returns; writing it
       // here too keeps a kill in between from rerunning a finished step.
       await customStatement('PRAGMA user_version = $to');
@@ -94,6 +99,8 @@ class AppDatabase extends _$AppDatabase {
         settings,
         newColumns: [
           settings.logHintSeen,
+          settings.wakeMinute,
+          settings.bedMinute,
           if (from < 4) ...[
             settings.askForTrigger,
             settings.triggerPromptIntroSeen,

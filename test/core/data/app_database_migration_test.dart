@@ -74,11 +74,11 @@ Future<PlanHistory> _history(AppDatabase db, int habitId) async =>
       PlanLocalDataSource(db),
     ).getHistory(habitId) as Success<PlanHistory?>).value!;
 
-/// Every upgrade ends on v8 with consistent foreign keys and no moved
+/// Every upgrade ends on v9 with consistent foreign keys and no moved
 /// columns left in settings.
-Future<void> _expectV8(AppDatabase database) async {
+Future<void> _expectLatest(AppDatabase database) async {
   final [version] = await _rows(database, 'PRAGMA user_version');
-  expect(version.values.single, 8);
+  expect(version.values.single, 9);
   expect(await _rows(database, 'PRAGMA foreign_key_check'), isEmpty);
 
   final settingsColumns = (await _rows(
@@ -87,8 +87,11 @@ Future<void> _expectV8(AppDatabase database) async {
   )).map((c) => c['name']);
   expect(
     settingsColumns,
+    containsAll(['log_hint_seen', 'wake_minute', 'bed_minute']),
+  );
+  expect(
+    settingsColumns,
     allOf(
-      contains('log_hint_seen'),
       isNot(contains('glass_effects')),
       isNot(contains('habit_kind')),
       isNot(contains('reason')),
@@ -255,7 +258,7 @@ void main() {
       );
       tearDown(() => database.close());
 
-      test('ends on v8', () => _expectV8(database));
+      test('ends on v9', () => _expectLatest(database));
 
       test('keeps settings; trigger prompt on', () async {
         final settings = await _settings(database);
@@ -335,7 +338,7 @@ void main() {
     );
     tearDown(() => database.close());
 
-    test('ends on v8', () => _expectV8(database));
+    test('ends on v9', () => _expectLatest(database));
 
     test('keeps settings; price and pack size move to habit 1', () async {
       expect((await _settings(database)).askForTrigger, isFalse);
@@ -393,7 +396,7 @@ void main() {
     );
     tearDown(() => database.close());
 
-    test('ends on v8', () => _expectV8(database));
+    test('ends on v9', () => _expectLatest(database));
 
     test('the habit, reason and price move to habit 1', () async {
       final [habit] = await _activeHabits(database);
@@ -426,7 +429,7 @@ void main() {
       final database = AppDatabase(NativeDatabase(file));
       addTearDown(database.close);
 
-      await _expectV8(database);
+      await _expectLatest(database);
       final [habit] = await _activeHabits(database);
       expect(habit.id, 1);
       expect(habit.habit.kind.name, settingsKind);
@@ -455,7 +458,7 @@ void main() {
       );
       addTearDown(database.close);
 
-      await _expectV8(database);
+      await _expectLatest(database);
       final habits = await _rows(
         database,
         'SELECT id, kind, archived_at FROM habits',
@@ -505,8 +508,43 @@ void main() {
       );
       addTearDown(database.close);
 
-      await _expectV8(database);
+      await _expectLatest(database);
       expect(await _activeHabits(database), isEmpty);
+    });
+  });
+
+  group('upgrade from v8', () {
+    late AppDatabase database;
+
+    setUp(() {
+      final dir = Directory.systemTemp.createTempSync('exhale_v8');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final file = File('test/fixtures/exhale_v8.sqlite')
+          .copySync('${dir.path}/exhale.sqlite');
+      driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+      database = AppDatabase(NativeDatabase(file));
+      addTearDown(database.close);
+    });
+
+    test('ends on v9', () => _expectLatest(database));
+
+    test('keeps settings; wake and bed times start unset', () async {
+      final settings = await _settings(database);
+      expect(settings.currencySymbol, 'AED');
+      expect(settings.wakeMinute, isNull);
+      expect(settings.bedMinute, isNull);
+    });
+
+    test('keeps the habit and its plan', () async {
+      final [habit] = await _activeHabits(database);
+      expect(habit.id, 1);
+      expect(habit.habit, Habit.smoking);
+      expect(habit.priceCents, 1500);
+
+      final [plan] = (await _history(database, 1)).plans;
+      expect(plan.startDay, LogicalDay(2026, 10, 20));
+      expect(plan.startLimit, 10);
+      expect(plan.quitDay, LogicalDay(2026, 12, 1));
     });
   });
 
@@ -514,7 +552,7 @@ void main() {
     final database = _open(_createV7Schema);
     addTearDown(database.close);
 
-    await _expectV8(database);
+    await _expectLatest(database);
     final [habit] = await _activeHabits(database);
     expect(habit.habit, Habit.smoking);
     expect(habit.unitsPerContainer, 20);
@@ -531,18 +569,18 @@ void main() {
     );
     addTearDown(database.close);
 
-    await _expectV8(database);
+    await _expectLatest(database);
     expect(await _activeHabits(database), isEmpty);
     expect(await _rows(database, 'SELECT habit_id FROM habit_logs'), [
       {'habit_id': 1},
     ]);
   });
 
-  test('a fresh install creates v8 with no habit', () async {
+  test('a fresh install creates v9 with no habit', () async {
     final database = _open((_) {});
     addTearDown(database.close);
 
-    await _expectV8(database);
+    await _expectLatest(database);
     expect(await _activeHabits(database), isEmpty);
   });
 }
