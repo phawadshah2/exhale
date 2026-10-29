@@ -1,13 +1,13 @@
 # Current state
 
-Updated 2026-10-29 (handoff after Task 3.2, HEAD 3b9faa3, tree clean
-apart from this line).
-Onboarding plan, Phase O3 in progress: Tasks 3.1–3.2 done, next is Task 3.3
-(Habit and Daily amount steps). To continue, read the plan section "Task 3.3"
+Updated 2026-10-29 (checkpoint after Task 3.3, code HEAD 180dff8).
+Onboarding plan, Phase O3 in progress: Tasks 3.1–3.3 done, next is Task 3.4
+(Cost step). To continue, read the plan section "Task 3.4"
 in `docs/superpowers/plans/2026-10-29-onboarding-redesign.md`, the ledger's
-Task 3.1–3.2 rulings (`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`)
-and `lib/features/onboarding/presentation/pages/onboarding_page.dart`
-(`OnboardingStepFrame`, `_PendingStep`). Roadmap:
+Task 3.2–3.3 rulings (`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`),
+`lib/features/onboarding/presentation/pages/onboarding_page.dart`
+(`OnboardingStepFrame`, `OnboardingStepHeader`, `_PendingStep`) and
+`steps/amount_step.dart` as the pattern for a step. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md` (row 3b).
 
 ## Goal
@@ -275,8 +275,19 @@ Checks observed by me: red first, 7 new tests passed, format,
 `analyze --fatal-infos` clean, full suite 380 passed. Not seen on a
 simulator.
 
-Next: Task 3.3 (Habit and Daily amount steps) with
-`superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
+Task 3.3 done (180dff8): `HabitStep` (2-column preset grid, dashed
+Something else with name and unit fields in place, reply per pick),
+`AmountStep` (round − / +, 64 px number, `AmountRuler`, `DotsGrid`,
+reaction by range), `OnboardingStepHeader`, `ExhaleReply`. The ruler's
+scale follows the finger: drag left raises (the plan said right; ledgered).
+Checks observed by me: red first (compile errors), 8 new tests passed,
+format (5 files), `analyze --fatal-infos` clean, full suite 388 passed.
+Not seen on a simulator.
+
+Next: Task 3.4 (Cost step) with `superpowers:executing-plans` (Sonnet 5.5
+medium). Its test covers Review Focus 1 (Cost disappearing after a habit
+switch). `task-done` is blocked by the global hook (it wraps a test
+command); run the tests bare and write the ledger line by hand. Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
 
