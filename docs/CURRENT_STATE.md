@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-10-28. Roadmap:
+Updated 2026-10-29. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`; tasks in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`.
 
@@ -8,8 +8,9 @@ Updated 2026-10-28. Roadmap:
 
 Home, Details and Logs redesign. M1, M2, M3 and the Home design fixes are
 merged to `main` (PR #23, 50bef85). M3 review merged (PR #24, 4457aea).
-Next: redesign onboarding (and maybe splash) from scratch, then revise the
-plan; M4 waits for that.
+Onboarding redesign spec approved (2026-10-29, commits 64d8fc8 and
+6055570 on `feat/onboarding-redesign`, local only). Next: its
+implementation plan, then revise the roadmap; M4 waits for that.
 
 ## Done
 
@@ -195,11 +196,16 @@ under `docs/superpowers/plans/`. Then revise
 4.1 Add a habit reuses the onboarding steps). Work on
 `feat/onboarding-redesign`.
 
+Read only: the spec, `lib/features/onboarding/` and
+`lib/core/theme/exhale_colors.dart`, and the settings table/migration
+files when planning phase 2. Checks: none run this session (docs and
+mockups only); `main` code unchanged since the 307-test full suite.
+
 **Git:** Claude may branch, commit and merge locally; push only when asked;
 no Co-Authored-By trailers. GitHub `main` is protected (PR plus the
 "Analyze & test" check), so pushing `main` directly fails. Local `main` is
-`origin/main` plus the handoff docs commit 372e0ba, which goes up with the
-onboarding PR. Untracked `todo.md` is Fawad's.
+`origin/main` plus the handoff docs commit 372e0ba; the branch adds the
+two spec commits. Both go up with the onboarding PR. Untracked `todo.md` is Fawad's.
 
 Test gotchas: never `await` a go_router `push` in a test (use `unawaited`);
 a failed assert skips `disposeApp()`, so run a failing test with
