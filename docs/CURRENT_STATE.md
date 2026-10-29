@@ -217,8 +217,18 @@ Closest call: Home's `_TodayChip` is tappable but a 16% accent ghost chip
 (a secondary jump back to today), held as fine. `SetupStepChip`'s accent dot
 is decorative.
 
-Next: Task 2.1 (schema v9, wake and bed times) with
-`superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
+Task 2.1 done (281324e): schema v9 adds nullable `settings.wake_minute`
+/ `bed_minute`; `AppSettings.wakeMinute`, `bedMinute`, `dayWindow`;
+`DayWindow` (default 7:30–23:30, at least 4 h awake); validation rejects
+times outside the day and windows under 4 h. New fixture
+`test/fixtures/exhale_v8.sqlite`. Plan fix: the v8 settings rebuild must
+list the two columns in `newColumns` (drift copies other columns by name),
+so v1–v7 upgrades reach v9. Checks observed by me: red first, Task 2.1
+files 48 passed, format (2 test files), `analyze --fatal-infos` clean,
+full suite 331 passed.
+
+Next: Task 2.2 (`CurrencyChoices`) with `superpowers:executing-plans`
+(Sonnet 5.5 medium). Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
 
@@ -226,7 +236,7 @@ via `.git/info/exclude`).
 no Co-Authored-By trailers. GitHub `main` is protected (PR plus the
 "Analyze & test" check), so pushing `main` directly fails. Local `main` is
 `origin/main` plus the handoff docs commit 372e0ba; the branch adds the
-spec, plan, Task 1.1 and checkpoint commits (HEAD 58a3f02, not pushed).
+spec, plan, Task 1.1, Task 2.1 and checkpoint commits (not pushed).
 All go up with the onboarding PR.
 
 Task 1.1 rulings (in the ledger): `showAppConfirm` is a native alert, so

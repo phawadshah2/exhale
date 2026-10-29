@@ -59,8 +59,8 @@ log each use with one tap (logging is always allowed, even over the limit).
   plan, settings, tracking, design_system.
 - **State:** Riverpod 3 with hand-written providers. **No riverpod_generator.**
   Providers read repositories and use cases from `sl`.
-- **Storage:** drift, fully offline, currently **schema v8** (`habits`;
-  plans and logs keyed by `habit_id`). Repositories
+- **Storage:** drift, fully offline, currently **schema v9** (`habits`;
+  plans and logs keyed by `habit_id`; v9 adds wake and bed times). Repositories
   return `Result` and wrap storage calls with `guardStorage`.
 - **Day logic:** a logical day resets at a user-set hour (default 4 AM). Logs
   between midnight and the reset hour belong to the previous day.
