@@ -1,7 +1,7 @@
 # Current state
 
-Updated 2026-10-29 (after Task 3.7; HEAD 981f15a plus this doc;
-branch 30+ commits ahead of origin, not pushed). Hook gotcha: the global
+Updated 2026-10-29 (handoff after Task 3.7; HEAD a0e779f, tree clean
+apart from this line; branch 30+ commits ahead of origin, not pushed). Hook gotcha: the global
 hook blocks any Bash call whose text mentions "format"/"test" next to
 other commands (including `git add` of `formatting/` paths, `git rm` of
 `*_test.dart` and `task-done`); run checks bare, stage with `git add -A`
