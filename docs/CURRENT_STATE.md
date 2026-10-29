@@ -1,19 +1,18 @@
 # Current state
 
-Updated 2026-10-29 (handoff after Task 3.4 and the money format fix; HEAD
-f517ec4, tree clean apart from this line; branch 25+ commits ahead of
-origin, not pushed). Hook gotcha: the global hook blocks any Bash call
-whose text mentions "format"/"test" next to other commands (including
-`git add` of `formatting/` paths and `task-done`); run checks bare, stage
-with `git add -u`, write ledger lines by hand.
-Onboarding plan, Phase O3 in progress: Tasks 3.1–3.5 done (3.5 uncommitted),
-next is Task 3.6 (The deal step and saving). To continue, read the plan
-section "Task 3.6" in `docs/superpowers/plans/2026-10-29-onboarding-redesign.md`,
-the ledger's Task 3.3–3.5 rulings
-(`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`),
-`lib/features/onboarding/presentation/pages/onboarding_page.dart`
-(`OnboardingStepFrame`, `OnboardingStepHeader`, `_PendingStep`) and
-`steps/day_step.dart` as the pattern for a step. Roadmap:
+Updated 2026-10-29 (after Task 3.6; HEAD 88e62c5 plus this doc;
+branch 28+ commits ahead of origin, not pushed). Hook gotcha: the global
+hook blocks any Bash call whose text mentions "format"/"test" next to
+other commands (including `git add` of `formatting/` paths and
+`task-done`); run checks bare, stage with `git add -A` / `-u`, write
+ledger lines by hand. Stay on `feat/onboarding-redesign`.
+Onboarding plan, Phase O3 in progress: Tasks 3.1–3.6 done and committed,
+next is Task 3.7 (Splash hand-off and old setup removed; Sonnet 5.5
+medium). To continue, read the plan section "Task 3.7" in
+`docs/superpowers/plans/2026-10-29-onboarding-redesign.md` and the
+ledger's Task 3.6 rulings
+(`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`). After
+3.7 comes the milestone O3 review (Opus 5.5 high). Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md` (row 3b).
 
 ## Goal
@@ -304,7 +303,7 @@ Checks observed by me: red first, 7 new tests passed, format (3 files),
 `analyze --fatal-infos` clean, full suite 395 passed. Not seen on a
 simulator.
 
-Task 3.5 done (uncommitted, 2026-10-29): `DayWindowPicker`
+Task 3.5 done (129d4f1, 2026-10-29): `DayWindowPicker`
 (`lib/features/settings/presentation/widgets/day_window_picker.dart`: arc
 with dots, Wake up / Bedtime tiles, inline `CupertinoDatePicker` at 15-min
 steps; a window under 4 h is not reported and the wheel snaps back when
@@ -316,9 +315,22 @@ by me: format (3 files), `analyze --fatal-infos` clean, full suite 405
 passed. Red was not observed first; the scroll-end snap-back has no test;
 not seen on a simulator.
 
-Next: Task 3.6 (The deal step and saving) with
-`superpowers:executing-plans` (Sonnet 5.5 medium; Opus 5.5 high is worth it
-for the save/retry logic, Review Focus 4). `task-done` is blocked by the global hook (it wraps a test
+Task 3.6 done (88e62c5, 2026-10-29): `DealStep` (title, `TaperChart`,
+Suggested / 4 weeks / 8 weeks / 3 months / Pick chips, steep warning,
+Tomorrow / Quit in / Back a year stats, pace line, **Shake on it** with
+the error under it, fine print; success goes to Home) and `TaperChart`
+(`widgets/taper_chart.dart`, real daily limits). `_PendingStep` deleted.
+Review Focus 3 and 4 are tested: 80 a day suggests 90 days; a failed
+save keeps every answer and the retry saves one habit; two presses in
+one frame save one habit (seen red with the `isSubmitting` guard
+removed). Tests reach `/onboarding` with `GoRouter.go` until 3.7 wires
+the splash. Checks observed by me: red first (compile errors), 7 passed,
+format (1 file), `analyze --fatal-infos` clean, full suite 412 passed.
+Not seen on a simulator.
+
+Next: Task 3.7 (Splash hand-off and old setup removed) with
+`superpowers:executing-plans`; then `toDeal` in `deal_step_test.dart`
+can start from the splash instead of `GoRouter.go`. `task-done` is blocked by the global hook (it wraps a test
 command); run the tests bare and write the ledger line by hand. Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
