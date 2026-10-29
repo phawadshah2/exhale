@@ -209,9 +209,16 @@ Task 1.1 done (04b699b): `ExhaleColors.emphasis` / `onEmphasis`
 Checks observed by me: full suite 314 passed, then format (2 files
 reflowed) and `analyze --fatal-infos` clean. Not seen on a simulator.
 
-Next: the Milestone O1 review (Opus 5.5 high, read-only: every
-`primaryContainer` use under `lib/` is state, not a primary action), then
-Task 2.1 with `superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
+Milestone O1 review done (2026-10-29, code read, no fixes): every
+`primaryContainer` use under `lib/` is state, selection, a chart/ring
+accent, a tint or decoration. Filled buttons get `emphasis` from
+`filledButtonTheme`; no FAB or `ElevatedButton` falls back to the accent.
+Closest call: Home's `_TodayChip` is tappable but a 16% accent ghost chip
+(a secondary jump back to today), held as fine. `SetupStepChip`'s accent dot
+is decorative.
+
+Next: Task 2.1 (schema v9, wake and bed times) with
+`superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
 
