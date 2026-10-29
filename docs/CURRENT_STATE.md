@@ -1,13 +1,14 @@
 # Current state
 
-Updated 2026-10-29 (checkpoint after Task 3.3, code HEAD 180dff8).
-Onboarding plan, Phase O3 in progress: Tasks 3.1–3.3 done, next is Task 3.4
-(Cost step). To continue, read the plan section "Task 3.4"
-in `docs/superpowers/plans/2026-10-29-onboarding-redesign.md`, the ledger's
-Task 3.2–3.3 rulings (`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`),
+Updated 2026-10-29 (checkpoint after Task 3.4, code HEAD 7a72513).
+Onboarding plan, Phase O3 in progress: Tasks 3.1–3.4 done, next is Task 3.5
+(Your day step and `DayWindowPicker`). To continue, read the plan section
+"Task 3.5" in `docs/superpowers/plans/2026-10-29-onboarding-redesign.md`,
+the ledger's Task 3.3–3.4 rulings
+(`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`),
 `lib/features/onboarding/presentation/pages/onboarding_page.dart`
 (`OnboardingStepFrame`, `OnboardingStepHeader`, `_PendingStep`) and
-`steps/amount_step.dart` as the pattern for a step. Roadmap:
+`steps/cost_step.dart` as the pattern for a step. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md` (row 3b).
 
 ## Goal
@@ -284,9 +285,21 @@ Checks observed by me: red first (compile errors), 8 new tests passed,
 format (5 files), `analyze --fatal-infos` clean, full suite 388 passed.
 Not seen on a simulator.
 
-Next: Task 3.4 (Cost step) with `superpowers:executing-plans` (Sonnet 5.5
-medium). Its test covers Review Focus 1 (Cost disappearing after a habit
-switch). `task-done` is blocked by the global hook (it wraps a test
+Task 3.4 done (7a72513): `CostStep` (price card with `CurrencyChip`,
+units-per-container stepper, month/year tiles and reply once a price is
+valid, "I'd rather not know" clears and moves on, invalid price errors on
+Continue), `showOptionWheel` in `app_dialogs.dart` (shares the date
+wheel's header), `RoundIconButton` (moved out of the amount step). Review
+Focus 1 is tested (Cost leaves the steps after a switch to Social media).
+Tile amounts read like "AED1825": `AppFormat.money` has no space or
+thousands separator (mockup "AED 1,825"); left alone, it is shared.
+Checks observed by me: red first, 7 new tests passed, format (3 files),
+`analyze --fatal-infos` clean, full suite 395 passed. Not seen on a
+simulator.
+
+Next: Task 3.5 (Your day step and `DayWindowPicker`) with
+`superpowers:executing-plans` (Sonnet 5.5 medium). Its tests cover Review
+Focus 2 (bedtime after midnight). `task-done` is blocked by the global hook (it wraps a test
 command); run the tests bare and write the ledger line by hand. Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
