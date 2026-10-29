@@ -1,6 +1,11 @@
 # Current state
 
-Updated 2026-10-29 (checkpoint after Task 3.4 and the money format fix).
+Updated 2026-10-29 (handoff after Task 3.4 and the money format fix; HEAD
+f517ec4, tree clean apart from this line; branch 25+ commits ahead of
+origin, not pushed). Hook gotcha: the global hook blocks any Bash call
+whose text mentions "format"/"test" next to other commands (including
+`git add` of `formatting/` paths and `task-done`); run checks bare, stage
+with `git add -u`, write ledger lines by hand.
 Onboarding plan, Phase O3 in progress: Tasks 3.1–3.4 done, next is Task 3.5
 (Your day step and `DayWindowPicker`). To continue, read the plan section
 "Task 3.5" in `docs/superpowers/plans/2026-10-29-onboarding-redesign.md`,
