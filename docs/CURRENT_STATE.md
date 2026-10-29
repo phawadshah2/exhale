@@ -219,7 +219,17 @@ via `.git/info/exclude`).
 no Co-Authored-By trailers. GitHub `main` is protected (PR plus the
 "Analyze & test" check), so pushing `main` directly fails. Local `main` is
 `origin/main` plus the handoff docs commit 372e0ba; the branch adds the
-two spec commits. Both go up with the onboarding PR. Untracked `todo.md` is Fawad's.
+spec, plan, Task 1.1 and checkpoint commits (HEAD 58a3f02, not pushed).
+All go up with the onboarding PR.
+
+Task 1.1 rulings (in the ledger): `showAppConfirm` is a native alert, so
+the wheel picker's Done got the emphasis tint instead; tinted
+`GlassIconButton` icons use `onEmphasis`; an extra
+`test/core/widgets/glow_button_test.dart` covers the dark-only halo.
+
+Shell gotcha: the global hook rejects compound commands that contain a
+check, so run each `fvm` check as a bare command with no `cd`, pipes or
+redirects.
 
 Test gotchas: never `await` a go_router `push` in a test (use `unawaited`);
 a failed assert skips `disposeApp()`, so run a failing test with
