@@ -7,10 +7,9 @@ Updated 2026-10-28. Roadmap:
 ## Goal
 
 Home, Details and Logs redesign. M1, M2, M3 and the Home design fixes are
-merged to `main` (PR #23, 50bef85). M3 review done: `fix/m3-review`
-pushed, PR not opened yet (no `gh` on this Mac; Fawad opens it from
-GitHub). Next: redesign onboarding (and maybe splash) from scratch, then
-revise the plan; M4 waits for that.
+merged to `main` (PR #23, 50bef85). M3 review merged (PR #24, 4457aea).
+Next: redesign onboarding (and maybe splash) from scratch, then revise the
+plan; M4 waits for that.
 
 ## Done
 
@@ -147,42 +146,59 @@ price only.
   tap and long-press semantic actions (VoiceOver falls back to a touch; the
   menu has no action).
 
-## Onboarding redesign (decided 2026-10-28)
+## Onboarding redesign (decided 2026-10-28, refined 2026-10-29)
 
-Fawad wants onboarding redone from scratch (splash maybe too) before M4,
-because onboarding may change Home; the roadmap gets revised once the
-onboarding design is settled. Direction discussed, not yet a spec:
-- Tone: sardonic and funny, but motivating; jokes hit the habit and the
-  excuses, never the person; no medical claims.
-- 5–6 uncrowded screens with purposeful animation (Reduce Motion
-  fallback). Proposal: Welcome → habit → daily amount (reactive copy) →
-  cost (price + pack size + currency chip from locale; skipped when the
-  habit has no cost) → your day (bedtime/wake dial) → the deal (taper
-  line, suggested quit date preselected, presets, money saved).
-- One visual thread: the daily-amount dots reappear on every screen.
-- Bedtime/wake (times, not hours) feed a pace guide on Home
-  ("next one on schedule in N min" = awake minutes ÷ today's limit, never
-  a lock) and could set the day reset hour; the Home timer is its own task.
-- Suggested cuts: no language picker at launch (no l10n; humour needs a
-  native writer); "Your why" moves to a Home prompt; optional "Less
-  sarcasm" setting.
+Fawad wants onboarding redone from scratch before M4, because onboarding
+may change Home; the roadmap gets revised once the spec is settled.
+Spec written (awaiting Fawad's review):
+`docs/superpowers/specs/2026-10-29-onboarding-redesign-design.md`.
+
+Decided with Fawad (2026-10-29):
+- Flow A, "the excuse chat": Exhale talks in short chat bubbles at the
+  top of each step. Mockups: `design/7._onboarding/flows.html` (Flow A
+  black = light mode; Flow A app accent dark = dark mode; Flow B and the
+  accent-light row are rejected alternatives).
+- Screens: splash (flows into Welcome on first launch) → 1 Welcome (your
+  excuses as sent texts, Exhale replies) → 2 Habit → 3 Daily amount →
+  4 Cost (price, pack size, currency chip; skipped for no-cost habits;
+  "I'd rather not know" skips the price) → 5 Your day (wake/bed, inline
+  wheel) → 6 The deal (taper chart, Suggested preselected, presets,
+  "Shake on it").
+- Stepper: six thin segments, back chevron, quiet "2/6" (Welcome is 1/6;
+  "/5" when Cost is skipped). No Skip button; a tap on Welcome only skips
+  its animation.
+- English only (no language picker at launch). Daily amount is one number
+  per day. Name, start date picker (start is today) and "Your why" leave
+  onboarding.
+- Sleep times feed only the pace guide; the 4 AM day reset stays separate
+  in Settings. The Home pace guide is in the same spec as a later phase.
+- Colour: a new `emphasis` / `onEmphasis` role in `ExhaleColors`: ink
+  (#111418, white text) in light, the accent (primaryContainer, dark teal
+  text) in dark. Used for primary filled buttons app-wide, Exhale's
+  bubbles, avatar, stepper and dots; the accent keeps selection and state
+  (selected cards and chips, ring, charts). Splash logo glyph and avatar
+  icon follow the accent. Easy to revert: only the role's colours change.
+- Tone: sardonic but motivating; jokes hit the habit and the excuses,
+  never the person; no medical claims ("A behaviour tool, not medical
+  advice." on Welcome).
+
+Data, reuse and the pace guide (spec §5, §8) were approved in chat.
+Open: the suggested quit date rule (spec §9).
 
 ## Next action
 
-Onboarding redesign spec (Opus 5.5 high): use
-`superpowers:brainstorming` to settle screens, copy and the pace guide
-with Fawad, write the spec under `docs/superpowers/specs/`, then mockups,
-then revise `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`
-(M4 Task 4.1 Add a habit should reuse the new onboarding steps). Branch
-`feat/onboarding-redesign` off `main` once the M3 PR is merged.
+Fawad reviews the onboarding spec and settles its open question (suggested
+quit date, spec §9). Then `superpowers:writing-plans` for the four phases
+in spec §10, then revise
+`docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md` (M4 Task
+4.1 Add a habit reuses the onboarding steps). Work on
+`feat/onboarding-redesign`.
 
 **Git:** Claude may branch, commit and merge locally; push only when asked;
 no Co-Authored-By trailers. GitHub `main` is protected (PR plus the
-"Analyze & test" check), so pushing `main` directly fails. Local `main`
-holds a local merge of `fix/m3-review` (aaf7d36, not on GitHub); after the
-PR merges, reset it: `git fetch origin`, then `git reset --hard
-origin/main` (ask Fawad first). Not run: nothing since the full suite
-(307 passed) before the commits. Untracked `todo.md` is Fawad's.
+"Analyze & test" check), so pushing `main` directly fails. Local `main` is
+`origin/main` plus the handoff docs commit 372e0ba, which goes up with the
+onboarding PR. Untracked `todo.md` is Fawad's.
 
 Test gotchas: never `await` a go_router `push` in a test (use `unawaited`);
 a failed assert skips `disposeApp()`, so run a failing test with
