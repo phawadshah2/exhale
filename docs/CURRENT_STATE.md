@@ -1,8 +1,7 @@
 # Current state
 
-Updated 2026-10-29 (handoff after Task 2.3, HEAD 27af8d3, tree clean
-apart from this line).
-Onboarding plan, Phase O2 built: next is the O2 milestone review. Roadmap:
+Updated 2026-10-29 (after the O2 milestone review).
+Onboarding plan, Phase O2 built and reviewed: next is Task 3.1. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`; tasks in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`.
 
@@ -241,9 +240,16 @@ Task 2.3 done (4f768d9): `ReductionPlan.suggestedQuitDay` is
 7 days), format (1 file), `analyze --fatal-infos` clean, full suite 340
 passed. No onboarding or Edit plan test needed new dates.
 
-Next: Milestone O2 review (Opus 5.5 high). Focus: every upgrade path
-(v3–v8 and a fresh install) ends on v9 with the same columns. Then Task
-3.1 with `superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
+Milestone O2 review done (2026-10-29): code read, no `lib/` changes.
+Migration logic holds (v8 adds the two columns; older versions get them
+from the v8 settings rebuild). Test gaps fixed: `_expectLatest` now
+compares every table's columns (type, not null, default, key) and the
+indexes with a fresh install; new `upgrade from v3` / `v4` groups (they
+had no test). Seen catching a mutation (bed_minute add removed on the v8
+path). Checks observed by me: format (1 file), `analyze --fatal-infos`
+clean, full suite 348 passed. 2.2 and 2.3 held as fine.
+
+Next: Task 3.1 with `superpowers:executing-plans` (Sonnet 5.5 medium). Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
 
