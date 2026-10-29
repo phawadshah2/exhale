@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-10-29 (checkpoint after Task 3.4, code HEAD 7a72513).
+Updated 2026-10-29 (checkpoint after Task 3.4 and the money format fix).
 Onboarding plan, Phase O3 in progress: Tasks 3.1–3.4 done, next is Task 3.5
 (Your day step and `DayWindowPicker`). To continue, read the plan section
 "Task 3.5" in `docs/superpowers/plans/2026-10-29-onboarding-redesign.md`,
@@ -291,8 +291,10 @@ valid, "I'd rather not know" clears and moves on, invalid price errors on
 Continue), `showOptionWheel` in `app_dialogs.dart` (shares the date
 wheel's header), `RoundIconButton` (moved out of the amount step). Review
 Focus 1 is tested (Cost leaves the steps after a switch to Social media).
-Tile amounts read like "AED1825": `AppFormat.money` has no space or
-thousands separator (mockup "AED 1,825"); left alone, it is shared.
+Follow-up fix (Fawad asked): `AppFormat.money` now puts a space after a
+symbol ending in a letter and groups thousands ("AED 1,825", "£2,646.25"),
+app-wide. Checks observed by me: red first, format, analyze clean, full
+suite 397 passed.
 Checks observed by me: red first, 7 new tests passed, format (3 files),
 `analyze --fatal-infos` clean, full suite 395 passed. Not seen on a
 simulator.
