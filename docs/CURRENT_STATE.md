@@ -1,6 +1,7 @@
 # Current state
 
-Updated 2026-10-29 (plan written). Roadmap:
+Updated 2026-10-29 (handoff after Task 2.1, HEAD 2dde171, tree clean).
+Onboarding plan, Phase O2: next is Task 2.2. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`; tasks in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`.
 
@@ -244,9 +245,15 @@ the wheel picker's Done got the emphasis tint instead; tinted
 `GlassIconButton` icons use `onEmphasis`; an extra
 `test/core/widgets/glow_button_test.dart` covers the dark-only halo.
 
-Shell gotcha: the global hook rejects compound commands that contain a
-check, so run each `fvm` check as a bare command with no `cd`, pipes or
-redirects.
+Checks policy (2026-10-29): format, analyze and test run without asking
+(global hook and settings allow them). Codegen, builds and simulator runs
+still need Fawad's approval. Run each check as a bare command: the hook
+still asks on redirects or `$(...)` and rejects a check chained with a gated
+command. Full-suite output is large; use `--reporter failures-only`.
+
+Task 2.2 starts from: plan section "Task 2.2: `CurrencyChoices`" in
+`docs/superpowers/plans/2026-10-29-onboarding-redesign.md` and the
+ledger's Task 2.1 rulings.
 
 Test gotchas: never `await` a go_router `push` in a test (use `unawaited`);
 a failed assert skips `disposeApp()`, so run a failing test with
