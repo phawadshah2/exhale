@@ -1,9 +1,14 @@
 # Current state
 
-Updated 2026-10-29 (after the O2 milestone review).
-Onboarding plan, Phase O3 in progress: Tasks 3.1–3.2 done, next is Task 3.3. Roadmap:
-`docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`; tasks in
-`docs/superpowers/plans/2026-10-21-home-details-logs.md`.
+Updated 2026-10-29 (handoff after Task 3.2, HEAD 3b9faa3, tree clean
+apart from this line).
+Onboarding plan, Phase O3 in progress: Tasks 3.1–3.2 done, next is Task 3.3
+(Habit and Daily amount steps). To continue, read the plan section "Task 3.3"
+in `docs/superpowers/plans/2026-10-29-onboarding-redesign.md`, the ledger's
+Task 3.1–3.2 rulings (`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`)
+and `lib/features/onboarding/presentation/pages/onboarding_page.dart`
+(`OnboardingStepFrame`, `_PendingStep`). Roadmap:
+`docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md` (row 3b).
 
 ## Goal
 
