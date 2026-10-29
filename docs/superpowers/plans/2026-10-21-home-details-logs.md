@@ -276,9 +276,12 @@
 
 ### Task 4.1: Add a habit flow
 
-**Files:** Modify `habit_picker_page.dart`, `setup_page.dart`, `setup_form_provider.dart` (mode `SetupMode { firstRun, addHabit }`); router `/add-habit`, `/add-habit/plan`; Test `test/features/onboarding/add_habit_test.dart`
+Revised 2026-10-29: the old setup pages are removed by the onboarding plan
+(`2026-10-29-onboarding-redesign.md`); this task reuses its steps.
 
-**Interfaces:** in `addHabit` mode the picker marks active kinds "TRACKING" and disables them, asks "Why this one?", and `submit()` adds the habit and its plan then returns Home.
+**Files:** Create `lib/features/onboarding/presentation/pages/add_habit_page.dart`; Modify `onboarding_form_provider.dart` (`OnboardingMode { firstRun, addHabit }`; in `addHabit` `steps` is habit, amount, cost (when the habit tracks cost), deal), `onboarding_page.dart` (takes the mode), `habit_step.dart` (marks active kinds "TRACKING" and disables them), router `/add-habit`; Test `test/features/onboarding/add_habit_test.dart`
+
+**Interfaces:** `submit()` in `addHabit` skips the second-habit guard and the settings write (wake, bed and currency stay as they are), adds the habit and its plan, then returns Home. No Welcome, no Your day, no "Why" (spec §5.3).
 - [ ] **Steps 1–4:** tests `tracked habit is disabled`, `adding a second habit shows the habit list on Home`.
 - [ ] **Step 5: Checkpoint:** `feat(habit): add a habit flow`
 

@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-10-29. Roadmap:
+Updated 2026-10-29 (plan written). Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`; tasks in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`.
 
@@ -9,8 +9,8 @@ Updated 2026-10-29. Roadmap:
 Home, Details and Logs redesign. M1, M2, M3 and the Home design fixes are
 merged to `main` (PR #23, 50bef85). M3 review merged (PR #24, 4457aea).
 Onboarding redesign spec approved (2026-10-29, commits 64d8fc8 and
-6055570 on `feat/onboarding-redesign`, local only). Next: its
-implementation plan, then revise the roadmap; M4 waits for that.
+6055570 on `feat/onboarding-redesign`, local only). Its implementation plan is written (see "Onboarding plan"); M4 waits
+for it to be built.
 
 ## Done
 
@@ -186,20 +186,29 @@ Decided with Fawad (2026-10-29):
 Data, reuse and the pace guide (spec §5, §8) were approved in chat.
 Suggested quit date: `startLimit × 7` days clamped to 14–90 (spec §9).
 
+## Onboarding plan (written 2026-10-29)
+
+`docs/superpowers/plans/2026-10-29-onboarding-redesign.md`: phases O1–O4,
+13 tasks (1.1; 2.1–2.3; 3.1–3.7; 4.1–4.2), milestone review after each
+phase. Roadmap gained the "3b. Onboarding redesign" row; plan Task 4.1
+(Add a habit) now reuses the onboarding steps (no "Why", per spec §5.3).
+Deviation from spec §5.3: `cost_card`, `projection_card`, `quit_date_card`
+and `setup_chrome` move to `lib/features/plan/presentation/widgets/`
+(Edit plan uses them) instead of being deleted.
+
+Choices in the plan Fawad may want to revisit: the GlowButton accent halo
+shows only in dark mode; the "Set your day" prompt shows until the day is
+set (no dismiss flag); first launch skips the long splash intro and shows
+"We need to talk." for 1.2 s.
+
 ## Next action
 
-Write the implementation plan (Opus 5.5 high, fresh session):
-`superpowers:writing-plans` for the four phases in spec §10 of
-`docs/superpowers/specs/2026-10-29-onboarding-redesign-design.md`, saved
-under `docs/superpowers/plans/`. Then revise
-`docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md` (M4 Task
-4.1 Add a habit reuses the onboarding steps). Work on
-`feat/onboarding-redesign`.
+Fawad reviews the plan, then Task 1.1 (emphasis role) on
+`feat/onboarding-redesign` with `superpowers:executing-plans` (Sonnet 5.5
+medium; Opus 5.5 high for each milestone review).
 
-Read only: the spec, `lib/features/onboarding/` and
-`lib/core/theme/exhale_colors.dart`, and the settings table/migration
-files when planning phase 2. Checks: none run this session (docs and
-mockups only); `main` code unchanged since the 307-test full suite.
+Checks: none run (docs only); `main` code unchanged since the 307-test
+full suite.
 
 **Git:** Claude may branch, commit and merge locally; push only when asked;
 no Co-Authored-By trailers. GitHub `main` is protected (PR plus the
