@@ -8,8 +8,9 @@ import 'package:flutter/material.dart';
 
 /// A day's ring: fills toward the limit. While it fills it is the safe
 /// green; once it has filled, the whole ring takes the colour of the day's
-/// status (amber at the limit, red over it). With no [progress] (a day before
-/// the plan) only the track is drawn.
+/// status (amber at the limit, red over it). A day at zero after the quit date
+/// is a full success ring. With no [progress] (a day before the plan) only the
+/// track is drawn.
 class ProgressRing extends StatelessWidget {
   const ProgressRing({
     required this.progress,
@@ -29,12 +30,15 @@ class ProgressRing extends StatelessWidget {
     final colors = context.colors;
     final status = context.exhale;
     final progress = this.progress;
-    final target = progress?.usedFraction ?? 0;
-    final finalColor = switch (progress?.status) {
-      LimitStatus.at => status.warning.solid,
-      LimitStatus.over => status.danger.solid,
-      _ => null,
-    };
+    final atZero = progress?.limit == 0 && progress?.count == 0;
+    final target = atZero ? 1.0 : progress?.usedFraction ?? 0;
+    final finalColor = atZero
+        ? status.success.solid
+        : switch (progress?.status) {
+            LimitStatus.at => status.warning.solid,
+            LimitStatus.over => status.danger.solid,
+            _ => null,
+          };
 
     return SizedBox.square(
       dimension: size,

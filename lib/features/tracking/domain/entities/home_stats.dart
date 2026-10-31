@@ -5,6 +5,7 @@ class HomeStats {
   const HomeStats({
     required this.dayNumber,
     required this.streakDays,
+    required this.freeDays,
     required this.baseline,
     required this.recentAverage,
     required this.avoided,
@@ -16,6 +17,9 @@ class HomeStats {
 
   /// Consecutive days within limit, ending today.
   final int streakDays;
+
+  /// Consecutive days with a limit of 0 and nothing logged, ending today.
+  final int freeDays;
 
   /// Daily amount the user started from.
   final int baseline;
@@ -38,6 +42,7 @@ class HomeStats {
       other is HomeStats &&
       other.dayNumber == dayNumber &&
       other.streakDays == streakDays &&
+      other.freeDays == freeDays &&
       other.baseline == baseline &&
       other.recentAverage == recentAverage &&
       other.avoided == avoided &&
@@ -47,6 +52,7 @@ class HomeStats {
   int get hashCode => Object.hash(
     dayNumber,
     streakDays,
+    freeDays,
     baseline,
     recentAverage,
     avoided,

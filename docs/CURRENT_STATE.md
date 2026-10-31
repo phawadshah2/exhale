@@ -14,20 +14,43 @@ The single-habit docs are committed (0541760) on `docs/single-habit-launch` and
 merged into local `main`, one commit ahead of `origin/main` and not pushed; they
 go up with the launch PR. No app code changed.
 
-Checks at this handoff: not run (docs only, and a handoff runs none). Task 5.1 is
-not started. `feat/launch-states` is at 0541760 with no upstream; the only
-uncommitted change there is this checkpoint edit, so commit it first.
+`feat/launch-states` has no upstream; nothing on it is pushed.
 
-**Next action:** M5 Task 5.1 (ring and dashboard states) in
+**Next action:** M5 Task 5.1b, Change habit (Opus 5.5 at high), in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`, on `feat/launch-states`,
-with `superpowers:executing-plans`, Sonnet 5.5 at
-medium. M5's deferred list below stays for M5. Task 5.3 now also removes "or start
-tracking another habit" from the hold hint.
+with `superpowers:executing-plans`. M5's deferred list below stays for M5. Task 5.3
+now also removes "or start tracking another habit" from the hold hint.
 
-M5 gained Task 5.1b (Opus 5.5 at high), Change habit (Fawad, 2026-10-31), because `main` has no way
-to replace a habit. Not built. My decisions in it, easy to reverse: no bare stop,
-the old habit is archived only when the new one saves, and old logs stay stored
-but hidden. It takes the onboarding parts of 5369b50 from `feat/multi-habit`.
+Task 5.1b (Fawad, 2026-10-31) exists because `main` has no way to replace a habit.
+Not built. My decisions in it, easy to reverse: no bare stop, the old habit is
+archived only when the new one saves, and old logs stay stored but hidden. It takes
+the onboarding parts of 5369b50 from `feat/multi-habit`.
+
+## Task 5.1 (2026-10-31, committed)
+
+Over limit and first day already worked; their copy is now pinned exactly. New:
+quit reached. `ProgressRing` draws a full success ring on a day at zero;
+`_FreeDaysCentre` shows "3 / days vape-free / Nothing logged today" (today only);
+`QuitReachedCard` sits under the ring with Keep at zero (sets `quitAcknowledgedAt`)
+and New goal (Edit plan); `quitCardDueProvider`; `HomeStats.freeDays`; the QUIT pill
+is green. The old "so far today" note is gone. `habit_dashboard.dart` needed no
+change.
+
+My calls, easy to reverse (ledger has them): the count is consecutive days at zero
+including today, so a slip restarts it and the quit day reads "1 day"; a slip today
+shows the over state and keeps the card; Keep at zero applies to one quit date, so
+a new goal offers the card again; Keep at zero uses the `emphasis` button, not the
+design's green.
+
+Checks observed by me: format (1 file), `analyze --fatal-infos` clean, full suite
+439 passed. Red seen for the quit tests that needed the state (8 of 11) and for
+`freeDays`. Not seen failing: the over-limit and first-day tests (they pin existing
+behaviour) and the three guards that the card stays hidden. A failed Keep at zero's
+snackbar has no test. Not seen on a simulator.
+
+Open: the normal stage pill still reads "Stage 1 of 9 · Daily limit: 9", where spec
+4.3 and the designs say "Vaping · Drops to 10 in 4d" and "STAGE 2 / 9"; 5.1 didn't
+ask for it, so it is unchanged.
 
 `splash_page.dart` is restored; the stash stays for the next walk.
 

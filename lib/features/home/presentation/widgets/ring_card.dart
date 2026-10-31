@@ -16,6 +16,7 @@ import 'package:exhale/features/home/presentation/providers/home_providers.dart'
 import 'package:exhale/features/home/presentation/widgets/backward_pager.dart';
 import 'package:exhale/features/home/presentation/widgets/day_triggers.dart';
 import 'package:exhale/features/home/presentation/widgets/progress_ring.dart';
+import 'package:exhale/features/home/presentation/widgets/quit_reached_card.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
@@ -165,18 +166,23 @@ class RingCard extends ConsumerWidget {
                       ),
                     ),
                     _Reveal(
-                      show: isToday && progress != null && progress.count == 0,
+                      show:
+                          isToday &&
+                          progress != null &&
+                          progress.count == 0 &&
+                          progress.limit > 0,
                       child: Padding(
                         padding: const EdgeInsets.only(top: AppSpacing.md),
                         child: _Note(
-                          label: progress == null
-                              ? ''
-                              : progress.limit == 0
-                              ? habit.freeLabel == null
-                                    ? 'None so far today.'
-                                    : '${habit.freeTitle} so far today.'
-                              : 'No ${habit.units} logged today. Nice start.',
+                          label: 'No ${habit.units} logged today. Nice start.',
                         ),
+                      ),
+                    ),
+                    _Reveal(
+                      show: isToday && ref.watch(quitCardDueProvider(habitId)),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.md),
+                        child: QuitReachedCard(habitId: habitId),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
@@ -275,16 +281,18 @@ class _DayRing extends ConsumerWidget {
       return const Center(child: CircularProgressIndicator.adaptive());
     }
     final beforePlan = day.isBefore(history.firstDay);
+    final isToday = day == ref.watch(todayProvider);
+    final freeDays = isToday && progress.limit == 0 && progress.count == 0
+        ? ref.watch(habitStatsProvider(habitId)).value?.freeDays ?? 0
+        : 0;
     return Center(
       child: ProgressRing(
         progress: beforePlan ? null : progress,
         child: beforePlan
             ? _BeforePlanCentre(count: progress.count)
-            : _RingCentre(
-                progress: progress,
-                habit: habit,
-                isToday: day == ref.watch(todayProvider),
-              ),
+            : freeDays > 0
+            ? _FreeDaysCentre(days: freeDays, habit: habit)
+            : _RingCentre(progress: progress, habit: habit, isToday: isToday),
       ),
     );
   }
@@ -496,6 +504,38 @@ class _RingCentre extends StatelessWidget {
         Text(
           caption,
           style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+        ),
+      ],
+    );
+  }
+}
+
+/// Today after the quit date, with nothing logged: "3 days vape-free".
+class _FreeDaysCentre extends StatelessWidget {
+  const _FreeDaysCentre({required this.days, required this.habit});
+
+  final int days;
+  final Habit habit;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = context.textTheme;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('$days', key: const Key('day-count'), style: text.displayLarge),
+        Text(
+          '${days == 1 ? 'day' : 'days'} ${habit.freeLabel ?? 'at zero'}',
+          style: text.titleLarge?.copyWith(
+            color: context.exhale.success.foreground,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          'Nothing logged today',
+          style: text.bodySmall?.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
         ),
       ],
     );

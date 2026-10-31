@@ -24,6 +24,9 @@ class StagePill extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final stage = plan.stageOn(today);
+    final quit = stage == null && plan.hasStartedOn(today);
+    final success = context.exhale.success.foreground;
+    final dot = quit ? success : colors.primaryContainer;
 
     final (label, chip) = !plan.hasStartedOn(today)
         ? (
@@ -55,10 +58,7 @@ class StagePill extends StatelessWidget {
           Container(
             width: 8,
             height: 8,
-            decoration: BoxDecoration(
-              color: colors.primaryContainer,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -72,17 +72,15 @@ class StagePill extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             decoration: ShapeDecoration(
-              color: colors.primaryContainer.withValues(alpha: 0.12),
+              color: dot.withValues(alpha: 0.12),
               shape: StadiumBorder(
-                side: BorderSide(
-                  color: colors.primaryContainer.withValues(alpha: 0.4),
-                ),
+                side: BorderSide(color: dot.withValues(alpha: 0.4)),
               ),
             ),
             child: Text(
               chip,
               style: context.textTheme.labelMedium?.copyWith(
-                color: colors.primary,
+                color: quit ? success : colors.primary,
                 letterSpacing: 0.6,
               ),
             ),

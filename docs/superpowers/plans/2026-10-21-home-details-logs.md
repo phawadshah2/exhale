@@ -336,8 +336,8 @@ This is the launch's next phase. Branch from `main`; nothing here depends on Pha
 **Files:** Modify `ring_card.dart`, `stage_pill.dart`, `habit_dashboard.dart`; Create `quit_reached_card.dart`; Test `ring_card_test.dart`
 
 **Interfaces:** over limit → coral badge, "2 over limit", note "A harder day. Tomorrow starts fresh at {nextLimit}, and your streak picks up again from there."; first day → "No sessions logged today. Nice start." and dashed "Today's triggers show here once you log."; quit reached → full success ring, "{n} days vape-free", card "You reached your quit date" with "Keep at zero" (sets `quitAcknowledgedAt`) and "New goal" (Edit plan).
-- [ ] **Steps 1–4:** one test per state with the exact copy above.
-- [ ] **Step 5: Checkpoint:** `feat(home): over, first-day and quit states`
+- [x] **Steps 1–4:** one test per state with the exact copy above.
+- [x] **Step 5: Checkpoint:** `feat(home): over, first-day and quit states`
 
 ### Task 5.1b: Change habit (added 2026-10-31)
 

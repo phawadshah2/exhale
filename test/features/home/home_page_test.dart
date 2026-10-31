@@ -431,8 +431,8 @@ void main() {
     );
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(countText(tester), '0 / 0');
-    expect(find.text('Smoke-free day'), findsOneWidget);
+    expect(countText(tester), '3');
+    expect(find.text('days smoke-free'), findsOneWidget);
     expect(find.text('Smoke-free since Oct 14'), findsOneWidget);
     expect(find.text('QUIT'), findsOneWidget);
 
@@ -482,7 +482,7 @@ void main() {
     );
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text('Vape-free day'), findsOneWidget);
+    expect(find.text('days vape-free'), findsOneWidget);
     expect(find.text('Vape-free since Oct 14'), findsOneWidget);
     expect(find.text('Vape-free'), findsWidgets);
 
