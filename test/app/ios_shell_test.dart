@@ -128,10 +128,34 @@ void main() {
       expect(find.text('Add a habit'), findsOneWidget);
       expect(find.text('What triggered this one?'), findsNothing);
 
+      await tester.disposeApp();
+    });
+
+    testWidgets('a missed log asks which habit, then logs that one', (
+      tester,
+    ) async {
+      await tester.pumpAppPastSplash(height: 2400);
+
+      await tapLogAndWaitForMenu(tester);
       await tester.tap(find.text('Add a missed log'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Close'));
+
+      expect(find.text('Add a missed log'), findsNothing);
+      expect(find.text('Add missed log'), findsNothing);
+
+      await tester.tap(find.text('Vaping').last);
       await tester.pumpAndSettle();
+
+      expect(find.text('Add missed log'), findsOneWidget);
+      expect(find.text('Vaping · Fri, Oct 16'), findsOneWidget);
+
+      await tester.tap(find.text('Add log'));
+      await tester.pumpAndSettle();
+
+      final logs = await tester.runAsync(
+        () => sl<HabitLogRepository>().watchRecent(limit: 10).first,
+      );
+      expect(logs!.where((log) => log.habitId == 2), hasLength(1));
       await tester.disposeApp();
     });
 

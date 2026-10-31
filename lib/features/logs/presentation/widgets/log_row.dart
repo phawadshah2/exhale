@@ -2,16 +2,28 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/presentation/habit_icon.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
 import 'package:flutter/material.dart';
 
-/// One log: trigger tile, time, note and trigger chip. Tap to edit.
+/// One log: trigger tile, time, note and trigger chip. Tap to edit. Among
+/// several habits, [habit] and [when] replace the trigger tile, the time and
+/// the note.
 class LogRow extends StatelessWidget {
-  const LogRow({required this.log, required this.onTap, super.key});
+  const LogRow({
+    required this.log,
+    required this.onTap,
+    this.habit,
+    this.when,
+    super.key,
+  });
 
   final HabitLog log;
   final VoidCallback onTap;
+  final Habit? habit;
+  final String? when;
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +32,7 @@ class LogRow extends StatelessWidget {
     final trigger = log.trigger;
     final note = log.note;
     final tint = trigger?.tint(context) ?? colors.onSurfaceVariant;
+    final habit = this.habit;
 
     return InkWell(
       onTap: onTap,
@@ -38,9 +51,9 @@ class LogRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
-                trigger?.icon ?? AppIcons.clock,
+                habit?.kind.icon ?? trigger?.icon ?? AppIcons.clock,
                 size: 20,
-                color: tint,
+                color: habit == null ? tint : colors.primary,
               ),
             ),
             Expanded(
@@ -49,13 +62,13 @@ class LogRow extends StatelessWidget {
                 spacing: 2,
                 children: [
                   Text(
-                    AppFormat.time(log.loggedAt),
+                    habit?.name ?? AppFormat.time(log.loggedAt),
                     style: text.titleSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
-                    note ?? 'No note',
+                    when ?? note ?? 'No note',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: text.bodySmall?.copyWith(

@@ -366,18 +366,6 @@ class _TodayDetails extends ConsumerWidget {
   final LogicalDay today;
   final Habit habit;
 
-  String _nextTarget() {
-    final plan = history.planOn(today);
-    final days = plan.daysUntilNextDrop(today);
-    if (days == null) return habit.freeTitle;
-    final next = plan.limitOn(plan.nextDropOn(today)!);
-    return next == 0
-        ? (days == 1 ? 'Quit day tomorrow' : 'Quit day in ${days}d')
-        : (days == 1
-              ? 'Drops to $next tomorrow'
-              : 'Drops to $next in ${days}d');
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = ref.watch(nowProvider).value ?? ref.watch(clockProvider).now();
@@ -387,16 +375,16 @@ class _TodayDetails extends ConsumerWidget {
     if (latest == null) {
       entry = today == history.firstDay ? 'Plan started today' : 'No logs yet';
     } else {
-      final elapsed = now.difference(latest.loggedAt);
-      final since = elapsed.isNegative ? Duration.zero : elapsed;
-      entry = since.inMinutes < 1
-          ? AppFormat.elapsed(since)
-          : '${AppFormat.elapsed(since)} ago';
+      entry = AppFormat.ago(now.difference(latest.loggedAt));
     }
 
     final _Cell right;
     if (latest == null) {
-      right = (AppIcons.trendDown, 'Next target', _nextTarget());
+      right = (
+        AppIcons.trendDown,
+        'Next target',
+        habit.nextTarget(history.planOn(today), today),
+      );
     } else {
       right = (
         AppIcons.stress,

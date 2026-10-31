@@ -3,6 +3,54 @@ import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('ago', () {
+    test('reads the elapsed time', () {
+      expect(
+        AppFormat.ago(const Duration(hours: 1, minutes: 42)),
+        '1h 42m ago',
+      );
+    });
+
+    test('under a minute or in the future is just now', () {
+      expect(AppFormat.ago(const Duration(seconds: 30)), 'Just now');
+      expect(AppFormat.ago(const Duration(minutes: -5)), 'Just now');
+    });
+  });
+
+  group('dayAndTime', () {
+    final today = LogicalDay(2026, 10, 16);
+
+    test('names today and yesterday', () {
+      expect(
+        AppFormat.dayAndTime(
+          DateTime(2026, 10, 16, 15, 42),
+          day: today,
+          today: today,
+        ),
+        'Today, 3:42 PM',
+      );
+      expect(
+        AppFormat.dayAndTime(
+          DateTime(2026, 10, 16, 1, 30),
+          day: today.addDays(-1),
+          today: today,
+        ),
+        'Yesterday, 1:30 AM',
+      );
+    });
+
+    test('dates anything older', () {
+      expect(
+        AppFormat.dayAndTime(
+          DateTime(2026, 10, 12, 9),
+          day: LogicalDay(2026, 10, 12),
+          today: today,
+        ),
+        'Mon, Oct 12, 9:00 AM',
+      );
+    });
+  });
+
   final oct16 = LogicalDay(2026, 10, 16);
 
   test('dates', () {

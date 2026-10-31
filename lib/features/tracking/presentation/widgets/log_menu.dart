@@ -21,7 +21,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// The + button's menu. One habit: Log now, then Add a missed log and Add a
-/// habit. Several: a row per habit with today's count, then the same two.
+/// habit. Several: a row per habit with today's count, then the same two; Add
+/// a missed log first asks which habit.
 Future<void> showLogMenu(
   BuildContext context,
   WidgetRef ref, {
@@ -40,7 +41,9 @@ Future<void> showLogMenu(
         };
   if (!context.mounted) return;
 
-  final missedLogHabit = single ? habits.single : habits.first;
+  void addMissedLog(TrackedHabit habit) =>
+      unawaited(showLogEditorSheet(context, habitId: habit.id, day: today));
+
   await showGlassMenu(
     context,
     anchor: anchor,
@@ -57,8 +60,26 @@ Future<void> showLogMenu(
       GlassMenuItem(
         label: 'Add a missed log',
         icon: AppIcons.clock,
-        onSelected: () =>
-            showLogEditorSheet(context, habitId: missedLogHabit.id, day: today),
+        onSelected: () {
+          if (single) {
+            addMissedLog(habits.single);
+            return;
+          }
+          unawaited(
+            showGlassMenu(
+              context,
+              anchor: anchor,
+              items: [
+                for (final habit in habits)
+                  GlassMenuItem(
+                    label: habit.habit.name,
+                    icon: habit.habit.kind.icon,
+                    onSelected: () => addMissedLog(habit),
+                  ),
+              ],
+            ),
+          );
+        },
       ),
       GlassMenuItem(
         label: 'Add a habit',

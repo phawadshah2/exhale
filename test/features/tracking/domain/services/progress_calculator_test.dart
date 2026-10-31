@@ -168,6 +168,61 @@ void main() {
     });
   });
 
+  group('combinedStreak', () {
+    final today = LogicalDay(2026, 10, 16);
+
+    List<DailyProgress> days(List<int> counts, {int limit = 5}) => [
+      for (var i = 0; i < counts.length; i++)
+        DailyProgress(
+          day: today.addDays(i - counts.length + 1),
+          count: counts[i],
+          limit: limit,
+        ),
+    ];
+
+    test('counts days every habit was within its limit, ending today', () {
+      expect(
+        ProgressCalculator.combinedStreak({
+          1: days([1, 2, 5]),
+          2: days([0, 5, 1]),
+        }),
+        3,
+      );
+    });
+
+    test('combined streak breaks when any habit is over', () {
+      expect(
+        ProgressCalculator.combinedStreak({
+          1: days([1, 2, 3]),
+          2: days([1, 6, 3]),
+        }),
+        1,
+      );
+      expect(
+        ProgressCalculator.combinedStreak({
+          1: days([1, 2, 6]),
+          2: days([1, 2, 3]),
+        }),
+        0,
+      );
+    });
+
+    test('a habit counts only from its own first day', () {
+      expect(
+        ProgressCalculator.combinedStreak({
+          1: days([1, 1, 1, 1]),
+          2: days([1]),
+        }),
+        4,
+      );
+    });
+
+    test('is zero with no days', () {
+      expect(ProgressCalculator.combinedStreak({}), 0);
+      expect(ProgressCalculator.combinedStreak({1: const []}), 0);
+    });
+  });
+
   group('homeStats', () {
     List<DailyProgress> days(List<int> counts) => [
       for (var i = 0; i < counts.length; i++)

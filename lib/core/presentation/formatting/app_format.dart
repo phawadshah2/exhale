@@ -109,6 +109,25 @@ abstract final class AppFormat {
     return hours == 0 ? '${duration.inDays}d' : '${duration.inDays}d ${hours}h';
   }
 
+  /// 1h 42m ago, or Just now under a minute and for a future time.
+  static String ago(Duration duration) =>
+      duration.inMinutes < 1 ? 'Just now' : '${elapsed(duration)} ago';
+
+  /// Today, 3:42 PM / Yesterday, 11:10 PM / Mon, Oct 12, 9:00 AM. [day] is
+  /// the logical day [time] belongs to.
+  static String dayAndTime(
+    DateTime time, {
+    required LogicalDay day,
+    required LogicalDay today,
+  }) {
+    final label = switch (day.daysSince(today)) {
+      0 => 'Today',
+      -1 => 'Yesterday',
+      _ => shortWeekdayDate(day),
+    };
+    return '$label, ${AppFormat.time(time)}';
+  }
+
   /// One-letter weekday: M T W T F S S
   static String weekdayInitial(LogicalDay day) =>
       _weekdays[day.weekday - 1].substring(0, 1);

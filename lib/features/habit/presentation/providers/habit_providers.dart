@@ -39,7 +39,7 @@ final ProviderFamily<TrackedHabit?, int> habitProvider =
           .firstOrNull,
     );
 
-/// The habit Home shows until it lists several: the oldest active one.
+/// The oldest active habit.
 final primaryHabitProvider = Provider<TrackedHabit?>(
   (ref) => ref.watch(activeHabitsProvider).value?.firstOrNull,
 );

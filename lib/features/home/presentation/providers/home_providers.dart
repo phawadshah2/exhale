@@ -1,8 +1,11 @@
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/all_time_series.dart';
+import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/home_stats.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/period_stats.dart';
@@ -191,11 +194,12 @@ final FutureProviderFamily<AllTimeSeries?, int> allTimeSeriesProvider =
       );
     });
 
-/// Streak, baseline change, avoided and saved; null before the habit has a
-/// plan.
-final FutureProviderFamily<HomeStats?, int> habitStatsProvider = FutureProvider
-    .autoDispose
-    .family<HomeStats?, int>((ref, habitId) async {
+/// Every plan day up to today; null before the habit has a plan.
+final FutureProviderFamily<List<DailyProgress>?, int> habitDaysProvider =
+    FutureProvider.autoDispose.family<List<DailyProgress>?, int>((
+      ref,
+      habitId,
+    ) async {
       final today = ref.watch(todayProvider);
       final history = await ref.watch(planHistoryProvider(habitId).future);
       if (history == null) return null;
@@ -204,13 +208,24 @@ final FutureProviderFamily<HomeStats?, int> habitStatsProvider = FutureProvider
         logsInRangeProvider((habitId: habitId, range: PeriodRange(from, today)))
             .future,
       );
-      final days = buildDailyProgress(
+      return buildDailyProgress(
         logs: logs,
         boundary: ref.watch(dayBoundaryProvider),
         history: history,
         from: history.firstDay,
         to: today,
       );
+    });
+
+/// Streak, baseline change, avoided and saved; null before the habit has a
+/// plan.
+final FutureProviderFamily<HomeStats?, int> habitStatsProvider = FutureProvider
+    .autoDispose
+    .family<HomeStats?, int>((ref, habitId) async {
+      final today = ref.watch(todayProvider);
+      final history = await ref.watch(planHistoryProvider(habitId).future);
+      final days = await ref.watch(habitDaysProvider(habitId).future);
+      if (history == null || days == null) return null;
       return ProgressCalculator.homeStats(
         days: days,
         history: history,
@@ -218,3 +233,50 @@ final FutureProviderFamily<HomeStats?, int> habitStatsProvider = FutureProvider
         unitPriceCents: ref.watch(habitProvider(habitId))?.unitPriceCents,
       );
     });
+
+/// One habit's share of the combined impact.
+typedef HabitImpact = ({TrackedHabit tracked, HomeStats stats});
+
+/// What the habit list adds up across habits, oldest habit first. Units are
+/// never summed, so `habits` keeps each habit's own stats.
+typedef CombinedImpact = ({List<HabitImpact> habits, int streakDays});
+
+/// The habits with a plan, added up; null while the habits load.
+final FutureProvider<CombinedImpact?> combinedImpactProvider =
+    FutureProvider.autoDispose<CombinedImpact?>((ref) async {
+      final habits = ref.watch(activeHabitsProvider).value;
+      if (habits == null) return null;
+      final statsFutures = [
+        for (final tracked in habits)
+          ref.watch(habitStatsProvider(tracked.id).future),
+      ];
+      final daysFutures = [
+        for (final tracked in habits)
+          ref.watch(habitDaysProvider(tracked.id).future),
+      ];
+      final stats = await Future.wait(statsFutures);
+      final days = await Future.wait(daysFutures);
+      return (
+        habits: [
+          for (var i = 0; i < habits.length; i++)
+            if (stats[i] case final HomeStats habitStats)
+              (tracked: habits[i], stats: habitStats),
+        ],
+        streakDays: ProgressCalculator.combinedStreak({
+          for (var i = 0; i < habits.length; i++)
+            if (days[i] case final List<DailyProgress> habitDays)
+              habits[i].id: habitDays,
+        }),
+      );
+    });
+
+/// How many logs the habit list's Recent logs shows.
+const int recentLogCount = 6;
+
+/// The latest logs across active habits, newest first.
+final StreamProvider<List<HabitLog>> recentLogsProvider =
+    StreamProvider.autoDispose<List<HabitLog>>(
+      (ref) => ref
+          .watch(habitLogRepositoryProvider)
+          .watchRecent(limit: recentLogCount),
+    );

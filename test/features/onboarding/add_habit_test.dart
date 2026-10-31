@@ -8,6 +8,7 @@ import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
 import 'package:exhale/features/home/presentation/widgets/habit_dashboard.dart';
+import 'package:exhale/features/home/presentation/widgets/habit_list_home.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/cost_step.dart';
@@ -113,7 +114,7 @@ void main() {
     }
     await tester.pumpAppPastSplash(height: 2400);
     unawaited(
-      GoRouter.of(tester.element(find.byType(HabitDashboard)))
+      GoRouter.of(tester.element(find.byType(HabitListHome)))
           .push<void>(AppRoutes.addHabit),
     );
     await tester.pumpAndSettle();
@@ -125,7 +126,7 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('adding a second habit saves it with a plan and returns Home', (
+  testWidgets('adding a second habit shows the habit list on Home', (
     tester,
   ) async {
     final vaping = await seedHabit(plan, habit: Habit.vaping);
@@ -137,7 +138,8 @@ void main() {
     await tester.tap(find.text(OnboardingCopy.dealButton).hitTestable());
     await tester.pumpAndSettle();
 
-    expect(find.byType(HabitDashboard), findsOneWidget);
+    expect(find.byType(HabitListHome), findsOneWidget);
+    expect(find.byType(HabitDashboard), findsNothing);
     final habits = await active(tester);
     expect(habits.map((h) => h.id).first, vaping);
     expect(habits.map((h) => h.habit.kind), [

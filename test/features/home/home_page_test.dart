@@ -529,20 +529,6 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('with two habits Home shows the oldest until it lists them', (
-    tester,
-  ) async {
-    await startPlan(today, limit: 12, habit: Habit.vaping);
-    await startPlan(today, limit: 4, habit: Habit.caffeine);
-    await logOn(DateTime(2026, 10, 16, 9), times: 3);
-    await tester.pumpAppPastSplash(height: 2400);
-
-    expect(countText(tester), '3 / 12');
-    expect(find.text('History'), findsOneWidget);
-
-    await tester.disposeApp();
-  });
-
   testWidgets('one habit shows the dashboard sections in order', (
     tester,
   ) async {

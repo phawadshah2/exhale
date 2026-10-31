@@ -4,6 +4,7 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/smooth_switcher.dart';
+import 'package:exhale/features/home/presentation/widgets/logs_card_header.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/logs/presentation/widgets/log_row.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
@@ -66,37 +67,7 @@ class _TodayLogsCardState extends ConsumerState<TodayLogsCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 6, 4, 8),
-          child: Row(
-            children: [
-              Expanded(child: Text("Today's logs", style: text.titleLarge)),
-              InkWell(
-                onTap: seeAll,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 44),
-                  child: Row(
-                    spacing: 4,
-                    children: [
-                      Text(
-                        'See all logs',
-                        style: text.labelLarge?.copyWith(
-                          color: colors.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      Icon(
-                        AppIcons.chevronRight,
-                        size: 14,
-                        color: colors.primary,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        LogsCardHeader(title: "Today's logs", onSeeAll: seeAll),
         Card(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),

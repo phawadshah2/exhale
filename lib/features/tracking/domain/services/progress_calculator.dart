@@ -233,4 +233,26 @@ abstract final class ProgressCalculator {
       moneySavedCents: unitPriceCents == null ? null : avoided * unitPriceCents,
     );
   }
+
+  /// Consecutive days, ending on the latest day, with no habit over its
+  /// limit. A habit counts only on the days it has progress for.
+  static int combinedStreak(Map<int, List<DailyProgress>> daysByHabit) {
+    final overDays = <LogicalDay>{};
+    final allDays = <LogicalDay>{};
+    for (final days in daysByHabit.values) {
+      for (final progress in days) {
+        allDays.add(progress.day);
+        if (progress.status == LimitStatus.over) overDays.add(progress.day);
+      }
+    }
+    if (allDays.isEmpty) return 0;
+
+    var day = allDays.reduce((a, b) => a.isAfter(b) ? a : b);
+    var streak = 0;
+    while (allDays.contains(day) && !overDays.contains(day)) {
+      streak++;
+      day = day.addDays(-1);
+    }
+    return streak;
+  }
 }

@@ -1,5 +1,4 @@
 import 'package:exhale/core/domain/time/logical_day.dart';
-import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
@@ -25,22 +24,12 @@ class StagePill extends StatelessWidget {
     final colors = context.colors;
     final stage = plan.stageOn(today);
 
-    final (label, chip) = !plan.hasStartedOn(today)
-        ? (
-            'Plan starts ${AppFormat.monthDay(plan.startDay)} · '
-                'Daily limit: ${plan.startLimit}',
-            'SOON',
-          )
+    final label = habit.stageLine(plan, today);
+    final chip = !plan.hasStartedOn(today)
+        ? 'SOON'
         : stage == null
-        ? (
-            '${habit.freeTitle} since ${AppFormat.monthDay(plan.quitDay)}',
-            'QUIT',
-          )
-        : (
-            'Stage ${stage.number} of ${plan.stageCount} · '
-                'Daily limit: ${stage.limit}',
-            'STAGE ${stage.number}',
-          );
+        ? 'QUIT'
+        : 'STAGE ${stage.number}';
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 10, 10),
