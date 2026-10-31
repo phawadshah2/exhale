@@ -121,4 +121,4 @@ Current progress and the next action are in `docs/CURRENT_STATE.md`. Read it
 first and update it when a task or milestone finishes.
 
 After launch: multiple habits first, then time-of-day insights, reminders,
-widgets, the Pro paywall, habit reordering, export.
+widgets and the Live Activity, the Pro paywall, habit reordering, export.

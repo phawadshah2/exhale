@@ -128,5 +128,22 @@ Never cut: the migration test, Undo on delete, Edit log, Edit plan.
 partly built, see M4 above. Whether a second habit stays free is rechecked then
 (the 2026-10-21 design said free).
 
-Then: time-of-day insights, trend vs plan with projections, reminders, widgets,
-Pro paywall (history beyond 30 days, insights), habit reorder, export.
+Then: time-of-day insights, trend vs plan with projections, reminders, Home and
+Lock Screen widgets with the Live Activity (below), Pro paywall (history beyond
+30 days, insights), habit reorder, export.
+
+### Widgets and Live Activity
+
+Fawad wants the next-log timer on the Lock Screen and Dynamic Island (2026-10-31),
+planned together with the widgets, as both need the same native target. Mockup:
+`LockScreen` on https://claude.ai/artifact/NBe5B8VGM6iMXDaiuysb88
+
+- Needs a Swift widget extension (WidgetKit, ActivityKit) and an App Group so the
+  extension can read today's state; Exhale has neither today.
+- The countdown can tick on its own from the `next` time, with no server.
+- Limits to design around: iOS ends a Live Activity after about 8 hours, and
+  starting one from the background needs a push server, which an offline app does
+  not have. So it starts and refreshes only when the app is opened or a log is
+  saved. Check these against the iOS version we target before planning.
+- Open: whether a Log button on the Live Activity is worth writing to the database
+  from the extension.
