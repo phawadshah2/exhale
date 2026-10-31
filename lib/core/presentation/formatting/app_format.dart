@@ -57,6 +57,10 @@ abstract final class AppFormat {
     return '$hour:$minute ${time.hour < 12 ? 'AM' : 'PM'}';
   }
 
+  /// 7:30 AM for 450 minutes after midnight.
+  static String minuteOfDay(int minute) =>
+      time(DateTime(2000, 1, 1, minute ~/ 60, minute % 60));
+
   /// $1,014.50, or $183 with [wholeUnits]. A symbol ending in a letter
   /// gets a space: AED 14.50.
   static String money(

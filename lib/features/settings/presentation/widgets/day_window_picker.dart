@@ -211,9 +211,7 @@ class _TimeTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  AppFormat.time(
-                    DateTime(2000, 1, 1, minute ~/ 60, minute % 60),
-                  ),
+                  AppFormat.minuteOfDay(minute),
                   style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
