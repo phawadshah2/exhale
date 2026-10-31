@@ -1,12 +1,16 @@
+import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
+import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/number_stepper.dart';
 import 'package:exhale/core/widgets/section_card.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
+import 'package:exhale/features/habit/presentation/widgets/tracked_habit_guard.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
 import 'package:exhale/features/plan/presentation/providers/edit_plan_provider.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
@@ -30,14 +34,18 @@ class EditPlanPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tracked = ref.watch(habitProvider(habitId));
     final history = ref.watch(planHistoryProvider(habitId)).value;
-    if (tracked == null || history == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator.adaptive()),
-      );
-    }
-    return _EditPlanForm(habitId: habitId);
+    return TrackedHabitGuard(
+      habitId: habitId,
+      child: tracked == null || history == null
+          ? const Scaffold(
+              body: Center(child: CircularProgressIndicator.adaptive()),
+            )
+          : _EditPlanForm(habitId: habitId),
+    );
   }
 }
+
+const _stopTrackingNote = 'Its logs are kept. You can add it again later.';
 
 /// Price of one unit from the form, or null without a price or cost.
 double? _unitPriceCents(Habit habit, EditPlanState form) {
@@ -69,6 +77,27 @@ class _EditPlanForm extends ConsumerWidget {
     Future<void> save() async {
       final saved = await controller.save();
       if (saved && context.mounted) context.pop();
+    }
+
+    // Once archived, TrackedHabitGuard leaves the page.
+    Future<void> stopTracking() async {
+      final confirmed = await showAppConfirm(
+        context,
+        title: 'Stop tracking ${habit.name}?',
+        message: _stopTrackingNote,
+        confirmLabel: 'Stop tracking',
+        destructive: true,
+      );
+      if (!confirmed || !context.mounted) return;
+      final result = await ref.read(archiveHabitProvider)(habitId);
+      if (!context.mounted) return;
+      if (result case FailureResult(:final failure)) {
+        showAppSnackBar(
+          context,
+          message: failureMessage(failure),
+          tone: SnackTone.danger,
+        );
+      }
     }
 
     return SetupScaffold(
@@ -180,6 +209,22 @@ class _EditPlanForm extends ConsumerWidget {
               counterText: '',
             ),
           ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Center(
+          child: TextButton(
+            onPressed: stopTracking,
+            style: TextButton.styleFrom(
+              foregroundColor: context.exhale.danger.foreground,
+              minimumSize: const Size(44, 44),
+            ),
+            child: Text('Stop tracking ${habit.name}'),
+          ),
+        ),
+        Text(
+          _stopTrackingNote,
+          textAlign: TextAlign.center,
+          style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
         ),
       ],
     );

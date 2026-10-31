@@ -7,7 +7,9 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
+import 'package:exhale/core/widgets/circle_icon_button.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
+import 'package:exhale/features/habit/presentation/widgets/tracked_habit_guard.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/logs/presentation/providers/logs_providers.dart';
 import 'package:exhale/features/logs/presentation/widgets/day_group.dart';
@@ -116,124 +118,131 @@ class _LogsPageState extends ConsumerState<LogsPage> {
         ? today
         : ref.watch(earliestDayProvider(habitId));
 
-    return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: AppSpacing.page.copyWith(top: AppSpacing.sm),
-              sliver: SliverToBoxAdapter(
-                child: Row(
-                  children: [
-                    _CircleButton(
-                      tooltip: 'Back',
-                      icon: AppIcons.back,
-                      onPressed: () => context.pop(),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Logs',
-                        textAlign: TextAlign.center,
-                        style: context.textTheme.titleLarge,
-                      ),
-                    ),
-                    _CircleButton(
-                      tooltip: 'Add a missed log',
-                      icon: AppIcons.add,
-                      accent: true,
-                      onPressed: habitId == null
-                          ? null
-                          : () => showLogEditorSheet(
-                              context,
-                              habitId: habitId,
-                              day: addDay,
-                            ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (view == null || habit == null || habitId == null)
-              const SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(child: CircularProgressIndicator.adaptive()),
-              )
-            else
+    return TrackedHabitGuard(
+      habitId: widget.query.habitId,
+      child: Scaffold(
+        body: SafeArea(
+          child: CustomScrollView(
+            slivers: [
               SliverPadding(
-                padding: AppSpacing.page.copyWith(bottom: AppSpacing.xl),
-                sliver: SliverList.list(
-                  children: [
-                    if (_singleDay || _trigger != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                        child: Wrap(
-                          spacing: AppSpacing.sm,
-                          runSpacing: AppSpacing.sm,
-                          children: [
-                            if (_singleDay)
-                              _FilterChip(
-                                label: AppFormat.shortWeekdayDate(_range.from),
-                                removeTooltip: 'Remove day filter',
-                                onRemove: _clearDay,
+                padding: AppSpacing.page.copyWith(top: AppSpacing.sm),
+                sliver: SliverToBoxAdapter(
+                  child: Row(
+                    children: [
+                      CircleIconButton(
+                        tooltip: 'Back',
+                        icon: AppIcons.back,
+                        onPressed: () => context.pop(),
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Logs',
+                          textAlign: TextAlign.center,
+                          style: context.textTheme.titleLarge,
+                        ),
+                      ),
+                      CircleIconButton(
+                        tooltip: 'Add a missed log',
+                        icon: AppIcons.add,
+                        accent: true,
+                        onPressed: habitId == null
+                            ? null
+                            : () => showLogEditorSheet(
+                                context,
+                                habitId: habitId,
+                                day: addDay,
                               ),
-                            if (_trigger case final trigger?)
-                              _FilterChip(
-                                label: trigger.label,
-                                removeTooltip: 'Remove ${trigger.label} filter',
-                                onRemove: () => setState(() => _trigger = null),
-                              ),
-                          ],
-                        ),
                       ),
-                    if (_singleDay && view.days.isNotEmpty)
-                      LogsDayCard(
-                        entry: view.days.first,
-                        today: today,
-                        habit: habit,
-                        trigger: _trigger,
-                      )
-                    else
-                      LogsPeriodCard(
-                        view: view,
-                        range: _range,
-                        today: today,
-                        weekly: _weekly,
-                        trigger: _trigger,
-                        onPrevious: _range.from.isAfter(earliest)
-                            ? () => _step(-1)
-                            : null,
-                        onNext: _range.to.isBefore(today)
-                            ? () => _step(1)
-                            : null,
-                        onTrigger: (trigger) =>
-                            setState(() => _trigger = trigger),
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.md,
-                      ),
-                      child: Text(
-                        'Newest first',
-                        style: context.textTheme.bodySmall?.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    ..._groups(view, habitId, today),
-                    Padding(
-                      padding: const EdgeInsets.only(top: AppSpacing.sm),
-                      child: Text(
-                        'Tap a log to edit · swipe left to delete',
-                        textAlign: TextAlign.center,
-                        style: context.textTheme.bodySmall?.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-          ],
+              if (view == null || habit == null || habitId == null)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(child: CircularProgressIndicator.adaptive()),
+                )
+              else
+                SliverPadding(
+                  padding: AppSpacing.page.copyWith(bottom: AppSpacing.xl),
+                  sliver: SliverList.list(
+                    children: [
+                      if (_singleDay || _trigger != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                          child: Wrap(
+                            spacing: AppSpacing.sm,
+                            runSpacing: AppSpacing.sm,
+                            children: [
+                              if (_singleDay)
+                                _FilterChip(
+                                  label: AppFormat.shortWeekdayDate(
+                                    _range.from,
+                                  ),
+                                  removeTooltip: 'Remove day filter',
+                                  onRemove: _clearDay,
+                                ),
+                              if (_trigger case final trigger?)
+                                _FilterChip(
+                                  label: trigger.label,
+                                  removeTooltip:
+                                      'Remove ${trigger.label} filter',
+                                  onRemove: () =>
+                                      setState(() => _trigger = null),
+                                ),
+                            ],
+                          ),
+                        ),
+                      if (_singleDay && view.days.isNotEmpty)
+                        LogsDayCard(
+                          entry: view.days.first,
+                          today: today,
+                          habit: habit,
+                          trigger: _trigger,
+                        )
+                      else
+                        LogsPeriodCard(
+                          view: view,
+                          range: _range,
+                          today: today,
+                          weekly: _weekly,
+                          trigger: _trigger,
+                          onPrevious: _range.from.isAfter(earliest)
+                              ? () => _step(-1)
+                              : null,
+                          onNext: _range.to.isBefore(today)
+                              ? () => _step(1)
+                              : null,
+                          onTrigger: (trigger) =>
+                              setState(() => _trigger = trigger),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.md,
+                        ),
+                        child: Text(
+                          'Newest first',
+                          style: context.textTheme.bodySmall?.copyWith(
+                            color: context.colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                      ..._groups(view, habitId, today),
+                      Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.sm),
+                        child: Text(
+                          'Tap a log to edit · swipe left to delete',
+                          textAlign: TextAlign.center,
+                          style: context.textTheme.bodySmall?.copyWith(
+                            color: context.colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -283,53 +292,6 @@ class _LogsPageState extends ConsumerState<LogsPage> {
       );
     }
     return groups;
-  }
-}
-
-class _CircleButton extends StatelessWidget {
-  const _CircleButton({
-    required this.tooltip,
-    required this.icon,
-    required this.onPressed,
-    this.accent = false,
-  });
-
-  final String tooltip;
-  final IconData icon;
-  final VoidCallback? onPressed;
-  final bool accent;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final tint = accent ? colors.primary : colors.onSurface;
-    return Tooltip(
-      message: tooltip,
-      child: Semantics(
-        button: true,
-        label: tooltip,
-        child: GestureDetector(
-          onTap: onPressed,
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: accent
-                  ? colors.primary.withValues(alpha: 0.14)
-                  : colors.surfaceContainerHigh,
-              border: Border.all(
-                color: accent
-                    ? colors.primary.withValues(alpha: 0.45)
-                    : colors.outlineVariant,
-              ),
-            ),
-            child: Icon(icon, size: 20, color: tint),
-          ),
-        ),
-      ),
-    );
   }
 }
 

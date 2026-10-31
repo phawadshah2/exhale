@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
-import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/theme/app_spacing.dart';
+import 'package:exhale/core/widgets/circle_icon_button.dart';
+import 'package:exhale/features/home/presentation/widgets/habit_switcher.dart';
 import 'package:exhale/features/home/presentation/widgets/home_header.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -15,7 +17,6 @@ class DashboardHeader extends StatelessWidget {
   const DashboardHeader({
     required this.habitId,
     required this.kind,
-    required this.habitName,
     required this.today,
     required this.now,
     required this.name,
@@ -25,7 +26,6 @@ class DashboardHeader extends StatelessWidget {
 
   final int habitId;
   final DashboardHeaderKind kind;
-  final String habitName;
   final LogicalDay today;
   final DateTime now;
   final String? name;
@@ -33,11 +33,8 @@ class DashboardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tune = IconButton(
-      tooltip: 'Edit plan',
-      onPressed: () => unawaited(context.push(AppRoutes.editPlanFor(habitId))),
-      icon: const Icon(AppIcons.tune),
-    );
+    void editPlan() => unawaited(context.push(AppRoutes.editPlanFor(habitId)));
+
     return switch (kind) {
       DashboardHeaderKind.greeting => Row(
         children: [
@@ -49,25 +46,29 @@ class DashboardHeader extends StatelessWidget {
               dayNumber: dayNumber,
             ),
           ),
-          tune,
+          IconButton(
+            tooltip: 'Edit plan',
+            onPressed: editPlan,
+            icon: const Icon(AppIcons.tune),
+          ),
         ],
       ),
       DashboardHeaderKind.back => Row(
+        spacing: AppSpacing.sm,
         children: [
-          IconButton(
+          CircleIconButton(
             tooltip: 'Back',
+            icon: AppIcons.back,
             onPressed: context.pop,
-            icon: const Icon(AppIcons.back),
           ),
           Expanded(
-            child: Text(
-              habitName,
-              style: context.textTheme.titleLarge,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: Center(child: HabitSwitcher(habitId: habitId)),
           ),
-          tune,
+          CircleIconButton(
+            tooltip: 'Edit plan',
+            icon: AppIcons.tune,
+            onPressed: editPlan,
+          ),
         ],
       ),
     };

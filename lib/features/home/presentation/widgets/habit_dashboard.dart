@@ -65,7 +65,6 @@ class HabitDashboard extends ConsumerWidget {
             child: DashboardHeader(
               habitId: habitId,
               kind: header,
-              habitName: habit.name,
               today: today,
               now: now,
               name: settings.userName,
