@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-10-31 (phase O4 committed, all onboarding plan tasks done;
+Updated 2026-10-31 (phase O4, its review and the simulator walk committed;
 branch not pushed). Hook gotcha: the global
 hook blocks any Bash call whose text mentions "format"/"test" next to
 other commands (including `git add` of `formatting/` paths, `git rm` of
@@ -41,10 +41,21 @@ is swiped to another day; Reduce Motion misses `SmoothSwitcher`, `PressScale`,
 tap targets under 44 pt (Deal chips, currency chip, units stepper); without a
 day window the prompt also shows at the limit and on quit day (pre-v9 only).
 
-**Next action:** a simulator walk (see
-Stash, ask Fawad first; the review could not judge motion, small phones,
-Dynamic Type or dark mode from code), then push and open the onboarding PR
-when Fawad asks. M4 follows.
+Simulator walk (2026-10-31, "exhale", from stills): onboarding in dark
+(vaping, 6 steps) and light (social media, 5 steps), Home, the prompt, the Your
+day sheet, the pace line and the Settings row all match. Fixed from it: the
+countdown read 89 next to a pace of 88 right after a log (a minute-old `now`);
+the deal fine print named Settings, which has no plan option, and now says
+Home (spec updated). Those two were not seen again on the simulator. Full
+suite 425 passed, format and `analyze --fatal-infos` clean.
+
+Not walked: a fresh first launch (the simulator already has a habit, so Shake
+on it skips the save; covered by `deal_step_test`), small phones, Dynamic Type,
+motion feel. The simulator's data gained a day window and one pouches log; its
+theme is back on Dark. For Fawad to look at: the + button reads mid-grey in
+light mode, not ink (glass over the page).
+
+**Next action:** push and open the onboarding PR when Fawad asks. M4 follows.
 
 **Stash:** `stash@{0}` "sim-walk splash hack" holds the debug edit to
 `splash_page.dart` (always starts onboarding). `git stash apply` it only
