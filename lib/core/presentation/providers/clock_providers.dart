@@ -13,3 +13,14 @@ final nowProvider = StreamProvider<DateTime>((ref) async* {
     (_) => clock.now(),
   );
 });
+
+/// Ticks each second, only while something on screen listens.
+final StreamProvider<DateTime> secondTickProvider =
+    StreamProvider.autoDispose<DateTime>((ref) async* {
+      final clock = ref.watch(clockProvider);
+      yield clock.now();
+      yield* Stream<DateTime>.periodic(
+        const Duration(seconds: 1),
+        (_) => clock.now(),
+      );
+    });

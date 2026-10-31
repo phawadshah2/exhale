@@ -12,9 +12,13 @@ import 'package:exhale/core/widgets/status_badge.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
+import 'package:exhale/features/home/domain/pace_guide.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
+import 'package:exhale/features/home/presentation/providers/next_log_timer_provider.dart';
 import 'package:exhale/features/home/presentation/widgets/backward_pager.dart';
 import 'package:exhale/features/home/presentation/widgets/day_triggers.dart';
+import 'package:exhale/features/home/presentation/widgets/draining_ring.dart';
+import 'package:exhale/features/home/presentation/widgets/pace_text.dart';
 import 'package:exhale/features/home/presentation/widgets/progress_ring.dart';
 import 'package:exhale/features/home/presentation/widgets/quit_reached_card.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
@@ -179,6 +183,14 @@ class RingCard extends ConsumerWidget {
                       ),
                     ),
                     _Reveal(
+                      show:
+                          isToday &&
+                          progress != null &&
+                          progress.count > 0 &&
+                          progress.status == LimitStatus.under,
+                      child: PaceText(habitId: habitId),
+                    ),
+                    _Reveal(
                       show: isToday && ref.watch(quitCardDueProvider(habitId)),
                       child: Padding(
                         padding: const EdgeInsets.only(top: AppSpacing.md),
@@ -285,6 +297,7 @@ class _DayRing extends ConsumerWidget {
     final freeDays = isToday && progress.limit == 0 && progress.count == 0
         ? ref.watch(habitStatsProvider(habitId)).value?.freeDays ?? 0
         : 0;
+    final timer = isToday ? ref.watch(nextLogTimerProvider(habitId)) : null;
     return Center(
       child: ProgressRing(
         progress: beforePlan ? null : progress,
@@ -292,6 +305,8 @@ class _DayRing extends ConsumerWidget {
             ? _BeforePlanCentre(count: progress.count)
             : freeDays > 0
             ? _FreeDaysCentre(days: freeDays, habit: habit)
+            : timer != null
+            ? _TimerCentre(timer: timer, progress: progress)
             : _RingCentre(progress: progress, habit: habit, isToday: isToday),
       ),
     );
@@ -424,6 +439,79 @@ class _Details extends StatelessWidget {
         Expanded(child: _InfoCell(cell: left)),
         Expanded(child: _InfoCell(cell: right)),
       ],
+    );
+  }
+}
+
+/// The countdown to the next log, inside its own thin ring; the day's count
+/// drops to a small line.
+class _TimerCentre extends StatelessWidget {
+  const _TimerCentre({required this.timer, required this.progress});
+
+  final NextLogTimer timer;
+  final DailyProgress progress;
+
+  static const double _ringSize = 164;
+  static const double _contentSize = 148;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = context.textTheme;
+    final colors = context.colors;
+    final past = timer.isPast;
+    final accent = past ? context.exhale.success.foreground : colors.primary;
+    final count = '${progress.count} of ${progress.limit}';
+    final spoken = past
+        ? "You're on schedule."
+        : 'Next one on schedule in ${AppFormat.hoursMinutes(timer.left)}.';
+
+    return Semantics(
+      label: '$spoken $count today, ${progress.remaining} left.',
+      excludeSemantics: true,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          DrainingRing(
+            fraction: timer.fraction,
+            restartKey: timer.guide.next,
+            size: _ringSize,
+            strokeWidth: 4,
+            color: colors.onSurface,
+            track: colors.surfaceContainerHigh,
+          ),
+          SizedBox.square(
+            dimension: _contentSize,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 2,
+                children: [
+                  Text(
+                    AppFormat.timer(timer.left),
+                    style: text.displayLarge?.copyWith(
+                      fontSize: 34,
+                      height: 1.15,
+                      color: past ? accent : null,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                  Text(
+                    past ? "You're on schedule" : 'until your next',
+                    style: text.labelLarge?.copyWith(color: accent),
+                  ),
+                  Text(
+                    '$count · ${progress.remaining} left',
+                    style: text.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

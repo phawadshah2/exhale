@@ -361,6 +361,15 @@ Built with two changes to the above (ledger has why): `replacedHabitProvider` in
 - [x] **Steps 1–4:** tests `a failed plan save rolls back and keeps the old habit active`, `backing out keeps the habit and plan`, `declining the confirm keeps the habit and the answers`, `replacing shows the new habit on Home with no logs`, `old logs stay stored`, `wake, bed and currency are unchanged`, `two presses replace once`, `the tracked preset is disabled`, `replacing with Edit plan underneath does not throw` (Review Focus 3).
 - [x] **Step 5: Checkpoint:** `feat(habit): change the tracked habit`
 
+### Task 5.1c: Next-log timer (added 2026-10-31)
+
+Fawad chose this from the mockups: the timer as the ring's main number, plus a ring and minutes chip on the + button. Spec: onboarding spec 8.2.
+
+**Files:** Create `lib/features/home/presentation/widgets/draining_ring.dart`, `next_log_badge.dart`, `pace_text.dart`; Modify `pace_guide.dart` (`gap`, `NextLogTimer`), `home_providers.dart`, `ring_card.dart`, `habit_dashboard.dart`, `app_format.dart`, `app_shell.dart`; Delete `pace_line.dart`; Test `test/features/home/next_log_timer_test.dart` (replaces `pace_line_test.dart`), `draining_ring_test.dart`, `pace_guide_test.dart`, the format test
+
+- [x] **Steps 1–4:** per spec 8.2.
+- [x] **Step 5: Checkpoint:** `feat(home): next-log timer in the ring and on the + button`
+
 ### Task 5.2: Light mode, Reduce Transparency, accessibility
 
 **Files:** new widgets from Phases 2–4 as needed; Test `test/features/home/accessibility_test.dart`

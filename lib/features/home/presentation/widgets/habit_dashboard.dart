@@ -5,7 +5,6 @@ import 'package:exhale/features/home/presentation/providers/home_providers.dart'
 import 'package:exhale/features/home/presentation/widgets/dashboard_header.dart';
 import 'package:exhale/features/home/presentation/widgets/dashboard_skeleton.dart';
 import 'package:exhale/features/home/presentation/widgets/history_card.dart';
-import 'package:exhale/features/home/presentation/widgets/pace_line.dart';
 import 'package:exhale/features/home/presentation/widgets/plan_card.dart';
 import 'package:exhale/features/home/presentation/widgets/quote_card.dart';
 import 'package:exhale/features/home/presentation/widgets/ring_card.dart';
@@ -84,7 +83,6 @@ class HabitDashboard extends ConsumerWidget {
             ),
           const SizedBox(height: AppSpacing.md),
           ScrollReveal(index: 2, child: RingCard(habitId: habitId)),
-          ScrollReveal(index: 2, child: PaceLine(habitId: habitId)),
           if (stats != null) ...[
             const SizedBox(height: AppSpacing.md),
             ScrollReveal(

@@ -14,7 +14,7 @@ The single-habit docs are committed (0541760) on `docs/single-habit-launch` and
 merged into local `main`, one commit ahead of `origin/main` and not pushed; they
 go up with the launch PR. No app code changed.
 
-`feat/launch-states` has no upstream; nothing on it is pushed. Task 5.1b is its head
+`feat/launch-states` has no upstream; nothing on it is pushed. Task 5.1c is its head
 commit.
 
 **Next action:** M5 Task 5.2, light mode, Reduce Transparency and accessibility, in
@@ -22,6 +22,40 @@ commit.
 with `superpowers:executing-plans`. M5's deferred list below stays for M5. Task 5.3
 now also removes "or start tracking another habit" from the hold hint and "You can
 add another later." from the first-run habit step.
+
+## Task 5.1c, next-log timer (2026-10-31, committed)
+
+Fawad chose it from mockups (https://claude.ai/artifact/NBe5B8VGM6iMXDaiuysb88,
+"Chosen design"); onboarding spec 8.1 and 8.2 hold the rules. The ring's main number
+is the timer, always with hours (`0:47:12`), inside a thin draining ring; past zero it
+counts up in green (`+0:12:03`, "You're on schedule"). The + button gets a draining
+ring and a chip in whole minutes (`87 min`), on every tab, and neither past zero. One
+text under the ring. Both new rings use `AppMotion.fill`. A log with time left adds
+that time to the next gap (Fawad), replayed from today's logs and capped at bed.
+`pace_line.dart` is gone (`pace_text.dart`, `draining_ring.dart`, `next_log_badge.dart`,
+`nextLogTimerProvider`, `secondTickProvider`).
+
+Fixed on the way: `BackwardPager._current` was `late`, so a first step with no earlier
+rebuild read the new page and never animated. The past-day test caught it, red seen.
+Also closes three M5 minors below (marked).
+
+My calls, easy to reverse (ledger has them): the order under the ring is over note,
+first-day note, prompt, pace (I told Fawad prompt before first-day, then swapped: only
+pre-v9 data has no window, and it kept the existing tests); the carry stops at bed; the
+first log of a day counts against the timer from wake, so a log soon after waking adds
+most of a gap; waiting past zero earns no credit.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 494
+passed. Red seen on assertions: the pager, and three carry-over tests with the carry
+removed. Otherwise red on compile errors only; the carry's cap at bed was not seen
+failing. Not seen on a simulator: the look, the rings' motion, the chip above the glass
+tab bar (the glass layer could clip it), and how seconds feel.
+
+For Fawad to look at: a new user finishing onboarding in the afternoon has no logs, so
+the timer has already passed and Home opens counting up from their first due time
+(`+5:10:00`, "You're on schedule"). The same applies to any day's first open with no
+logs. For Task 5.2: at 3× text, `today_logs_card.dart`, `log_row.dart` and the ring
+card's header row overflow; not caused by this.
 
 ## Task 5.1b (2026-10-31, committed)
 
@@ -186,12 +220,11 @@ and `next` use `max((bed − wake) / limit, (bed − from) / remaining)`, so lim
 12 at 22:00 reads as The deal's 80 min, not 8. The second line hides when one
 gap would run past bed. Spec 8.1 and 8.2 are updated.
 
-Deferred to M5 (minors from the review): the pace line stays when the ring
-is swiped to another day; Reduce Motion misses `SmoothSwitcher`, `PressScale`,
-`deal_step`, `exhale_bubble`, `day_window_picker`, `habit_step`; back chevron
-44 × 36 pt since the polish; pace figures only in minutes (960 min); older
-tap targets under 44 pt (Deal chips, currency chip, units stepper); without a
-day window the prompt also shows at the limit and on quit day (pre-v9 only).
+Deferred to M5 (minors from the review): Reduce Motion misses `SmoothSwitcher`,
+`PressScale`, `deal_step`, `exhale_bubble`, `day_window_picker`, `habit_step`; back
+chevron 44 × 36 pt since the polish; older tap targets under 44 pt (Deal chips,
+currency chip, units stepper). Closed by Task 5.1c: the pace line on a swiped day,
+pace figures only in minutes, the prompt at the limit and on quit day.
 
 Simulator walk (2026-10-31, "exhale", from stills): onboarding in dark
 (vaping, 6 steps) and light (social media, 5 steps), Home, the prompt, the Your

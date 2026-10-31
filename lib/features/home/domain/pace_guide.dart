@@ -6,9 +6,18 @@ import 'package:meta/meta.dart';
 /// When the next use would keep the user on track for today's limit.
 @immutable
 class PaceGuide {
-  const PaceGuide({required this.next, required this.pace, required this.bed});
+  const PaceGuide({
+    required this.next,
+    required this.gap,
+    required this.pace,
+    required this.bed,
+  });
 
   final DateTime next;
+
+  /// From the last log (or wake) to [next]; holds still until the next log.
+  final Duration gap;
+
   final Duration pace;
 
   /// The end of the waking window, cut at the day's end.
@@ -24,6 +33,7 @@ class PaceGuide {
     required int limit,
     required int countToday,
     DateTime? lastLogToday,
+    List<DateTime> earlierLogsToday = const [],
   }) {
     if (limit <= 0 || countToday >= limit) return null;
 
@@ -36,16 +46,31 @@ class PaceGuide {
 
     // A guide to cutting down never suggests going faster than the even rate.
     final even = bed.difference(wake) ~/ limit;
-    Duration gap(DateTime from) {
-      final share = bed.difference(from) ~/ (limit - countToday);
+    Duration gap(DateTime from, int count) {
+      final share = bed.difference(from) ~/ (limit - count);
       return share > even ? share : even;
     }
 
-    // Counted from the last log, so it holds still until the next one.
-    final anchor = _latest(lastLogToday ?? wake, wake);
+    // Replayed from the day's logs, so it holds still until the next one and
+    // an undone or added log corrects it. Time left on the timer when a log
+    // comes carries into the next gap.
+    final logs = [...earlierLogsToday, ?lastLogToday];
+    var count = countToday - logs.length;
+    var anchor = wake;
+    var due = wake.add(gap(wake, count));
+    for (final log in logs) {
+      count++;
+      final left = log.isBefore(wake) ? Duration.zero : due.difference(log);
+      anchor = _latest(log, wake);
+      due = anchor.add(gap(anchor, count));
+      if (left > Duration.zero) due = due.add(left);
+    }
+
+    final next = _earliest(due, bed);
     return PaceGuide(
-      next: anchor.add(gap(anchor)),
-      pace: gap(_latest(now, wake)),
+      next: next,
+      gap: next.difference(anchor),
+      pace: gap(_latest(now, wake), countToday),
       bed: bed,
     );
   }
@@ -57,4 +82,38 @@ class PaceGuide {
   static DateTime _latest(DateTime a, DateTime b) => a.isAfter(b) ? a : b;
 
   static DateTime _earliest(DateTime a, DateTime b) => a.isBefore(b) ? a : b;
+}
+
+/// A [PaceGuide] at one moment: what the countdown to the next log shows.
+@immutable
+class NextLogTimer {
+  const NextLogTimer({required this.guide, required this.now});
+
+  final PaceGuide guide;
+  final DateTime now;
+
+  /// Negative once [PaceGuide.next] has passed.
+  Duration get left => guide.next.difference(now);
+
+  bool get isPast => left <= Duration.zero;
+
+  /// What is left of the gap, from 1 just after a log to 0 at the next one.
+  double get fraction =>
+      (left.inMicroseconds / guide.gap.inMicroseconds).clamp(0.0, 1.0);
+
+  /// False when one more gap would run past bed.
+  bool get showsPace => !now.add(guide.pace).isAfter(guide.bed);
+
+  @override
+  bool operator ==(Object other) =>
+      other is NextLogTimer &&
+      other.now == now &&
+      other.guide.next == guide.next &&
+      other.guide.gap == guide.gap &&
+      other.guide.pace == guide.pace &&
+      other.guide.bed == guide.bed;
+
+  @override
+  int get hashCode =>
+      Object.hash(now, guide.next, guide.gap, guide.pace, guide.bed);
 }

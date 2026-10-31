@@ -94,6 +94,8 @@ simulator).
 - Change habit (Task 5.1b): from Edit plan, pick another habit and shake on a
   new deal. Backing out or a failed save keeps the old habit; wake, bed and
   currency stay as they are; old logs stay stored but hidden.
+- Next-log timer (Task 5.1c): in the ring with hours, on the + button in minutes,
+  one text under the ring; time left when logging early carries over.
 - Light mode and Reduce Transparency checked on every new screen.
 - 44 pt tap targets, VoiceOver labels on charts and trigger rows.
 - Release blockers from the earlier roadmap: remove the Design system
