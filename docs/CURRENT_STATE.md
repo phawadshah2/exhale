@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-10-31. Onboarding redesign merged to `main` (PR #26, 686246e).
+Updated 2026-11-01. Onboarding redesign merged to `main` (PR #26, 686246e).
 `gh` is deliberately not installed on this Mac: Fawad opens PRs from a prefilled
 compare link.
 
@@ -14,14 +14,46 @@ The single-habit docs are committed (0541760) on `docs/single-habit-launch` and
 merged into local `main`, one commit ahead of `origin/main` and not pushed; they
 go up with the launch PR. No app code changed.
 
-`feat/launch-states` has no upstream; nothing on it is pushed. Task 5.1c is its head
-commit.
+`feat/launch-states` has no upstream; nothing on it is pushed.
 
-**Next action:** M5 Task 5.2, light mode, Reduce Transparency and accessibility, in
-`docs/superpowers/plans/2026-10-21-home-details-logs.md`, on `feat/launch-states`,
-with `superpowers:executing-plans`. M5's deferred list below stays for M5. Task 5.3
-now also removes "or start tracking another habit" from the hold hint and "You can
-add another later." from the first-run habit step.
+M5 so far: Tasks 5.1, 5.1b (9d52e82) and 5.1c (eed0676, dfc2271) are committed. Tasks
+5.2, 5.3 and the M5 review are not done.
+
+Checks: last run on 4ac7580, format clean, `analyze --fatal-infos` clean, full suite 517
+passed. Only docs changed after that.
+
+**Next action:** M5 Task 5.2, light mode, Reduce Transparency and accessibility
+(Sonnet 5.5 at medium), in `docs/superpowers/plans/2026-10-21-home-details-logs.md`, on
+`feat/launch-states`, with `superpowers:executing-plans`. M5's deferred list below stays
+for M5, and 5.2 also owns the overflows at 3× text noted under Task 5.1c. Task 5.3 also
+removes "or start tracking another habit" from the hold hint and "You can add another
+later." from the first-run habit step.
+
+Read first: `CLAUDE.md`, plan Task 5.2, Task 5.1c below.
+
+Unanswered, for Fawad (timer, both noted under Task 5.1c): Home counting up on a late
+first open with no logs; very large numbers after bursts of logs. Nothing blocks 5.2.
+
+Later: Live Activity with the widgets, roadmap "Post-launch backlog".
+
+## Ink accent and no glows (2026-11-01, committed)
+
+Fawad asked. Ink is the third accent in Settings (stored index 2; Eucalyptus and Ocean
+keep 0 and 1). `emphasis` now always follows the accent, so Eucalyptus and Ocean are no
+longer black in light mode. Glows are gone everywhere: `PrimaryButton` (was `GlowButton`,
+renamed because it no longer glows), `ExhaleColors.glow` and `accentGlow`, the ring halo,
+the splash's radial wash and logo shadow, the snackbar dot, the unused history chart. The
+splash dust stays, unblurred. Neutral black drop shadows under glass stay: they are depth.
+
+My calls, easy to reverse: new installs start on Ink (`AppPalette.defaultAccentIndex`), so
+light onboarding stays black, and a saved setting keeps its accent. The table's column
+default is still 0, unused because every save writes the index, so no migration. Ink shows
+paper on dark surfaces, where ink would vanish, so dark onboarding is now paper, not teal.
+Under Ink the ring has no green (`ExhaleColors.ringStart`). Status colours (green, amber,
+red for on track, at limit, over) stay in every accent.
+
+Not seen on a simulator: Ink in light and dark, the splash without its wash, the + button
+in Ink (glass over the page, the mid-grey note below may apply).
 
 ## Task 5.1c, next-log timer (2026-10-31, committed)
 

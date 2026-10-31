@@ -184,18 +184,19 @@ when an active habit exists (no new flag).
 
 ## 6. Colour role: emphasis
 
-`ExhaleColors` gains `emphasis` and `onEmphasis`:
+`ExhaleColors` gains `emphasis` and `onEmphasis`, which are always the chosen
+accent (`primaryContainer`, `onPrimaryContainer`). Black is its own accent
+since 2026-11-01, not a light-mode override (Fawad):
 
-| Mode | emphasis | onEmphasis |
+| Accent | Light | Dark |
 | --- | --- | --- |
-| Light | ink (`#111418`) | white |
-| Dark | accent (`primaryContainer`) | `onPrimaryContainer` |
+| Ink (new installs) | ink `#111418`, white text | paper `#F4F7FA`, ink text |
+| Eucalyptus, Ocean | the accent | the accent |
 
 Used for primary filled buttons app-wide (onboarding buttons, the Home +
 button, sheet confirm buttons, Edit plan save), Exhale's bubbles and
-avatar, stepper segments and the dots. The accent keeps state: selected
-cards and chips, the ring, charts, accent text. The splash and avatar glyph
-use the accent. Reverting means changing the light row only.
+avatar, stepper segments and the dots. The splash and avatar glyph use the
+accent. Nothing in the app glows, in any accent.
 
 ## 7. Copy
 
