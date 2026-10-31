@@ -74,6 +74,22 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('a fresh log counts from the real time, not the last tick', (
+    tester,
+  ) async {
+    await setWindow();
+    final habitId = await startPlan();
+    await tester.pumpAppPastSplash(height: 2400);
+
+    clock.current = DateTime(2026, 10, 29, 9, 0, 55);
+    await tester.runAsync(() => logAt(habitId, clock.current));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Next one on schedule in 125 min'), findsOneWidget);
+    expect(find.text('About one every 125 min until bed'), findsOneWidget);
+    await tester.disposeApp();
+  });
+
   testWidgets('a late evening keeps the even pace, not a catch-up one', (
     tester,
   ) async {

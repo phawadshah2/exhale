@@ -25,7 +25,10 @@ class PaceLine extends ConsumerWidget {
     final window = ref.watch(currentSettingsProvider).dayWindow;
     if (window == null) return const _SetYourDayPrompt();
 
-    final now = ref.watch(nowProvider).value ?? ref.watch(clockProvider).now();
+    // The tick only rebuilds; a log between ticks must not count from a
+    // minute-old time.
+    ref.watch(nowProvider);
+    final now = ref.watch(clockProvider).now();
     final today = ref.watch(todayProvider);
     final boundary = ref.watch(dayBoundaryProvider);
     final progress = ref
