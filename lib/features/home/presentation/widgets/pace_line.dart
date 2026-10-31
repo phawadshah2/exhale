@@ -61,13 +61,14 @@ class PaceLine extends ConsumerWidget {
             textAlign: TextAlign.center,
             style: text.labelLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
-          Text(
-            'About one every ${_ceilMinutes(guide.pace)} min until bed',
-            textAlign: TextAlign.center,
-            style: text.bodySmall?.copyWith(
-              color: context.colors.onSurfaceVariant,
+          if (!now.add(guide.pace).isAfter(guide.bed))
+            Text(
+              'About one every ${_ceilMinutes(guide.pace)} min until bed',
+              textAlign: TextAlign.center,
+              style: text.bodySmall?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
             ),
-          ),
         ],
       ),
     );

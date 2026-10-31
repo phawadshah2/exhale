@@ -56,7 +56,7 @@ void main() {
     await tester.pumpAppPastSplash(height: 2400);
 
     expect(find.text("You're on schedule"), findsOneWidget);
-    expect(find.text('About one every 99 min until bed'), findsOneWidget);
+    expect(find.text('About one every 120 min until bed'), findsOneWidget);
     await tester.disposeApp();
   });
 
@@ -74,14 +74,29 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('never says every 0 min close to bedtime', (tester) async {
+  testWidgets('a late evening keeps the even pace, not a catch-up one', (
+    tester,
+  ) async {
+    await setWindow();
+    await startPlan();
+    clock.current = DateTime(2026, 10, 29, 20);
+
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.text("You're on schedule"), findsOneWidget);
+    expect(find.text('About one every 120 min until bed'), findsOneWidget);
+    await tester.disposeApp();
+  });
+
+  testWidgets('hides the pace when one gap would run past bed', (tester) async {
     await setWindow();
     await startPlan();
     clock.current = DateTime(2026, 10, 29, 23, 29);
 
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text('About one every 1 min until bed'), findsOneWidget);
+    expect(find.text("You're on schedule"), findsOneWidget);
+    expect(find.textContaining('About one every'), findsNothing);
     await tester.disposeApp();
   });
 

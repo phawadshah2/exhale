@@ -6,10 +6,13 @@ import 'package:meta/meta.dart';
 /// When the next use would keep the user on track for today's limit.
 @immutable
 class PaceGuide {
-  const PaceGuide({required this.next, required this.pace});
+  const PaceGuide({required this.next, required this.pace, required this.bed});
 
   final DateTime next;
   final Duration pace;
+
+  /// The end of the waking window, cut at the day's end.
+  final DateTime bed;
 
   /// Null when there is nothing to pace: at or over the limit, on a limit of
   /// 0, or outside the waking window.
@@ -31,15 +34,19 @@ class PaceGuide {
     );
     if (now.isBefore(wake) || !now.isBefore(bed)) return null;
 
-    Duration share(DateTime from) => Duration(
-      microseconds: bed.difference(from).inMicroseconds ~/ (limit - countToday),
-    );
+    // A guide to cutting down never suggests going faster than the even rate.
+    final even = bed.difference(wake) ~/ limit;
+    Duration gap(DateTime from) {
+      final share = bed.difference(from) ~/ (limit - countToday);
+      return share > even ? share : even;
+    }
 
     // Counted from the last log, so it holds still until the next one.
     final anchor = _latest(lastLogToday ?? wake, wake);
     return PaceGuide(
-      next: anchor.add(share(anchor)),
-      pace: share(_latest(now, wake)),
+      next: anchor.add(gap(anchor)),
+      pace: gap(_latest(now, wake)),
+      bed: bed,
     );
   }
 

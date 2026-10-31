@@ -40,8 +40,35 @@ void main() {
       lastLogToday: DateTime(2026, 10, 29, 11),
     )!;
 
-    expect(guide.pace, const Duration(hours: 1, minutes: 55));
+    expect(guide.pace, const Duration(hours: 2));
     expect(guide.next, DateTime(2026, 10, 29, 13, 5));
+  });
+
+  group('never faster than the even rate', () {
+    test('a late start keeps the pace of the whole day', () {
+      final guide = compute(now: DateTime(2026, 10, 29, 22), limit: 12)!;
+
+      expect(guide.pace, const Duration(minutes: 80));
+      expect(guide.next, DateTime(2026, 10, 29, 8, 50));
+    });
+
+    test('a late log waits a full gap', () {
+      final lastLog = DateTime(2026, 10, 29, 22);
+      final guide = compute(
+        now: lastLog,
+        limit: 12,
+        countToday: 1,
+        lastLogToday: lastLog,
+      )!;
+
+      expect(guide.next, DateTime(2026, 10, 29, 23, 20));
+    });
+  });
+
+  test('the guide knows when the window ends', () {
+    final guide = compute(now: DateTime(2026, 10, 29, 12))!;
+
+    expect(guide.bed, DateTime(2026, 10, 29, 23, 30));
   });
 
   test('next holds still until the next log; only the pace moves', () {
@@ -101,7 +128,7 @@ void main() {
       lastLogToday: DateTime(2026, 10, 29, 22, 30),
     )!;
 
-    expect(guide.pace, const Duration(hours: 2));
+    expect(guide.pace, const Duration(hours: 2, minutes: 11, seconds: 15));
     expect(guide.next, DateTime(2026, 10, 30, 1));
   });
 
@@ -113,7 +140,8 @@ void main() {
       window: lateBed,
       limit: 1,
     )!;
-    expect(guide.pace, const Duration(hours: 1));
+    expect(guide.pace, const Duration(hours: 20, minutes: 30));
+    expect(guide.bed, DateTime(2026, 10, 30, 4));
 
     expect(compute(now: DateTime(2026, 10, 30, 4), window: lateBed), isNull);
   });
