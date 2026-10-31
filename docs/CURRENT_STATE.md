@@ -10,13 +10,17 @@ Multiple habits ship in a later release (version not fixed).
 **Git (Fawad, 2026-10-31):** Claude branches and commits, under Fawad's identity
 and with no attribution, so Claude never shows up as a contributor. See `CLAUDE.md`.
 
-The single-habit docs are committed on `docs/single-habit-launch` and merged into
-local `main`, which is ahead of `origin/main` and not pushed; they go up with the
-launch PR. No app code changed and no checks ran for them (docs only).
+The single-habit docs are committed (0541760) on `docs/single-habit-launch` and
+merged into local `main`, one commit ahead of `origin/main` and not pushed; they
+go up with the launch PR. No app code changed.
+
+Checks at this handoff: not run (docs only, and a handoff runs none). Task 5.1 is
+not started. `feat/launch-states` is at 0541760 with no upstream; the only
+uncommitted change there is this checkpoint edit, so commit it first.
 
 **Next action:** M5 Task 5.1 (ring and dashboard states) in
-`docs/superpowers/plans/2026-10-21-home-details-logs.md`, on `feat/launch-states`
-(created from local `main`), with `superpowers:executing-plans`, Sonnet 5.5 at
+`docs/superpowers/plans/2026-10-21-home-details-logs.md`, on `feat/launch-states`,
+with `superpowers:executing-plans`, Sonnet 5.5 at
 medium. M5's deferred list below stays for M5. Task 5.3 now also removes "or start
 tracking another habit" from the hold hint.
 
