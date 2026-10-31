@@ -129,7 +129,7 @@ Skipped when `habit.tracksCost` is false.
   (yearly cost; hidden when there is no price).
 - Pace line: "Today that's about one every N min. It gets slower from
   here." (§8, using the chosen wake and bed).
-- Button **Shake on it**; fine print "Change the plan any time in Settings."
+- Button **Shake on it**; fine print "Change the plan any time from Home."
 - Saving: §5.4. On success Home opens with the existing entrance.
 
 ## 5. Data and structure

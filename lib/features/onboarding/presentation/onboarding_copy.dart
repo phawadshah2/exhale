@@ -115,7 +115,7 @@ abstract final class OnboardingCopy {
   static String paceLine(int minutes) =>
       "Today that's about one every $minutes min. It gets slower from here.";
   static const dealButton = 'Shake on it';
-  static const dealFinePrint = 'Change the plan any time in Settings.';
+  static const dealFinePrint = 'Change the plan any time from Home.';
 
   static const continueButton = 'Continue';
 }
