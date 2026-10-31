@@ -186,4 +186,33 @@ void main() {
 
     await tester.disposeApp();
   });
+
+  testWidgets('choosing Ink re-tints the app and is saved', (tester) async {
+    await seedHabit(
+      PlanDraft(
+        startDay: LogicalDay(2026, 10, 16),
+        startLimit: 9,
+        quitDay: LogicalDay(2026, 10, 16).addDays(63),
+      ),
+    );
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Ocean accent'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Ink accent'));
+    await tester.pumpAndSettle();
+
+    final context = tester.element(find.byType(SettingsPage));
+    final theme = Theme.of(context);
+    expect(
+      theme.colorScheme.primaryContainer,
+      theme.brightness == Brightness.dark ? AppPalette.paper : AppPalette.ink,
+    );
+    final stored = await tester.runAsync(() => sl<SettingsRepository>().get());
+    expect((stored! as Success<AppSettings>).value.accentIndex, 2);
+
+    await tester.disposeApp();
+  });
 }

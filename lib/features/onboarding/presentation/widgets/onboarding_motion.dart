@@ -1,8 +1,8 @@
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:flutter/material.dart';
 
-/// Onboarding selects in the emphasis colour (ink in light, the accent in
-/// dark), so a pick reads like the buttons and Exhale's bubbles.
+/// Onboarding selects in the emphasis colour, so a pick reads like the
+/// buttons and Exhale's bubbles.
 @immutable
 class SelectionColors {
   const SelectionColors._({

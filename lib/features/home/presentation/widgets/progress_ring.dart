@@ -6,8 +6,8 @@ import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:flutter/material.dart';
 
-/// A day's ring: fills toward the limit. While it fills it is the safe
-/// green; once it has filled, the whole ring takes the colour of the day's
+/// A day's ring: fills toward the limit. While it fills it is the accent's
+/// gradient; once it has filled, the whole ring takes the colour of the day's
 /// status (amber at the limit, red over it). A day at zero after the quit date
 /// is a full success ring. With no [progress] (a day before the plan) only the
 /// track is drawn.
@@ -54,7 +54,7 @@ class ProgressRing extends StatelessWidget {
             settle: target == 0 ? 1 : (fill / target).clamp(0.0, 1.0),
             strokeWidth: strokeWidth,
             track: colors.surfaceContainerHigh,
-            gradient: [colors.secondaryContainer, colors.primaryContainer],
+            gradient: [status.ringStart, colors.primaryContainer],
             finalColor: finalColor,
           ),
           child: Center(child: child),

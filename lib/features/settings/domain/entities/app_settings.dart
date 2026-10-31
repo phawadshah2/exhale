@@ -1,4 +1,5 @@
 import 'package:exhale/core/domain/time/day_boundary.dart';
+import 'package:exhale/core/theme/app_palette.dart';
 import 'package:exhale/features/settings/domain/entities/app_icon_choice.dart';
 import 'package:exhale/features/settings/domain/entities/day_window.dart';
 import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
@@ -10,7 +11,7 @@ class AppSettings {
     this.userName,
     this.dayResetHour = DayBoundary.defaultResetHour,
     this.themePreference = ThemePreference.system,
-    this.accentIndex = 0,
+    this.accentIndex = AppPalette.defaultAccentIndex,
     this.appIcon = AppIconChoice.breath,
     this.currencySymbol = defaultCurrencySymbol,
     this.askForTrigger = true,

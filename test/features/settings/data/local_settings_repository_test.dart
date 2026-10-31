@@ -34,7 +34,7 @@ void main() {
       userName: 'Fawad',
       dayResetHour: 5,
       themePreference: ThemePreference.light,
-      accentIndex: 2,
+      accentIndex: 1,
       appIcon: AppIconChoice.ember,
       currencySymbol: 'AED',
       askForTrigger: false,

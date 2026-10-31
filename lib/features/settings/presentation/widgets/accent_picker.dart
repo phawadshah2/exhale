@@ -53,6 +53,7 @@ class _Swatch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final fill = swatch.colorIn(colors.brightness);
     return Semantics(
       button: true,
       selected: selected,
@@ -71,17 +72,19 @@ class _Swatch extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: selected ? swatch.color : Colors.transparent,
+                  color: selected ? fill : Colors.transparent,
                   width: 2,
                 ),
               ),
               child: DecoratedBox(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: swatch.color,
-                ),
+                decoration: BoxDecoration(shape: BoxShape.circle, color: fill),
+                // Only the chosen accent shows the check, so its role fits.
                 child: selected
-                    ? const Icon(AppIcons.check, size: 18, color: Colors.white)
+                    ? Icon(
+                        AppIcons.check,
+                        size: 18,
+                        color: colors.onPrimaryContainer,
+                      )
                     : null,
               ),
             ),
