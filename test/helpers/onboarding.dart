@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// The day arc's time awake, which it speaks as one label ("16 h awake").
+Finder awakeLabel(String label) => find.byWidgetPredicate(
+  (widget) => widget is Semantics && widget.properties.label == label,
+);
+
 /// Pumps [OnboardingPage] alone on a tall phone, with a UAE locale.
 Future<void> pumpOnboarding(WidgetTester tester) async {
   tester.view

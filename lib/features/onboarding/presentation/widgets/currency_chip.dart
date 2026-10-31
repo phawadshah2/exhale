@@ -4,6 +4,7 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
 import 'package:exhale/features/settings/domain/entities/currency_choices.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -38,8 +39,8 @@ class CurrencyChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final accent = colors.primary;
+    final pick = SelectionColors.of(context);
+    final accent = pick.foreground;
     return Semantics(
       button: true,
       label: OnboardingCopy.currency,
@@ -49,26 +50,28 @@ class CurrencyChip extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => unawaited(_pick(context)),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-          decoration: BoxDecoration(
-            color: colors.primaryContainer.withValues(alpha: 0.14),
-            borderRadius: const BorderRadius.all(Radius.circular(999)),
-            border: Border.all(color: accent),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 5,
-            children: [
-              Text(
-                symbol,
-                style: context.textTheme.labelLarge?.copyWith(
-                  color: accent,
-                  fontWeight: FontWeight.w600,
+        child: PressScale(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+            decoration: BoxDecoration(
+              color: pick.fill,
+              borderRadius: const BorderRadius.all(Radius.circular(999)),
+              border: Border.all(color: accent),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 5,
+              children: [
+                Text(
+                  symbol,
+                  style: context.textTheme.labelLarge?.copyWith(
+                    color: accent,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              Icon(AppIcons.chevronDown, size: 13, color: accent),
-            ],
+                Icon(AppIcons.chevronDown, size: 13, color: accent),
+              ],
+            ),
           ),
         ),
       ),

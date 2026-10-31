@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/amount_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/cost_step.dart';
@@ -10,6 +11,7 @@ import 'package:exhale/features/onboarding/presentation/steps/deal_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/habit_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/exhale_bubble.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/onboarding_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -148,19 +150,25 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 }
 
-/// A step's scrollable body above its pinned footer. [body] gets at least
+/// A step's scrollable body above its pinned [button]. [body] gets at least
 /// the visible height, so a `Column` with `spaceBetween` puts its last
-/// child at the bottom.
+/// child at the bottom. [below] (a link or fine print) sits in a slot of
+/// [belowHeight] under the button, so the button is at the same height on
+/// every step.
 class OnboardingStepFrame extends StatelessWidget {
   const OnboardingStepFrame({
     required this.body,
-    required this.footer,
+    required this.button,
+    this.below,
     this.onTapBody,
     super.key,
   });
 
+  static const double belowHeight = 44;
+
   final Widget body;
-  final Widget footer;
+  final Widget button;
+  final Widget? below;
   final VoidCallback? onTapBody;
 
   @override
@@ -186,9 +194,18 @@ class OnboardingStepFrame extends StatelessWidget {
           AppSpacing.pageMargin,
           AppSpacing.gutterSm,
           AppSpacing.pageMargin,
-          AppSpacing.md,
+          AppSpacing.sm,
         ),
-        child: footer,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(width: double.infinity, child: button),
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: belowHeight),
+              child: Align(alignment: Alignment.topCenter, child: below),
+            ),
+          ],
+        ),
       ),
     ],
   );
@@ -214,22 +231,32 @@ class OnboardingStepHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: AppSpacing.sm),
-        ExhaleBubble(text: prompt),
+        StepReveal(child: ExhaleBubble(text: prompt)),
         const SizedBox(height: AppSpacing.md + 2),
-        Text(
-          title,
-          style: text.headlineMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            height: 1.15,
+        StepReveal(
+          index: 1,
+          child: SmoothSwitcher(
+            resize: true,
+            child: Text(
+              title,
+              key: ValueKey(title),
+              style: text.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                height: 1.15,
+              ),
+            ),
           ),
         ),
         if (lead != null) ...[
           const SizedBox(height: AppSpacing.sm),
-          Text(
-            lead!,
-            style: text.bodyLarge?.copyWith(
-              color: context.colors.onSurfaceVariant,
-              height: 1.5,
+          StepReveal(
+            index: 2,
+            child: Text(
+              lead!,
+              style: text.bodyLarge?.copyWith(
+                color: context.colors.onSurfaceVariant,
+                height: 1.5,
+              ),
             ),
           ),
         ],

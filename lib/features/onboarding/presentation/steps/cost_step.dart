@@ -11,6 +11,7 @@ import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.da
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/currency_chip.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/exhale_bubble.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/round_icon_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -68,32 +69,26 @@ class _CostStepState extends ConsumerState<CostStep> {
     final yearly = form.yearlyCostCents;
     final showTotals =
         monthly != null && yearly != null && !form.hasInvalidPrice;
+    String money(int cents) =>
+        AppFormat.money(cents, symbol: form.currency, wholeUnits: true);
     final muted = text.bodySmall?.copyWith(color: colors.onSurfaceVariant);
 
     return OnboardingStepFrame(
-      footer: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: GlowButton(
-              label: OnboardingCopy.continueButton,
-              onPressed: _continue,
-            ),
+      button: GlowButton(
+        label: OnboardingCopy.continueButton,
+        onPressed: _continue,
+      ),
+      below: CupertinoButton(
+        padding: const EdgeInsets.only(top: AppSpacing.sm),
+        minimumSize: const Size(44, OnboardingStepFrame.belowHeight),
+        onPressed: _skip,
+        child: Text(
+          OnboardingCopy.skipPrice,
+          style: text.bodyMedium?.copyWith(
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
           ),
-          CupertinoButton(
-            padding: const EdgeInsets.only(top: AppSpacing.sm),
-            minimumSize: const Size(44, 36),
-            onPressed: _skip,
-            child: Text(
-              OnboardingCopy.skipPrice,
-              style: text.bodyMedium?.copyWith(
-                color: colors.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -105,121 +100,135 @@ class _CostStepState extends ConsumerState<CostStep> {
                 : OnboardingCopy.costTitleContainer(container),
           ),
           const SizedBox(height: AppSpacing.md + 4),
-          Card(
-            margin: EdgeInsets.zero,
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    OnboardingCopy.priceOf(container ?? habit.unit),
-                    style: muted,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Row(
-                    spacing: 10,
-                    children: [
-                      CurrencyChip(
-                        symbol: form.currency,
-                        onChanged: controller.setCurrency,
-                      ),
-                      Expanded(
-                        child: TextField(
-                          controller: _price,
-                          onChanged: (value) {
-                            controller.setPriceText(value);
-                            if (_showError) setState(() => _showError = false);
-                          },
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp('[0-9.,]'),
+          StepReveal(
+            index: 2,
+            child: Card(
+              margin: EdgeInsets.zero,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      OnboardingCopy.priceOf(container ?? habit.unit),
+                      style: muted,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Row(
+                      spacing: 10,
+                      children: [
+                        CurrencyChip(
+                          symbol: form.currency,
+                          onChanged: controller.setCurrency,
+                        ),
+                        Expanded(
+                          child: TextField(
+                            controller: _price,
+                            onChanged: (value) {
+                              controller.setPriceText(value);
+                              if (_showError) {
+                                setState(() => _showError = false);
+                              }
+                            },
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
                             ),
-                          ],
-                          style: text.headlineLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                          decoration: InputDecoration.collapsed(
-                            hintText: container == null ? '3.50' : '14.50',
-                            hintStyle: text.headlineLarge?.copyWith(
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp('[0-9.,]'),
+                              ),
+                            ],
+                            style: text.headlineLarge?.copyWith(
                               fontWeight: FontWeight.w700,
-                              color: colors.outlineVariant,
+                            ),
+                            decoration: InputDecoration.collapsed(
+                              hintText: container == null ? '3.50' : '14.50',
+                              hintStyle: text.headlineLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: colors.outlineVariant,
+                              ),
                             ),
                           ),
                         ),
+                      ],
+                    ),
+                    if (_showError && form.hasInvalidPrice) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        OnboardingCopy.invalidPrice,
+                        style: text.bodySmall?.copyWith(color: colors.error),
                       ),
                     ],
-                  ),
-                  if (_showError && form.hasInvalidPrice) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      OnboardingCopy.invalidPrice,
-                      style: text.bodySmall?.copyWith(color: colors.error),
-                    ),
                   ],
-                ],
+                ),
               ),
             ),
           ),
           if (container != null) ...[
             const SizedBox(height: 10),
-            Card(
-              margin: EdgeInsets.zero,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.gutterSm,
-                ),
-                child: Row(
-                  spacing: 10,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            OnboardingCopy.perContainer(habit.units, container),
-                            style: text.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
+            StepReveal(
+              index: 3,
+              child: Card(
+                margin: EdgeInsets.zero,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.gutterSm,
+                  ),
+                  child: Row(
+                    spacing: 10,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              OnboardingCopy.perContainer(
+                                habit.units,
+                                container,
+                              ),
+                              style: text.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                          Text(OnboardingCopy.perContainerHint, style: muted),
-                        ],
-                      ),
-                    ),
-                    RoundIconButton(
-                      icon: AppIcons.remove,
-                      label: OnboardingCopy.fewer,
-                      size: 34,
-                      onTap: form.unitsPerContainer > 1
-                          ? () => _stepUnits(form.unitsPerContainer - 1)
-                          : null,
-                    ),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(minWidth: 36),
-                      child: Text(
-                        '${form.unitsPerContainer}',
-                        textAlign: TextAlign.center,
-                        style: text.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          fontFeatures: const [FontFeature.tabularFigures()],
+                            Text(OnboardingCopy.perContainerHint, style: muted),
+                          ],
                         ),
                       ),
-                    ),
-                    RoundIconButton(
-                      icon: AppIcons.add,
-                      label: OnboardingCopy.more,
-                      size: 34,
-                      onTap:
-                          form.unitsPerContainer <
-                              HabitValidation.maxUnitsPerContainer
-                          ? () => _stepUnits(form.unitsPerContainer + 1)
-                          : null,
-                    ),
-                  ],
+                      RoundIconButton(
+                        icon: AppIcons.remove,
+                        label: OnboardingCopy.fewer,
+                        size: 34,
+                        onTap: form.unitsPerContainer > 1
+                            ? () => _stepUnits(form.unitsPerContainer - 1)
+                            : null,
+                      ),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(minWidth: 36),
+                        child: Center(
+                          child: RollingNumber(
+                            value: form.unitsPerContainer,
+                            style: text.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      RoundIconButton(
+                        icon: AppIcons.add,
+                        label: OnboardingCopy.more,
+                        size: 34,
+                        onTap:
+                            form.unitsPerContainer <
+                                HabitValidation.maxUnitsPerContainer
+                            ? () => _stepUnits(form.unitsPerContainer + 1)
+                            : null,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -241,21 +250,15 @@ class _CostStepState extends ConsumerState<CostStep> {
                           Expanded(
                             child: _TotalTile(
                               label: OnboardingCopy.aMonth,
-                              value: AppFormat.money(
-                                monthly,
-                                symbol: form.currency,
-                                wholeUnits: true,
-                              ),
+                              cents: monthly,
+                              format: money,
                             ),
                           ),
                           Expanded(
                             child: _TotalTile(
                               label: OnboardingCopy.aYear,
-                              value: AppFormat.money(
-                                yearly,
-                                symbol: form.currency,
-                                wholeUnits: true,
-                              ),
+                              cents: yearly,
+                              format: money,
                               color: context.exhale.warning.foreground,
                             ),
                           ),
@@ -280,10 +283,16 @@ class _CostStepState extends ConsumerState<CostStep> {
 }
 
 class _TotalTile extends StatelessWidget {
-  const _TotalTile({required this.label, required this.value, this.color});
+  const _TotalTile({
+    required this.label,
+    required this.cents,
+    required this.format,
+    this.color,
+  });
 
   final String label;
-  final String value;
+  final int cents;
+  final String Function(int cents) format;
   final Color? color;
 
   @override
@@ -309,11 +318,14 @@ class _TotalTile extends StatelessWidget {
             FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
-              child: Text(
-                value,
-                style: text.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: color,
+              child: CountTo(
+                value: cents,
+                builder: (context, shown) => Text(
+                  format(shown),
+                  style: text.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
                 ),
               ),
             ),

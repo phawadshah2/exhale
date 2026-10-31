@@ -4,6 +4,7 @@ import 'package:exhale/core/widgets/glow_button.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
 import 'package:exhale/features/settings/presentation/widgets/day_window_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,12 +17,9 @@ class DayStep extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final window = ref.watch(onboardingFormProvider.select((s) => s.dayWindow));
     return OnboardingStepFrame(
-      footer: SizedBox(
-        width: double.infinity,
-        child: GlowButton(
-          label: OnboardingCopy.continueButton,
-          onPressed: () => OnboardingScope.of(context).next(),
-        ),
+      button: GlowButton(
+        label: OnboardingCopy.continueButton,
+        onPressed: () => OnboardingScope.of(context).next(),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -31,21 +29,27 @@ class DayStep extends ConsumerWidget {
             title: OnboardingCopy.dayTitle,
           ),
           const SizedBox(height: AppSpacing.md),
-          DayWindowPicker(
-            window: window,
-            onChanged: (value) => ref
-                .read(onboardingFormProvider.notifier)
-                .setDayWindow(
-                  wakeMinute: value.wakeMinute,
-                  bedMinute: value.bedMinute,
-                ),
+          StepReveal(
+            index: 2,
+            child: DayWindowPicker(
+              window: window,
+              onChanged: (value) => ref
+                  .read(onboardingFormProvider.notifier)
+                  .setDayWindow(
+                    wakeMinute: value.wakeMinute,
+                    bedMinute: value.bedMinute,
+                  ),
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            OnboardingCopy.dayNote,
-            textAlign: TextAlign.center,
-            style: context.textTheme.bodySmall?.copyWith(
-              color: context.colors.onSurfaceVariant,
+          StepReveal(
+            index: 3,
+            child: Text(
+              OnboardingCopy.dayNote,
+              textAlign: TextAlign.center,
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.md),

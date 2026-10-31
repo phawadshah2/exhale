@@ -37,14 +37,11 @@ class DotsGrid extends StatelessWidget {
                 runSpacing: _gap,
                 children: [
                   for (var i = 0; i < count; i++)
-                    SizedBox.square(
-                      dimension: size,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: exhale.emphasis,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
+                    _Dot(
+                      key: ValueKey(i),
+                      index: i,
+                      size: size,
+                      color: exhale.emphasis,
                     ),
                 ],
               );
@@ -61,6 +58,47 @@ class DotsGrid extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// Pops in when it first appears; the first row ripples in left to right.
+class _Dot extends StatelessWidget {
+  const _Dot({
+    required this.index,
+    required this.size,
+    required this.color,
+    super.key,
+  });
+
+  final int index;
+  final double size;
+  final Color color;
+
+  static const Duration _pop = Duration(milliseconds: 320);
+  static const Duration _stagger = Duration(milliseconds: 30);
+
+  @override
+  Widget build(BuildContext context) {
+    final still = MediaQuery.disableAnimationsOf(context);
+    final delay = _stagger * index;
+    final total = delay + _pop;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: still ? Duration.zero : total,
+      curve: Interval(
+        delay.inMilliseconds / total.inMilliseconds,
+        1,
+        curve: Curves.easeOutBack,
+      ),
+      builder: (context, t, child) =>
+          Transform.scale(scale: t.clamp(0, 1.2), child: child),
+      child: SizedBox.square(
+        dimension: size,
+        child: DecoratedBox(
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
       ),
     );
   }

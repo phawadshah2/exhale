@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../helpers/onboarding.dart';
+
 void main() {
   const defaults = DayWindow(
     wakeMinute: DayWindow.defaultWake,
@@ -52,7 +54,7 @@ void main() {
     expect(find.text(OnboardingCopy.bedtime), findsOneWidget);
     expect(find.text('7:30 AM'), findsOneWidget);
     expect(find.text('11:30 PM'), findsOneWidget);
-    expect(find.text('16 h awake'), findsOneWidget);
+    expect(awakeLabel('16 h awake'), findsOneWidget);
   });
 
   testWidgets('a bedtime after midnight is a longer day, not a negative one', (
@@ -67,7 +69,7 @@ void main() {
 
     expect(reported, [const DayWindow(wakeMinute: 450, bedMinute: 60)]);
     expect(find.text('1:00 AM'), findsOneWidget);
-    expect(find.text('17 h 30 min awake'), findsOneWidget);
+    expect(awakeLabel('17 h 30 min awake'), findsOneWidget);
   });
 
   testWidgets('the wake tile edits the wake time', (tester) async {
@@ -78,7 +80,7 @@ void main() {
 
     expect(reported, [const DayWindow(wakeMinute: 375, bedMinute: 1410)]);
     expect(find.text('6:15 AM'), findsOneWidget);
-    expect(find.text('17 h 15 min awake'), findsOneWidget);
+    expect(awakeLabel('17 h 15 min awake'), findsOneWidget);
   });
 
   testWidgets(
@@ -88,7 +90,7 @@ void main() {
         tester,
         initial: const DayWindow(wakeMinute: 450, bedMinute: 120),
       );
-      expect(find.text('18 h 30 min awake'), findsOneWidget);
+      expect(awakeLabel('18 h 30 min awake'), findsOneWidget);
 
       spinTo(tester, 23, 0);
       await tester.pumpAndSettle();
@@ -96,7 +98,7 @@ void main() {
       expect(reported, isEmpty);
       expect(find.text('7:30 AM'), findsOneWidget);
       expect(find.text('11:00 PM'), findsNothing);
-      expect(find.text('18 h 30 min awake'), findsOneWidget);
+      expect(awakeLabel('18 h 30 min awake'), findsOneWidget);
     },
   );
 }

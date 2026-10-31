@@ -47,7 +47,7 @@ void main() {
     expect(find.text('5/6'), findsOneWidget);
     expect(find.text(OnboardingCopy.dayPrompt), findsOneWidget);
     expect(find.text(OnboardingCopy.dayTitle), findsOneWidget);
-    expect(find.text('16 h awake'), findsOneWidget);
+    expect(awakeLabel('16 h awake'), findsOneWidget);
     expect(find.text(OnboardingCopy.dayNote), findsOneWidget);
 
     await tester.disposeApp();
@@ -80,7 +80,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(form(tester).bedMinute, 60);
-    expect(find.text('17 h 30 min awake'), findsOneWidget);
+    expect(awakeLabel('17 h 30 min awake'), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -96,7 +96,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(form(tester).wakeMinute, 450);
-    expect(find.text('16 h awake'), findsOneWidget);
+    expect(awakeLabel('16 h awake'), findsOneWidget);
 
     await tester.disposeApp();
   });

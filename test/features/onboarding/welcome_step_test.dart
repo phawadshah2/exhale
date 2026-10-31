@@ -23,6 +23,11 @@ void main() {
     ]) {
       expect(find.text(line), findsOneWidget, reason: line);
     }
+    expect(
+      find.text('You · Tonight 11:48 PM', findRichText: true),
+      findsOneWidget,
+    );
+    expect(find.text(OnboardingCopy.welcomeRead), findsOneWidget);
   }
 
   testWidgets('plays the chat, then shows the headline', (tester) async {

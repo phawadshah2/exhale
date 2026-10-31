@@ -33,6 +33,14 @@ void main() {
   bool continueEnabled(WidgetTester tester) =>
       tester.widget<GlowButton>(continueButton()).onPressed != null;
 
+  Finder shownCheck() => find.byWidgetPredicate(
+    (widget) =>
+        widget is AnimatedScale &&
+        widget.scale == 1 &&
+        widget.child is Icon &&
+        (widget.child! as Icon).icon == AppIcons.checkCircle,
+  );
+
   testWidgets('vaping is selected by default with its reply', (tester) async {
     await toHabitStep(tester);
 
@@ -45,7 +53,7 @@ void main() {
       tester.getSemantics(find.bySemanticsLabel(Habit.vaping.name)),
       isSemantics(isButton: true, isSelected: true, hasTapAction: true),
     );
-    expect(find.byIcon(AppIcons.checkCircle), findsOneWidget);
+    expect(shownCheck(), findsOneWidget);
     expect(
       find.text(OnboardingCopy.habitReply(HabitKind.vaping)),
       findsOneWidget,

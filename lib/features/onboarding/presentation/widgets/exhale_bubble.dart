@@ -23,7 +23,6 @@ class ExhaleBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final exhale = context.exhale;
-    final isDark = context.theme.brightness == Brightness.dark;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -38,10 +37,7 @@ class ExhaleBubble extends StatelessWidget {
                   child: Icon(
                     AppIcons.breath,
                     size: 16,
-                    // On the dark accent avatar the accent glyph would vanish.
-                    color: isDark
-                        ? exhale.onEmphasis
-                        : context.colors.primaryContainer,
+                    color: exhale.onEmphasis,
                   ),
                 )
               : null,
@@ -82,11 +78,42 @@ class ExhaleBubble extends StatelessWidget {
 }
 
 /// Exhale's one-line reaction to an answer, right aligned without an
-/// avatar.
-class ExhaleReply extends StatelessWidget {
+/// avatar. A new [text] fades the old one out, eases the bubble to the new
+/// size and fades the new one in, so the bubble itself never jumps.
+class ExhaleReply extends StatefulWidget {
   const ExhaleReply({required this.text, super.key});
 
   final String text;
+
+  @override
+  State<ExhaleReply> createState() => _ExhaleReplyState();
+}
+
+class _ExhaleReplyState extends State<ExhaleReply> {
+  static const Duration _fade = Duration(milliseconds: 160);
+  static const Duration _resize = Duration(milliseconds: 280);
+
+  late String _shown = widget.text;
+  bool _visible = true;
+
+  @override
+  void didUpdateWidget(ExhaleReply old) {
+    super.didUpdateWidget(old);
+    if (widget.text == _shown) return;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _shown = widget.text;
+    } else {
+      _visible = false;
+    }
+  }
+
+  void _faded() {
+    if (_visible || !mounted) return;
+    setState(() {
+      _shown = widget.text;
+      _visible = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,13 +132,24 @@ class ExhaleReply extends StatelessWidget {
               bottomLeft: Radius.circular(20),
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            child: Text(
-              text,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: exhale.onEmphasis,
-                height: 1.4,
+          child: AnimatedSize(
+            duration: _resize,
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              child: AnimatedOpacity(
+                opacity: _visible ? 1 : 0,
+                duration: _visible ? _resize : _fade,
+                curve: Curves.easeOut,
+                onEnd: _faded,
+                child: Text(
+                  _shown,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: exhale.onEmphasis,
+                    height: 1.4,
+                  ),
+                ),
               ),
             ),
           ),

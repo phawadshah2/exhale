@@ -24,7 +24,9 @@ class YouBubble extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 280),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: context.exhale.inset,
+            color: colors.brightness == Brightness.dark
+                ? colors.surfaceContainerHigh
+                : colors.surfaceContainerHighest,
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(20),
               topRight: Radius.circular(continued ? 6 : 20),

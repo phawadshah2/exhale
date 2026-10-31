@@ -93,23 +93,17 @@ class _WelcomeStepState extends State<WelcomeStep>
 
     return OnboardingStepFrame(
       onTapBody: _skip,
-      footer: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: GlowButton(
-              label: OnboardingCopy.welcomeButton,
-              onPressed: () => OnboardingScope.of(context).next(),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            OnboardingCopy.welcomeFinePrint,
-            textAlign: TextAlign.center,
-            style: faint,
-          ),
-        ],
+      button: GlowButton(
+        label: OnboardingCopy.welcomeButton,
+        onPressed: () => OnboardingScope.of(context).next(),
+      ),
+      below: Padding(
+        padding: const EdgeInsets.only(top: AppSpacing.sm),
+        child: Text(
+          OnboardingCopy.welcomeFinePrint,
+          textAlign: TextAlign.center,
+          style: faint,
+        ),
       ),
       body: AnimatedBuilder(
         animation: _timeline,
@@ -130,15 +124,13 @@ class _WelcomeStepState extends State<WelcomeStep>
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: 'You',
+                          text: OnboardingCopy.welcomeSender,
                           style: TextStyle(
                             color: colors.onSurfaceVariant,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        TextSpan(
-                          text: OnboardingCopy.welcomeSender.substring(3),
-                        ),
+                        const TextSpan(text: OnboardingCopy.welcomeSentAt),
                       ],
                     ),
                     textAlign: TextAlign.center,

@@ -4,7 +4,6 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/glow_button.dart';
-import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/habit_icon.dart';
 import 'package:exhale/features/home/presentation/widgets/history/chart_paint.dart';
@@ -12,6 +11,7 @@ import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/exhale_bubble.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,14 +57,11 @@ class _HabitStepState extends ConsumerState<HabitStep> {
     const presets = Habit.presets;
 
     return OnboardingStepFrame(
-      footer: SizedBox(
-        width: double.infinity,
-        child: GlowButton(
-          label: OnboardingCopy.continueButton,
-          onPressed: form.canContinue
-              ? () => OnboardingScope.of(context).next()
-              : null,
-        ),
+      button: GlowButton(
+        label: OnboardingCopy.continueButton,
+        onPressed: form.canContinue
+            ? () => OnboardingScope.of(context).next()
+            : null,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -76,29 +73,35 @@ class _HabitStepState extends ConsumerState<HabitStep> {
           ),
           const SizedBox(height: AppSpacing.md + 4),
           for (var i = 0; i < presets.length; i += 2)
-            Padding(
-              padding: const EdgeInsets.only(bottom: _gap),
-              child: Row(
-                spacing: _gap,
-                children: [
-                  for (final habit in presets.skip(i).take(2))
-                    Expanded(
-                      child: _HabitCard(
-                        icon: habit.kind.icon,
-                        label: habit.name,
-                        selected: kind == habit.kind,
-                        onTap: () => controller.selectHabit(habit.kind),
+            StepReveal(
+              index: 3 + i ~/ 2,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: _gap),
+                child: Row(
+                  spacing: _gap,
+                  children: [
+                    for (final habit in presets.skip(i).take(2))
+                      Expanded(
+                        child: _HabitCard(
+                          icon: habit.kind.icon,
+                          label: habit.name,
+                          selected: kind == habit.kind,
+                          onTap: () => controller.selectHabit(habit.kind),
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
-          _HabitCard(
-            icon: AppIcons.add,
-            label: OnboardingCopy.somethingElse,
-            selected: kind == HabitKind.custom,
-            dashed: true,
-            onTap: () => controller.selectHabit(HabitKind.custom),
+          StepReveal(
+            index: 3 + presets.length ~/ 2,
+            child: _HabitCard(
+              icon: AppIcons.add,
+              label: OnboardingCopy.somethingElse,
+              selected: kind == HabitKind.custom,
+              dashed: true,
+              onTap: () => controller.selectHabit(HabitKind.custom),
+            ),
           ),
           AnimatedSize(
             duration: MediaQuery.disableAnimationsOf(context)
@@ -141,12 +144,9 @@ class _HabitStepState extends ConsumerState<HabitStep> {
                 : const SizedBox(width: double.infinity),
           ),
           const SizedBox(height: AppSpacing.md - 2),
-          SmoothSwitcher(
-            resize: true,
-            child: ExhaleReply(
-              key: ValueKey(kind),
-              text: OnboardingCopy.habitReply(kind),
-            ),
+          StepReveal(
+            index: 4 + presets.length ~/ 2,
+            child: ExhaleReply(text: OnboardingCopy.habitReply(kind)),
           ),
           const SizedBox(height: AppSpacing.md),
         ],
@@ -175,22 +175,20 @@ class _HabitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final accent = colors.primary;
-    final line = selected ? accent : colors.outlineVariant;
+    final pick = SelectionColors.of(context);
+    final line = selected ? pick.line : pick.idleLine;
     final foreground = selected
-        ? accent
+        ? pick.foreground
         : dashed
         ? colors.onSurfaceVariant
         : colors.onSurface;
     final card = AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 240),
       curve: Curves.easeOut,
       height: dashed ? 56 : 66,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: selected
-            ? colors.primaryContainer.withValues(alpha: 0.14)
-            : context.theme.cardTheme.color ?? colors.surfaceContainerLow,
+        color: selected ? pick.fill : pick.idleFill,
         borderRadius: _radius,
         border: dashed
             ? null
@@ -212,7 +210,12 @@ class _HabitCard extends StatelessWidget {
               ),
             ),
           ),
-          if (selected) Icon(AppIcons.checkCircle, size: 16, color: accent),
+          AnimatedScale(
+            scale: selected ? 1 : 0,
+            duration: const Duration(milliseconds: 260),
+            curve: selected ? Curves.easeOutBack : Curves.easeIn,
+            child: Icon(AppIcons.checkCircle, size: 16, color: pick.foreground),
+          ),
         ],
       ),
     );
@@ -229,15 +232,17 @@ class _HabitCard extends StatelessWidget {
           unawaited(HapticFeedback.selectionClick());
           onTap();
         },
-        child: dashed
-            ? CustomPaint(
-                foregroundPainter: _DashedBorder(
-                  color: line,
-                  width: selected ? 1.5 : 1,
-                ),
-                child: card,
-              )
-            : card,
+        child: PressScale(
+          child: dashed
+              ? CustomPaint(
+                  foregroundPainter: _DashedBorder(
+                    color: line,
+                    width: selected ? 1.5 : 1,
+                  ),
+                  child: card,
+                )
+              : card,
+        ),
       ),
     );
   }

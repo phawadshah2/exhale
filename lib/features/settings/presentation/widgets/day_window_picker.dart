@@ -3,9 +3,11 @@ import 'dart:math' as math;
 
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
 import 'package:exhale/features/settings/domain/entities/day_window.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -172,48 +174,50 @@ class _TimeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.textTheme;
-    final accent = colors.primary;
+    final pick = SelectionColors.of(context);
     return Semantics(
       button: true,
       selected: selected,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: selected
-                ? colors.primaryContainer.withValues(alpha: 0.14)
-                : context.theme.cardTheme.color ?? colors.surfaceContainerLow,
-            borderRadius: _radius,
-            border: Border.all(
-              color: selected ? accent : colors.outlineVariant,
-              width: selected ? 1.5 : 1,
+        child: PressScale(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 240),
+            curve: Curves.easeOut,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: selected ? pick.fill : pick.idleFill,
+              borderRadius: _radius,
+              border: Border.all(
+                color: selected ? pick.line : pick.idleLine,
+                width: selected ? 1.5 : 1,
+              ),
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                spacing: 6,
-                children: [
-                  Icon(icon, size: 15, color: colors.onSurfaceVariant),
-                  Text(
-                    label,
-                    style: text.bodySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  spacing: 6,
+                  children: [
+                    Icon(icon, size: 15, color: colors.onSurfaceVariant),
+                    Text(
+                      label,
+                      style: text.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  AppFormat.time(
+                    DateTime(2000, 1, 1, minute ~/ 60, minute % 60),
                   ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                AppFormat.time(DateTime(2000, 1, 1, minute ~/ 60, minute % 60)),
-                style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-              ),
-            ],
+                  style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -222,7 +226,9 @@ class _TimeTile extends StatelessWidget {
 }
 
 /// A half-circle track with dots along it, a filled dot at wake and a ring
-/// at bed, and the time awake in the middle.
+/// at bed, and the time awake in the middle: big numbers with small units,
+/// on two lines when there are minutes. The dots sweep from wake to bed
+/// when it appears.
 class _DayArc extends StatelessWidget {
   const _DayArc({required this.awakeMinutes});
 
@@ -235,46 +241,84 @@ class _DayArc extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.textTheme;
-    return SizedBox(
-      width: _width,
-      height: _height,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _ArcPainter(
-                track: colors.surfaceContainerHighest,
-                dots: context.exhale.emphasis,
-                background: colors.surface,
+    final hours = awakeMinutes ~/ 60;
+    final minutes = awakeMinutes % 60;
+    final number = text.displaySmall?.copyWith(
+      fontWeight: FontWeight.w700,
+      color: colors.onSurface,
+      height: 1.05,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+    final unit = text.titleMedium?.copyWith(
+      color: colors.onSurfaceVariant,
+      fontWeight: FontWeight.w600,
+    );
+
+    Widget line(int value, String label) => Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      spacing: 3,
+      children: [
+        RollingNumber(value: value, style: number),
+        Text(label, style: unit),
+      ],
+    );
+
+    return Semantics(
+      label:
+          '${OnboardingCopy.awakeDuration(awakeMinutes)} '
+          '${OnboardingCopy.awake}',
+      excludeSemantics: true,
+      child: SizedBox(
+        width: _width,
+        height: _height,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: 1),
+                duration: MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : AppMotion.fill,
+                curve: AppMotion.fillCurve,
+                builder: (context, sweep, _) => CustomPaint(
+                  painter: _ArcPainter(
+                    sweep: sweep,
+                    track: colors.surfaceContainerHighest,
+                    dots: context.exhale.emphasis,
+                    background: colors.surface,
+                  ),
+                ),
               ),
             ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 62,
-            child: Text.rich(
-              textAlign: TextAlign.center,
-              TextSpan(
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 8,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextSpan(
-                    text: OnboardingCopy.awakeDuration(awakeMinutes),
-                    style: text.displaySmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: colors.onSurface,
-                    ),
+                  line(hours, OnboardingCopy.hourUnit),
+                  AnimatedSize(
+                    duration: AppMotion.swap,
+                    curve: AppMotion.swapCurve,
+                    child: minutes == 0
+                        ? const SizedBox(width: 1)
+                        : line(minutes, OnboardingCopy.minuteUnit),
                   ),
-                  TextSpan(
-                    text: ' ${OnboardingCopy.awake}',
-                    style: text.bodyMedium?.copyWith(
+                  const SizedBox(height: 2),
+                  Text(
+                    OnboardingCopy.awake,
+                    style: text.bodySmall?.copyWith(
                       color: colors.onSurfaceVariant,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -282,11 +326,14 @@ class _DayArc extends StatelessWidget {
 
 class _ArcPainter extends CustomPainter {
   const _ArcPainter({
+    required this.sweep,
     required this.track,
     required this.dots,
     required this.background,
   });
 
+  /// How far from wake toward bed the dots have reached, 0 to 1.
+  final double sweep;
   final Color track;
   final Color dots;
   final Color background;
@@ -316,6 +363,7 @@ class _ArcPainter extends CustomPainter {
     final steps = (math.pi * radius / _dotGap).floor();
     final dot = Paint()..color = dots;
     for (var i = 1; i < steps; i++) {
+      if (i / steps > sweep) break;
       final angle = math.pi + math.pi * i / steps;
       canvas.drawCircle(
         center + Offset(math.cos(angle), math.sin(angle)) * radius,
@@ -326,12 +374,14 @@ class _ArcPainter extends CustomPainter {
 
     final wake = center + Offset(-radius, 0);
     final bed = center + Offset(radius, 0);
+    final arrived = ((sweep - 0.9) / 0.1).clamp(0.0, 1.0);
+    canvas.drawCircle(wake, 8, dot);
+    if (arrived == 0) return;
     canvas
-      ..drawCircle(wake, 8, dot)
-      ..drawCircle(bed, 8, Paint()..color = background)
+      ..drawCircle(bed, 8 * arrived, Paint()..color = background)
       ..drawCircle(
         bed,
-        8,
+        8 * arrived,
         Paint()
           ..color = dots
           ..style = PaintingStyle.stroke
@@ -341,6 +391,7 @@ class _ArcPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_ArcPainter oldDelegate) =>
+      oldDelegate.sweep != sweep ||
       oldDelegate.track != track ||
       oldDelegate.dots != dots ||
       oldDelegate.background != background;

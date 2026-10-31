@@ -47,6 +47,9 @@ void main() {
     }
   }
 
+  Future<void> swapReply(WidgetTester tester) =>
+      tester.pumpInSteps(const Duration(milliseconds: 200));
+
   int startLimit(WidgetTester tester) =>
       ProviderScope.containerOf(tester.element(find.byType(AmountStep)))
           .read(onboardingFormProvider)
@@ -72,6 +75,7 @@ void main() {
 
     await tapPlus(tester);
     expect(inStep(find.text('10')), findsOneWidget);
+    await swapReply(tester);
     expect(
       find.text("That's not a habit. That's a part-time job."),
       findsOneWidget,
@@ -79,6 +83,7 @@ void main() {
 
     await tapMinus(tester, times: 6);
     expect(inStep(find.text('4')), findsOneWidget);
+    await swapReply(tester);
     expect(find.text('Practically a hobby.'), findsOneWidget);
     expect(tester.widget<DotsGrid>(find.byType(DotsGrid)).count, 4);
 
@@ -114,6 +119,7 @@ void main() {
         .read(onboardingFormProvider.notifier)
         .setStartLimit(PlanValidation.maxStartLimit);
     await tester.pump();
+    await swapReply(tester);
 
     final dots = tester.widget<DotsGrid>(find.byType(DotsGrid));
     expect((dots.count, dots.unit), (12, 7));

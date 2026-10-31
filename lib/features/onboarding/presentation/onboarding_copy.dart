@@ -5,7 +5,8 @@ abstract final class OnboardingCopy {
   static const splashLine = 'We need to talk.';
 
   // Welcome.
-  static const welcomeSender = 'You · Tonight 11:48 PM';
+  static const welcomeSender = 'You';
+  static const welcomeSentAt = ' · Tonight 11:48 PM';
   static const excuses = [
     'just one more',
     "it's basically flavoured air",
@@ -93,6 +94,8 @@ abstract final class OnboardingCopy {
   }
 
   static const awake = 'awake';
+  static const hourUnit = 'h';
+  static const minuteUnit = 'min';
   static const wakeUp = 'Wake up';
   static const bedtime = 'Bedtime';
   static const dayNote = 'Used to pace your limit. Never to lock you out.';
