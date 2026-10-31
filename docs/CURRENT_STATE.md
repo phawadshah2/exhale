@@ -57,8 +57,11 @@ log, a delete and a past day all work; one frame caught both rings filling in st
 walked: the count-up past zero, Undo from the snackbar (the log was removed from Edit
 log), carry-over, Reduce Motion, and how the seconds feel. The walk ran with a cap at
 bed: at 9:49 PM the timer already equalled the time to bed, so a log did not change the
-number, and Fawad removed the cap. Removing it has not been seen on a simulator. The
-simulator's data is back as it was.
+number, and Fawad removed the cap. Second walk without the cap (bedtime set to 3:30 AM
+for it, then restored): after bed Home shows the count and no + ring; a log took
+`10:03:11` to `11:42:53`, and the rings refilled. Open from that walk: two-digit hours
+fit but sit close to the inner ring, and bursts of logs make large numbers (`703 min`).
+The simulator's data is back as it was.
 
 For Fawad to look at: a new user finishing onboarding in the afternoon has no logs, so
 the timer has already passed and Home opens counting up from their first due time
