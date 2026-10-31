@@ -1,20 +1,47 @@
 # Current state
 
-Updated 2026-10-29 (handoff after Task 3.7; HEAD a0e779f, tree clean
-apart from this line; branch 30+ commits ahead of origin, not pushed). Hook gotcha: the global
+Updated 2026-10-30 (onboarding polish green, uncommitted; HEAD 5ec93e6;
+branch not pushed). Hook gotcha: the global
 hook blocks any Bash call whose text mentions "format"/"test" next to
 other commands (including `git add` of `formatting/` paths, `git rm` of
 `*_test.dart` and `task-done`); run checks bare, stage with `git add -A`
 / `-u`, write ledger lines by hand. Stay on `feat/onboarding-redesign`.
-Onboarding plan, Phase O3 done (Tasks 3.1–3.7 committed). Next is the
-milestone O3 review (Opus 5.5 high, fresh session): walk the flow
-against `design/7._onboarding/flows.html` in light and dark on a
-simulator (ask Fawad first) and check the copy against spec §4 and §7
-word for word. Then Phase O4 (Task 4.1). Read the plan's "Milestone O3
-review" note under Task 3.7 in
-`docs/superpowers/plans/2026-10-29-onboarding-redesign.md` and the
-ledger's Task 3.6–3.7 rulings
-(`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`). Roadmap:
+Phase O3 committed; milestone O3 review fixes AND Fawad's onboarding
+polish round are both uncommitted (see "Onboarding polish" below).
+
+**Stash:** `stash@{0}` "sim-walk splash hack" holds the debug edit to
+`splash_page.dart` (always starts onboarding). `git stash apply` it only
+for a simulator walk, then `git checkout -- <splash_page.dart>` before
+running tests or committing (on 2026-10-30 it was found applied in the
+tree and made 74 Home/app tests fail).
+
+## Onboarding polish (2026-10-29, in progress, uncommitted)
+
+Fawad asked after the O3 walk: buttons at one height, mockup stepper
+with a visible track, ink (`emphasis`) instead of the accent for every
+onboarding selection, two-line awake time (big numbers, small units),
+taper chart that travels on entry and on date change (after the Pick
+sheet closes), smooth habit reply, more motion throughout. All coded:
+`OnboardingStepFrame` now takes `button` + `below` (44 pt slot); new
+`widgets/onboarding_motion.dart` (`SelectionColors`, `StepReveal`,
+`PressScale`, `RollingNumber`, `CountTo`); `ExhaleReply` morphs in
+place; `TaperChart` is stateful with `delay`; `DealStep` is stateful
+(`sheetClose` 250 ms); stepper, habit, amount, dots, cost, currency
+chip, day picker, deal restyled. Dark mode keeps the accent (emphasis).
+Tests: `awakeLabel` finder added to `test/helpers/onboarding.dart`;
+day picker/day step asserts moved to it.
+
+2026-10-30: tests updated for the new motion (`habit_step_test` matches
+the check icon at full `AnimatedScale`; `amount_step_test` waits out
+`ExhaleReply`'s 160 ms fade via `swapReply`). Checks observed: format
+clean (0 changed), `analyze --fatal-infos` clean, full suite 394
+passed. Not seen on a simulator.
+
+**Next action:** commit O3 fixes + polish (or first `git stash apply`
+and walk light + dark on the "exhale" simulator, asking Fawad first;
+restore the splash file afterwards). Then Phase O4 (Task 4.1) in
+`docs/superpowers/plans/2026-10-29-onboarding-redesign.md`. Ledger:
+`.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md` (row 3b).
 
 ## Goal
@@ -343,8 +370,29 @@ it. Returning users keep the intro + hold to Home. `SetupPage`,
 passed (splash, app, deal), format, `analyze --fatal-infos` clean, full
 suite 394 passed. Not seen on a simulator.
 
-Next: milestone O3 review (Opus 5.5 high), then Task 4.1 with
-`superpowers:executing-plans`. `task-done` is blocked by the global hook (it wraps a test
+Milestone O3 review done (2026-10-29, uncommitted): copy matches spec
+§4 and §7 word for word; flow walked on the "exhale" simulator in light
+and dark against `flows.html`. Fixes: the light "You" bubbles were
+near-invisible (`inset` at 60%), now `surfaceContainerHighest` in light
+and `surfaceContainerHigh` in dark (mockup #E9EEF3 / #242A34); the taper
+chart's "N today" label sat on the first flat step (plot top 22 → 30,
+label 18 above it); the deal stats drop tabular figures ("A$2, 190"
+read as a space); the welcome sender line is two constants instead of
+`substring(3)`, and the welcome test now checks it and "Read 11:49 PM".
+Checks observed by me: welcome tests 3 passed; format clean;
+`analyze --fatal-infos` clean and full suite 394 passed with the splash
+debug edit stashed. No widget test for the chart label or bubble colour
+(paint/colour only). Held as fine: the habit, amount and cost replies
+sit right-aligned (as in the mockup); prices over 1,000 hide the totals
+until Continue shows the error. Open for Fawad: the mockup wordmark is
+lowercase "exhale", the app shows "Exhale" (shared with the returning
+splash). Uncommitted debug edit in `splash_page.dart` (always starts
+onboarding) is kept for simulator walks; revert it before committing.
+The simulator app's saved theme was set to dark for the walk and put
+back to light.
+
+Next: finish the onboarding polish (top of this file), then Task 4.1
+with `superpowers:executing-plans`. `task-done` is blocked by the global hook (it wraps a test
 command); run the tests bare and write the ledger line by hand. Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
