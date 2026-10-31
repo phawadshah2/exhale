@@ -1,7 +1,8 @@
 # Current state
 
 Updated 2026-10-31 (phase O4, its review and the simulator walk committed;
-branch not pushed). Hook gotcha: the global
+branch pushed, onboarding PR being opened by Fawad; `gh` is not installed on
+this Mac). Hook gotcha: the global
 hook blocks any Bash call whose text mentions "format"/"test" next to
 other commands (including `git add` of `formatting/` paths, `git rm` of
 `*_test.dart` and `task-done`); run checks bare, stage with `git add -A`
@@ -55,7 +56,7 @@ motion feel. The simulator's data gained a day window and one pouches log; its
 theme is back on Dark. For Fawad to look at: the + button reads mid-grey in
 light mode, not ink (glass over the page).
 
-**Next action:** push and open the onboarding PR when Fawad asks. M4 follows.
+**Next action:** the onboarding PR (needs "Analyze & test" green), then M4.
 
 **Stash:** `stash@{0}` "sim-walk splash hack" holds the debug edit to
 `splash_page.dart` (always starts onboarding). `git stash apply` it only
