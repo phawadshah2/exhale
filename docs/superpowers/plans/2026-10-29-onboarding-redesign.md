@@ -24,7 +24,7 @@ black (light) and Flow A app accent dark (dark).
 
 - Toolchain: `fvm flutter` / `fvm dart` only. Codegen after table changes:
   `fvm dart run build_runner build -d`.
-- Checks (ask Fawad before each, one command per call): `fvm dart format .`,
+- Checks (no permission needed, one command per call): `fvm dart format .`,
   `fvm flutter analyze --fatal-infos`, `fvm flutter test <path>`.
 - Commits: Conventional Commits (`.githooks/commit-msg`), no Co-Authored-By
   trailers. Claude may commit on `feat/onboarding-redesign`; push only when
