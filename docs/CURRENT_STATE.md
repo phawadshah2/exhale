@@ -48,9 +48,15 @@ Checks observed by me: format (1 file), `analyze --fatal-infos` clean, full suit
 behaviour) and the three guards that the card stays hidden. A failed Keep at zero's
 snackbar has no test. Not seen on a simulator.
 
-Open: the normal stage pill still reads "Stage 1 of 9 · Daily limit: 9", where spec
-4.3 and the designs say "Vaping · Drops to 10 in 4d" and "STAGE 2 / 9"; 5.1 didn't
-ask for it, so it is unchanged.
+Stage pill (Fawad asked, 2026-10-31, committed): now matches spec 4.3 and the
+designs: habit icon, "Vaping · Drops to 10 in 4d", "STAGE 2 / 9", and on a plan's
+first day "Vaping · Day 1, plan starts today". `nextTarget` moved to `HabitWording`,
+as on `feat/multi-habit`, though that branch's `stageLine` and pill will conflict
+when it resumes. My calls: a long name truncates before the target; the chip's text
+scale is capped at 1.5, because the chip overflowed at 3×. Checks observed by me:
+format clean, `analyze --fatal-infos` clean, full suite 442 passed; red seen first.
+Not seen on a simulator, and the test font is wider than the real one, so how real
+names fit is unchecked.
 
 `splash_page.dart` is restored; the stash stays for the next walk.
 
