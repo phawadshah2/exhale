@@ -2,7 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Per-habit data, a habit dashboard as Home, a filterable Logs page, the new logging menus and editors, multiple habits, and every designed state.
+**Goal:** Per-habit data, a habit dashboard as Home, a filterable Logs page, the new logging menus and editors, and every designed state, launched with one tracked habit. Multiple habits (Phase 4) ship in a later release.
+
+**Order changed 2026-10-31:** the launch skips Phase 4 and goes straight to Phase 5, on branches from `main`.
 
 **Architecture:** Phase 1 moves the habit out of settings into a `habits` table and keys plans and logs by habit id (schema v8); every provider that reads plans or logs becomes a family keyed by habit id. Phases 2–5 build screens on those providers. Pure calculations live in `ProgressCalculator` and are unit-tested; widgets are tested through `pumpAppPastSplash`.
 
@@ -26,7 +28,7 @@
 
 1. **Logs between midnight and the reset hour (4 AM)** belong to the previous logical day in period stats, trigger breakdowns, Logs day groups and the All-time series. Test owner: Task 2.1.
 2. **Plan edited mid-period:** "allowed" sums each day's own limit from the plan in force that day, not today's limit. Test owner: Task 2.1.
-3. **Habit archived while its dashboard or Logs filter is open:** the app returns to Home and never throws. Test owner: Task 4.3.
+3. **Habit archived while its dashboard or Logs filter is open:** the app returns to Home and never throws. Test owner: Task 5.1b for the launch's Change habit, Task 4.3 for the later release.
 4. **Upgrading a real v7 database** with a null price, logs stamped with another kind and two plans keeps every plan and log on habit 1. Test owner: Task 1.2.
 5. **A period entirely before the plan or a plan starting tomorrow:** a period entirely before the plan has allowed 0; a plan starting tomorrow gives the whole period's allowance with `allowedByToday` 0 (spec §5). Average is null (shown as "—"), no division by zero. Test owner: Task 2.1.
 
@@ -272,9 +274,15 @@
 
 ---
 
-## Phase 4: Multiple habits (milestone M4)
+## Phase 4: Multiple habits (milestone M4, later release)
+
+**Deferred 2026-10-31, not part of the launch.** Do not merge `feat/multi-habit` into a launch build. Tasks 4.1 to 4.3 are committed on that branch (5369b50, 747347d, 8aab391; `feat/multi-habit` also holds the checkpoint docs). Task 4.4 and the M4 review are not done. To resume: bring the branch up to date with `main`, then build Task 4.4.
+
+Open on the branch: stopping the last habit goes to onboarding, which overwrites the saved wake, bed and currency. "See all logs" shows the oldest habit's logs until 4.4. The cards have not been compared with `HomeMulti.dc.html` on a simulator. The launch's hint copy (Task 5.3) needs its second-habit line back with this release. When the branch is brought up to date, Task 5.1b will already hold parts of 5369b50, and 4.3's "Stop tracking" needs reconciling with Change habit (its note "You can add it again later" also overpromises: adding it again starts fresh).
 
 ### Task 4.1: Add a habit flow
+
+Status: built on `feat/multi-habit` (5369b50), not merged.
 
 Revised 2026-10-29: the old setup pages are removed by the onboarding plan
 (`2026-10-29-onboarding-redesign.md`); this task reuses its steps.
@@ -287,6 +295,8 @@ Revised 2026-10-29: the old setup pages are removed by the onboarding plan
 
 ### Task 4.2: Multi-habit Home
 
+Status: built on `feat/multi-habit` (747347d), not merged.
+
 **Files:** Create `lib/features/home/presentation/widgets/habit_list_home.dart`, `habit_summary_card.dart`, `combined_impact_card.dart`, `recent_logs_card.dart`; Modify `home_page.dart`, `progress_calculator.dart` (`combinedStreak(Map<int, List<DailyProgress>>) → int`); Test `test/features/home/habit_list_home_test.dart`, calculator test
 
 **Interfaces:** Home shows `HabitDashboard` when `singleHabitIdProvider != null`, else `HabitListHome`. Cards push `/habit/:id`. Combined impact: money summed, "All on track" streak, avoided per habit. Recent logs: `watchRecent(limit: 6)`, "See all logs" → `LogsQuery(habitId: null)`.
@@ -295,6 +305,8 @@ Revised 2026-10-29: the old setup pages are removed by the onboarding plan
 
 ### Task 4.3: Details header, switcher and stop tracking
 
+Status: built on `feat/multi-habit` (8aab391), not merged. These tests were never seen failing on an assertion, and a failed archive's snackbar has no test.
+
 **Files:** Modify `dashboard_header.dart`, `edit_plan_page.dart` ("Stop tracking <habit>" → `ArchiveHabit`); Test `test/features/home/habit_details_test.dart`
 
 **Interfaces:** back bar with habit switcher pill (bottom sheet listing active habits) and tune button; archiving pops to Home.
@@ -302,6 +314,8 @@ Revised 2026-10-29: the old setup pages are removed by the onboarding plan
 - [ ] **Step 5: Checkpoint:** `feat(habit): details header, switcher and stop tracking`
 
 ### Task 4.4: Logs habit tabs and All
+
+Status: not started. `TrackedHabitGuard` on `LogsPage` reads `query.habitId`, so a habit picked from the new tabs needs the same guard.
 
 **Files:** Modify `logs_page.dart`, `day_group.dart`; Test `logs_page_test.dart`
 
@@ -315,6 +329,8 @@ Revised 2026-10-29: the old setup pages are removed by the onboarding plan
 
 ## Phase 5: States and launch polish (milestone M5)
 
+This is the launch's next phase. Branch from `main`; nothing here depends on Phase 4.
+
 ### Task 5.1: Ring and dashboard states
 
 **Files:** Modify `ring_card.dart`, `stage_pill.dart`, `habit_dashboard.dart`; Create `quit_reached_card.dart`; Test `ring_card_test.dart`
@@ -322,6 +338,26 @@ Revised 2026-10-29: the old setup pages are removed by the onboarding plan
 **Interfaces:** over limit → coral badge, "2 over limit", note "A harder day. Tomorrow starts fresh at {nextLimit}, and your streak picks up again from there."; first day → "No sessions logged today. Nice start." and dashed "Today's triggers show here once you log."; quit reached → full success ring, "{n} days vape-free", card "You reached your quit date" with "Keep at zero" (sets `quitAcknowledgedAt`) and "New goal" (Edit plan).
 - [ ] **Steps 1–4:** one test per state with the exact copy above.
 - [ ] **Step 5: Checkpoint:** `feat(home): over, first-day and quit states`
+
+### Task 5.1b: Change habit (added 2026-10-31)
+
+Without this, someone who picks the wrong habit or moves to another one is stuck: the launch tracks one habit and `main` has no way to replace it. Use Opus 5.5 high: it archives user data.
+
+**Decisions (Claude's, easy to reverse):**
+- One action, "Change habit", with no bare "Stop tracking". The old habit is archived only when the new one saves, so backing out changes nothing and the app never sits with no habit. This avoids first-run onboarding, which would overwrite wake, bed and currency.
+- The flow is Habit, Daily amount, Cost, The deal. It never asks for or writes wake, bed or currency.
+- The current preset shows "TRACKING" and is disabled; a fresh start on the same habit is Edit plan's job.
+- Old logs stay in the database but are not shown at launch. Choosing that habit again later starts fresh (a new row), so the copy must not promise otherwise.
+
+**Files:** Take the onboarding parts of 5369b50 from `feat/multi-habit` (`OnboardingMode`, `onboarding_page.dart`, `habit_step.dart`, `cost_step.dart`, `currency_chip.dart`, `page_visits.dart` and their tests), not the + menu row or "Add a habit" copy, and use a `changeHabit` mode with route `/change-habit/:habitId`. Create `lib/features/habit/domain/usecases/change_habit.dart`; Modify `habit_injection.dart`, `habit_providers.dart`, `edit_plan_page.dart`, the router; Test `test/features/habit/domain/usecases/change_habit_test.dart`, `test/features/onboarding/change_habit_test.dart`
+
+**Interfaces:**
+- `ChangeHabit` runs the archive and `StartTracking` in one `TransactionRunner.run`. `StartTracking` catches its own abort and returns a failure, so `ChangeHabit` must throw on that failure for the outer transaction to roll back.
+- Edit plan gets a "Change habit" text button below the form (44 pt, `AppSpacing`, no new design).
+- "Shake on it" asks first with `showAppConfirm`: title "Replace {old} with {new}?", message "Your {old} logs stay saved but won't show while you track {new}. Your plan and history start fresh.", confirm "Replace", destructive. On success, `context.go` Home.
+
+- [ ] **Steps 1–4:** tests `a failed plan save rolls back and keeps the old habit active`, `backing out keeps the habit and plan`, `declining the confirm keeps the habit and the answers`, `replacing shows the new habit on Home with no logs`, `old logs stay stored`, `wake, bed and currency are unchanged`, `two presses replace once`, `the tracked preset is disabled`, `replacing with Edit plan underneath does not throw` (Review Focus 3).
+- [ ] **Step 5: Checkpoint:** `feat(habit): change the tracked habit`
 
 ### Task 5.2: Light mode, Reduce Transparency, accessibility
 
@@ -333,10 +369,11 @@ Revised 2026-10-29: the old setup pages are removed by the onboarding plan
 
 ### Task 5.3: Release blockers and device QA
 
-**Files:** Modify `settings_page.dart` (remove Design system link), `setup_chrome.dart` captions to match Settings; Delete `lib/features/design_system/` and its route
+**Files:** Modify `settings_page.dart` (remove Design system link), `setup_chrome.dart` captions to match Settings, `lib/app/shell/log_hint.dart` (drop "or start tracking another habit", so the line reads "Add a missed log."); Delete `lib/features/design_system/` and its route
 - [ ] **Step 1:** remove the link and route; update tests that referenced them.
-- [ ] **Step 2:** run the full checks.
-- [ ] **Step 3:** real-iPhone pass using the roadmap's M5 checklist; record results in the PR.
-- [ ] **Step 4: Checkpoint:** `chore: release blockers for launch`
+- [ ] **Step 2:** change the hint copy and its tests; confirm no launch screen offers a second habit.
+- [ ] **Step 3:** run the full checks.
+- [ ] **Step 4:** real-iPhone pass using the roadmap's M5 checklist; record results in the PR.
+- [ ] **Step 5: Checkpoint:** `chore: release blockers for launch`
 
 **Milestone M5 reached: release candidate.**

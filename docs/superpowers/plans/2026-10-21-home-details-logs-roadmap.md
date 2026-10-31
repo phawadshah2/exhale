@@ -9,13 +9,18 @@ canvas https://claude.ai/artifact/Es7ju6TWmMj5pkNon4tbHu
 
 A vaping-first quit app people open several times a day: logging takes one
 tap, Home tells them in a glance whether today is on track, and one scroll
-down answers "am I getting better, and why do I slip?". Several habits work
-from day one, free.
+down answers "am I getting better, and why do I slip?". The first release
+tracks one habit; tracking several comes in a later release.
 
 **Launch definition of done:** a new vaper can set up, log for a week, see
-the week line and their top triggers, edit a wrong log, change their plan,
-and add a second habit, with no crash, in dark and light mode, on a real
-iPhone.
+the week line and their top triggers, edit a wrong log, change their plan and
+replace their habit with another, with no crash, in dark and light mode, on a
+real iPhone.
+
+**Scope change (decided by Fawad, 2026-10-31):** launch with one tracked habit.
+Phase 4 moves out of the launch and ships in a later release (version not
+fixed). The launch goes M3 and the onboarding redesign, then M5. The per-habit
+data from M1 stays, so the later release needs no data migration for this.
 
 ## Before Phase 1
 
@@ -32,8 +37,8 @@ iPhone.
 | 2. Dashboard and Logs | **M2:** new one-habit Home (ring, impact, Week/Month/All, plan, why, today's logs) and the Logs page | Yes | L | Yes, as one-habit app |
 | 3. Logging and editing | **M3:** + tap/hold, trigger sheet with habit, hint, Edit log, Edit plan | Yes | M | Yes |
 | 3b. Onboarding redesign | **O1–O4:** emphasis colour, schema v9 (wake/bed), six-step chat onboarding, pace guide on Home. Plan: `2026-10-29-onboarding-redesign.md` | Yes | L | Yes |
-| 4. Multiple habits | **M4:** Add habit, multi-habit Home, Details with switcher, Logs "All", stop tracking | Yes | L | Yes |
-| 5. States and launch polish | **M5:** every state from the "States" row, light mode, accessibility, release blockers, device QA | Yes | M | Release candidate |
+| 5. States and launch polish | **M5:** every state from the "States" row, change habit, light mode, accessibility, release blockers, device QA | Yes | L | Release candidate |
+| 4. Multiple habits (after launch) | **M4:** Add habit, multi-habit Home, Details with switcher, Logs "All", stop tracking | Yes | L | Later release |
 
 Each milestone ends with: all tests passing, analyze clean, a simulator run
 recorded in the PR, and Fawad's review before merging.
@@ -69,7 +74,13 @@ recorded in the PR, and Fawad's review before merging.
   wake/bed and currency saved; upgrades from v3–v8 end on v9; the pace
   line shows under the ring.
 
-### M4: Multiple habits
+### M4: Multiple habits (later release, not part of the launch)
+
+Status: Tasks 4.1 to 4.3 are built and committed on `feat/multi-habit`, which
+is not merged and stays parked. Task 4.4 and the M4 review are not done. When
+this release is scheduled, bring the branch up to date with `main`, finish 4.4,
+then run the review and a simulator walk (4.1 to 4.3 have never been seen on a
+simulator).
 
 - "Add a habit" creates a second habit with its own plan, through the
   onboarding steps (Habit, Daily amount, Cost, The deal).
@@ -80,10 +91,15 @@ recorded in the PR, and Fawad's review before merging.
 ### M5: Release candidate
 
 - States: over limit, before the plan, first day, quit reached.
+- Change habit (Task 5.1b): from Edit plan, pick another habit and shake on a
+  new deal. Backing out or a failed save keeps the old habit; wake, bed and
+  currency stay as they are; old logs stay stored but hidden.
 - Light mode and Reduce Transparency checked on every new screen.
 - 44 pt tap targets, VoiceOver labels on charts and trigger rows.
 - Release blockers from the earlier roadmap: remove the Design system
   link; settings caption matches what Settings can do.
+- No copy or path in the launch build offers a second habit (the hold hint
+  says "start tracking another habit" today).
 - Real iPhone pass: glass performance, chart scrolling with 90+ days.
 
 ## Scope cuts if time runs short (product owner call)
@@ -91,10 +107,7 @@ recorded in the PR, and Fawad's review before merging.
 Cut in this order, each keeps the app coherent:
 
 1. All-time 7-day average (show the daily line only).
-2. Logs trigger filter chips (keep habit and period filters).
-3. Recent logs on the multi-habit Home (cards + combined impact remain).
-4. Phase 4 entirely: launch single-habit, hide "Add a habit", ship M4 as
-   1.1. Phase 1 still lands first so 1.1 needs no data migration.
+2. Logs trigger filter chips (keep the period filters).
 
 Never cut: the migration test, Undo on delete, Edit log, Edit plan.
 
@@ -107,8 +120,13 @@ Never cut: the migration test, Undo on delete, Edit log, Edit plan.
 | Glass cost on older iPhones | Reduce Transparency fallback already exists; measure on device in M5 |
 | Scope creep from new chart ideas | Out-of-scope list in the spec; new ideas go to the post-launch backlog |
 | Day boundary bugs (logs after midnight) | Review Focus item 1, tested in Phase 2 |
+| `feat/multi-habit` drifts from `main` while M5 lands | Keep it parked and pushed; expect conflicts in `logs_page.dart`, `edit_plan_page.dart` and the dashboard widgets when it is brought up to date |
 
 ## Post-launch backlog
 
-Time-of-day insights, trend vs plan with projections, reminders, widgets,
+**Multiple habits (M4) comes first**, in a release after launch: the work is
+partly built, see M4 above. Whether a second habit stays free is rechecked then
+(the 2026-10-21 design said free).
+
+Then: time-of-day insights, trend vs plan with projections, reminders, widgets,
 Pro paywall (history beyond 30 days, insights), habit reorder, export.

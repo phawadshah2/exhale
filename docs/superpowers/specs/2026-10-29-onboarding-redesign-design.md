@@ -254,8 +254,8 @@ Under the ring on the single-habit dashboard, updated each minute:
 | Wake/bed not set | One-time prompt "Set your day to get a pace guide", opens a Your day sheet |
 
 Settings gets a "Your day" row (the same arc and wheel in a sheet).
-Multi-habit Home cards get a compact "next in N min" in M4, from the same
-function.
+Multi-habit Home cards get a compact "next in N min" in M4 (a release after
+launch), from the same function.
 
 ## 9. Suggested quit date
 
@@ -275,8 +275,8 @@ it. Part of phase 2.
 4. **Pace guide**: `PaceGuide`, the ring line, the prompt and the Settings
    row.
 
-Then the Home, Details and Logs roadmap continues with M4, whose Task 4.1
-reuses the steps.
+Then the Home, Details and Logs roadmap continues with M5 and the launch. M4,
+whose Task 4.1 reuses the steps, moved to a later release on 31 Oct 2026.
 
 ## 11. Out of scope
 

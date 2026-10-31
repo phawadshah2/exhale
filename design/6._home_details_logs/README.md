@@ -12,6 +12,9 @@ layout. The canvas is the source of truth; refresh this copy when it changes.
 
 Spec: `docs/superpowers/specs/2026-10-21-home-details-logs-design.md`
 
+Later release, not in the launch build (scope change, 31 Oct 2026):
+`HomeMulti`, `LogPicker`, `Details` and `AddHabit`.
+
 | File | Screen |
 | --- | --- |
 | `Main.dc.html` | Home with one habit (the habit dashboard) |
