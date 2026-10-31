@@ -41,7 +41,20 @@ void main() {
     )!;
 
     expect(guide.pace, const Duration(hours: 1, minutes: 55));
-    expect(guide.next, DateTime(2026, 10, 29, 12, 55));
+    expect(guide.next, DateTime(2026, 10, 29, 13, 5));
+  });
+
+  test('next holds still until the next log; only the pace moves', () {
+    final lastLog = DateTime(2026, 10, 29, 20);
+    PaceGuide at(DateTime now) =>
+        compute(now: now, countToday: 7, lastLogToday: lastLog)!;
+
+    final early = at(DateTime(2026, 10, 29, 20, 1));
+    final late = at(DateTime(2026, 10, 29, 21));
+
+    expect(early.next, DateTime(2026, 10, 29, 23, 30));
+    expect(late.next, early.next);
+    expect(late.pace, const Duration(hours: 2, minutes: 30));
   });
 
   test('a log from before wake counts from wake', () {
@@ -81,16 +94,15 @@ void main() {
   });
 
   test('a bedtime after midnight falls on the next calendar date', () {
-    final lastLog = DateTime(2026, 10, 29, 22, 30);
     final guide = compute(
       now: DateTime(2026, 10, 29, 23),
       window: const DayWindow(wakeMinute: 450, bedMinute: 60),
       countToday: 7,
-      lastLogToday: lastLog,
+      lastLogToday: DateTime(2026, 10, 29, 22, 30),
     )!;
 
     expect(guide.pace, const Duration(hours: 2));
-    expect(guide.next, lastLog.add(const Duration(hours: 2)));
+    expect(guide.next, DateTime(2026, 10, 30, 1));
   });
 
   test('a bedtime after the reset hour is cut at the reset', () {

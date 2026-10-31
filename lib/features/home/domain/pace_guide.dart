@@ -31,14 +31,15 @@ class PaceGuide {
     );
     if (now.isBefore(wake) || !now.isBefore(bed)) return null;
 
-    final pace = Duration(
-      microseconds:
-          bed.difference(_latest(now, wake)).inMicroseconds ~/
-          (limit - countToday),
+    Duration share(DateTime from) => Duration(
+      microseconds: bed.difference(from).inMicroseconds ~/ (limit - countToday),
     );
+
+    // Counted from the last log, so it holds still until the next one.
+    final anchor = _latest(lastLogToday ?? wake, wake);
     return PaceGuide(
-      next: _latest(lastLogToday ?? wake, wake).add(pace),
-      pace: pace,
+      next: anchor.add(share(anchor)),
+      pace: share(_latest(now, wake)),
     );
   }
 

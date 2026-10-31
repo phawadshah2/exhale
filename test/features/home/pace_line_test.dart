@@ -42,7 +42,7 @@ void main() {
 
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text('Next one on schedule in 65 min'), findsOneWidget);
+    expect(find.text('Next one on schedule in 73 min'), findsOneWidget);
     expect(find.text('About one every 125 min until bed'), findsOneWidget);
     expect(find.text(prompt), findsNothing);
     await tester.disposeApp();
@@ -64,7 +64,7 @@ void main() {
     await setWindow();
     await logAt(await startPlan(), DateTime(2026, 10, 29, 8));
     await tester.pumpAppPastSplash(height: 2400);
-    expect(find.text('Next one on schedule in 65 min'), findsOneWidget);
+    expect(find.text('Next one on schedule in 73 min'), findsOneWidget);
 
     clock.current = DateTime(2026, 10, 29, 10, 30);
     await tester.pump(const Duration(minutes: 1));
