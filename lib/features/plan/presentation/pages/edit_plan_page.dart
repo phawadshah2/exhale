@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
@@ -179,6 +182,15 @@ class _EditPlanForm extends ConsumerWidget {
               hintText: 'More energy for the people I love',
               counterText: '',
             ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Center(
+          child: TextButton(
+            style: TextButton.styleFrom(minimumSize: const Size(0, 44)),
+            onPressed: () =>
+                unawaited(context.push(AppRoutes.changeHabitFor(habitId))),
+            child: const Text('Change habit'),
           ),
         ),
       ],

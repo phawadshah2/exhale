@@ -31,6 +31,17 @@ abstract final class OnboardingCopy {
   static const habitPrompt = "Let's start with the obvious.";
   static const habitTitle = 'What are we quitting?';
   static const habitLead = 'Pick the main one. You can add another later.';
+  static const changeHabitPrompt = 'New target? We can take it.';
+  static const changeHabitTitle = 'Change habit';
+  static String changeHabitLead(String current) =>
+      'It takes the place of $current, with its own plan and limits.';
+  static const tracking = 'TRACKING';
+  static String replaceTitle(String current, String next) =>
+      'Replace $current with $next?';
+  static String replaceMessage(String current, String next) =>
+      "Your $current logs stay saved but won't show while you track $next. "
+      'Your plan and history start fresh.';
+  static const replaceConfirm = 'Replace';
   static const somethingElse = 'Something else';
   static const customNameLabel = 'Habit';
   static const customNameHint = 'Gaming';

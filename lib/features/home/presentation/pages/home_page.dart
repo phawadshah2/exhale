@@ -16,6 +16,7 @@ class HomePage extends ConsumerWidget {
     return ReplayOnVisit(
       tab: 0,
       child: HabitDashboard(
+        key: ValueKey(habitId),
         habitId: habitId,
         header: DashboardHeaderKind.greeting,
       ),

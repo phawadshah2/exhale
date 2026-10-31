@@ -36,6 +36,9 @@ class _DealStepState extends ConsumerState<DealStep> {
   /// The chart waits for the sheet when the date came from Pick.
   Duration _chartDelay = Duration.zero;
 
+  /// The replace alert is up, so another press must not open a second one.
+  bool _asking = false;
+
   Future<void> _pickDate() async {
     final controller = ref.read(onboardingFormProvider.notifier);
     final picked = await showWheelPicker(
@@ -56,7 +59,28 @@ class _DealStepState extends ConsumerState<DealStep> {
   }
 
   Future<void> _shake() async {
+    final form = ref.read(onboardingFormProvider);
+    if (_asking || form.isSubmitting) return;
     unawaited(HapticFeedback.mediumImpact());
+    final replaced = form.replaced;
+    if (replaced != null) {
+      _asking = true;
+      final confirmed = await showAppConfirm(
+        context,
+        title: OnboardingCopy.replaceTitle(
+          replaced.habit.name,
+          form.habit.name,
+        ),
+        message: OnboardingCopy.replaceMessage(
+          replaced.habit.name,
+          form.habit.name,
+        ),
+        confirmLabel: OnboardingCopy.replaceConfirm,
+        destructive: true,
+      );
+      _asking = false;
+      if (!confirmed || !mounted) return;
+    }
     final saved = await ref.read(onboardingFormProvider.notifier).submit();
     if (saved && mounted) context.go(AppRoutes.home);
   }

@@ -3,6 +3,7 @@ import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
 import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/archive_habit.dart';
+import 'package:exhale/features/habit/domain/usecases/change_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/start_tracking.dart';
 import 'package:exhale/features/habit/domain/usecases/update_habit.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,8 @@ final archiveHabitProvider = Provider<ArchiveHabit>(
 final startTrackingProvider = Provider<StartTracking>(
   (ref) => sl<StartTracking>(),
 );
+
+final changeHabitProvider = Provider<ChangeHabit>((ref) => sl<ChangeHabit>());
 
 /// Habits being tracked, oldest first.
 final activeHabitsProvider = StreamProvider<List<TrackedHabit>>(

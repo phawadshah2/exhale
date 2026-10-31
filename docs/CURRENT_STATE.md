@@ -14,19 +14,39 @@ The single-habit docs are committed (0541760) on `docs/single-habit-launch` and
 merged into local `main`, one commit ahead of `origin/main` and not pushed; they
 go up with the launch PR. No app code changed.
 
-`feat/launch-states` has no upstream; nothing on it is pushed.
+`feat/launch-states` has no upstream; nothing on it is pushed. Task 5.1b is its head
+commit.
 
-**Next action:** M5 Task 5.1b, Change habit (Opus 5.5 at high), in
+**Next action:** M5 Task 5.2, light mode, Reduce Transparency and accessibility, in
 `docs/superpowers/plans/2026-10-21-home-details-logs.md`, on `feat/launch-states`,
 with `superpowers:executing-plans`. M5's deferred list below stays for M5. Task 5.3
-now also removes "or start tracking another habit" from the hold hint.
+now also removes "or start tracking another habit" from the hold hint and "You can
+add another later." from the first-run habit step.
 
-Task 5.1b (Fawad, 2026-10-31) exists because `main` has no way to replace a habit.
-Not built. My decisions in it, easy to reverse: no bare stop, the old habit is
-archived only when the new one saves, and old logs stay stored but hidden. It takes
-the onboarding parts of 5369b50 from `feat/multi-habit`.
+## Task 5.1b (2026-10-31, committed)
 
-## Task 5.1 (2026-10-31, committed)
+Edit plan has a "Change habit" button (`/change-habit/:habitId`, `ChangeHabitPage`).
+It runs Habit, Daily amount, Cost and The deal. "Shake on it" asks first, then
+`ChangeHabit` archives the old habit and starts the new one in one transaction, and
+the app goes Home. Wake, bed and currency are not asked for or written; the currency
+chip is read-only. Old logs stay stored and hidden.
+
+My calls, easy to reverse (ledger has them): `replacedHabitProvider` instead of an
+`OnboardingMode` enum; `page_visits.dart` was not taken from 5369b50, because
+`didPopNext` never fires here (Edit plan sits between Home and the flow); `ChangeHabit`
+fails with `NotFoundFailure` when the old habit is no longer active; a stale link
+redirects Home; Home's dashboard is keyed by habit id; the habit step's prompt, title
+and lead are my copy.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 465
+passed. Red seen: the two rollback tests with the rethrow missing, "two presses" and
+"a press during the save" with each guard removed. Not seen failing beyond compile
+errors: the other flow tests, including the stale link. The dashboard key has no test
+of its own. Swipe back on the first step has no test. Not seen on a simulator: the
+button, the Replace alert (tests use the Flutter fallback, not the native alert) and
+the entrance on Home after replacing.
+
+## Task 5.1 (2026-10-31, committed 2e131b0)
 
 Over limit and first day already worked; their copy is now pinned exactly. New:
 quit reached. `ProgressRing` draws a full success ring on a day at zero;
@@ -48,7 +68,7 @@ Checks observed by me: format (1 file), `analyze --fatal-infos` clean, full suit
 behaviour) and the three guards that the card stays hidden. A failed Keep at zero's
 snackbar has no test. Not seen on a simulator.
 
-Stage pill (Fawad asked, 2026-10-31, committed): now matches spec 4.3 and the
+Stage pill (Fawad asked, 2026-10-31, committed 10f0d2a): now matches spec 4.3 and the
 designs: habit icon, "Vaping · Drops to 10 in 4d", "STAGE 2 / 9", and on a plan's
 first day "Vaping · Day 1, plan starts today". `nextTarget` moved to `HabitWording`,
 as on `feat/multi-habit`, though that branch's `stageLine` and pill will conflict
@@ -60,7 +80,8 @@ names fit is unchecked.
 
 `splash_page.dart` is restored; the stash stays for the next walk.
 
-Read first: `CLAUDE.md`, plan Phase 5, roadmap "M5: Release candidate".
+Read first: `CLAUDE.md`, plan Task 5.1b, roadmap "M5: Release candidate", and the
+ledger's rulings (`.superpowers/sdd/2026-10-21-home-details-logs/progress.md`).
 
 ## Parked: multiple habits (`feat/multi-habit`, not merged)
 

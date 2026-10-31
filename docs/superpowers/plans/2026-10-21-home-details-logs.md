@@ -356,8 +356,10 @@ Without this, someone who picks the wrong habit or moves to another one is stuck
 - Edit plan gets a "Change habit" text button below the form (44 pt, `AppSpacing`, no new design).
 - "Shake on it" asks first with `showAppConfirm`: title "Replace {old} with {new}?", message "Your {old} logs stay saved but won't show while you track {new}. Your plan and history start fresh.", confirm "Replace", destructive. On success, `context.go` Home.
 
-- [ ] **Steps 1–4:** tests `a failed plan save rolls back and keeps the old habit active`, `backing out keeps the habit and plan`, `declining the confirm keeps the habit and the answers`, `replacing shows the new habit on Home with no logs`, `old logs stay stored`, `wake, bed and currency are unchanged`, `two presses replace once`, `the tracked preset is disabled`, `replacing with Edit plan underneath does not throw` (Review Focus 3).
-- [ ] **Step 5: Checkpoint:** `feat(habit): change the tracked habit`
+Built with two changes to the above (ledger has why): `replacedHabitProvider` instead of an `OnboardingMode` enum, and `page_visits.dart` was not taken, because no launch path calls `didPopNext` during a build. When `feat/multi-habit` resumes, its `OnboardingMode` and `trackedKinds` need reconciling with these.
+
+- [x] **Steps 1–4:** tests `a failed plan save rolls back and keeps the old habit active`, `backing out keeps the habit and plan`, `declining the confirm keeps the habit and the answers`, `replacing shows the new habit on Home with no logs`, `old logs stay stored`, `wake, bed and currency are unchanged`, `two presses replace once`, `the tracked preset is disabled`, `replacing with Edit plan underneath does not throw` (Review Focus 3).
+- [x] **Step 5: Checkpoint:** `feat(habit): change the tracked habit`
 
 ### Task 5.2: Light mode, Reduce Transparency, accessibility
 
@@ -371,7 +373,7 @@ Without this, someone who picks the wrong habit or moves to another one is stuck
 
 **Files:** Modify `settings_page.dart` (remove Design system link), `setup_chrome.dart` captions to match Settings, `lib/app/shell/log_hint.dart` (drop "or start tracking another habit", so the line reads "Add a missed log."); Delete `lib/features/design_system/` and its route
 - [ ] **Step 1:** remove the link and route; update tests that referenced them.
-- [ ] **Step 2:** change the hint copy and its tests; confirm no launch screen offers a second habit.
+- [ ] **Step 2:** change the hint copy and its tests; confirm no launch screen offers a second habit (`OnboardingCopy.habitLead` still says "You can add another later.").
 - [ ] **Step 3:** run the full checks.
 - [ ] **Step 4:** real-iPhone pass using the roadmap's M5 checklist; record results in the PR.
 - [ ] **Step 5: Checkpoint:** `chore: release blockers for launch`
