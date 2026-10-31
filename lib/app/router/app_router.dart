@@ -6,11 +6,11 @@ import 'package:exhale/features/home/presentation/pages/habit_details_page.dart'
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
-import 'package:exhale/features/onboarding/presentation/pages/habit_picker_page.dart';
-import 'package:exhale/features/onboarding/presentation/pages/setup_page.dart';
+import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
 import 'package:exhale/features/plan/presentation/pages/edit_plan_page.dart';
 import 'package:exhale/features/settings/presentation/pages/settings_page.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -24,11 +24,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SplashPage(),
       ),
       GoRoute(
-        path: AppRoutes.setup,
-        builder: (context, state) => const HabitPickerPage(),
-        routes: [
-          GoRoute(path: 'plan', builder: (context, state) => const SetupPage()),
-        ],
+        path: AppRoutes.onboarding,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          transitionDuration: const Duration(milliseconds: 380),
+          child: const OnboardingPage(),
+          transitionsBuilder: (context, animation, _, child) => SlideTransition(
+            position: Tween(begin: const Offset(1, 0), end: Offset.zero)
+                .animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ),
+                ),
+            child: child,
+          ),
+        ),
       ),
       GoRoute(
         path: AppRoutes.designSystem,

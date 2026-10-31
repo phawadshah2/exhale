@@ -3,6 +3,9 @@ import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/theme/app_palette.dart';
 import 'package:exhale/core/theme/app_theme.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
+import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
@@ -38,24 +41,29 @@ void main() {
     await tester.pumpInSteps(const Duration(milliseconds: 900));
   }
 
-  testWidgets('first launch goes from splash to setup to home', (tester) async {
-    await tester.pumpAppPastSplash();
-    expect(find.text('What are you cutting down?'), findsOneWidget);
+  testWidgets('first launch goes from splash through onboarding to home', (
+    tester,
+  ) async {
+    await tester.pumpAppPastSplash(height: 2400);
+    expect(find.text('1/6'), findsOneWidget);
 
-    await tester.tap(find.text('Smoking'));
+    await tester.tap(find.byType(WelcomeStep));
     await tester.pump();
-    await tester.tap(find.text('Continue'));
+    await tester.tap(find.text(OnboardingCopy.welcomeButton));
     await tester.pumpAndSettle();
-    expect(find.text('Craft your gradual quitting plan'), findsOneWidget);
+    for (final label in ['2/6', '3/6', '4/6', '5/6']) {
+      expect(find.text(label), findsOneWidget);
+      await tester.tap(find.text(OnboardingCopy.continueButton).hitTestable());
+      await tester.pumpAndSettle();
+    }
+    expect(find.text('6/6'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField).first, 'Fawad');
-    await tester.scrollAndTap(find.byTooltip('Increase daily amount'));
-    await tester.tap(find.text('Start my plan'));
+    await tester.tap(find.text(OnboardingCopy.dealButton).hitTestable());
     await tester.pumpAndSettle();
 
-    expect(find.text('Good afternoon, Fawad'), findsOneWidget);
-    expect(todayCount('0 / 10'), findsOneWidget);
-    expect(find.text('10 left today'), findsOneWidget);
+    final limit = Habit.vaping.defaultDailyAmount;
+    expect(todayCount('0 / $limit'), findsOneWidget);
+    expect(find.text('$limit left today'), findsOneWidget);
 
     await tester.disposeApp();
   });

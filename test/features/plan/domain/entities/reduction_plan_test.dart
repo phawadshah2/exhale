@@ -185,7 +185,13 @@ void main() {
 
     test('suggested quit day is about one fewer per week', () {
       expect(ReductionPlan.suggestedQuitDay(oct19, 9), oct19.addDays(63));
-      expect(ReductionPlan.suggestedQuitDay(oct19, 1), oct19.addDays(7));
+    });
+
+    test('suggested quit day is clamped to 14-90 days', () {
+      expect(ReductionPlan.suggestedQuitDay(oct19, 1), oct19.addDays(14));
+      expect(ReductionPlan.suggestedQuitDay(oct19, 2), oct19.addDays(14));
+      expect(ReductionPlan.suggestedQuitDay(oct19, 13), oct19.addDays(90));
+      expect(ReductionPlan.suggestedQuitDay(oct19, 80), oct19.addDays(90));
     });
 
     test('flags start and completion', () {

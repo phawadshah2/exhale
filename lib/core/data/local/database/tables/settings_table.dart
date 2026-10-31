@@ -26,6 +26,10 @@ class Settings extends Table {
   TextColumn get currencySymbol =>
       text().named('currency_symbol').withDefault(const Constant(r'$'))();
 
+  /// Wake and bed times in minutes after midnight; null until set.
+  IntColumn get wakeMinute => integer().named('wake_minute').nullable()();
+  IntColumn get bedMinute => integer().named('bed_minute').nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

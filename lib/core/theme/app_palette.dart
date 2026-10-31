@@ -16,6 +16,9 @@ abstract final class AppPalette {
 
   static const Color ocean = Color(0xFF3B82F6);
 
+  /// Light-mode emphasis: primary buttons, Exhale's bubbles, the stepper.
+  static const Color ink = Color(0xFF111418);
+
   /// Accent choices offered in Settings > Appearance, by stored index.
   static const List<AccentSwatch> accents = [
     AccentSwatch(name: 'Eucalyptus', color: eucalyptus),

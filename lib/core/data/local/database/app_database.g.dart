@@ -1576,6 +1576,28 @@ class $SettingsTable extends Settings
     requiredDuringInsert: false,
     defaultValue: const Constant(r'$'),
   );
+  static const VerificationMeta _wakeMinuteMeta = const VerificationMeta(
+    'wakeMinute',
+  );
+  @override
+  late final GeneratedColumn<int> wakeMinute = GeneratedColumn<int>(
+    'wake_minute',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bedMinuteMeta = const VerificationMeta(
+    'bedMinute',
+  );
+  @override
+  late final GeneratedColumn<int> bedMinute = GeneratedColumn<int>(
+    'bed_minute',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1588,6 +1610,8 @@ class $SettingsTable extends Settings
     triggerPromptIntroSeen,
     logHintSeen,
     currencySymbol,
+    wakeMinute,
+    bedMinute,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1679,6 +1703,18 @@ class $SettingsTable extends Settings
         ),
       );
     }
+    if (data.containsKey('wake_minute')) {
+      context.handle(
+        _wakeMinuteMeta,
+        wakeMinute.isAcceptableOrUnknown(data['wake_minute']!, _wakeMinuteMeta),
+      );
+    }
+    if (data.containsKey('bed_minute')) {
+      context.handle(
+        _bedMinuteMeta,
+        bedMinute.isAcceptableOrUnknown(data['bed_minute']!, _bedMinuteMeta),
+      );
+    }
     return context;
   }
 
@@ -1728,6 +1764,14 @@ class $SettingsTable extends Settings
         DriftSqlType.string,
         data['${effectivePrefix}currency_symbol'],
       )!,
+      wakeMinute: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}wake_minute'],
+      ),
+      bedMinute: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}bed_minute'],
+      ),
     );
   }
 
@@ -1750,6 +1794,10 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
   /// True once the one-time "Hold + for more" hint was shown.
   final bool logHintSeen;
   final String currencySymbol;
+
+  /// Wake and bed times in minutes after midnight; null until set.
+  final int? wakeMinute;
+  final int? bedMinute;
   const SettingsRow({
     required this.id,
     this.userName,
@@ -1761,6 +1809,8 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     required this.triggerPromptIntroSeen,
     required this.logHintSeen,
     required this.currencySymbol,
+    this.wakeMinute,
+    this.bedMinute,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1777,6 +1827,12 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     map['trigger_prompt_intro_seen'] = Variable<bool>(triggerPromptIntroSeen);
     map['log_hint_seen'] = Variable<bool>(logHintSeen);
     map['currency_symbol'] = Variable<String>(currencySymbol);
+    if (!nullToAbsent || wakeMinute != null) {
+      map['wake_minute'] = Variable<int>(wakeMinute);
+    }
+    if (!nullToAbsent || bedMinute != null) {
+      map['bed_minute'] = Variable<int>(bedMinute);
+    }
     return map;
   }
 
@@ -1794,6 +1850,12 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       triggerPromptIntroSeen: Value(triggerPromptIntroSeen),
       logHintSeen: Value(logHintSeen),
       currencySymbol: Value(currencySymbol),
+      wakeMinute: wakeMinute == null && nullToAbsent
+          ? const Value.absent()
+          : Value(wakeMinute),
+      bedMinute: bedMinute == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bedMinute),
     );
   }
 
@@ -1815,6 +1877,8 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       ),
       logHintSeen: serializer.fromJson<bool>(json['logHintSeen']),
       currencySymbol: serializer.fromJson<String>(json['currencySymbol']),
+      wakeMinute: serializer.fromJson<int?>(json['wakeMinute']),
+      bedMinute: serializer.fromJson<int?>(json['bedMinute']),
     );
   }
   @override
@@ -1831,6 +1895,8 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       'triggerPromptIntroSeen': serializer.toJson<bool>(triggerPromptIntroSeen),
       'logHintSeen': serializer.toJson<bool>(logHintSeen),
       'currencySymbol': serializer.toJson<String>(currencySymbol),
+      'wakeMinute': serializer.toJson<int?>(wakeMinute),
+      'bedMinute': serializer.toJson<int?>(bedMinute),
     };
   }
 
@@ -1845,6 +1911,8 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     bool? triggerPromptIntroSeen,
     bool? logHintSeen,
     String? currencySymbol,
+    Value<int?> wakeMinute = const Value.absent(),
+    Value<int?> bedMinute = const Value.absent(),
   }) => SettingsRow(
     id: id ?? this.id,
     userName: userName.present ? userName.value : this.userName,
@@ -1857,6 +1925,8 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
         triggerPromptIntroSeen ?? this.triggerPromptIntroSeen,
     logHintSeen: logHintSeen ?? this.logHintSeen,
     currencySymbol: currencySymbol ?? this.currencySymbol,
+    wakeMinute: wakeMinute.present ? wakeMinute.value : this.wakeMinute,
+    bedMinute: bedMinute.present ? bedMinute.value : this.bedMinute,
   );
   SettingsRow copyWithCompanion(SettingsCompanion data) {
     return SettingsRow(
@@ -1884,6 +1954,10 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       currencySymbol: data.currencySymbol.present
           ? data.currencySymbol.value
           : this.currencySymbol,
+      wakeMinute: data.wakeMinute.present
+          ? data.wakeMinute.value
+          : this.wakeMinute,
+      bedMinute: data.bedMinute.present ? data.bedMinute.value : this.bedMinute,
     );
   }
 
@@ -1899,7 +1973,9 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           ..write('askForTrigger: $askForTrigger, ')
           ..write('triggerPromptIntroSeen: $triggerPromptIntroSeen, ')
           ..write('logHintSeen: $logHintSeen, ')
-          ..write('currencySymbol: $currencySymbol')
+          ..write('currencySymbol: $currencySymbol, ')
+          ..write('wakeMinute: $wakeMinute, ')
+          ..write('bedMinute: $bedMinute')
           ..write(')'))
         .toString();
   }
@@ -1916,6 +1992,8 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     triggerPromptIntroSeen,
     logHintSeen,
     currencySymbol,
+    wakeMinute,
+    bedMinute,
   );
   @override
   bool operator ==(Object other) =>
@@ -1930,7 +2008,9 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           other.askForTrigger == this.askForTrigger &&
           other.triggerPromptIntroSeen == this.triggerPromptIntroSeen &&
           other.logHintSeen == this.logHintSeen &&
-          other.currencySymbol == this.currencySymbol);
+          other.currencySymbol == this.currencySymbol &&
+          other.wakeMinute == this.wakeMinute &&
+          other.bedMinute == this.bedMinute);
 }
 
 class SettingsCompanion extends UpdateCompanion<SettingsRow> {
@@ -1944,6 +2024,8 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
   final Value<bool> triggerPromptIntroSeen;
   final Value<bool> logHintSeen;
   final Value<String> currencySymbol;
+  final Value<int?> wakeMinute;
+  final Value<int?> bedMinute;
   const SettingsCompanion({
     this.id = const Value.absent(),
     this.userName = const Value.absent(),
@@ -1955,6 +2037,8 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.triggerPromptIntroSeen = const Value.absent(),
     this.logHintSeen = const Value.absent(),
     this.currencySymbol = const Value.absent(),
+    this.wakeMinute = const Value.absent(),
+    this.bedMinute = const Value.absent(),
   });
   SettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -1967,6 +2051,8 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.triggerPromptIntroSeen = const Value.absent(),
     this.logHintSeen = const Value.absent(),
     this.currencySymbol = const Value.absent(),
+    this.wakeMinute = const Value.absent(),
+    this.bedMinute = const Value.absent(),
   });
   static Insertable<SettingsRow> custom({
     Expression<int>? id,
@@ -1979,6 +2065,8 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Expression<bool>? triggerPromptIntroSeen,
     Expression<bool>? logHintSeen,
     Expression<String>? currencySymbol,
+    Expression<int>? wakeMinute,
+    Expression<int>? bedMinute,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1992,6 +2080,8 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
         'trigger_prompt_intro_seen': triggerPromptIntroSeen,
       if (logHintSeen != null) 'log_hint_seen': logHintSeen,
       if (currencySymbol != null) 'currency_symbol': currencySymbol,
+      if (wakeMinute != null) 'wake_minute': wakeMinute,
+      if (bedMinute != null) 'bed_minute': bedMinute,
     });
   }
 
@@ -2006,6 +2096,8 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Value<bool>? triggerPromptIntroSeen,
     Value<bool>? logHintSeen,
     Value<String>? currencySymbol,
+    Value<int?>? wakeMinute,
+    Value<int?>? bedMinute,
   }) {
     return SettingsCompanion(
       id: id ?? this.id,
@@ -2019,6 +2111,8 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
           triggerPromptIntroSeen ?? this.triggerPromptIntroSeen,
       logHintSeen: logHintSeen ?? this.logHintSeen,
       currencySymbol: currencySymbol ?? this.currencySymbol,
+      wakeMinute: wakeMinute ?? this.wakeMinute,
+      bedMinute: bedMinute ?? this.bedMinute,
     );
   }
 
@@ -2057,6 +2151,12 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     if (currencySymbol.present) {
       map['currency_symbol'] = Variable<String>(currencySymbol.value);
     }
+    if (wakeMinute.present) {
+      map['wake_minute'] = Variable<int>(wakeMinute.value);
+    }
+    if (bedMinute.present) {
+      map['bed_minute'] = Variable<int>(bedMinute.value);
+    }
     return map;
   }
 
@@ -2072,7 +2172,9 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
           ..write('askForTrigger: $askForTrigger, ')
           ..write('triggerPromptIntroSeen: $triggerPromptIntroSeen, ')
           ..write('logHintSeen: $logHintSeen, ')
-          ..write('currencySymbol: $currencySymbol')
+          ..write('currencySymbol: $currencySymbol, ')
+          ..write('wakeMinute: $wakeMinute, ')
+          ..write('bedMinute: $bedMinute')
           ..write(')'))
         .toString();
   }
@@ -3252,6 +3354,8 @@ typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
   Value<bool> triggerPromptIntroSeen,
   Value<bool> logHintSeen,
   Value<String> currencySymbol,
+  Value<int?> wakeMinute,
+  Value<int?> bedMinute,
 });
 typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<int> id,
@@ -3264,6 +3368,8 @@ typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<bool> triggerPromptIntroSeen,
   Value<bool> logHintSeen,
   Value<String> currencySymbol,
+  Value<int?> wakeMinute,
+  Value<int?> bedMinute,
 });
 
 class $$SettingsTableFilterComposer
@@ -3322,6 +3428,16 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<String> get currencySymbol => $composableBuilder(
     column: $table.currencySymbol,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get wakeMinute => $composableBuilder(
+    column: $table.wakeMinute,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get bedMinute => $composableBuilder(
+    column: $table.bedMinute,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3384,6 +3500,16 @@ class $$SettingsTableOrderingComposer
     column: $table.currencySymbol,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get wakeMinute => $composableBuilder(
+    column: $table.wakeMinute,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get bedMinute => $composableBuilder(
+    column: $table.bedMinute,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableAnnotationComposer
@@ -3438,6 +3564,14 @@ class $$SettingsTableAnnotationComposer
     column: $table.currencySymbol,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get wakeMinute => $composableBuilder(
+    column: $table.wakeMinute,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get bedMinute =>
+      $composableBuilder(column: $table.bedMinute, builder: (column) => column);
 }
 
 class $$SettingsTableTableManager
@@ -3481,6 +3615,8 @@ class $$SettingsTableTableManager
                 Value<bool> triggerPromptIntroSeen = const Value.absent(),
                 Value<bool> logHintSeen = const Value.absent(),
                 Value<String> currencySymbol = const Value.absent(),
+                Value<int?> wakeMinute = const Value.absent(),
+                Value<int?> bedMinute = const Value.absent(),
               }) => SettingsCompanion(
                 id: id,
                 userName: userName,
@@ -3492,6 +3628,8 @@ class $$SettingsTableTableManager
                 triggerPromptIntroSeen: triggerPromptIntroSeen,
                 logHintSeen: logHintSeen,
                 currencySymbol: currencySymbol,
+                wakeMinute: wakeMinute,
+                bedMinute: bedMinute,
               ),
           createCompanionCallback:
               ({
@@ -3505,6 +3643,8 @@ class $$SettingsTableTableManager
                 Value<bool> triggerPromptIntroSeen = const Value.absent(),
                 Value<bool> logHintSeen = const Value.absent(),
                 Value<String> currencySymbol = const Value.absent(),
+                Value<int?> wakeMinute = const Value.absent(),
+                Value<int?> bedMinute = const Value.absent(),
               }) => SettingsCompanion.insert(
                 id: id,
                 userName: userName,
@@ -3516,6 +3656,8 @@ class $$SettingsTableTableManager
                 triggerPromptIntroSeen: triggerPromptIntroSeen,
                 logHintSeen: logHintSeen,
                 currencySymbol: currencySymbol,
+                wakeMinute: wakeMinute,
+                bedMinute: bedMinute,
               ),
           withReferenceMapper: (p0) => p0
               .map(

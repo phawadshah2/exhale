@@ -1,7 +1,6 @@
 abstract final class AppRoutes {
   static const splash = '/';
-  static const setup = '/setup';
-  static const setupPlan = '/setup/plan';
+  static const onboarding = '/onboarding';
   static const home = '/home';
   static const habit = '/habit/:habitId';
   static const editPlan = '/habit/:habitId/plan';

@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/plan/domain/entities/plan_stage.dart';
 import 'package:meta/meta.dart';
@@ -28,9 +26,15 @@ class ReductionPlan {
     }
   }
 
-  /// About one fewer per week.
+  static const int minSuggestedDays = 14;
+  static const int maxSuggestedDays = 90;
+
+  /// About one fewer per week, kept between [minSuggestedDays] and
+  /// [maxSuggestedDays].
   static LogicalDay suggestedQuitDay(LogicalDay startDay, int startLimit) =>
-      startDay.addDays(math.max(7, startLimit * 7));
+      startDay.addDays(
+        (startLimit * 7).clamp(minSuggestedDays, maxSuggestedDays),
+      );
 
   final LogicalDay startDay;
   final int startLimit;

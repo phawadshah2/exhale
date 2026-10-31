@@ -1,7 +1,7 @@
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:flutter/material.dart';
 
-/// Primary pill button with the accent halo ("Start my plan").
+/// Primary pill button; in dark mode it carries the accent halo.
 class GlowButton extends StatelessWidget {
   const GlowButton({
     required this.label,
@@ -21,10 +21,12 @@ class GlowButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onPressed != null && !isBusy;
+    // An accent halo around the light-mode ink pill reads as a smudge.
+    final glow = enabled && context.theme.brightness == Brightness.dark;
     return DecoratedBox(
       decoration: ShapeDecoration(
         shape: const StadiumBorder(),
-        shadows: enabled ? context.exhale.accentGlow : null,
+        shadows: glow ? context.exhale.accentGlow : null,
       ),
       child: FilledButton(
         onPressed: enabled ? onPressed : null,
@@ -33,7 +35,7 @@ class GlowButton extends StatelessWidget {
                 dimension: 22,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
-                  color: context.colors.onPrimaryContainer,
+                  color: context.exhale.onEmphasis,
                 ),
               )
             : Row(

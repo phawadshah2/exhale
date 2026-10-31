@@ -17,6 +17,8 @@ extension SettingsRowMapper on SettingsRow {
     askForTrigger: askForTrigger,
     triggerPromptIntroSeen: triggerPromptIntroSeen,
     logHintSeen: logHintSeen,
+    wakeMinute: wakeMinute,
+    bedMinute: bedMinute,
   );
 }
 
@@ -32,5 +34,7 @@ extension AppSettingsMapper on AppSettings {
     askForTrigger: Value(askForTrigger),
     triggerPromptIntroSeen: Value(triggerPromptIntroSeen),
     logHintSeen: Value(logHintSeen),
+    wakeMinute: Value(wakeMinute),
+    bedMinute: Value(bedMinute),
   );
 }

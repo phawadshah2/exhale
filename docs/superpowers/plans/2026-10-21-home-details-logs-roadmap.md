@@ -31,6 +31,7 @@ iPhone.
 | 1. Habits foundation | **M1:** app looks the same; data is per-habit; upgrade from today's build keeps every log | No | M | Yes |
 | 2. Dashboard and Logs | **M2:** new one-habit Home (ring, impact, Week/Month/All, plan, why, today's logs) and the Logs page | Yes | L | Yes, as one-habit app |
 | 3. Logging and editing | **M3:** + tap/hold, trigger sheet with habit, hint, Edit log, Edit plan | Yes | M | Yes |
+| 3b. Onboarding redesign | **O1–O4:** emphasis colour, schema v9 (wake/bed), six-step chat onboarding, pace guide on Home. Plan: `2026-10-29-onboarding-redesign.md` | Yes | L | Yes |
 | 4. Multiple habits | **M4:** Add habit, multi-habit Home, Details with switcher, Logs "All", stop tracking | Yes | L | Yes |
 | 5. States and launch polish | **M5:** every state from the "States" row, light mode, accessibility, release blockers, device QA | Yes | M | Release candidate |
 
@@ -58,9 +59,20 @@ recorded in the PR, and Fawad's review before merging.
 - Two habits (testable via a seeded second habit): tap opens the menu.
 - Edit log sheet (glass, icons) and Edit plan page work end to end.
 
+### Onboarding redesign (added 2026-10-29, before M4)
+
+- Spec `docs/superpowers/specs/2026-10-29-onboarding-redesign-design.md`,
+  plan `docs/superpowers/plans/2026-10-29-onboarding-redesign.md`.
+- Comes first because M4 Task 4.1 reuses its Habit, Daily amount, Cost and
+  The deal steps, and the old setup pages are gone afterwards.
+- Exit: a new install goes splash → six steps → Home with the habit, plan,
+  wake/bed and currency saved; upgrades from v3–v8 end on v9; the pace
+  line shows under the ring.
+
 ### M4: Multiple habits
 
-- "Add a habit" creates a second habit with its own plan.
+- "Add a habit" creates a second habit with its own plan, through the
+  onboarding steps (Habit, Daily amount, Cost, The deal).
 - Home switches to the habit list with combined impact and recent logs.
 - Details has back, the habit switcher and Edit plan; stop tracking
   archives a habit and Home falls back to the dashboard with one habit.

@@ -217,7 +217,7 @@ class _LogButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
+    final exhale = context.exhale;
     return Tooltip(
       message: 'Log',
       child: Semantics(
@@ -230,14 +230,10 @@ class _LogButton extends StatelessWidget {
           onTap: () => onTap(_anchor(context)),
           onLongPress: () => onLongPress(_anchor(context)),
           child: AppGlass(
-            tint: colors.primaryContainer.withValues(alpha: 0.6),
+            tint: exhale.emphasis.withValues(alpha: 0.6),
             child: SizedBox.square(
               dimension: FloatingTabBar.height,
-              child: Icon(
-                AppIcons.add,
-                size: 28,
-                color: colors.onPrimaryContainer,
-              ),
+              child: Icon(AppIcons.add, size: 28, color: exhale.onEmphasis),
             ),
           ),
         ),

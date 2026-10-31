@@ -129,7 +129,7 @@ Skipped when `habit.tracksCost` is false.
   (yearly cost; hidden when there is no price).
 - Pace line: "Today that's about one every N min. It gets slower from
   here." (§8, using the chosen wake and bed).
-- Button **Shake on it**; fine print "Change the plan any time in Settings."
+- Button **Shake on it**; fine print "Change the plan any time from Home."
 - Saving: §5.4. On success Home opens with the existing entrance.
 
 ## 5. Data and structure
@@ -230,11 +230,14 @@ lastLogToday)`:
 - window = wake to bed of the current logical day. A bedtime after
   midnight works. If the bedtime falls after the day reset hour, the window
   is cut at the reset.
-- `pace = (bed − max(now, wake)) / remaining`
-- `next = (lastLogToday ?? wake) + pace`
+- `even = (bed − wake) / limit`, the gap for the whole day
+- `gap(from) = max(even, (bed − from) / remaining)`
+- `pace = gap(max(now, wake))`
+- `next = anchor + gap(anchor)`, with `anchor = max(lastLogToday ?? wake, wake)`
 
-It is recalculated after every log, so it adapts: logging early stretches
-later gaps, waiting shortens them.
+`next` is recalculated after every log, so it adapts: logging early stretches
+later gaps. Waiting never shortens them below the even rate, because a guide
+to cutting down must not suggest going faster (changed 2026-10-31).
 
 ### 8.2 Home line
 
@@ -244,7 +247,7 @@ Under the ring on the single-habit dashboard, updated each minute:
 | --- | --- |
 | `next` in the future | "Next one on schedule in N min" |
 | `next` passed | "You're on schedule" |
-| Second line | "About one every N min until bed" |
+| Second line | "About one every N min until bed"; hidden when one gap would run past bed |
 | At or over the limit | The existing over-limit state; no pace line |
 | Limit 0 (quit day or later) | The quit-day state; no pace line |
 | Before wake or after bed | Hidden |

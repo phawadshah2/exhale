@@ -1,5 +1,6 @@
 import 'package:exhale/core/domain/time/day_boundary.dart';
 import 'package:exhale/features/settings/domain/entities/app_icon_choice.dart';
+import 'package:exhale/features/settings/domain/entities/day_window.dart';
 import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
 import 'package:meta/meta.dart';
 
@@ -15,6 +16,8 @@ class AppSettings {
     this.askForTrigger = true,
     this.triggerPromptIntroSeen = false,
     this.logHintSeen = false,
+    this.wakeMinute,
+    this.bedMinute,
   });
 
   static const String defaultCurrencySymbol = r'$';
@@ -35,7 +38,20 @@ class AppSettings {
   /// True once the one-time "Hold + for more" hint was shown.
   final bool logHintSeen;
 
+  /// Wake and bed times in minutes after midnight; null until set.
+  final int? wakeMinute;
+  final int? bedMinute;
+
   DayBoundary get dayBoundary => DayBoundary(resetHour: dayResetHour);
+
+  /// Null unless both times are set.
+  DayWindow? get dayWindow => switch ((wakeMinute, bedMinute)) {
+    (final int wake, final int bed) => DayWindow(
+      wakeMinute: wake,
+      bedMinute: bed,
+    ),
+    _ => null,
+  };
 
   AppSettings copyWith({
     String? Function()? userName,
@@ -47,6 +63,8 @@ class AppSettings {
     bool? askForTrigger,
     bool? triggerPromptIntroSeen,
     bool? logHintSeen,
+    int? Function()? wakeMinute,
+    int? Function()? bedMinute,
   }) => AppSettings(
     userName: userName != null ? userName() : this.userName,
     dayResetHour: dayResetHour ?? this.dayResetHour,
@@ -58,6 +76,8 @@ class AppSettings {
     triggerPromptIntroSeen:
         triggerPromptIntroSeen ?? this.triggerPromptIntroSeen,
     logHintSeen: logHintSeen ?? this.logHintSeen,
+    wakeMinute: wakeMinute != null ? wakeMinute() : this.wakeMinute,
+    bedMinute: bedMinute != null ? bedMinute() : this.bedMinute,
   );
 
   @override
@@ -71,7 +91,9 @@ class AppSettings {
       other.currencySymbol == currencySymbol &&
       other.askForTrigger == askForTrigger &&
       other.triggerPromptIntroSeen == triggerPromptIntroSeen &&
-      other.logHintSeen == logHintSeen;
+      other.logHintSeen == logHintSeen &&
+      other.wakeMinute == wakeMinute &&
+      other.bedMinute == bedMinute;
 
   @override
   int get hashCode => Object.hash(
@@ -84,5 +106,7 @@ class AppSettings {
     askForTrigger,
     triggerPromptIntroSeen,
     logHintSeen,
+    wakeMinute,
+    bedMinute,
   );
 }
