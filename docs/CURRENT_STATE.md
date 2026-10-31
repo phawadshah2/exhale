@@ -14,13 +14,14 @@ The single-habit docs are committed (0541760) on `docs/single-habit-launch` and
 merged into local `main`, one commit ahead of `origin/main` and not pushed; they
 go up with the launch PR. No app code changed.
 
-`feat/launch-states` has no upstream; nothing on it is pushed.
+`feat/launch-states` has no upstream; nothing on it is pushed. Head is the Ink docs
+commit; only this handoff note is uncommitted.
 
 M5 so far: Tasks 5.1, 5.1b (9d52e82) and 5.1c (eed0676, dfc2271) are committed. Tasks
 5.2, 5.3 and the M5 review are not done.
 
 Checks: last run on 4ac7580, format clean, `analyze --fatal-infos` clean, full suite 517
-passed. Only docs changed after that.
+passed. Only docs changed after that. Not run at handoff (handoff skips them).
 
 **Next action:** M5 Task 5.2, light mode, Reduce Transparency and accessibility
 (Sonnet 5.5 at medium), in `docs/superpowers/plans/2026-10-21-home-details-logs.md`, on
@@ -29,7 +30,8 @@ for M5, and 5.2 also owns the overflows at 3× text noted under Task 5.1c. Task 
 removes "or start tracking another habit" from the hold hint and "You can add another
 later." from the first-run habit step.
 
-Read first: `CLAUDE.md`, plan Task 5.2, Task 5.1c below.
+Read first: `CLAUDE.md`, plan Task 5.2, Task 5.1c and "Ink accent and no glows" below.
+5.2's light-mode walk should cover all three accents.
 
 Unanswered, for Fawad (timer, both noted under Task 5.1c): Home counting up on a late
 first open with no logs; very large numbers after bursts of logs. Nothing blocks 5.2.
@@ -45,12 +47,12 @@ renamed because it no longer glows), `ExhaleColors.glow` and `accentGlow`, the r
 the splash's radial wash and logo shadow, the snackbar dot, the unused history chart. The
 splash dust stays, unblurred. Neutral black drop shadows under glass stay: they are depth.
 
-My calls, easy to reverse: new installs start on Ink (`AppPalette.defaultAccentIndex`), so
-light onboarding stays black, and a saved setting keeps its accent. The table's column
-default is still 0, unused because every save writes the index, so no migration. Ink shows
-paper on dark surfaces, where ink would vanish, so dark onboarding is now paper, not teal.
-Under Ink the ring has no green (`ExhaleColors.ringStart`). Status colours (green, amber,
-red for on track, at limit, over) stay in every accent.
+Fawad confirmed: new installs start on Ink (`AppPalette.defaultAccentIndex`), so light
+onboarding stays black; a saved setting keeps its accent. My calls, easy to reverse: the
+table's column default is still 0, unused because every save writes the index, so no
+migration. Ink shows paper on dark surfaces, where ink would vanish, so dark onboarding is
+now paper, not teal. Under Ink the ring has no green (`ExhaleColors.ringStart`). Status
+colours (green, amber, red for on track, at limit, over) stay in every accent.
 
 Not seen on a simulator: Ink in light and dark, the splash without its wash, the + button
 in Ink (glass over the page, the mid-grey note below may apply).
