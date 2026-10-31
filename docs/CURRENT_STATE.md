@@ -1,13 +1,30 @@
 # Current state
 
-Updated 2026-10-30 (onboarding polish green, uncommitted; HEAD 5ec93e6;
+Updated 2026-10-31 (phase O4 committed, all onboarding plan tasks done;
 branch not pushed). Hook gotcha: the global
 hook blocks any Bash call whose text mentions "format"/"test" next to
 other commands (including `git add` of `formatting/` paths, `git rm` of
 `*_test.dart` and `task-done`); run checks bare, stage with `git add -A`
 / `-u`, write ledger lines by hand. Stay on `feat/onboarding-redesign`.
-Phase O3 committed; milestone O3 review fixes AND Fawad's onboarding
-polish round are both uncommitted (see "Onboarding polish" below).
+
+## Phase O4 (2026-10-31, committed)
+
+Task 4.1 (4453e42): `PaceGuide.compute` in `lib/features/home/domain/`.
+Task 4.2: `PaceLine` under the ring (`HabitDashboard`), `showYourDaySheet`
+and `YourDayTile` in `your_day_sheet.dart`, `AppFormat.minuteOfDay`. The
+pace figure rounds up so "every 0 min" never shows.
+Checks observed by me: red first, format (1 file), `analyze --fatal-infos`
+clean, full suite 416 passed. Neither the polish nor O4 has been seen on a
+simulator.
+
+Milestone O4 review: self-review by the author only, no findings above
+minor. Not independent. Minors: without a day window the prompt also shows
+at the limit and on quit day (pre-v9 users only); the Your day sheet's save
+failure path has no widget check.
+
+**Next action:** independent O4 review (Opus 5.5 high), a simulator walk
+(see Stash, ask Fawad first), then push and open the onboarding PR when
+Fawad asks. M4 follows.
 
 **Stash:** `stash@{0}` "sim-walk splash hack" holds the debug edit to
 `splash_page.dart` (always starts onboarding). `git stash apply` it only
@@ -15,7 +32,7 @@ for a simulator walk, then `git checkout -- <splash_page.dart>` before
 running tests or committing (on 2026-10-30 it was found applied in the
 tree and made 74 Home/app tests fail).
 
-## Onboarding polish (2026-10-29, in progress, uncommitted)
+## Onboarding polish (2026-10-29, committed 338a92c with the O3 fixes)
 
 Fawad asked after the O3 walk: buttons at one height, mockup stepper
 with a visible track, ink (`emphasis`) instead of the accent for every
@@ -37,9 +54,8 @@ the check icon at full `AnimatedScale`; `amount_step_test` waits out
 clean (0 changed), `analyze --fatal-infos` clean, full suite 394
 passed. Not seen on a simulator.
 
-**Next action:** commit O3 fixes + polish (or first `git stash apply`
-and walk light + dark on the "exhale" simulator, asking Fawad first;
-restore the splash file afterwards). Then Phase O4 (Task 4.1) in
+Simulator walk: `git stash apply`, walk light + dark on the "exhale"
+simulator, then restore the splash file. Plan:
 `docs/superpowers/plans/2026-10-29-onboarding-redesign.md`. Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md`. Roadmap:
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md` (row 3b).
@@ -391,8 +407,7 @@ onboarding) is kept for simulator walks; revert it before committing.
 The simulator app's saved theme was set to dark for the walk and put
 back to light.
 
-Next: finish the onboarding polish (top of this file), then Task 4.1
-with `superpowers:executing-plans`. `task-done` is blocked by the global hook (it wraps a test
+`task-done` is blocked by the global hook (it wraps a test
 command); run the tests bare and write the ledger line by hand. Ledger:
 `.superpowers/sdd/2026-10-29-onboarding-redesign/progress.md` (git-excluded
 via `.git/info/exclude`).
