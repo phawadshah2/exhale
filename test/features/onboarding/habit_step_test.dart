@@ -1,6 +1,6 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
-import 'package:exhale/core/widgets/glow_button.dart';
+import 'package:exhale/core/widgets/primary_button.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/steps/habit_step.dart';
@@ -27,11 +27,11 @@ void main() {
 
   Finder continueButton() => find.descendant(
     of: find.byType(HabitStep),
-    matching: find.widgetWithText(GlowButton, OnboardingCopy.continueButton),
+    matching: find.widgetWithText(PrimaryButton, OnboardingCopy.continueButton),
   );
 
   bool continueEnabled(WidgetTester tester) =>
-      tester.widget<GlowButton>(continueButton()).onPressed != null;
+      tester.widget<PrimaryButton>(continueButton()).onPressed != null;
 
   Finder shownCheck() => find.byWidgetPredicate(
     (widget) =>

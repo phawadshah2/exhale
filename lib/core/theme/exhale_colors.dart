@@ -39,7 +39,6 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
     required this.success,
     required this.warning,
     required this.danger,
-    required this.glow,
     required this.inset,
     required this.emphasis,
     required this.onEmphasis,
@@ -65,7 +64,6 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
         onSolid: scheme.onErrorContainer,
         foreground: scheme.error,
       ),
-      glow: scheme.primaryContainer.withValues(alpha: isDark ? 0.14 : 0.16),
       // Dark cards are already containerLow, so insets step up to stay
       // visible; light insets stay barely off-white.
       inset: isDark
@@ -91,9 +89,6 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
   /// Over the daily limit.
   final StatusColors danger;
 
-  /// Soft accent halo around the primary log button and active ring.
-  final Color glow;
-
   /// Fill for boxes inside a card (steppers, date rows, chips).
   final Color inset;
 
@@ -107,16 +102,11 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
   /// Where a filling ring's gradient starts; it ends in the accent.
   final Color ringStart;
 
-  List<BoxShadow> get accentGlow => [
-    BoxShadow(color: glow, blurRadius: 14, spreadRadius: -4),
-  ];
-
   @override
   ExhaleColors copyWith({
     StatusColors? success,
     StatusColors? warning,
     StatusColors? danger,
-    Color? glow,
     Color? inset,
     Color? emphasis,
     Color? onEmphasis,
@@ -125,7 +115,6 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
     success: success ?? this.success,
     warning: warning ?? this.warning,
     danger: danger ?? this.danger,
-    glow: glow ?? this.glow,
     inset: inset ?? this.inset,
     emphasis: emphasis ?? this.emphasis,
     onEmphasis: onEmphasis ?? this.onEmphasis,
@@ -141,7 +130,6 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
       success: StatusColors.lerp(success, other.success, t),
       warning: StatusColors.lerp(warning, other.warning, t),
       danger: StatusColors.lerp(danger, other.danger, t),
-      glow: Color.lerp(glow, other.glow, t)!,
       inset: Color.lerp(inset, other.inset, t)!,
       emphasis: Color.lerp(emphasis, other.emphasis, t)!,
       onEmphasis: Color.lerp(onEmphasis, other.onEmphasis, t)!,

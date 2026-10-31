@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-/// Slow, glowing dust drifting upward. One [animation] cycle (0 → 1) is a
+/// Slow dust drifting upward. One [animation] cycle (0 → 1) is a
 /// seamless loop: every particle completes whole laps.
 class DriftingParticles extends StatelessWidget {
   const DriftingParticles({
@@ -97,9 +97,7 @@ class _ParticlePainter extends CustomPainter {
       final edge = math.min(1, math.min(y, 1 - y) * 6);
       final opacity = (p.alpha * twinkle * edge).clamp(0.0, 1.0);
 
-      paint
-        ..color = color.withValues(alpha: opacity)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, p.radius);
+      paint.color = color.withValues(alpha: opacity);
       canvas.drawCircle(
         Offset(x * size.width, y * size.height),
         p.radius,

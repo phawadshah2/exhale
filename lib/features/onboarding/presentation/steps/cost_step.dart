@@ -4,7 +4,7 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/core/widgets/glow_button.dart';
+import 'package:exhale/core/widgets/primary_button.dart';
 import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
@@ -74,7 +74,7 @@ class _CostStepState extends ConsumerState<CostStep> {
     final muted = text.bodySmall?.copyWith(color: colors.onSurfaceVariant);
 
     return OnboardingStepFrame(
-      button: GlowButton(
+      button: PrimaryButton(
         label: OnboardingCopy.continueButton,
         onPressed: _continue,
       ),

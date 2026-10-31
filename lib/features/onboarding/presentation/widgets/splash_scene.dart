@@ -106,30 +106,6 @@ class _SplashSceneState extends State<SplashScene>
     return Stack(
       fit: StackFit.expand,
       children: [
-        AnimatedBuilder(
-          animation: _breath,
-          builder: (context, _) {
-            final b = _breathValue;
-            // Fade the glow itself to transparent (not to the surface colour)
-            // so there is no visible edge; keep it subtler on light surfaces.
-            final strength = colors.brightness == Brightness.dark ? 1.0 : 0.55;
-            final glow = colors.primaryContainer;
-            final alpha = (0.14 + 0.08 * b) * strength;
-            return DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  radius: 0.9 + 0.12 * b,
-                  stops: const [0, 0.45, 1],
-                  colors: [
-                    glow.withValues(alpha: alpha),
-                    glow.withValues(alpha: alpha * 0.4),
-                    glow.withValues(alpha: 0),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
         if (widget.animate)
           DriftingParticles(animation: _drift, color: colors.primaryContainer),
         SafeArea(
@@ -204,21 +180,7 @@ class _SplashSceneState extends State<SplashScene>
           opacity: logoIn,
           child: Transform.scale(
             scale: (0.6 + 0.4 * logoIn) * (0.97 + 0.06 * b),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: colors.primaryContainer.withValues(
-                      alpha: (0.05 + 0.07 * b) * logoIn,
-                    ),
-                    blurRadius: 50,
-                    spreadRadius: 4,
-                  ),
-                ],
-              ),
-              child: const AppLogo(size: 220),
-            ),
+            child: const AppLogo(size: 220),
           ),
         ),
         const SizedBox(height: AppSpacing.lg),

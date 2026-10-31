@@ -8,7 +8,7 @@ import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
-import 'package:exhale/core/widgets/glow_button.dart';
+import 'package:exhale/core/widgets/primary_button.dart';
 import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
@@ -96,7 +96,7 @@ class _DealStepState extends ConsumerState<DealStep> {
     final muted = text.bodySmall?.copyWith(color: colors.onSurfaceVariant);
 
     return OnboardingStepFrame(
-      button: GlowButton(
+      button: PrimaryButton(
         label: OnboardingCopy.dealButton,
         isBusy: form.isSubmitting,
         onPressed: plan == null ? null : _shake,

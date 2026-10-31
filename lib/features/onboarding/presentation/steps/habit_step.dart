@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/core/widgets/glow_button.dart';
+import 'package:exhale/core/widgets/primary_button.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/habit_icon.dart';
 import 'package:exhale/features/home/presentation/widgets/history/chart_paint.dart';
@@ -57,7 +57,7 @@ class _HabitStepState extends ConsumerState<HabitStep> {
     const presets = Habit.presets;
 
     return OnboardingStepFrame(
-      button: GlowButton(
+      button: PrimaryButton(
         label: OnboardingCopy.continueButton,
         onPressed: form.canContinue
             ? () => OnboardingScope.of(context).next()

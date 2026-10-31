@@ -202,16 +202,10 @@ class _Buttons extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: AppSpacing.gutterSm,
       children: [
-        DecoratedBox(
-          decoration: ShapeDecoration(
-            shape: const StadiumBorder(),
-            shadows: context.exhale.accentGlow,
-          ),
-          child: FilledButton.icon(
-            onPressed: () {},
-            icon: const Icon(AppIcons.flame),
-            label: const Text('Log now'),
-          ),
+        FilledButton.icon(
+          onPressed: () {},
+          icon: const Icon(AppIcons.flame),
+          label: const Text('Log now'),
         ),
         OutlinedButton.icon(
           onPressed: () {},

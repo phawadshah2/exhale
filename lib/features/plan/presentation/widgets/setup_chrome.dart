@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/core/widgets/glow_button.dart';
+import 'package:exhale/core/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 
 /// Room the floating footer takes above the bottom inset.
@@ -133,7 +133,7 @@ class SetupFooter extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            GlowButton(
+            PrimaryButton(
               label: label,
               trailingIcon: AppIcons.forward,
               isBusy: isBusy,

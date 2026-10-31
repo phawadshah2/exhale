@@ -370,7 +370,6 @@ void main() {
         ),
         paints
           ..arc()
-          ..arc()
           ..arc(color: success.solid),
       );
       expect(inQuitCard('You reached your quit date'), findsOneWidget);
