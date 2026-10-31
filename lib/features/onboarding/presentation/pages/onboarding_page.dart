@@ -237,12 +237,15 @@ class OnboardingStepHeader extends StatelessWidget {
           index: 1,
           child: SmoothSwitcher(
             resize: true,
-            child: Text(
-              title,
+            child: SizedBox(
               key: ValueKey(title),
-              style: text.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                height: 1.15,
+              width: double.infinity,
+              child: Text(
+                title,
+                style: text.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  height: 1.15,
+                ),
               ),
             ),
           ),
