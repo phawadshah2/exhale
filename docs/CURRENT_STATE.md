@@ -48,8 +48,15 @@ most of a gap; waiting past zero earns no credit.
 Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 494
 passed. Red seen on assertions: the pager, and three carry-over tests with the carry
 removed. Otherwise red on compile errors only; the carry's cap at bed was not seen
-failing. Not seen on a simulator: the look, the rings' motion, the chip above the glass
-tab bar (the glass layer could clip it), and how seconds feel.
+failing.
+
+Simulator walk (2026-10-31, "exhale", from stills, light and dark): the timer ticks; the
+rings, chip and pace text match the design; the chip is not clipped by the glass bar; a
+log, a delete and a past day all work; one frame caught both rings filling in step. Not
+walked: the count-up past zero, Undo from the snackbar (the log was removed from Edit
+log), carry-over below the cap, Reduce Motion, and how the seconds feel. The carry cap
+showed up there: at 9:49 PM the timer already equalled the time to bed, so a log did not
+change the number. The simulator's data is back as it was.
 
 For Fawad to look at: a new user finishing onboarding in the afternoon has no logs, so
 the timer has already passed and Home opens counting up from their first due time
