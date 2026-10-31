@@ -90,7 +90,7 @@ void main() {
       expect(guide.gap, const Duration(minutes: 144 + 125));
     });
 
-    test('it can run past bed, and the guide still ends at bed', () {
+    test('it can run past bed, and keeps counting there', () {
       final first = DateTime(2026, 10, 29, 20);
       final second = DateTime(2026, 10, 29, 21);
       PaceGuide? at(DateTime now) => compute(
@@ -103,7 +103,10 @@ void main() {
 
       // 5:20 is the even gap at a limit of 3, and 4:20 was left at 21:00.
       expect(at(second)!.gap, const Duration(hours: 9, minutes: 40));
-      expect(at(DateTime(2026, 10, 29, 23, 30)), isNull);
+      expect(
+        at(DateTime(2026, 10, 29, 23, 30))!.next,
+        second.add(at(second)!.gap),
+      );
     });
 
     test('a log before wake carries nothing', () {
@@ -247,10 +250,6 @@ void main() {
       expect(compute(now: DateTime(2026, 10, 29, 7)), isNull);
     });
 
-    test('at bedtime', () {
-      expect(compute(now: DateTime(2026, 10, 29, 23, 30)), isNull);
-    });
-
     test('at the limit', () {
       final now = DateTime(2026, 10, 29, 12);
       expect(compute(now: now, countToday: 8), isNull);
@@ -264,6 +263,33 @@ void main() {
     test('limit 0', () {
       final now = DateTime(2026, 10, 29, 12);
       expect(compute(now: now, limit: 0), isNull);
+    });
+  });
+
+  group('after bed, until the day resets', () {
+    final now = DateTime(2026, 10, 30, 2, 1);
+
+    test('a log restarts the timer at the even gap', () {
+      final log = DateTime(2026, 10, 30, 1, 42);
+      final guide = compute(now: now, countToday: 1, lastLogToday: log)!;
+
+      expect(guide.next, DateTime(2026, 10, 30, 3, 42));
+      expect(guide.gap, const Duration(hours: 2));
+      expect(NextLogTimer(guide: guide, now: now).showsPace, isFalse);
+    });
+
+    test('with no log since it counts up', () {
+      final guide = compute(
+        now: now,
+        countToday: 1,
+        lastLogToday: DateTime(2026, 10, 29, 22),
+      )!;
+
+      expect(NextLogTimer(guide: guide, now: now).isPast, isTrue);
+    });
+
+    test('at the limit there is still no timer', () {
+      expect(compute(now: now, countToday: 8), isNull);
     });
   });
 

@@ -235,8 +235,9 @@ lastLogToday)`:
 - `gap(from) = max(even, (bed − from) / remaining)`
 - `pace = gap(max(now, wake))`
 - `next = anchor + gap(anchor) + carried`, with
-  `anchor = max(lastLogToday ?? wake, wake)`. It may fall after bed; the timer still
-  ends at bed.
+  `anchor = max(lastLogToday ?? wake, wake)`. It may fall after bed. The timer keeps
+  running after bed until the day resets (Fawad, 2026-11-01); a log there starts the
+  even gap.
 - `carried` is the time that was left on the timer when the last log came, which
   already includes anything carried into that gap (Fawad, 2026-10-31). With 30 min
   left, a log adds those 30 min to the new gap. It is replayed from today's logs in
@@ -259,7 +260,7 @@ Updated each second while on screen.
 | --- | --- |
 | `next` in the future | `0:47:12` (always with hours), "until your next", "4 of 11 · 7 left", and a thin inner ring draining from full over `gap` |
 | `next` passed | `+0:12:03` in the success colour, "You're on schedule", the count line, an empty inner ring |
-| At or over the limit, limit 0, before wake, after bed, no wake/bed, a past day | The count, as before; no inner ring |
+| At or over the limit, limit 0, before wake, no wake/bed, a past day | The count, as before; no inner ring |
 
 **+ button.** While `next` is in the future: a ring around it draining the same way
 and a chip above it with whole minutes only (`47 min`, `87 min`). Otherwise neither.

@@ -24,7 +24,7 @@ class PaceGuide {
   final DateTime bed;
 
   /// Null when there is nothing to pace: at or over the limit, on a limit of
-  /// 0, or outside the waking window.
+  /// 0, or before wake. Past bed it keeps running until the day resets.
   static PaceGuide? compute({
     required DateTime now,
     required LogicalDay day,
@@ -38,11 +38,12 @@ class PaceGuide {
     if (limit <= 0 || countToday >= limit) return null;
 
     final wake = _latest(_onDay(day, window.wakeMinute), boundary.startOf(day));
+    final end = boundary.endOf(day);
     final bed = _earliest(
       _onDay(day, window.wakeMinute + window.awakeMinutes),
-      boundary.endOf(day),
+      end,
     );
-    if (now.isBefore(wake) || !now.isBefore(bed)) return null;
+    if (now.isBefore(wake) || !now.isBefore(end)) return null;
 
     // A guide to cutting down never suggests going faster than the even rate.
     final even = bed.difference(wake) ~/ limit;

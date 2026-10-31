@@ -103,6 +103,23 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('after bed the timer and + chip stay, with no pace line', (
+    tester,
+  ) async {
+    await setWindow();
+    final habitId = await startPlan();
+    clock.current = DateTime(2026, 10, 30, 2, 1);
+    await logAt(habitId, DateTime(2026, 10, 30, 1, 42));
+
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.text('1:41:00'), findsOneWidget);
+    expect(find.text('until your next'), findsOneWidget);
+    expect(find.text('101 min'), findsOneWidget);
+    expect(find.textContaining('About one every'), findsNothing);
+    await tester.disposeApp();
+  });
+
   testWidgets('it ticks each second', (tester) async {
     await setWindow();
     await logAt(await startPlan(), DateTime(2026, 10, 29, 8));
