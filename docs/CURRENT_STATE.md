@@ -28,10 +28,11 @@ plan's 12:55 example becomes 13:05). `pace` still uses now. Checks observed
 by me: format (1 file), `analyze --fatal-infos` clean, full suite 420
 passed.
 
-**Open for Fawad:** the second line can urge faster use. Limit 12 at 22:00
-reads "every 8 min" while The deal said 80. It matches spec 8.1 ("waiting
-shortens them"), so it stays until he decides. The fix would be never faster
-than the even rate, `max((bed − wake) / limit, (bed − now) / remaining)`.
+Pace floor (2026-10-31, Claude's call after Fawad said to continue, easy to
+reverse): the guide never suggests going faster than the even rate. `pace`
+and `next` use `max((bed − wake) / limit, (bed − from) / remaining)`, so limit
+12 at 22:00 reads as The deal's 80 min, not 8. The second line hides when one
+gap would run past bed. Spec 8.1 and 8.2 are updated.
 
 Deferred to M5 (minors from the review): the pace line stays when the ring
 is swiped to another day; Reduce Motion misses `SmoothSwitcher`, `PressScale`,
@@ -40,7 +41,7 @@ is swiped to another day; Reduce Motion misses `SmoothSwitcher`, `PressScale`,
 tap targets under 44 pt (Deal chips, currency chip, units stepper); without a
 day window the prompt also shows at the limit and on quit day (pre-v9 only).
 
-**Next action:** Fawad's call on the pace wording, a simulator walk (see
+**Next action:** a simulator walk (see
 Stash, ask Fawad first; the review could not judge motion, small phones,
 Dynamic Type or dark mode from code), then push and open the onboarding PR
 when Fawad asks. M4 follows.

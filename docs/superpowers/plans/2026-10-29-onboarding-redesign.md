@@ -652,7 +652,8 @@ first). Check the copy against spec §4 and §7 word for word.
   `anchor = max(lastLogToday ?? wake, wake)`;
   `next = anchor + (bed − anchor) / (limit − countToday)`, so it holds still
   until the next log (changed by the O4 review; the 12:55 example below is
-  now 13:05).
+  now 13:05). Both gaps are floored at the even rate; spec 8.1 has the final
+  rule.
 
 - [ ] **Step 1: Write the failing tests** (day 2026-10-29, reset 4,
   window 7:30–23:30, limit 8):
