@@ -1,12 +1,18 @@
 # Current state
 
-Updated 2026-10-31 (phase O4, its review and the simulator walk committed;
-branch pushed, onboarding PR being opened by Fawad; `gh` is not installed on
-this Mac). Hook gotcha: the global
+Updated 2026-10-31. Onboarding redesign merged to `main` (PR #26, 686246e).
+On `feat/multi-habit`, M4 not started. `gh` is deliberately not installed on
+this Mac: Fawad opens PRs from a prefilled compare link.
+
+**Next action:** M4 Task 4.1 (Add a habit) in
+`docs/superpowers/plans/2026-10-21-home-details-logs.md`, line 277, with
+`superpowers:executing-plans` on Opus 5.5 high. It reuses the onboarding steps.
+Carry in: the "Add a missed log" habit choice (4.2), the pace line under the
+Details dashboard, and M5's deferred list below. Hook gotcha: the global
 hook blocks any Bash call whose text mentions "format"/"test" next to
 other commands (including `git add` of `formatting/` paths, `git rm` of
 `*_test.dart` and `task-done`); run checks bare, stage with `git add -A`
-/ `-u`, write ledger lines by hand. Stay on `feat/onboarding-redesign`.
+/ `-u`, write ledger lines by hand.
 
 ## Phase O4 (2026-10-31, committed)
 
@@ -56,7 +62,7 @@ motion feel. The simulator's data gained a day window and one pouches log; its
 theme is back on Dark. For Fawad to look at: the + button reads mid-grey in
 light mode, not ink (glass over the page).
 
-**Next action:** the onboarding PR (needs "Analyze & test" green), then M4.
+The onboarding PR merged as #26; see the top of this file for the next action.
 
 **Stash:** `stash@{0}` "sim-walk splash hack" holds the debug edit to
 `splash_page.dart` (always starts onboarding). `git stash apply` it only
