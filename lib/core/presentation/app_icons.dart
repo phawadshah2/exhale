@@ -22,6 +22,7 @@ abstract final class AppIcons {
 
   // Actions
   static const IconData add = CupertinoIcons.plus;
+  static const IconData addCircle = CupertinoIcons.plus_circle;
   static const IconData remove = CupertinoIcons.minus;
   static const IconData edit = CupertinoIcons.pencil;
   static const IconData delete = CupertinoIcons.trash;

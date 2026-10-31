@@ -31,6 +31,11 @@ abstract final class OnboardingCopy {
   static const habitPrompt = "Let's start with the obvious.";
   static const habitTitle = 'What are we quitting?';
   static const habitLead = 'Pick the main one. You can add another later.';
+  static const addHabitPrompt = 'Another one? We can take it.';
+  static const addHabitTitle = 'Add a habit';
+  static const addHabitLead =
+      'It gets its own plan, limits and logs. Home will show all your habits.';
+  static const tracking = 'TRACKING';
   static const somethingElse = 'Something else';
   static const customNameLabel = 'Habit';
   static const customNameHint = 'Gaming';

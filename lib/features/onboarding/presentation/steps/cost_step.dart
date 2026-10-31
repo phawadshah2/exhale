@@ -119,7 +119,9 @@ class _CostStepState extends ConsumerState<CostStep> {
                       children: [
                         CurrencyChip(
                           symbol: form.currency,
-                          onChanged: controller.setCurrency,
+                          onChanged: form.isAddingHabit
+                              ? null
+                              : controller.setCurrency,
                         ),
                         Expanded(
                           child: TextField(

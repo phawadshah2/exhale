@@ -6,12 +6,14 @@ import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
+import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
+import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/currency_choices.dart';
 import 'package:exhale/features/settings/domain/entities/day_window.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
@@ -20,6 +22,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum OnboardingStep { welcome, habit, amount, cost, day, deal }
+
+enum OnboardingMode { firstRun, addHabit }
+
+/// Overridden by a nested scope in `AddHabitPage`.
+final onboardingModeProvider = Provider<OnboardingMode>(
+  (ref) => OnboardingMode.firstRun,
+  dependencies: const [],
+);
 
 /// Quick quit-date choices, in chip order. While one is selected the quit
 /// date follows the daily amount (for [suggested]).
@@ -52,6 +62,8 @@ class OnboardingFormState {
     required this.startLimit,
     required this.unitsPerContainer,
     required this.currency,
+    this.mode = OnboardingMode.firstRun,
+    this.trackedKinds = const {},
     this.quitPreset = QuitPreset.suggested,
     this.habitKind = defaultHabit,
     this.customName = '',
@@ -76,10 +88,42 @@ class OnboardingFormState {
     );
   }
 
+  /// One more habit: starts on the first preset not tracked, with the saved
+  /// day and currency. Those stay as they are, so the form never edits them.
+  factory OnboardingFormState.adding(
+    LogicalDay today,
+    AppSettings settings,
+    Set<HabitKind> trackedKinds,
+  ) {
+    final habit =
+        Habit.presets
+            .where((h) => !trackedKinds.contains(h.kind))
+            .firstOrNull ??
+        Habit.custom(name: '', unit: '');
+    final window = settings.dayWindow;
+    return OnboardingFormState(
+      mode: OnboardingMode.addHabit,
+      trackedKinds: trackedKinds,
+      habitKind: habit.kind,
+      startDay: today,
+      startLimit: habit.defaultDailyAmount,
+      unitsPerContainer: habit.defaultUnitsPerContainer,
+      quitDay: QuitPreset.suggested.quitDayFor(today, habit.defaultDailyAmount),
+      currency: settings.currencySymbol,
+      wakeMinute: window?.wakeMinute ?? DayWindow.defaultWake,
+      bedMinute: window?.bedMinute ?? DayWindow.defaultBed,
+    );
+  }
+
   static const HabitKind defaultHabit = HabitKind.vaping;
 
   /// Dots shown before each dot stands for more than one unit.
   static const int maxDots = 12;
+
+  final OnboardingMode mode;
+
+  /// Presets already tracked; only set when adding a habit.
+  final Set<HabitKind> trackedKinds;
 
   final LogicalDay startDay;
   final LogicalDay quitDay;
@@ -103,10 +147,16 @@ class OnboardingFormState {
       ? Habit.custom(name: customName, unit: customUnit)
       : Habit.presets.firstWhere((h) => h.kind == habitKind);
 
-  /// Cost is skipped for habits that do not track it.
+  bool get isAddingHabit => mode == OnboardingMode.addHabit;
+
+  /// Cost is skipped for habits that do not track it. Adding a habit also
+  /// skips Welcome and Your day.
   List<OnboardingStep> get steps => [
     for (final step in OnboardingStep.values)
-      if (step != OnboardingStep.cost || habit.tracksCost) step,
+      if ((step != OnboardingStep.cost || habit.tracksCost) &&
+          (!isAddingHabit ||
+              (step != OnboardingStep.welcome && step != OnboardingStep.day)))
+        step,
   ];
 
   int get total => steps.length;
@@ -189,6 +239,8 @@ class OnboardingFormState {
     bool? isSubmitting,
     String? Function()? errorMessage,
   }) => OnboardingFormState(
+    mode: mode,
+    trackedKinds: trackedKinds,
     startDay: startDay,
     quitDay: quitDay ?? this.quitDay,
     quitPreset: quitPreset != null ? quitPreset() : this.quitPreset,
@@ -209,14 +261,26 @@ class OnboardingFormState {
 final NotifierProvider<OnboardingFormController, OnboardingFormState>
 onboardingFormProvider = NotifierProvider.autoDispose(
   OnboardingFormController.new,
+  dependencies: [onboardingModeProvider],
 );
 
 class OnboardingFormController extends Notifier<OnboardingFormState> {
   @override
-  OnboardingFormState build() => OnboardingFormState.initial(
-    ref.read(todayProvider),
-    CurrencyChoices.forRegion(ref.read(deviceRegionProvider)),
-  );
+  OnboardingFormState build() => switch (ref.read(onboardingModeProvider)) {
+    OnboardingMode.firstRun => OnboardingFormState.initial(
+      ref.read(todayProvider),
+      CurrencyChoices.forRegion(ref.read(deviceRegionProvider)),
+    ),
+    OnboardingMode.addHabit => OnboardingFormState.adding(
+      ref.read(todayProvider),
+      ref.read(currentSettingsProvider),
+      {
+        for (final tracked
+            in ref.read(activeHabitsProvider).value ?? const <TrackedHabit>[])
+          if (tracked.habit.kind != HabitKind.custom) tracked.habit.kind,
+      },
+    ),
+  };
 
   /// Earliest quit day; there is no latest.
   LogicalDay get earliestQuitDay =>
@@ -224,7 +288,7 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
 
   /// Switches habit and resets the amounts to that habit's defaults.
   void selectHabit(HabitKind kind) {
-    if (kind == state.habitKind) return;
+    if (kind == state.habitKind || state.trackedKinds.contains(kind)) return;
     final habit = state.copyWith(habitKind: kind).habit;
     state = _withQuitFollowingPreset(
       state.copyWith(
@@ -287,7 +351,7 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
   }
 
   /// Saves the day and currency, then the habit with its plan. Returns true
-  /// when all are stored.
+  /// when all are stored. Adding a habit saves only the habit and its plan.
   Future<bool> submit() async {
     if (state.isSubmitting) return false;
     if (state.hasInvalidPrice) {
@@ -297,27 +361,29 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
     final form = state;
     state = state.copyWith(isSubmitting: true, errorMessage: () => null);
 
-    // A second submit (onboarding reached again) must not add a second
-    // habit.
-    final existing = await ref.read(habitRepositoryProvider).getActive();
-    if (!ref.mounted) return false;
-    if (existing case Success(value: [_, ...])) {
-      state = state.copyWith(isSubmitting: false);
-      return true;
-    }
+    if (!form.isAddingHabit) {
+      // A second submit (onboarding reached again) must not add a second
+      // habit.
+      final existing = await ref.read(habitRepositoryProvider).getActive();
+      if (!ref.mounted) return false;
+      if (existing case Success(value: [_, ...])) {
+        state = state.copyWith(isSubmitting: false);
+        return true;
+      }
 
-    final settingsResult = await ref
-        .read(settingsActionsProvider)
-        .update(
-          (current) => current.copyWith(
-            wakeMinute: () => form.wakeMinute,
-            bedMinute: () => form.bedMinute,
-            currencySymbol: form.currency,
-          ),
-        );
-    if (!ref.mounted) return false;
-    if (settingsResult case FailureResult(:final failure)) {
-      return _fail(failureMessage(failure));
+      final settingsResult = await ref
+          .read(settingsActionsProvider)
+          .update(
+            (current) => current.copyWith(
+              wakeMinute: () => form.wakeMinute,
+              bedMinute: () => form.bedMinute,
+              currencySymbol: form.currency,
+            ),
+          );
+      if (!ref.mounted) return false;
+      if (settingsResult case FailureResult(:final failure)) {
+        return _fail(failureMessage(failure));
+      }
     }
 
     final result = await ref.read(startTrackingProvider)((

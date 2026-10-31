@@ -72,6 +72,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Log now'), findsOneWidget);
     expect(find.text('Add a missed log'), findsOneWidget);
+    expect(find.text('Add a habit'), findsOneWidget);
 
     await tester.tap(find.text('Add a missed log'));
     await tester.pumpAndSettle();
@@ -124,6 +125,7 @@ void main() {
       expect(find.widgetWithText(InkWell, '1 of 9 today'), findsOneWidget);
       expect(find.widgetWithText(InkWell, '0 of 5 today'), findsOneWidget);
       expect(find.text('Add a missed log'), findsOneWidget);
+      expect(find.text('Add a habit'), findsOneWidget);
       expect(find.text('What triggered this one?'), findsNothing);
 
       await tester.tap(find.text('Add a missed log'));

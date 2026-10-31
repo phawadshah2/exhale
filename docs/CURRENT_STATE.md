@@ -1,14 +1,38 @@
 # Current state
 
 Updated 2026-10-31. Onboarding redesign merged to `main` (PR #26, 686246e).
-On `feat/multi-habit`, M4 not started. `gh` is deliberately not installed on
-this Mac: Fawad opens PRs from a prefilled compare link.
+On `feat/multi-habit`, M4 Task 4.1 is built but not committed. `gh` is
+deliberately not installed on this Mac: Fawad opens PRs from a prefilled
+compare link.
 
-**Next action:** M4 Task 4.1 (Add a habit) in
-`docs/superpowers/plans/2026-10-21-home-details-logs.md`, line 277, with
-`superpowers:executing-plans` on Opus 5.5 high. It reuses the onboarding steps.
-Carry in: the "Add a missed log" habit choice (4.2), the pace line under the
-Details dashboard, and M5's deferred list below. Hook gotcha: the global
+**Next action:** M4 Task 4.2 (Multi-habit Home) in
+`docs/superpowers/plans/2026-10-21-home-details-logs.md`, line 288, with
+`superpowers:executing-plans` on Opus 5.5 high. Carry in: the "Add a missed
+log" habit choice (4.2), the list assertion moved from 4.1 ("adding a second
+habit shows the habit list on Home"), the pace line under the Details
+dashboard, and M5's deferred list below.
+
+Read first: `CLAUDE.md`, plan Phase 4, roadmap "M4: Multiple habits". Ledger:
+`.superpowers/sdd/2026-10-21-home-details-logs/progress.md` (rulings for 4.1).
+
+## Task 4.1 (2026-10-31, uncommitted)
+
+`/add-habit` (`AddHabitPage`) runs Habit, Daily amount, Cost and The deal; the
++ menu's new "Add a habit" row opens it. `onboardingModeProvider` is overridden
+in a nested `ProviderScope`, and `onboardingFormProvider` depends on it. Tracked
+presets show "TRACKING" and are disabled; the form opens on the first untracked
+preset. Currency, wake and bed come from settings and are not saved; the
+currency chip is read-only. The first step's chevron leaves the flow. Also
+fixed: `context.go` over a pushed page threw, because `didPopNext` bumped a
+provider during a build (`ShellReturnListener` now waits for the frame's end).
+
+Checks observed by me: red first, then format, `analyze --fatal-infos` clean,
+full suite 434 passed. Until 4.2, Home still shows the first habit with two
+tracked. Not seen on a simulator; swipe back on the first step has no test; the
+prompt "Another one? We can take it." is my copy, not from a spec.
+
+Open for Fawad: `CLAUDE.md` line 24 says he commits, while "Git" below says
+Claude may; the + button reads mid-grey in light mode. Hook gotcha: the global
 hook blocks any Bash call whose text mentions "format"/"test" next to
 other commands (including `git add` of `formatting/` paths, `git rm` of
 `*_test.dart` and `task-done`); run checks bare, stage with `git add -A`

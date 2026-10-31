@@ -1,3 +1,4 @@
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -72,8 +73,19 @@ class _ShellReturnListenerState extends State<ShellReturnListener>
     if (route != null) shellRouteObserver.subscribe(this, route);
   }
 
+  /// `context.go` removes a pushed page during a build, when providers cannot
+  /// change, so the report waits for the end of that frame.
   @override
-  void didPopNext() => widget.onReturn();
+  void didPopNext() {
+    final scheduler = SchedulerBinding.instance;
+    if (scheduler.schedulerPhase != SchedulerPhase.persistentCallbacks) {
+      widget.onReturn();
+      return;
+    }
+    scheduler.addPostFrameCallback((_) {
+      if (mounted) widget.onReturn();
+    });
+  }
 
   @override
   void dispose() {

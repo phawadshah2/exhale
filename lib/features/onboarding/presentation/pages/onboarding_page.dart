@@ -47,12 +47,15 @@ class OnboardingPage extends ConsumerStatefulWidget {
 
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   final PageController _pages = PageController();
-  OnboardingStep _current = OnboardingStep.welcome;
+  late OnboardingStep _current = _steps.first;
 
   static const Duration _turn = Duration(milliseconds: 380);
   static const double _backFlingVelocity = 300;
 
   List<OnboardingStep> get _steps => ref.read(onboardingFormProvider).steps;
+
+  /// Adding a habit was opened from the app, so the first step can go back.
+  bool get _canLeave => ref.read(onboardingFormProvider).isAddingHabit;
 
   @override
   void dispose() {
@@ -81,9 +84,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   void _back() {
     final index = _steps.indexOf(_current);
-    if (index <= 0) return;
+    if (index <= 0 && !_canLeave) return;
     unawaited(HapticFeedback.selectionClick());
-    _goTo(index - 1);
+    if (index <= 0) {
+      Navigator.of(context).pop();
+    } else {
+      _goTo(index - 1);
+    }
   }
 
   @override
@@ -112,7 +119,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               OnboardingStepper(
                 index: index,
                 total: steps.length,
-                onBack: index > 0 ? _back : null,
+                onBack: index > 0 || _canLeave ? _back : null,
               ),
               Expanded(
                 child: GestureDetector(

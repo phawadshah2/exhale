@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
@@ -17,9 +18,10 @@ import 'package:exhale/features/tracking/presentation/providers/tracking_provide
 import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-/// The + button's menu. One habit: Log now and Add a missed log. Several:
-/// a row per habit with today's count, then Add a missed log.
+/// The + button's menu. One habit: Log now, then Add a missed log and Add a
+/// habit. Several: a row per habit with today's count, then the same two.
 Future<void> showLogMenu(
   BuildContext context,
   WidgetRef ref, {
@@ -57,6 +59,11 @@ Future<void> showLogMenu(
         icon: AppIcons.clock,
         onSelected: () =>
             showLogEditorSheet(context, habitId: missedLogHabit.id, day: today),
+      ),
+      GlassMenuItem(
+        label: 'Add a habit',
+        icon: AppIcons.addCircle,
+        onSelected: () => unawaited(context.push<void>(AppRoutes.addHabit)),
       ),
     ],
   );

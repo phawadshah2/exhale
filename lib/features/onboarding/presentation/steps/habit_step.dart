@@ -66,11 +66,18 @@ class _HabitStepState extends ConsumerState<HabitStep> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const OnboardingStepHeader(
-            prompt: OnboardingCopy.habitPrompt,
-            title: OnboardingCopy.habitTitle,
-            lead: OnboardingCopy.habitLead,
-          ),
+          if (form.isAddingHabit)
+            const OnboardingStepHeader(
+              prompt: OnboardingCopy.addHabitPrompt,
+              title: OnboardingCopy.addHabitTitle,
+              lead: OnboardingCopy.addHabitLead,
+            )
+          else
+            const OnboardingStepHeader(
+              prompt: OnboardingCopy.habitPrompt,
+              title: OnboardingCopy.habitTitle,
+              lead: OnboardingCopy.habitLead,
+            ),
           const SizedBox(height: AppSpacing.md + 4),
           for (var i = 0; i < presets.length; i += 2)
             StepReveal(
@@ -86,6 +93,7 @@ class _HabitStepState extends ConsumerState<HabitStep> {
                           icon: habit.kind.icon,
                           label: habit.name,
                           selected: kind == habit.kind,
+                          tracking: form.trackedKinds.contains(habit.kind),
                           onTap: () => controller.selectHabit(habit.kind),
                         ),
                       ),
@@ -162,6 +170,7 @@ class _HabitCard extends StatelessWidget {
     required this.selected,
     required this.onTap,
     this.dashed = false,
+    this.tracking = false,
   });
 
   final IconData icon;
@@ -169,6 +178,9 @@ class _HabitCard extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
   final bool dashed;
+
+  /// Already tracked: shown as such and disabled.
+  final bool tracking;
 
   static const BorderRadius _radius = BorderRadius.all(Radius.circular(20));
 
@@ -179,7 +191,7 @@ class _HabitCard extends StatelessWidget {
     final line = selected ? pick.line : pick.idleLine;
     final foreground = selected
         ? pick.foreground
-        : dashed
+        : dashed || tracking
         ? colors.onSurfaceVariant
         : colors.onSurface;
     final card = AnimatedContainer(
@@ -199,15 +211,30 @@ class _HabitCard extends StatelessWidget {
         children: [
           Icon(icon, size: 22, color: foreground),
           Expanded(
-            child: Text(
-              label,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: foreground,
-                fontWeight: selected ? FontWeight.w600 : null,
-                height: 1.2,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  maxLines: tracking ? 1 : 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: foreground,
+                    fontWeight: selected ? FontWeight.w600 : null,
+                    height: 1.2,
+                  ),
+                ),
+                if (tracking)
+                  Text(
+                    OnboardingCopy.tracking,
+                    style: context.textTheme.labelSmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.6,
+                    ),
+                  ),
+              ],
             ),
           ),
           AnimatedScale(
@@ -219,6 +246,16 @@ class _HabitCard extends StatelessWidget {
         ],
       ),
     );
+
+    if (tracking) {
+      return Semantics(
+        button: true,
+        enabled: false,
+        label: '$label, ${OnboardingCopy.tracking.toLowerCase()}',
+        excludeSemantics: true,
+        child: Opacity(opacity: 0.55, child: card),
+      );
+    }
 
     return Semantics(
       button: true,

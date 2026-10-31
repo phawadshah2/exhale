@@ -18,11 +18,15 @@ class CurrencyChip extends StatelessWidget {
   });
 
   final String symbol;
-  final ValueChanged<String> onChanged;
+
+  /// Null shows the symbol alone, with no wheel.
+  final ValueChanged<String>? onChanged;
 
   static const double itemExtent = 36;
 
   Future<void> _pick(BuildContext context) async {
+    final changed = onChanged;
+    if (changed == null) return;
     unawaited(HapticFeedback.selectionClick());
     const choices = CurrencyChoices.all;
     final index = await showOptionWheel(
@@ -34,18 +38,19 @@ class CurrencyChip extends StatelessWidget {
           .clamp(0, choices.length - 1),
       itemExtent: itemExtent,
     );
-    if (index != null) onChanged(choices[index].symbol);
+    if (index != null) changed(choices[index].symbol);
   }
 
   @override
   Widget build(BuildContext context) {
     final pick = SelectionColors.of(context);
     final accent = pick.foreground;
+    final editable = onChanged != null;
     return Semantics(
-      button: true,
+      button: editable,
       label: OnboardingCopy.currency,
       value: symbol,
-      onTap: () => unawaited(_pick(context)),
+      onTap: editable ? () => unawaited(_pick(context)) : null,
       excludeSemantics: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -69,7 +74,8 @@ class CurrencyChip extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Icon(AppIcons.chevronDown, size: 13, color: accent),
+                if (editable)
+                  Icon(AppIcons.chevronDown, size: 13, color: accent),
               ],
             ),
           ),
