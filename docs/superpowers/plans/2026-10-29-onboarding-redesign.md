@@ -649,7 +649,10 @@ first). Check the copy against spec §4 and §7 word for word.
   `boundary.endOf(day)`. Null when
   `limit <= 0`, `countToday >= limit`, `now` is before wake or not before
   bed. `pace = (bed − max(now, wake)) / (limit − countToday)`;
-  `next = max(lastLogToday ?? wake, wake) + pace`.
+  `anchor = max(lastLogToday ?? wake, wake)`;
+  `next = anchor + (bed − anchor) / (limit − countToday)`, so it holds still
+  until the next log (changed by the O4 review; the 12:55 example below is
+  now 13:05).
 
 - [ ] **Step 1: Write the failing tests** (day 2026-10-29, reset 4,
   window 7:30–23:30, limit 8):

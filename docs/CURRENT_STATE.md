@@ -17,14 +17,33 @@ Checks observed by me: red first, format (1 file), `analyze --fatal-infos`
 clean, full suite 416 passed. Neither the polish nor O4 has been seen on a
 simulator.
 
-Milestone O4 review: self-review by the author only, no findings above
-minor. Not independent. Minors: without a day window the prompt also shows
-at the limit and on quit day (pre-v9 users only); the Your day sheet's save
-failure path has no widget check.
+Milestone O4 review (2026-10-31): independent, read the polish and O4
+(5ec93e6..18fa52d). Fixed, each seen red first: one-line step titles sat
+centred (`OnboardingStepHeader`); the Your day sheet had no inset; its save
+error was hidden behind the sheet, now inline; `PaceGuide.next` was
+recomputed from now every minute, so the countdown ran at twice the clock.
+`next` is now the last log (or wake) plus an even share of what is left to
+bed, fixed until the next log (spec 8.1 "recalculated after every log"; the
+plan's 12:55 example becomes 13:05). `pace` still uses now. Checks observed
+by me: format (1 file), `analyze --fatal-infos` clean, full suite 420
+passed.
 
-**Next action:** independent O4 review (Opus 5.5 high), a simulator walk
-(see Stash, ask Fawad first), then push and open the onboarding PR when
-Fawad asks. M4 follows.
+**Open for Fawad:** the second line can urge faster use. Limit 12 at 22:00
+reads "every 8 min" while The deal said 80. It matches spec 8.1 ("waiting
+shortens them"), so it stays until he decides. The fix would be never faster
+than the even rate, `max((bed − wake) / limit, (bed − now) / remaining)`.
+
+Deferred to M5 (minors from the review): the pace line stays when the ring
+is swiped to another day; Reduce Motion misses `SmoothSwitcher`, `PressScale`,
+`deal_step`, `exhale_bubble`, `day_window_picker`, `habit_step`; back chevron
+44 × 36 pt since the polish; pace figures only in minutes (960 min); older
+tap targets under 44 pt (Deal chips, currency chip, units stepper); without a
+day window the prompt also shows at the limit and on quit day (pre-v9 only).
+
+**Next action:** Fawad's call on the pace wording, a simulator walk (see
+Stash, ask Fawad first; the review could not judge motion, small phones,
+Dynamic Type or dark mode from code), then push and open the onboarding PR
+when Fawad asks. M4 follows.
 
 **Stash:** `stash@{0}` "sim-walk splash hack" holds the debug edit to
 `splash_page.dart` (always starts onboarding). `git stash apply` it only
