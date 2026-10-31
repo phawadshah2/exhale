@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
+import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_sheet.dart';
-import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/features/settings/domain/entities/day_window.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/settings/presentation/widgets/day_window_picker.dart';
@@ -34,10 +34,14 @@ class _YourDaySheetState extends ConsumerState<_YourDaySheet> {
         bedMinute: DayWindow.defaultBed,
       );
   bool _saving = false;
+  String? _error;
 
   Future<void> _save() async {
     unawaited(HapticFeedback.mediumImpact());
-    setState(() => _saving = true);
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
     final window = _window;
     final result = await ref
         .read(settingsActionsProvider)
@@ -51,19 +55,23 @@ class _YourDaySheetState extends ConsumerState<_YourDaySheet> {
     switch (result) {
       case Success():
         Navigator.of(context).pop();
-      case FailureResult():
-        setState(() => _saving = false);
-        showAppSnackBar(
-          context,
-          message: "Couldn't save your day. Try again.",
-          tone: SnackTone.danger,
-        );
+      case FailureResult(:final failure):
+        setState(() {
+          _saving = false;
+          _error = failureMessage(failure);
+        });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.lg,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -73,6 +81,15 @@ class _YourDaySheetState extends ConsumerState<_YourDaySheet> {
             window: _window,
             onChanged: (window) => setState(() => _window = window),
           ),
+          if (_error != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              _error!,
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.exhale.danger.foreground,
+              ),
+            ),
+          ],
           const SizedBox(height: AppSpacing.lg),
           FilledButton(
             onPressed: _saving ? null : _save,
