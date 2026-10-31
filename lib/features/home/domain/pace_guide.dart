@@ -66,10 +66,9 @@ class PaceGuide {
       if (left > Duration.zero) due = due.add(left);
     }
 
-    final next = _earliest(due, bed);
     return PaceGuide(
-      next: next,
-      gap: next.difference(anchor),
+      next: due,
+      gap: due.difference(anchor),
       pace: gap(_latest(now, wake), countToday),
       bed: bed,
     );

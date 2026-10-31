@@ -90,18 +90,20 @@ void main() {
       expect(guide.gap, const Duration(minutes: 144 + 125));
     });
 
-    test('it never runs past bed', () {
-      final at = DateTime(2026, 10, 29, 21);
-      final guide = compute(
-        now: at,
+    test('it can run past bed, and the guide still ends at bed', () {
+      final first = DateTime(2026, 10, 29, 20);
+      final second = DateTime(2026, 10, 29, 21);
+      PaceGuide? at(DateTime now) => compute(
+        now: now,
         countToday: 2,
-        earlierLogsToday: [DateTime(2026, 10, 29, 20)],
-        lastLogToday: at,
+        earlierLogsToday: [first],
+        lastLogToday: second,
         limit: 3,
-      )!;
+      );
 
-      expect(guide.next, guide.bed);
-      expect(guide.gap, guide.bed.difference(at));
+      // 5:20 is the even gap at a limit of 3, and 4:20 was left at 21:00.
+      expect(at(second)!.gap, const Duration(hours: 9, minutes: 40));
+      expect(at(DateTime(2026, 10, 29, 23, 30)), isNull);
     });
 
     test('a log before wake carries nothing', () {

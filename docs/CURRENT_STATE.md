@@ -31,7 +31,8 @@ is the timer, always with hours (`0:47:12`), inside a thin draining ring; past z
 counts up in green (`+0:12:03`, "You're on schedule"). The + button gets a draining
 ring and a chip in whole minutes (`87 min`), on every tab, and neither past zero. One
 text under the ring. Both new rings use `AppMotion.fill`. A log with time left adds
-that time to the next gap (Fawad), replayed from today's logs and capped at bed.
+that time to the next gap (Fawad), replayed from today's logs. It may run past bed
+(`3:00:00` at 10 PM, Fawad removed my cap); the timer still ends at bed.
 `pace_line.dart` is gone (`pace_text.dart`, `draining_ring.dart`, `next_log_badge.dart`,
 `nextLogTimerProvider`, `secondTickProvider`).
 
@@ -41,22 +42,23 @@ Also closes three M5 minors below (marked).
 
 My calls, easy to reverse (ledger has them): the order under the ring is over note,
 first-day note, prompt, pace (I told Fawad prompt before first-day, then swapped: only
-pre-v9 data has no window, and it kept the existing tests); the carry stops at bed; the
-first log of a day counts against the timer from wake, so a log soon after waking adds
-most of a gap; waiting past zero earns no credit.
+pre-v9 data has no window, and it kept the existing tests); the first log of a day
+counts against the timer from wake, so a log soon after waking adds most of a gap;
+waiting past zero earns no credit.
 
 Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 494
 passed. Red seen on assertions: the pager, and three carry-over tests with the carry
-removed. Otherwise red on compile errors only; the carry's cap at bed was not seen
-failing.
+removed, and the past-bed test with the cap still in. Otherwise red on compile errors
+only.
 
 Simulator walk (2026-10-31, "exhale", from stills, light and dark): the timer ticks; the
 rings, chip and pace text match the design; the chip is not clipped by the glass bar; a
 log, a delete and a past day all work; one frame caught both rings filling in step. Not
 walked: the count-up past zero, Undo from the snackbar (the log was removed from Edit
-log), carry-over below the cap, Reduce Motion, and how the seconds feel. The carry cap
-showed up there: at 9:49 PM the timer already equalled the time to bed, so a log did not
-change the number. The simulator's data is back as it was.
+log), carry-over, Reduce Motion, and how the seconds feel. The walk ran with a cap at
+bed: at 9:49 PM the timer already equalled the time to bed, so a log did not change the
+number, and Fawad removed the cap. Removing it has not been seen on a simulator. The
+simulator's data is back as it was.
 
 For Fawad to look at: a new user finishing onboarding in the afternoon has no logs, so
 the timer has already passed and Home opens counting up from their first due time

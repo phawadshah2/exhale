@@ -233,8 +233,9 @@ lastLogToday)`:
 - `even = (bed − wake) / limit`, the gap for the whole day
 - `gap(from) = max(even, (bed − from) / remaining)`
 - `pace = gap(max(now, wake))`
-- `next = min(anchor + gap(anchor) + carried, bed)`, with
-  `anchor = max(lastLogToday ?? wake, wake)`
+- `next = anchor + gap(anchor) + carried`, with
+  `anchor = max(lastLogToday ?? wake, wake)`. It may fall after bed; the timer still
+  ends at bed.
 - `carried` is the time that was left on the timer when the last log came, which
   already includes anything carried into that gap (Fawad, 2026-10-31). With 30 min
   left, a log adds those 30 min to the new gap. It is replayed from today's logs in
