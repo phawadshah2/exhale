@@ -152,7 +152,7 @@ class _EditPlanForm extends ConsumerWidget {
             min: PlanValidation.minStartLimit,
             max: PlanValidation.maxStartLimit,
             onChanged: controller.setDailyLimit,
-            unit: habit.shortUnits,
+            unit: form.startLimit == 1 ? habit.unit : habit.shortUnits,
             caption: 'per day',
             semanticLabel: 'daily limit',
           ),

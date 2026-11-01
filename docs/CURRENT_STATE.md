@@ -1,40 +1,78 @@
 # Current state
 
-Updated 2026-11-01. Onboarding redesign merged to `main` (PR #26, 686246e).
-`gh` is deliberately not installed on this Mac: Fawad opens PRs from a prefilled
-compare link.
+Updated 2026-11-01. Goal: release candidate, M5 of
+`docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`. The first release
+tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a
+prefilled compare link.
 
-**Scope change (Fawad, 2026-10-31):** the first release tracks one habit.
-Multiple habits ship in a later release (version not fixed).
+**M5 is done on `feat/launch-states` (head fefc700) except the real iPhone pass.**
+Tasks 5.1 to 5.3, the independent review (0541760..43131f4, verdict "With fixes") and
+all its fixes are committed. The branch is on `origin`; check `git status` for what is not pushed. Local `main`
+has one docs commit (0541760) that goes up with the launch PR. Uncommitted: this file,
+`CLAUDE.md`, the plan and the roadmap (docs only).
 
-**Git (Fawad, 2026-10-31):** Claude branches and commits, under Fawad's identity
-and with no attribution, so Claude never shows up as a contributor. See `CLAUDE.md`.
+Checks at fefc700: format clean, `analyze --fatal-infos` clean, full suite 677 passed.
+Not run at handoff (docs only).
 
-The single-habit docs are committed (0541760) on `docs/single-habit-launch` and
-merged into local `main`, one commit ahead of `origin/main` and not pushed; they
-go up with the launch PR. No app code changed.
+Simulator walk, seen: fresh onboarding on Air and SE; timer counting up and down; Settings;
+dark with Ink on Home, Logs and Edit log; light with Eucalyptus and Ocean on Home; largest
+text on Home, Logs and Edit log (after the fixes, only the top of Home); SE trigger sheet;
+Reduce Transparency.
+Not seen: the stage pill fix on SE (rebuilt, no screenshot taken), carry-over, Undo snackbar,
+quit reached, Edit plan and Change habit, after-bed live, Reduce Motion in motion (stills
+only). Two spare QA simulators may still be booted, one with Reduce Motion and
+Reduce Transparency on.
 
-`feat/launch-states` has no upstream; nothing on it is pushed. Head is the Ink docs
-commit; only this handoff note is uncommitted.
+**Next action:** Fawad's calls below, then the launch PR, with the iPhone pass listed as
+pending.
 
-M5 so far: Tasks 5.1, 5.1b (9d52e82) and 5.1c (eed0676, dfc2271) are committed. Tasks
-5.2, 5.3 and the M5 review are not done.
+Simulator walk (2026-11-01, iPhone Air and SE, from stills): seen working: timer reaching
+zero and hiding, a log restarting it, carry-over, Undo, the long + chip, quit reached, Keep
+at zero, New goal, Edit plan, Change habit to Home, after bed, the SE stage pill. Not seen:
+Reduce Motion in motion, which stills can't show; the fade at zero (only the state after it).
 
-Checks: last run on 4ac7580, format clean, `analyze --fatal-infos` clean, full suite 517
-passed. Only docs changed after that. Not run at handoff (handoff skips them).
+Found and fixed: Replace crashed on iOS (`7b55f5a`). `context.go` removes Edit plan during a
+build, and on iOS that fires `didPopNext`, which changed a provider mid-build. The 5.1b note
+below that it "never fires here" was wrong: widget tests run as Android, where it doesn't
+fire. The new test is iOS only and was seen failing with the app's error. Most widget tests
+still run as Android, though the app is iOS only; that gap is open. Also fixed (`56ddde4`):
+`1 sessions`, page text showing through the Edit plan footer, the chip over the snackbar, no
+gap above the empty triggers box. Those four have no failing test seen first; `1 sessions`
+has a test written with the fix. Full suite 680 passed, format and analyze clean.
 
-**Next action:** M5 Task 5.2, light mode, Reduce Transparency and accessibility
-(Sonnet 5.5 at medium), in `docs/superpowers/plans/2026-10-21-home-details-logs.md`, on
-`feat/launch-states`, with `superpowers:executing-plans`. M5's deferred list below stays
-for M5, and 5.2 also owns the overflows at 3× text noted under Task 5.1c. Task 5.3 also
-removes "or start tracking another habit" from the hold hint and "You can add another
-later." from the first-run habit step.
+Fawad's call (2026-11-01): scrolling pages keep running under the status bar, no backdrop.
 
-Read first: `CLAUDE.md`, plan Task 5.2, Task 5.1c and "Ink accent and no glows" below.
-5.2's light-mode walk should cover all three accents.
+For Fawad: `limit 0` overlaps the last day's `0` in
+the Week chart. New goal after quitting offers a limit of 1 with "0 sessions avoided".
 
-Unanswered, for Fawad (timer, both noted under Task 5.1c): Home counting up on a late
-first open with no logs; very large numbers after bursts of logs. Nothing blocks 5.2.
++ chip (Fawad, 2026-11-01): hours and minutes from 60 minutes (`1 h 27 min`, was `87 min`),
+which settles `703 min`. VoiceOver reads the same. Spec 8.2 is updated. Not seen on a
+simulator, so how a long chip like `11 h 43 min` looks is unchecked.
+
+Timer past zero (Fawad, 2026-11-01): no more count-up. When the timer reaches zero, the
+timer, its inner ring and the + ring and chip hide, and the ring shows the count with a
+short fade. The next log starts the timer again. This also settles the late first open
+with no logs (`+5:10:00`). The pace text under the ring stays. Spec 8.2 is updated. Checks
+after the change: format clean, `analyze --fatal-infos` clean, full suite 679 passed; the
+timer tests were seen failing first. Not seen on a simulator.
+
+Deferred by Fawad (2026-11-01), not done: the real iPhone pass (plan 5.3 Step 4): glass
+performance, chart scrolling with 90+ days, returning from the background. It must happen
+before release.
+
+Seed for that pass: `lib/main_seed.dart`, git-excluded in `.git/info/exclude`, so not in
+any commit. Run it with `fvm flutter run --profile -t lib/main_seed.dart -d <id>`. On an
+install with no habit it writes vaping, a plan from 120 days back to 30 days ahead, and
+1,357 logs on past days. It writes nothing if any habit is stored. Delete it after the pass.
+
+Read first: `CLAUDE.md`, roadmap "M5: Release candidate", and the rulings and deferred
+minors in `.superpowers/sdd/2026-10-21-home-details-logs/progress.md` (kept for M4).
+
+Product calls to reverse if disliked: text capped at 200%; the timer runs after bed; the
+stage pill stacks name above target when both don't fit.
+
+The "exhale" simulator needs a relaunch
+to show the timer; its files were deleted outside the session, cause unknown.
 
 Later: Live Activity with the widgets, roadmap "Post-launch backlog".
 
@@ -455,13 +493,9 @@ price only.
 
 ## Open
 
-- Logs spins forever if the log stream or plan history fails (M5 states).
 - `home/presentation/widgets/history_chart.dart` is unused since 2.4; not
   removed.
 - Plan roadmap page is a later design decision.
-- M5 (5.2): the + button's `Semantics(excludeSemantics: true)` drops the
-  tap and long-press semantic actions (VoiceOver falls back to a touch; the
-  menu has no action).
 
 ## Onboarding redesign (decided 2026-10-28, refined 2026-10-29)
 

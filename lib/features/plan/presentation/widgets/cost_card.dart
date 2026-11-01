@@ -114,7 +114,9 @@ class _CostCardState extends State<CostCard> {
                       min: 1,
                       max: HabitValidation.maxUnitsPerContainer,
                       onChanged: widget.onUnitsPerContainerChanged,
-                      unit: habit.shortUnits,
+                      unit: widget.unitsPerContainer == 1
+                          ? habit.unit
+                          : habit.shortUnits,
                       caption: 'per $container',
                       semanticLabel: '${habit.units} per $container',
                     ),
