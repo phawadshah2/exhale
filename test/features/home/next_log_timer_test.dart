@@ -87,19 +87,69 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('past zero it counts up and the + shows nothing', (tester) async {
+  testWidgets('past zero the timer and its rings hide', (tester) async {
     await setWindow();
     await logAt(await startPlan(), DateTime(2026, 10, 29, 8));
     clock.current = DateTime(2026, 10, 29, 12);
 
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text('+0:17:08'), findsOneWidget);
-    expect(find.text("You're on schedule"), findsOneWidget);
-    expect(find.text('1 of 8 · 7 left'), findsOneWidget);
+    expect(find.byKey(count), findsOneWidget);
+    expect(find.text('until your next'), findsNothing);
+    expect(find.textContaining('+'), findsNothing);
     expect(find.byKey(const Key('next-log-chip')), findsNothing);
+    expect(find.byType(DrainingRing), findsNothing);
     expect(find.text('About one every 2 h until bed'), findsOneWidget);
-    expect(find.byType(DrainingRing), findsOneWidget);
+    await tester.disposeApp();
+  });
+
+  testWidgets('it hides when it reaches zero on screen', (tester) async {
+    await setWindow();
+    await logAt(await startPlan(), DateTime(2026, 10, 29, 8));
+    clock.current = DateTime(2026, 10, 29, 11, 42, 51);
+    await tester.pumpAppPastSplash(height: 2400);
+    expect(find.text('until your next'), findsOneWidget);
+
+    clock.current = DateTime(2026, 10, 29, 11, 42, 53);
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(count), findsOneWidget);
+    expect(find.text('until your next'), findsNothing);
+    expect(find.byType(DrainingRing), findsNothing);
+    await tester.disposeApp();
+  });
+
+  testWidgets('a log past zero starts the timer again', (tester) async {
+    await setWindow();
+    final habitId = await startPlan();
+    await logAt(habitId, DateTime(2026, 10, 29, 8));
+    clock.current = DateTime(2026, 10, 29, 12);
+    await tester.pumpAppPastSplash(height: 2400);
+    expect(find.byType(DrainingRing), findsNothing);
+
+    await tester.runAsync(() => logAt(habitId, clock.current));
+    await tester.pumpAndSettle();
+
+    // The even gap, with nothing carried from the time spent past zero.
+    expect(find.text('2:00:00'), findsOneWidget);
+    expect(find.text('2 of 8 · 6 left'), findsOneWidget);
+    expect(find.text('120 min'), findsOneWidget);
+    expect(find.byType(DrainingRing), findsNWidgets(2));
+    await tester.disposeApp();
+  });
+
+  testWidgets('a late first open with no logs shows the count', (tester) async {
+    await setWindow();
+    await startPlan();
+    clock.current = DateTime(2026, 10, 29, 15);
+
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.byKey(count), findsOneWidget);
+    expect(find.textContaining('logged today. Nice start.'), findsOneWidget);
+    expect(find.text('until your next'), findsNothing);
+    expect(find.byType(DrainingRing), findsNothing);
     await tester.disposeApp();
   });
 
@@ -196,7 +246,6 @@ void main() {
 
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text("You're on schedule"), findsOneWidget);
     expect(find.text('About one every 2 h until bed'), findsOneWidget);
     await tester.disposeApp();
   });
@@ -209,7 +258,6 @@ void main() {
 
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text("You're on schedule"), findsOneWidget);
     expect(find.textContaining('About one every'), findsNothing);
     await tester.disposeApp();
   });

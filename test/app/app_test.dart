@@ -44,6 +44,7 @@ void main() {
   testWidgets('first launch goes from splash through onboarding to home', (
     tester,
   ) async {
+    clock.current = DateTime(2026, 10, 16, 8);
     await tester.pumpAppPastSplash(height: 2400);
     expect(find.text('1/6'), findsOneWidget);
 

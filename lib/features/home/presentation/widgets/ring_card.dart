@@ -310,27 +310,39 @@ class _DayRing extends ConsumerWidget {
         ? ref.watch(habitStatsProvider(habitId)).value?.freeDays ?? 0
         : 0;
     final timer = isToday ? ref.watch(nextLogTimerProvider(habitId)) : null;
+    final showsTimer =
+        timer != null && !timer.isPast && !beforePlan && freeDays == 0;
     return Center(
       child: ProgressRing(
         progress: beforePlan ? null : progress,
-        child: timer != null && !beforePlan && freeDays == 0
-            ? _TimerCentre(timer: timer, progress: progress)
-            : SizedBox.square(
-                dimension: _centreSize,
-                // Large text shrinks to stay inside the ring.
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: beforePlan
-                      ? _BeforePlanCentre(count: progress.count)
-                      : freeDays > 0
-                      ? _FreeDaysCentre(days: freeDays, habit: habit)
-                      : _RingCentre(
-                          progress: progress,
-                          habit: habit,
-                          isToday: isToday,
-                        ),
+        child: AnimatedSwitcher(
+          duration: MediaQuery.disableAnimationsOf(context)
+              ? Duration.zero
+              : AppMotion.swap,
+          child: showsTimer
+              ? _TimerCentre(
+                  key: const ValueKey('timer'),
+                  timer: timer,
+                  progress: progress,
+                )
+              : SizedBox.square(
+                  key: const ValueKey('count'),
+                  dimension: _centreSize,
+                  // Large text shrinks to stay inside the ring.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: beforePlan
+                        ? _BeforePlanCentre(count: progress.count)
+                        : freeDays > 0
+                        ? _FreeDaysCentre(days: freeDays, habit: habit)
+                        : _RingCentre(
+                            progress: progress,
+                            habit: habit,
+                            isToday: isToday,
+                          ),
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }
@@ -504,7 +516,7 @@ class _Details extends StatelessWidget {
 /// The countdown to the next log, inside its own thin ring; the day's count
 /// drops to a small line.
 class _TimerCentre extends StatelessWidget {
-  const _TimerCentre({required this.timer, required this.progress});
+  const _TimerCentre({required this.timer, required this.progress, super.key});
 
   final NextLogTimer timer;
   final DailyProgress progress;
@@ -516,12 +528,9 @@ class _TimerCentre extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = context.textTheme;
     final colors = context.colors;
-    final past = timer.isPast;
-    final accent = past ? context.exhale.success.foreground : colors.primary;
     final count = '${progress.count} of ${progress.limit}';
-    final spoken = past
-        ? "You're on schedule."
-        : 'Next one on schedule in ${AppFormat.hoursMinutes(timer.left)}.';
+    final spoken =
+        'Next one on schedule in ${AppFormat.hoursMinutes(timer.left)}.';
 
     return Semantics(
       label: '$spoken $count today, ${progress.remaining} left.',
@@ -550,13 +559,12 @@ class _TimerCentre extends StatelessWidget {
                     style: text.displayLarge?.copyWith(
                       fontSize: 34,
                       height: 1.15,
-                      color: past ? accent : null,
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
                   Text(
-                    past ? "You're on schedule" : 'until your next',
-                    style: text.labelLarge?.copyWith(color: accent),
+                    'until your next',
+                    style: text.labelLarge?.copyWith(color: colors.primary),
                   ),
                   Text(
                     '$count · ${progress.remaining} left',

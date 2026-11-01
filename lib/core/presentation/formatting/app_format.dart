@@ -109,17 +109,13 @@ abstract final class AppFormat {
     return hours == 0 ? '${duration.inDays}d' : '${duration.inDays}d ${hours}h';
   }
 
-  /// 0:47:12 while counting down, rounded up so it reaches zero only at zero;
-  /// +0:12:03 from zero on.
+  /// 0:47:12, rounded up so it reaches zero only at zero.
   static String timer(Duration left) {
-    final past = left <= Duration.zero;
-    final micros = left.inMicroseconds.abs();
-    final seconds = past
-        ? micros ~/ Duration.microsecondsPerSecond
-        : (micros / Duration.microsecondsPerSecond).ceil();
+    final seconds = (left.inMicroseconds / Duration.microsecondsPerSecond)
+        .ceil();
     final minute = (seconds ~/ 60 % 60).toString().padLeft(2, '0');
     final second = (seconds % 60).toString().padLeft(2, '0');
-    return '${past ? '+' : ''}${seconds ~/ 3600}:$minute:$second';
+    return '${seconds ~/ 3600}:$minute:$second';
   }
 
   /// 47 min, 1 h, 1 h 27 min; part minutes round up.

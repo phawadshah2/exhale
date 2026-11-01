@@ -259,8 +259,7 @@ Updated each second while on screen.
 | Case | Shows |
 | --- | --- |
 | `next` in the future | `0:47:12` (always with hours), "until your next", "4 of 11 · 7 left", and a thin inner ring draining from full over `gap` |
-| `next` passed | `+0:12:03` in the success colour, "You're on schedule", the count line, an empty inner ring |
-| At or over the limit, limit 0, before wake, no wake/bed, a past day | The count, as before; no inner ring |
+| `next` passed (Fawad, 2026-11-01: no count-up), at or over the limit, limit 0, before wake, no wake/bed, a past day | The count, as before; no inner ring. A log that puts `next` in the future starts the timer again |
 
 **+ button.** While `next` is in the future: a ring around it draining the same way
 and a chip above it with whole minutes only (`47 min`, `87 min`). Otherwise neither.
