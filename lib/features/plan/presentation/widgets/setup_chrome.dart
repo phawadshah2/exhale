@@ -31,6 +31,7 @@ class SetupScaffold extends StatelessWidget {
         children: [
           GestureDetector(
             behavior: HitTestBehavior.translucent,
+            excludeFromSemantics: true,
             onTap: () => FocusScope.of(context).unfocus(),
             child: ListView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -97,8 +98,8 @@ class SetupFooter extends StatelessWidget {
     required this.label,
     required this.bottomInset,
     required this.onPressed,
+    required this.caption,
     this.isBusy = false,
-    this.caption = 'You can adjust your plan anytime in Settings.',
     super.key,
   });
 

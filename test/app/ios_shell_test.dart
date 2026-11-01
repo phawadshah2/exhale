@@ -185,10 +185,7 @@ void main() {
       await tester.pumpInSteps(const Duration(seconds: 2));
       await tester.pumpAndSettle();
       expect(find.text('Hold + for more'), findsOneWidget);
-      expect(
-        find.text('Add a missed log, or start tracking another habit.'),
-        findsOneWidget,
-      );
+      expect(find.text('Add a missed log.'), findsOneWidget);
 
       await tester.tap(find.text('Got it'));
       await tester.pumpAndSettle();

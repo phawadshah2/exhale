@@ -87,7 +87,7 @@ class _LogHintBubble extends StatelessWidget {
                 Text('Hold + for more', style: text.titleMedium),
                 const SizedBox(height: 4),
                 Text(
-                  'Add a missed log, or start tracking another habit.',
+                  'Add a missed log.',
                   style: text.bodyMedium?.copyWith(
                     color: colors.onSurfaceVariant,
                   ),

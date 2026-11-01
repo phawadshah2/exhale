@@ -30,7 +30,7 @@ abstract final class OnboardingCopy {
   // Habit.
   static const habitPrompt = "Let's start with the obvious.";
   static const habitTitle = 'What are we quitting?';
-  static const habitLead = 'Pick the main one. You can add another later.';
+  static const habitLead = 'Pick the main one.';
   static const changeHabitPrompt = 'New target? We can take it.';
   static const changeHabitTitle = 'Change habit';
   static String changeHabitLead(String current) =>

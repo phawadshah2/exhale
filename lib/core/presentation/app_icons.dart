@@ -41,7 +41,6 @@ abstract final class AppIcons {
   static const IconData info = CupertinoIcons.info_circle;
   static const IconData tune = CupertinoIcons.slider_horizontal_3;
   static const IconData person = CupertinoIcons.person_fill;
-  static const IconData palette = CupertinoIcons.paintbrush;
   static const IconData appearance = CupertinoIcons.circle_lefthalf_fill;
   static const IconData glass = CupertinoIcons.drop;
 

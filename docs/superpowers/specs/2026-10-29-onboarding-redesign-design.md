@@ -72,7 +72,7 @@ habit exists): the short splash goes straight to Home, as today.
 ### 4.2 Habit (2/6)
 
 - Exhale: "Let's start with the obvious." Title "What are we quitting?",
-  lead "Pick the main one. You can add another later."
+  lead "Pick the main one."
 - 2-column grid of the 8 presets (icon + name), selected card in the accent
   with a check. Default: vaping.
 - **Something else** (full width, dashed) expands name and unit fields in

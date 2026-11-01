@@ -56,8 +56,8 @@ log each use with one tap (logging is always allowed, even over the limit).
   (`Result`/`Failure`, `Clock`, `LogicalDay`, `DayBoundary`), `presentation`,
   `theme`, `widgets`.
 - `lib/features/<feature>/{data,domain,presentation}`: clean architecture.
-  Each feature has a `*_injection.dart`. Features: habit, home, onboarding,
-  plan, settings, tracking, design_system.
+  Each feature has a `*_injection.dart`. Features: habit, home, logs,
+  onboarding, plan, settings, tracking.
 - **State:** Riverpod 3 with hand-written providers. **No riverpod_generator.**
   Providers read repositories and use cases from `sl`.
 - **Storage:** drift, fully offline, currently **schema v9** (`habits`;
