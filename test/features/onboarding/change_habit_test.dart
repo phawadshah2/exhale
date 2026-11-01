@@ -27,6 +27,7 @@ import 'package:exhale/features/settings/domain/repositories/settings_repository
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -403,6 +404,32 @@ void main() {
 
     await tester.disposeApp();
   });
+
+  testWidgets(
+    'on iOS, replacing with Edit plan underneath does not throw',
+    (tester) async {
+      // The native alert answers Replace, its second action.
+      const channel = MethodChannel('exhale/native_ui');
+      final messenger = tester.binding.defaultBinaryMessenger
+        ..setMockMethodCallHandler(
+          channel,
+          (call) async => call.method == 'showAlert' ? 1 : false,
+        );
+      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
+      await seedHabit(plan, habit: Habit.vaping);
+      await openChangeHabit(tester);
+      await walkToDeal(tester);
+
+      await shake(tester);
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(HabitDashboard), findsOneWidget);
+
+      await tester.disposeApp();
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.iOS),
+  );
 
   testWidgets('a link to a habit no longer tracked returns Home', (
     tester,
