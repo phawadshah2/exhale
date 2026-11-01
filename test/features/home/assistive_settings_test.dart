@@ -36,24 +36,31 @@ void main() {
   setUp(() => setUpTestDependencies(clock));
   tearDown(InjectionContainer.reset);
 
-  Future<int> seed({int logs = 3}) async {
-    final repository = sl<SettingsRepository>();
-    final current = await repository.get() as Success<AppSettings>;
-    await repository.save(
-      current.value.copyWith(wakeMinute: () => 450, bedMinute: () => 1410),
-    );
+  Future<int> seed({
+    int logs = 3,
+    bool window = true,
+    LogicalDay? startDay,
+    LogicalDay? quitDay,
+  }) async {
+    if (window) {
+      final repository = sl<SettingsRepository>();
+      final current = await repository.get() as Success<AppSettings>;
+      await repository.save(
+        current.value.copyWith(wakeMinute: () => 450, bedMinute: () => 1410),
+      );
+    }
     final habitId = await seedHabit(
       PlanDraft(
-        startDay: today.addDays(-3),
+        startDay: startDay ?? today.addDays(-3),
         startLimit: 9,
-        quitDay: today.addDays(60),
+        quitDay: quitDay ?? today.addDays(60),
       ),
     );
     for (var i = 0; i < logs; i++) {
       await sl<AddHabitLog>()(
         AddHabitLogInput(
           habitId: habitId,
-          loggedAt: DateTime(2026, 10, 29, 8 + i),
+          loggedAt: DateTime(2026, 10, 29, 8 + i % 7, i ~/ 7),
           trigger: Trigger.avoidingTasks,
           note: 'Between meetings, again',
         ),
@@ -128,6 +135,39 @@ void main() {
       await expectWholeText(tester);
     });
 
+    // An overflow in the ring fails these by itself.
+    testWidgets('the ring holds at the limit', (tester) async {
+      await seed(logs: 9);
+      await tester.pumpAppPastSplash(height: 6000);
+      expect(find.text('Limit reached'), findsOneWidget);
+      await expectWholeText(tester);
+    });
+
+    testWidgets('the ring holds over the limit', (tester) async {
+      await seed(logs: 11);
+      await tester.pumpAppPastSplash(height: 6000);
+      expect(find.text('2 over limit'), findsOneWidget);
+      await expectWholeText(tester);
+    });
+
+    testWidgets('the ring holds after the quit date', (tester) async {
+      await seed(
+        logs: 0,
+        startDay: today.addDays(-30),
+        quitDay: today.addDays(-2),
+      );
+      await tester.pumpAppPastSplash(height: 6000);
+      expect(find.byKey(const Key('day-count')), findsWidgets);
+      await expectWholeText(tester);
+    });
+
+    testWidgets('the ring holds with no day window', (tester) async {
+      await seed(window: false);
+      await tester.pumpAppPastSplash(height: 6000);
+      expect(find.byKey(const Key('day-count')), findsWidgets);
+      await expectWholeText(tester);
+    });
+
     testWidgets('text stops growing at 200%', (tester) async {
       await seed();
       await tester.pumpAppPastSplash(height: 6000);
@@ -137,7 +177,64 @@ void main() {
     });
   });
 
+  group('the trigger sheet', () {
+    Future<void> expectSaves(WidgetTester tester) async {
+      final save = find.text('Save without trigger');
+      await tester.ensureVisible(save);
+      await tester.pumpAndSettle();
+      await tester.tap(save.hitTestable());
+      await tester.pumpAndSettle();
+      expect(find.text('What triggered this one?'), findsNothing);
+      await tester.disposeApp();
+    }
+
+    testWidgets('scrolls to Save on a small phone', (tester) async {
+      await seed();
+      await tester.pumpAppPastSplash(height: 667);
+      await tester.tap(find.byTooltip('Log'));
+      await tester.pumpAndSettle();
+      await expectSaves(tester);
+    });
+
+    testWidgets('scrolls to Save with large text', (tester) async {
+      binding.platformDispatcher.textScaleFactorTestValue = 3;
+      addTearDown(binding.platformDispatcher.clearTextScaleFactorTestValue);
+      await seed();
+      await tester.pumpAppPastSplash();
+      await tester.tap(find.byTooltip('Log'));
+      await tester.pumpAndSettle();
+      await expectSaves(tester);
+    });
+
+    testWidgets('scrolls to Save with the keyboard up', (tester) async {
+      await seed();
+      await tester.pumpAppPastSplash();
+      await tester.tap(find.byTooltip('Log'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(TextField));
+      tester.view.viewInsets = const FakeViewPadding(bottom: 336 * 3);
+      addTearDown(tester.view.resetViewInsets);
+      await tester.pumpAndSettle();
+      await expectSaves(tester);
+    });
+  });
+
   group('VoiceOver', () {
+    testWidgets('the Edit log time row is a button', (tester) async {
+      final handle = tester.ensureSemantics();
+      await seed();
+      await tester.pumpAppPastSplash(height: 2400);
+      await tester.scrollAndTap(find.text('10:00 AM'));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.getSemantics(find.text('Time')),
+        isSemantics(isButton: true, hasTapAction: true),
+      );
+      handle.dispose();
+      await tester.disposeApp();
+    });
+
     testWidgets('+ offers tap and long press', (tester) async {
       final handle = tester.ensureSemantics();
       await seed();

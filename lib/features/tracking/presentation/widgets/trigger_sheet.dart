@@ -80,7 +80,7 @@ class _TriggerSheetState extends ConsumerState<_TriggerSheet> {
         ? habit.name
         : '${habit.name} · ${progress.count + 1} of ${progress.limit} '
               'after this';
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
         0,

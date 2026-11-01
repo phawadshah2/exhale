@@ -55,6 +55,18 @@ void main() {
         pair('success on a card', exhale.success.foreground, card);
         pair('warning on a card', exhale.warning.foreground, card);
         pair('danger on a card', exhale.danger.foreground, card);
+        pair('primary on a panel', scheme.primary, scheme.surfaceContainerHigh);
+        for (final (name, status) in [
+          ('success', exhale.success),
+          ('warning', exhale.warning),
+          ('danger', exhale.danger),
+        ]) {
+          pair(
+            '$name badge on its tint',
+            status.foreground,
+            Color.alphaBlend(status.soft, card),
+          );
+        }
       });
     }
   }
