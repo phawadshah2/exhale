@@ -193,11 +193,15 @@ class _WelcomeStepState extends State<WelcomeStep>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      OnboardingCopy.welcomeTitle,
-                      style: text.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        height: 1.15,
+                    // Capped: past this "negotiating" no longer fits a line.
+                    MediaQuery.withClampedTextScaling(
+                      maxScaleFactor: 1.5,
+                      child: Text(
+                        OnboardingCopy.welcomeTitle,
+                        style: text.headlineLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          height: 1.15,
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),

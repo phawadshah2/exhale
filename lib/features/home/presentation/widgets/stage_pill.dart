@@ -44,14 +44,15 @@ class StagePill extends StatelessWidget {
       );
     } else {
       chip = quit ? 'QUIT' : 'SOON';
+      final large = context.hasLargeText;
       label = Text(
         quit
             ? '${habit.freeTitle} since ${AppFormat.monthDay(plan.quitDay)}'
             : 'Plan starts ${AppFormat.monthDay(plan.startDay)} · '
                   'Daily limit: ${plan.startLimit}',
         style: style,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
+        maxLines: large ? null : 1,
+        overflow: large ? null : TextOverflow.ellipsis,
       );
     }
 
@@ -94,7 +95,8 @@ class StagePill extends StatelessWidget {
   }
 }
 
-/// The name gives way first, so a long one never hides the target.
+/// The name gives way first, so a long one never hides the target. With large
+/// text both wrap instead.
 class _NameAndTarget extends StatelessWidget {
   const _NameAndTarget({
     required this.name,
@@ -107,27 +109,29 @@ class _NameAndTarget extends StatelessWidget {
   final TextStyle? style;
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, box) => Row(
-      children: [
-        Flexible(
-          child: Text(
-            name,
-            style: style,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+  Widget build(BuildContext context) => context.hasLargeText
+      ? Text('$name · $target', style: style)
+      : LayoutBuilder(
+          builder: (context, box) => Row(
+            children: [
+              Flexible(
+                child: Text(
+                  name,
+                  style: style,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: box.maxWidth),
+                child: Text(
+                  ' · $target',
+                  style: style,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
-        ),
-        ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: box.maxWidth),
-          child: Text(
-            ' · $target',
-            style: style,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    ),
-  );
+        );
 }

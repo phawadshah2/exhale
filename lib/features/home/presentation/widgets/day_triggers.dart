@@ -106,6 +106,35 @@ class _TriggerRow extends StatelessWidget {
     final percent = (share.fraction * 100).round();
     final tap = onTap == null ? null : () => onTap!(share.trigger);
     final logs = share.count == 1 ? '1 log' : '${share.count} logs';
+    final labelStyle = text.bodyMedium?.copyWith(fontWeight: FontWeight.w600);
+    final large = context.hasLargeText;
+    final bar = Expanded(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(99),
+        // Keyed by day, so each day's bars fill from empty.
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: share.fraction),
+          duration: AppMotion.fill,
+          curve: AppMotion.fillCurve,
+          builder: (context, value, _) => LinearProgressIndicator(
+            value: value,
+            minHeight: 8,
+            color: color,
+            backgroundColor: colors.outlineVariant,
+          ),
+        ),
+      ),
+    );
+    final count = Text(
+      '${share.count} · $percent%',
+      textAlign: TextAlign.right,
+      style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+    );
+    final chevron = Icon(
+      AppIcons.chevronRight,
+      size: 14,
+      color: colors.onSurfaceVariant,
+    );
     return Semantics(
       container: true,
       button: tap != null,
@@ -118,55 +147,35 @@ class _TriggerRow extends StatelessWidget {
         onTap: tap,
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 44),
-          child: Row(
-            spacing: 10,
-            children: [
-              SizedBox(
-                width: 78,
-                child: Text(
-                  share.trigger.label,
-                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  // Keyed by day, so each day's bars fill from empty.
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0, end: share.fraction),
-                    duration: AppMotion.fill,
-                    curve: AppMotion.fillCurve,
-                    builder: (context, value, _) => LinearProgressIndicator(
-                      value: value,
-                      minHeight: 8,
-                      color: color,
-                      backgroundColor: colors.outlineVariant,
+          child: large
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 4,
+                  children: [
+                    Text(share.trigger.label, style: labelStyle),
+                    Row(spacing: 10, children: [bar, count, chevron]),
+                  ],
+                )
+              : Row(
+                  spacing: 10,
+                  children: [
+                    SizedBox(
+                      width: 78,
+                      child: Text(
+                        share.trigger.label,
+                        style: labelStyle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              MediaQuery.withClampedTextScaling(
-                maxScaleFactor: 1.5,
-                child: SizedBox(
-                  width: 56,
-                  child: Text(
-                    '${share.count} · $percent%',
-                    textAlign: TextAlign.right,
-                    style: text.bodySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
+                    bar,
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(minWidth: 56),
+                      child: count,
                     ),
-                  ),
+                    chevron,
+                  ],
                 ),
-              ),
-              Icon(
-                AppIcons.chevronRight,
-                size: 14,
-                color: colors.onSurfaceVariant,
-              ),
-            ],
-          ),
         ),
       ),
     );

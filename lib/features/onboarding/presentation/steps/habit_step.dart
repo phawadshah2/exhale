@@ -55,6 +55,7 @@ class _HabitStepState extends ConsumerState<HabitStep> {
     final controller = ref.read(onboardingFormProvider.notifier);
     final kind = form.habitKind;
     const presets = Habit.presets;
+    final perRow = context.hasLargeText ? 1 : 2;
 
     return OnboardingStepFrame(
       button: PrimaryButton(
@@ -79,7 +80,7 @@ class _HabitStepState extends ConsumerState<HabitStep> {
               lead: OnboardingCopy.habitLead,
             ),
           const SizedBox(height: AppSpacing.md + 4),
-          for (var i = 0; i < presets.length; i += 2)
+          for (var i = 0; i < presets.length; i += perRow)
             StepReveal(
               index: 3 + i ~/ 2,
               child: Padding(
@@ -87,7 +88,7 @@ class _HabitStepState extends ConsumerState<HabitStep> {
                 child: Row(
                   spacing: _gap,
                   children: [
-                    for (final habit in presets.skip(i).take(2))
+                    for (final habit in presets.skip(i).take(perRow))
                       Expanded(
                         child: _HabitCard(
                           icon: habit.kind.icon,

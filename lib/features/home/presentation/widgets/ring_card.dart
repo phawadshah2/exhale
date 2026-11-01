@@ -84,31 +84,32 @@ class RingCard extends ConsumerWidget {
               // keeps the card from shifting when switching between them.
               child: ConstrainedBox(
                 constraints: const BoxConstraints(minHeight: 40),
-                child: Row(
-                  children: [
-                    Icon(AppIcons.breath, color: colors.primary, size: 22),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        isToday
-                            ? "Today's Consumption"
-                            : AppFormat.weekdayDate(day),
-                        style: text.titleLarge,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                child: _CardHeader(
+                  title: Row(
+                    children: [
+                      Icon(AppIcons.breath, color: colors.primary, size: 22),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          isToday
+                              ? "Today's Consumption"
+                              : AppFormat.weekdayDate(day),
+                          style: text.titleLarge,
+                        ),
                       ),
-                    ),
-                    if (!isToday)
-                      MediaQuery.withClampedTextScaling(
-                        maxScaleFactor: 1.5,
-                        child: _TodayChip(onTap: picker.showToday),
-                      )
-                    else if (progress != null)
-                      StatusBadge(
-                        label: progress.badgeLabel(habit),
-                        colors: progress.status.colors(context),
-                      ),
-                  ],
+                    ],
+                  ),
+                  trailing: !isToday
+                      ? MediaQuery.withClampedTextScaling(
+                          maxScaleFactor: 1.5,
+                          child: _TodayChip(onTap: picker.showToday),
+                        )
+                      : progress != null
+                      ? StatusBadge(
+                          label: progress.badgeLabel(habit),
+                          colors: progress.status.colors(context),
+                        )
+                      : null,
                 ),
               ),
             ),
@@ -426,6 +427,32 @@ class _TodayDetails extends ConsumerWidget {
   }
 }
 
+/// The title with [trailing] at its end, or under it with large text.
+class _CardHeader extends StatelessWidget {
+  const _CardHeader({required this.title, required this.trailing});
+
+  final Widget title;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final end = trailing;
+    if (end == null) return title;
+    return context.hasLargeText
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: AppSpacing.xs,
+            children: [title, end],
+          )
+        : Row(
+            children: [
+              Expanded(child: title),
+              end,
+            ],
+          );
+  }
+}
+
 typedef _Cell = (IconData icon, String label, String value);
 
 class _Details extends StatelessWidget {
@@ -436,6 +463,15 @@ class _Details extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (context.hasLargeText) {
+      return Column(
+        spacing: AppSpacing.sm,
+        children: [
+          _InfoCell(cell: left),
+          _InfoCell(cell: right),
+        ],
+      );
+    }
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

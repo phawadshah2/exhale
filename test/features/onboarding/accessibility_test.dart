@@ -5,6 +5,7 @@ import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart'
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../helpers/fixed_clock.dart';
+import '../../helpers/large_text.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
@@ -59,7 +60,10 @@ void main() {
   testWidgets('every step has no overflow at 3x text', (tester) async {
     binding.platformDispatcher.textScaleFactorTestValue = 3;
     addTearDown(binding.platformDispatcher.clearTextScaleFactorTestValue);
+    await loadAppFonts();
+    final clipped = <String>{};
     // An overflow on any step fails the test by itself.
-    await walk(tester, () async {}, 5000);
+    await walk(tester, () async => clipped.addAll(tester.clippedTexts()), 5000);
+    expect(clipped, isEmpty);
   });
 }

@@ -61,12 +61,16 @@ class NextLogBadge extends ConsumerWidget {
                     horizontal: 12,
                     vertical: 6,
                   ),
-                  child: Text(
-                    minutes,
-                    style: context.textTheme.labelLarge?.copyWith(
-                      color: colors.primary,
-                      fontWeight: FontWeight.w700,
-                      fontFeatures: const [FontFeature.tabularFigures()],
+                  // Capped: it floats over the page, and the ring repeats it.
+                  child: MediaQuery.withClampedTextScaling(
+                    maxScaleFactor: 1.5,
+                    child: Text(
+                      minutes,
+                      style: context.textTheme.labelLarge?.copyWith(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w700,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
                     ),
                   ),
                 ),

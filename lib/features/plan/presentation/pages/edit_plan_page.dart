@@ -184,6 +184,7 @@ class _EditPlanForm extends ConsumerWidget {
             maxLength: HabitValidation.maxReasonLength,
             decoration: const InputDecoration(
               hintText: 'More energy for the people I love',
+              hintMaxLines: 3,
               counterText: '',
             ),
           ),

@@ -42,8 +42,6 @@ class HomeHeader extends StatelessWidget {
               Text(
                 name == null ? greeting : '$greeting, $name',
                 style: text.headlineSmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -106,10 +104,14 @@ class _Avatar extends StatelessWidget {
                       side: BorderSide(color: colors.surface, width: 2),
                     ),
                   ),
-                  child: Text(
-                    'D$dayNumber',
-                    style: context.textTheme.labelSmall?.copyWith(
-                      color: colors.onPrimaryContainer,
+                  // Capped so it never covers the avatar.
+                  child: MediaQuery.withClampedTextScaling(
+                    maxScaleFactor: 1.3,
+                    child: Text(
+                      'D$dayNumber',
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: colors.onPrimaryContainer,
+                      ),
                     ),
                   ),
                 ),

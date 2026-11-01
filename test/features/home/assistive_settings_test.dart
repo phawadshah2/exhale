@@ -25,6 +25,7 @@ import 'package:go_router/go_router.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 import '../../helpers/fixed_clock.dart';
+import '../../helpers/large_text.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
@@ -62,20 +63,26 @@ void main() {
   }
 
   group('at 3x text', () {
+    setUpAll(loadAppFonts);
     setUp(() {
       binding.platformDispatcher.textScaleFactorTestValue = 3;
     });
     tearDown(binding.platformDispatcher.clearTextScaleFactorTestValue);
 
-    testWidgets('Home has no overflow', (tester) async {
+    // An overflow fails the test by itself; clipped text does not.
+    Future<void> expectWholeText(WidgetTester tester) async {
+      final clipped = tester.clippedTexts();
+      await tester.disposeApp();
+      expect(clipped, isEmpty);
+    }
+
+    testWidgets('Home keeps its text whole', (tester) async {
       await seed();
       await tester.pumpAppPastSplash(height: 6000);
-      final error = tester.takeException();
-      await tester.disposeApp();
-      expect(error, isNull);
+      await expectWholeText(tester);
     });
 
-    testWidgets('Logs has no overflow', (tester) async {
+    testWidgets('Logs keeps its text whole', (tester) async {
       await seed();
       await tester.pumpAppPastSplash(height: 6000);
       final context = tester.element(find.byType(Scaffold).first);
@@ -85,48 +92,48 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      final error = tester.takeException();
-      await tester.disposeApp();
-      expect(error, isNull);
+      await expectWholeText(tester);
     });
 
-    testWidgets('Settings has no overflow', (tester) async {
+    testWidgets('Settings keeps its text whole', (tester) async {
       await seed();
       await tester.pumpAppPastSplash(height: 6000);
       await tester.tap(find.byTooltip('Settings'));
       await tester.pumpAndSettle();
-      await tester.disposeApp();
+      await expectWholeText(tester);
     });
 
-    testWidgets('Edit plan has no overflow', (tester) async {
+    testWidgets('Edit plan keeps its text whole', (tester) async {
       await seed();
       await tester.pumpAppPastSplash(height: 6000);
       final context = tester.element(find.byType(Scaffold).first);
       unawaited(GoRouter.of(context).push(AppRoutes.editPlanFor(1)));
       await tester.pumpAndSettle();
-      final error = tester.takeException();
-      await tester.disposeApp();
-      expect(error, isNull);
+      await expectWholeText(tester);
     });
 
-    testWidgets('the Edit log sheet has no overflow', (tester) async {
+    testWidgets('the Edit log sheet keeps its text whole', (tester) async {
       await seed();
       await tester.pumpAppPastSplash(height: 6000);
       await tester.scrollAndTap(find.text('10:00 AM'));
       await tester.pumpAndSettle();
-      final error = tester.takeException();
-      await tester.disposeApp();
-      expect(error, isNull);
+      await expectWholeText(tester);
     });
 
-    testWidgets('the trigger sheet has no overflow', (tester) async {
+    testWidgets('the trigger sheet keeps its text whole', (tester) async {
       await seed();
       await tester.pumpAppPastSplash(height: 6000);
       await tester.tap(find.byTooltip('Log'));
       await tester.pumpAndSettle();
-      final error = tester.takeException();
+      await expectWholeText(tester);
+    });
+
+    testWidgets('text stops growing at 200%', (tester) async {
+      await seed();
+      await tester.pumpAppPastSplash(height: 6000);
+      final context = tester.element(find.byType(Scaffold).first);
+      expect(MediaQuery.textScalerOf(context).scale(1), 2);
       await tester.disposeApp();
-      expect(error, isNull);
     });
   });
 

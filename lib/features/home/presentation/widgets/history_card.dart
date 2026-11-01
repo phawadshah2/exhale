@@ -114,9 +114,12 @@ class _HistoryCardState extends ConsumerState<HistoryCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                runSpacing: AppSpacing.sm,
                 children: [
-                  Expanded(child: Text('History', style: text.headlineSmall)),
+                  Text('History', style: text.headlineSmall),
                   SizedBox(
                     width: 216,
                     child: PillSegmentedControl<HistoryPeriod>(

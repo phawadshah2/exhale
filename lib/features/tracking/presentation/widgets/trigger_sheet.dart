@@ -111,7 +111,6 @@ class _TriggerSheetState extends ConsumerState<_TriggerSheet> {
                   Flexible(
                     child: Text(
                       chip,
-                      overflow: TextOverflow.ellipsis,
                       style: text.labelMedium?.copyWith(
                         color: colors.onSurface,
                         fontWeight: FontWeight.w700,

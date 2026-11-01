@@ -89,8 +89,7 @@ class AmountStep extends ConsumerWidget {
                           const SizedBox(height: AppSpacing.xs),
                           Text(
                             OnboardingCopy.perDay(habit.units),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
                             style: context.textTheme.bodyMedium?.copyWith(
                               color: context.colors.onSurfaceVariant,
                             ),

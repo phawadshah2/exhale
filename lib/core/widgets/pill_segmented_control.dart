@@ -107,15 +107,25 @@ class _SegmentLabel<T> extends StatelessWidget {
                 unawaited(HapticFeedback.selectionClick());
                 parent.onChanged(segment.value);
               },
-        child: Center(
-          child: AnimatedDefaultTextStyle(
-            duration: PillSegmentedControl._duration,
-            style: context.textTheme.labelLarge!.copyWith(
-              color: isSelected
-                  ? colors.onPrimaryContainer
-                  : colors.onSurfaceVariant,
+        // Capped and fitted, as the track's height and width are fixed.
+        child: MediaQuery.withClampedTextScaling(
+          maxScaleFactor: 1.5,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: AnimatedDefaultTextStyle(
+                  duration: PillSegmentedControl._duration,
+                  style: context.textTheme.labelLarge!.copyWith(
+                    color: isSelected
+                        ? colors.onPrimaryContainer
+                        : colors.onSurfaceVariant,
+                  ),
+                  child: Text(segment.label),
+                ),
+              ),
             ),
-            child: Text(segment.label),
           ),
         ),
       ),
