@@ -23,8 +23,26 @@ quit reached, Edit plan and Change habit, after-bed live, Reduce Motion in motio
 only). Two spare QA simulators may still be booted, one with Reduce Motion and
 Reduce Transparency on.
 
-**Next action:** walk the unseen states on a simulator, then the launch PR, with the
-iPhone pass listed as pending.
+**Next action:** Fawad's calls below, then the launch PR, with the iPhone pass listed as
+pending.
+
+Simulator walk (2026-11-01, iPhone Air and SE, from stills): seen working: timer reaching
+zero and hiding, a log restarting it, carry-over, Undo, the long + chip, quit reached, Keep
+at zero, New goal, Edit plan, Change habit to Home, after bed, the SE stage pill. Not seen:
+Reduce Motion in motion, which stills can't show; the fade at zero (only the state after it).
+
+Found and fixed: Replace crashed on iOS (`7b55f5a`). `context.go` removes Edit plan during a
+build, and on iOS that fires `didPopNext`, which changed a provider mid-build. The 5.1b note
+below that it "never fires here" was wrong: widget tests run as Android, where it doesn't
+fire. The new test is iOS only and was seen failing with the app's error. Most widget tests
+still run as Android, though the app is iOS only; that gap is open. Also fixed (`56ddde4`):
+`1 sessions`, page text showing through the Edit plan footer, the chip over the snackbar, no
+gap above the empty triggers box. Those four have no failing test seen first; `1 sessions`
+has a test written with the fix. Full suite 680 passed, format and analyze clean.
+
+For Fawad: scrolling pages run under the status bar on Home and Edit plan, so text collides
+with the clock (not fixed, it needs a design call). `limit 0` overlaps the last day's `0` in
+the Week chart. New goal after quitting offers a limit of 1 with "0 sessions avoided".
 
 + chip (Fawad, 2026-11-01): hours and minutes from 60 minutes (`1 h 27 min`, was `87 min`),
 which settles `703 min`. VoiceOver reads the same. Spec 8.2 is updated. Not seen on a
