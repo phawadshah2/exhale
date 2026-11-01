@@ -247,7 +247,7 @@ class RingCard extends ConsumerWidget {
                     ),
                     if (!beforePlan) ...[
                       _Reveal(
-                        show: logs.value?.isNotEmpty ?? false,
+                        show: isToday || (logs.value?.isNotEmpty ?? false),
                         child: const SizedBox(height: AppSpacing.md),
                       ),
                       DayTriggers(

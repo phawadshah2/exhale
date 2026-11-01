@@ -119,10 +119,10 @@ class SetupFooter extends StatelessWidget {
           end: Alignment.bottomCenter,
           colors: [
             colors.surface.withValues(alpha: 0),
-            colors.surface.withValues(alpha: 0.85),
+            colors.surface,
             colors.surface,
           ],
-          stops: const [0, 0.45, 1],
+          stops: const [0, 0.3, 1],
         ),
       ),
       child: Padding(

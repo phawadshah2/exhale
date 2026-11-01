@@ -80,6 +80,19 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('a daily limit of one reads in the singular', (tester) async {
+    await openEditPlan(tester);
+
+    for (var i = 0; i < 20; i++) {
+      await tester.tap(find.byTooltip('Decrease daily limit'));
+      await tester.pump();
+    }
+
+    expect(find.text('cigarette'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('price is saved with the plan', (tester) async {
     await openEditPlan(tester);
 

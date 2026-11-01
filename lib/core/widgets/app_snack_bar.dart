@@ -31,6 +31,8 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showAppSnackBar(
       padding: EdgeInsets.zero,
       clipBehavior: Clip.none,
       behavior: SnackBarBehavior.floating,
+      // Clears the next-log chip above the + button.
+      margin: const EdgeInsets.fromLTRB(15, 5, 15, 42),
       duration: visibleFor,
       persist: false,
       content: AppSnackBarContent(
