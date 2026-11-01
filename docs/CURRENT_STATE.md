@@ -1,30 +1,130 @@
 # Current state
 
-Updated 2026-11-01. Goal: release candidate, M5 of
+Updated 2026-11-02. Goal: release candidate, M5 of
 `docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`. The first release
 tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a
 prefilled compare link.
 
-**M5 is done on `feat/launch-states` (head fefc700) except the real iPhone pass.**
+**M5 is done on `feat/launch-states` (head 1b21134) except the real iPhone pass.**
 Tasks 5.1 to 5.3, the independent review (0541760..43131f4, verdict "With fixes") and
-all its fixes are committed. The branch is on `origin`; check `git status` for what is not pushed. Local `main`
-has one docs commit (0541760) that goes up with the launch PR. Uncommitted: this file,
-`CLAUDE.md`, the plan and the roadmap (docs only).
+all its fixes are committed. PR #27 (up to fefc700) and PR #28 (up to 1b21134) are merged to
+`main` (51e0bc6, same tree as 1b21134). Local `main` is still behind `origin/main`.
 
-Checks at fefc700: format clean, `analyze --fatal-infos` clean, full suite 677 passed.
-Not run at handoff (docs only).
+Checks at 56ddde4, the last code commit: format clean, `analyze --fatal-infos` clean, full
+suite 680 passed. Not run at handoff (docs only).
 
-Simulator walk, seen: fresh onboarding on Air and SE; timer counting up and down; Settings;
-dark with Ink on Home, Logs and Edit log; light with Eucalyptus and Ocean on Home; largest
-text on Home, Logs and Edit log (after the fixes, only the top of Home); SE trigger sheet;
-Reduce Transparency.
-Not seen: the stage pill fix on SE (rebuilt, no screenshot taken), carry-over, Undo snackbar,
-quit reached, Edit plan and Change habit, after-bed live, Reduce Motion in motion (stills
-only). Two spare QA simulators may still be booted, one with Reduce Motion and
-Reduce Transparency on.
+**Next action (2026-11-02):** Fawad reviews
+`docs/superpowers/specs/2026-11-02-stage-management-design.md` (rules and frames AA to AD approved).
+Then write the spec for Plan details, Edit plan and Logs, which is built first, and a plan for
+both (Opus 5.5 high:
+price-history migration, replans on K), then build on Sonnet 5.5 medium, on a new branch from an updated `main`. CI on PR #28 was not
+read here. The real iPhone pass stays pending. Read first: `CLAUDE.md`, `design/README.md`, the
+"Design round" section below.
 
-**Next action:** Fawad's calls below, then the launch PR, with the iPhone pass listed as
-pending.
+State: design only, no app code changed. Checks not run (docs and designs only); last code
+checks are noted below. Branch `feat/plan-and-stages` from `origin/main` (51e0bc6), local only.
+Left uncommitted on purpose: `design/all-designs.html` (6.7 MB) and `design/figma-import/`
+(3 MB, temporary).
+
+## Design round in progress (2026-11-01): Plan details, Edit plan, Logs
+
+Design only, no app code yet. Fawad wants all three designs final first, then one
+development pass. Canvas: https://claude.ai/artifact/JaQJQ5meV7qTnZNeKiPkoK
+All designs so far are in one file, `design/all-designs.html`. Later canvas edits don't reach
+it or `design/8._plan_edit_logs/` by themselves. **The Figma copy is unfinished:** the Starter
+plan's tool-call limit stopped the import; `design/README.md` says exactly what is left.
+
+- **Plan details: final, frame K** (`StagesRings`, "Ring ladder"). Ring stepper grouped
+  Behind you, You, Ahead of you; stages open and close independently; the top card is the
+  four tiles from frame I (sessions used, avoided, money saved, days kept) and the
+  "Without a plan" line. "Missed" is read as days over the limit, not yet confirmed.
+  When built: a replan restarts stage numbers at 1, so K must also show the earlier
+  plan's stages under Behind you, and the tile totals must span both plans.
+  No connector lines (Fawad tried them and removed them). Current stage (Fawad, 2026-11-01):
+  rings per day with counts for at most 2 rows (7 to a row, so up to 14 days, frames X and
+  Y); longer stages show one dot per day coloured by result (frame Z), start date above the
+  first dot. Dots: 13 to a row at 16 px up to 4 rows (52 days); then 4 rows with more across
+  and smaller dots, down to 7 px at 33 across (132 days); past that the dots stay at 7 px
+  and the rows grow (Fawad). Everything else in the card is shared. Frame K itself still
+  shows the older dot rows.
+- **Edit plan: frame N** (`EditDial`, "Dial and ruler"), with a price card added.
+- **Logs: final, frame T** (`LogsCombined`): Q's ring calendar with Week and Month and a
+  month picker, P's trigger bar, R's rail, a colour key under the calendar, and a hint to
+  use + for missed logs instead of a button. + opens with the selected day filled in.
+- **All three signed off by Fawad (2026-11-01).** K's current-stage card is built from Y and
+  Z; frame K itself still draws the older dot rows. Next: the parked question below, then
+  a written spec and plan, then one development pass on a new branch from an updated `main`.
+- **Must handle when building Edit plan:** `EditPlanController.save` always calls
+  `savePlan`, so a save that changes only the price still starts a new plan today and
+  restarts the stage numbers. A price-only save must leave the plan alone. Read from the
+  code, not run.
+- **Price changes:** `habits.price_cents` holds one price and Home's savings use it for every
+  day. N's card, signed off, promises "Counts from today. What you've saved so far stays as
+  it is", so the build needs a price history (a schema migration, v10).
+
+### Decided: the plan reacts to repeated overs (spec 2026-11-02-stage-management-design.md)
+
+Fawad's question (2026-11-01): if Stage A is 10 a day and they smoke 12-13, should Stage B
+(9 a day) change? Today the plan is fixed: going over never changes later stages, and
+nothing detects a pattern. Home only says "A harder day. Tomorrow starts fresh at N".
+Claude's proposal, not decided: no silent changes. When a stage ends with over-limit days
+on more than half its days, show a one-time card on Home and the plan page with three
+choices: Keep the deal; Hold at this limit one more stage (quit date 1 week later at one
+fewer a week); Start from the real number, e.g. 13 (4 weeks later). Show the new quit date
+before confirming. Uses `PlanHistory.replan`; probably one small stored field for "offered
+once". The card is not mocked up.
+
+Fawad's answer (2026-11-02), a four-scenario stage management system, read as replacing that
+card (not yet confirmed):
+1. Occasional over-limit day: continue, no change.
+2. One unsuccessful week (weekly average over target): hold the stage another week.
+3. Two unsuccessful weeks in a row: adaptive review; find reasons, suggest a slower plan, the
+   user approves the new timeline.
+4. Back near original use: reassess the baseline, ask about recommitting, offer support, keep
+   history.
+
+Claude's calls, easy to reverse: a week is unsuccessful only if logged total is over allowed
+total and at least 2 days are over, because any one over day at the limit puts the average
+over target; check at each stage's end, on its last 7 days; scenario 4 is an average of at
+least 90% of the first plan's start limit over 14 days, and outranks scenario 3; support is
+one general line with no phone numbers or medical claims, worded per habit. Its own spec, built
+after the three screens, because it needs K's earlier-stage view.
+
+Read from the code, not run: stages are not weeks. Starts above 12 a day have stages under 7
+days on the suggested date, and limit 2 over 3 months has 45-day stages. A plan's first stage
+lasts `totalDays / startLimit`, so a replan can hold one stage's length at the same rate, but
+a full week from a shorter stage slows the whole plan. Each hold through `replan` moves the
+quit date and restarts stage numbers at 1. Fawad's call (2026-11-02): the hold happens on its
+own, then a card shows the new quit date with one tap to keep the original. Fawad's call
+(2026-11-02): a hold is a 7-day pause stored inside the plan (`plan_holds`, schema v10), not a
+replan. The stage keeps its number and the stage count stays; later drops and the quit date
+move exactly 7 days. Claude's calls, easy to reverse: keeping the original date deletes the
+hold, offered only on the day it starts so past limits never change; checks run on open, and
+an open more than 2 days after the stage ended skips the hold; a second failed check goes to
+the scenario 3 review, never a second hold in a row. Fawad's call (2026-11-02) on the review:
+a Home card opens a sheet with logged against allowed, the top logged triggers and no
+questionnaire, then three choices, each with its new quit date: Start from your real number
+(today's rounded-up average, capped at 80, same pace; preselected), Slow down (the limit that
+failed, half the pace; the plan has already dropped one by then), Keep my plan. The first two use
+`PlanHistory.replan`. Keep waits for two more failed checks; an ignored card stays and the plan
+carries on. Fawad's call (2026-11-02) on scenario 4:
+the same sheet with the 14-day average as the current baseline and totals kept so far,
+then two choices: Start again from N (suggested quit date, preselected) and Keep my plan, with the
+support line under them and, for alcohol, a line on not stopping suddenly without medical advice.
+Claude's calls, easy to reverse: a check's result is stored once, so logs added later never
+reopen it; a plan under 7 days old is not checked; at most one check per 7 days, for short
+stages; missing logs count as under the limit, and nothing asks about them.
+
+Mocks, approved by Fawad: frames AA to AD at the top of the canvas above, copied to
+`design/8._plan_edit_logs/`, not in `design/all-designs.html` or Figma. Claude did not see them
+rendered. The spec is the record from here.
+
+Earlier walk, seen: fresh onboarding on Air and SE; Settings; dark with Ink on Home, Logs
+and Edit log; light with Eucalyptus and Ocean on Home; largest text on Home, Logs and Edit
+log (after the fixes, only the top of Home); SE trigger sheet; Reduce Transparency. Spare
+QA simulators may still be booted; the Air's test data was overwritten by the walk. On SE
+(iOS 18), `flutter run` stuck after the build; quitting and reopening loaded the new app.
+Build one simulator at a time: concurrent builds share one output folder.
 
 Simulator walk (2026-11-01, iPhone Air and SE, from stills): seen working: timer reaching
 zero and hiding, a log restarting it, carry-over, Undo, the long + chip, quit reached, Keep
@@ -46,15 +146,14 @@ For Fawad: `limit 0` overlaps the last day's `0` in
 the Week chart. New goal after quitting offers a limit of 1 with "0 sessions avoided".
 
 + chip (Fawad, 2026-11-01): hours and minutes from 60 minutes (`1 h 27 min`, was `87 min`),
-which settles `703 min`. VoiceOver reads the same. Spec 8.2 is updated. Not seen on a
-simulator, so how a long chip like `11 h 43 min` looks is unchecked.
+which settles `703 min`. VoiceOver reads the same. Spec 8.2 is updated. Seen up to
+`3 h 59 min`; two-digit hours like `11 h 43 min` are not seen.
 
 Timer past zero (Fawad, 2026-11-01): no more count-up. When the timer reaches zero, the
 timer, its inner ring and the + ring and chip hide, and the ring shows the count with a
 short fade. The next log starts the timer again. This also settles the late first open
-with no logs (`+5:10:00`). The pace text under the ring stays. Spec 8.2 is updated. Checks
-after the change: format clean, `analyze --fatal-infos` clean, full suite 679 passed; the
-timer tests were seen failing first. Not seen on a simulator.
+with no logs (`+5:10:00`). The pace text under the ring stays. Spec 8.2 is updated. The
+timer tests were seen failing first.
 
 Deferred by Fawad (2026-11-01), not done: the real iPhone pass (plan 5.3 Step 4): glass
 performance, chart scrolling with 90+ days, returning from the background. It must happen
