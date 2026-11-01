@@ -7,6 +7,7 @@ import 'package:exhale/core/presentation/providers/clock_providers.dart';
 import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/load_failure.dart';
 import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/core/widgets/status_badge.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
@@ -288,13 +289,20 @@ class _DayRing extends ConsumerWidget {
   final PlanHistory history;
   final Habit habit;
 
+  static const double _centreSize = 176;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progress = ref
-        .watch(dayProgressProvider((habitId: habitId, day: day)))
-        .value;
+    final key = (habitId: habitId, day: day);
+    final loaded = ref.watch(dayProgressProvider(key));
+    final progress = loaded.value;
     if (progress == null) {
-      return const Center(child: CircularProgressIndicator.adaptive());
+      return loaded.failedToLoad
+          ? LoadFailure(
+              message: "Couldn't load this day.",
+              onRetry: () => ref.invalidate(logsForDayProvider(key)),
+            )
+          : const Center(child: CircularProgressIndicator.adaptive());
     }
     final beforePlan = day.isBefore(history.firstDay);
     final isToday = day == ref.watch(todayProvider);
@@ -305,13 +313,24 @@ class _DayRing extends ConsumerWidget {
     return Center(
       child: ProgressRing(
         progress: beforePlan ? null : progress,
-        child: beforePlan
-            ? _BeforePlanCentre(count: progress.count)
-            : freeDays > 0
-            ? _FreeDaysCentre(days: freeDays, habit: habit)
-            : timer != null
+        child: timer != null && !beforePlan && freeDays == 0
             ? _TimerCentre(timer: timer, progress: progress)
-            : _RingCentre(progress: progress, habit: habit, isToday: isToday),
+            : SizedBox.square(
+                dimension: _centreSize,
+                // Large text shrinks to stay inside the ring.
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: beforePlan
+                      ? _BeforePlanCentre(count: progress.count)
+                      : freeDays > 0
+                      ? _FreeDaysCentre(days: freeDays, habit: habit)
+                      : _RingCentre(
+                          progress: progress,
+                          habit: habit,
+                          isToday: isToday,
+                        ),
+                ),
+              ),
       ),
     );
   }

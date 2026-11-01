@@ -1,5 +1,6 @@
 import 'package:exhale/core/presentation/providers/clock_providers.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
+import 'package:exhale/core/widgets/load_failure.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
 import 'package:exhale/features/home/presentation/widgets/dashboard_header.dart';
@@ -33,6 +34,8 @@ class HabitDashboard extends ConsumerWidget {
   final int habitId;
   final DashboardHeaderKind header;
 
+  static const String loadFailure = "Couldn't load your habit.";
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final today = ref.watch(todayProvider);
@@ -44,7 +47,18 @@ class HabitDashboard extends ConsumerWidget {
     }
     final habit = tracked.habit;
     final reason = tracked.reason;
-    final history = ref.watch(planHistoryProvider(habitId)).value;
+    final plan = ref.watch(planHistoryProvider(habitId));
+    final todayKey = (habitId: habitId, day: today);
+    if (plan.failedToLoad ||
+        ref.watch(logsForDayProvider(todayKey)).failedToLoad) {
+      return LoadFailure(
+        message: loadFailure,
+        onRetry: () => ref
+          ..invalidate(planHistoryProvider(habitId))
+          ..invalidate(logsForDayProvider(todayKey)),
+      );
+    }
+    final history = plan.value;
     final stats = ref.watch(habitStatsProvider(habitId)).value;
 
     // Edge to edge: content scrolls under the status bar and the floating

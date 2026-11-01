@@ -7,6 +7,7 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
+import 'package:exhale/core/widgets/load_failure.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/logs/presentation/providers/logs_providers.dart';
@@ -116,15 +117,15 @@ class _LogsPageState extends ConsumerState<LogsPage> {
     final earliest = habitId == null
         ? today
         : ref.watch(earliestDayProvider(habitId));
-    // A retry keeps the old error while it loads; that shows the spinner.
-    bool stillFailed(AsyncValue<Object?> value) =>
-        value.hasError && !value.isLoading;
     final failed =
-        habitId != null &&
-        (stillFailed(
-              ref.watch(logsInRangeProvider((habitId: habitId, range: _range))),
-            ) ||
-            stillFailed(ref.watch(planHistoryProvider(habitId))));
+        ref.watch(activeHabitsProvider).failedToLoad ||
+        (habitId != null &&
+            (ref
+                    .watch(
+                      logsInRangeProvider((habitId: habitId, range: _range)),
+                    )
+                    .failedToLoad ||
+                ref.watch(planHistoryProvider(habitId)).failedToLoad));
 
     return Scaffold(
       body: SafeArea(
@@ -166,33 +167,17 @@ class _LogsPageState extends ConsumerState<LogsPage> {
             if (failed)
               SliverFillRemaining(
                 hasScrollBody: false,
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: AppSpacing.sm,
-                    children: [
-                      Text(
-                        "Couldn't load your logs.",
-                        textAlign: TextAlign.center,
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          ref
-                            ..invalidate(
-                              logsInRangeProvider((
-                                habitId: habitId,
-                                range: _range,
-                              )),
-                            )
-                            ..invalidate(planHistoryProvider(habitId));
-                        },
-                        child: const Text('Try again'),
-                      ),
-                    ],
-                  ),
+                child: LoadFailure(
+                  message: "Couldn't load your logs.",
+                  onRetry: () {
+                    ref.invalidate(activeHabitsProvider);
+                    if (habitId == null) return;
+                    ref
+                      ..invalidate(
+                        logsInRangeProvider((habitId: habitId, range: _range)),
+                      )
+                      ..invalidate(planHistoryProvider(habitId));
+                  },
                 ),
               )
             else if (view == null || habit == null || habitId == null)

@@ -231,6 +231,42 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('a failed check for an existing habit saves nothing', (
+    tester,
+  ) async {
+    final real = sl<HabitRepository>();
+    final repository = _FailReadsRepository(real);
+    sl
+      ..unregister<HabitRepository>()
+      ..registerSingleton<HabitRepository>(repository);
+    await toDeal(tester);
+    final before = await tester.runAsync(
+      () async => await sl<SettingsRepository>().get() as Success<AppSettings>,
+    );
+
+    repository.failing = true;
+    await tester.tap(find.text(QuitPreset.weeks8.label));
+    await tester.pumpAndSettle();
+    await tester.tap(shakeOnIt());
+    await tester.pumpAndSettle();
+    repository.failing = false;
+
+    expect(find.byType(HomePage), findsNothing);
+    final failed = form(tester);
+    expect(failed.errorMessage, isNotNull);
+    expect(failed.isSubmitting, isFalse);
+    await tester.runAsync(() async {
+      final habits = await real.getActive() as Success<List<TrackedHabit>>;
+      expect(habits.value, isEmpty);
+      final after =
+          await sl<SettingsRepository>().get() as Success<AppSettings>;
+      expect(after.value.wakeMinute, before!.value.wakeMinute);
+      expect(after.value.currencySymbol, before.value.currencySymbol);
+    });
+
+    await tester.disposeApp();
+  });
+
   testWidgets('a fast double tap saves one habit', (tester) async {
     await toDeal(tester);
 
@@ -257,6 +293,38 @@ void main() {
 
     await tester.disposeApp();
   });
+}
+
+/// The real repository, except [getActive] fails while [failing].
+class _FailReadsRepository implements HabitRepository {
+  _FailReadsRepository(this._real);
+
+  final HabitRepository _real;
+  bool failing = false;
+
+  @override
+  Future<Result<List<TrackedHabit>>> getActive() => failing
+      ? guardStorage<List<TrackedHabit>>(
+          'FailReadsRepository',
+          () async => throw const FormatException('disk error'),
+        )
+      : _real.getActive();
+
+  @override
+  Future<Result<TrackedHabit>> add(
+    HabitDraft draft, {
+    required DateTime createdAt,
+  }) => _real.add(draft, createdAt: createdAt);
+
+  @override
+  Stream<List<TrackedHabit>> watchActive() => _real.watchActive();
+
+  @override
+  Future<Result<void>> update(TrackedHabit habit) => _real.update(habit);
+
+  @override
+  Future<Result<void>> archive(int id, {required DateTime at}) =>
+      _real.archive(id, at: at);
 }
 
 /// The real repository, except the first [add] fails as storage would.

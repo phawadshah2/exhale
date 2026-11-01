@@ -361,6 +361,9 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
       // habit.
       final existing = await ref.read(habitRepositoryProvider).getActive();
       if (!ref.mounted) return false;
+      if (existing case FailureResult(:final failure)) {
+        return _fail(failureMessage(failure));
+      }
       if (existing case Success(value: [_, ...])) {
         state = state.copyWith(isSubmitting: false);
         return true;

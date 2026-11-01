@@ -5,6 +5,7 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
+import 'package:exhale/core/widgets/load_failure.dart';
 import 'package:exhale/core/widgets/number_stepper.dart';
 import 'package:exhale/core/widgets/section_card.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
@@ -32,10 +33,30 @@ class EditPlanPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tracked = ref.watch(habitProvider(habitId));
-    final history = ref.watch(planHistoryProvider(habitId)).value;
-    if (tracked == null || history == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator.adaptive()),
+    final history = ref.watch(planHistoryProvider(habitId));
+    if (tracked == null || history.value == null) {
+      return Scaffold(
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IconButton(
+                tooltip: 'Back',
+                onPressed: context.pop,
+                icon: Icon(AppIcons.back, color: context.colors.onSurface),
+              ),
+              Expanded(
+                child: history.failedToLoad
+                    ? LoadFailure(
+                        message: "Couldn't load your plan.",
+                        onRetry: () =>
+                            ref.invalidate(planHistoryProvider(habitId)),
+                      )
+                    : const Center(child: CircularProgressIndicator.adaptive()),
+              ),
+            ],
+          ),
+        ),
       );
     }
     return _EditPlanForm(habitId: habitId);

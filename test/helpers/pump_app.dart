@@ -13,6 +13,7 @@ import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -61,7 +62,10 @@ void mockPackageInfo() => PackageInfo.setMockInitialValues(
 extension PumpApp on WidgetTester {
   /// Launches the app and waits past the splash screen.
   /// [height] is in logical pixels; tall views avoid lazy list disposal.
-  Future<void> pumpAppPastSplash({double height = 844}) async {
+  Future<void> pumpAppPastSplash({
+    double height = 844,
+    List<Override> overrides = const [],
+  }) async {
     view
       ..physicalSize = Size(1170, height * 3)
       ..devicePixelRatio = 3;
@@ -69,7 +73,7 @@ extension PumpApp on WidgetTester {
     mockPackageInfo();
     await pumpWidget(
       ProviderScope(
-        overrides: await startupOverrides(),
+        overrides: [...await startupOverrides(), ...overrides],
         child: const ExhaleApp(),
       ),
     );
