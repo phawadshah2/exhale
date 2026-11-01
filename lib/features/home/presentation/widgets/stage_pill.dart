@@ -95,8 +95,8 @@ class StagePill extends StatelessWidget {
   }
 }
 
-/// The name gives way first, so a long one never hides the target. With large
-/// text both wrap instead.
+/// On one line when both fit; otherwise the name above the target, so neither
+/// hides the other.
 class _NameAndTarget extends StatelessWidget {
   const _NameAndTarget({
     required this.name,
@@ -109,29 +109,44 @@ class _NameAndTarget extends StatelessWidget {
   final TextStyle? style;
 
   @override
-  Widget build(BuildContext context) => context.hasLargeText
-      ? Text('$name · $target', style: style)
-      : LayoutBuilder(
-          builder: (context, box) => Row(
-            children: [
-              Flexible(
-                child: Text(
-                  name,
-                  style: style,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) {
+      final oneLine = TextPainter(
+        text: TextSpan(text: '$name · $target', style: style),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+        maxLines: 1,
+      )..layout();
+      final fits = oneLine.width < box.maxWidth - 1;
+      oneLine.dispose();
+      if (fits) {
+        return Row(
+          children: [
+            Flexible(
+              child: Text(
+                name,
+                style: style,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: box.maxWidth),
-                child: Text(
-                  ' · $target',
-                  style: style,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
+            ),
+            Text(' · ', style: style),
+            Text(target, style: style),
+          ],
         );
+      }
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            name,
+            style: style,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(target, style: style),
+        ],
+      );
+    },
+  );
 }

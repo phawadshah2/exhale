@@ -177,6 +177,15 @@ void main() {
     });
   });
 
+  testWidgets('on day one the stage pill keeps the habit name', (tester) async {
+    await loadAppFonts();
+    await seed(logs: 0, startDay: today);
+    await tester.pumpAppPastSplash();
+    final clipped = tester.clippedTexts();
+    await tester.disposeApp();
+    expect(clipped, isNot(contains('Smoking')));
+  });
+
   group('the trigger sheet', () {
     Future<void> expectSaves(WidgetTester tester) async {
       final save = find.text('Save without trigger');

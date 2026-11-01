@@ -27,6 +27,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../helpers/fixed_clock.dart';
+import '../../helpers/large_text.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
@@ -100,7 +101,7 @@ void main() {
       find.text('No cigarettes logged today. Nice start.'),
       findsOneWidget,
     );
-    expect(find.text(' · Day 1, plan starts today'), findsOneWidget);
+    expect(find.text('Day 1, plan starts today'), findsOneWidget);
     expect(find.text('STAGE 1 / 9'), findsOneWidget);
     expect(find.text('Plan started today'), findsOneWidget);
     expect(find.text('Drops to 8 in 7d'), findsOneWidget);
@@ -419,8 +420,8 @@ void main() {
     );
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text('Quit day in 3d'), findsOneWidget);
-    expect(find.text(' · Quit day in 3d'), findsOneWidget);
+    // The stage pill and the next-target cell.
+    expect(find.text('Quit day in 3d'), findsNWidgets(2));
     expect(find.text('STAGE 3 / 3'), findsOneWidget);
 
     await tester.disposeApp();
@@ -449,7 +450,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.descendant(of: pill, matching: find.text(' · Drops to 7 in 6d')),
+      find.descendant(of: pill, matching: find.text('Drops to 7 in 6d')),
       findsOneWidget,
     );
     expect(
@@ -495,7 +496,7 @@ void main() {
     await pumpStagePill(
       tester,
       habit: Habit.custom(name: name, unit: 'time'),
-      width: 700,
+      width: 350,
     );
 
     expect(
@@ -504,21 +505,23 @@ void main() {
     );
     expect(
       tester
-          .renderObject<RenderParagraph>(find.text(' · Drops to 7 in 6d'))
+          .renderObject<RenderParagraph>(find.text('Drops to 7 in 6d'))
           .didExceedMaxLines,
       isFalse,
     );
   });
 
   testWidgets('the stage pill fits at the largest text size', (tester) async {
+    await loadAppFonts();
     await pumpStagePill(
       tester,
       habit: Habit.nicotinePouches,
       width: 350,
-      textScale: 3,
+      textScale: 2,
     );
 
     expect(tester.takeException(), isNull);
+    expect(tester.clippedTexts(), isEmpty);
   });
 
   testWidgets('after the quit date the limit is 0 and the day is smoke-free', (
