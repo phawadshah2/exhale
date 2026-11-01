@@ -40,8 +40,9 @@ still run as Android, though the app is iOS only; that gap is open. Also fixed (
 gap above the empty triggers box. Those four have no failing test seen first; `1 sessions`
 has a test written with the fix. Full suite 680 passed, format and analyze clean.
 
-For Fawad: scrolling pages run under the status bar on Home and Edit plan, so text collides
-with the clock (not fixed, it needs a design call). `limit 0` overlaps the last day's `0` in
+Fawad's call (2026-11-01): scrolling pages keep running under the status bar, no backdrop.
+
+For Fawad: `limit 0` overlaps the last day's `0` in
 the Week chart. New goal after quitting offers a limit of 1 with "0 sessions avoided".
 
 + chip (Fawad, 2026-11-01): hours and minutes from 60 minutes (`1 h 27 min`, was `87 min`),
