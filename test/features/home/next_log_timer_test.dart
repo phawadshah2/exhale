@@ -41,7 +41,7 @@ void main() {
   Future<void> logAt(int habitId, DateTime at) =>
       sl<AddHabitLog>()(AddHabitLogInput(habitId: habitId, loggedAt: at));
 
-  testWidgets('the ring counts down with hours, the + chip in minutes', (
+  testWidgets('the ring counts down with hours, the + chip without seconds', (
     tester,
   ) async {
     await setWindow();
@@ -53,7 +53,7 @@ void main() {
     expect(find.text('until your next'), findsOneWidget);
     expect(find.text('1 of 8 · 7 left'), findsOneWidget);
     expect(find.byKey(count), findsNothing);
-    expect(find.text('163 min'), findsOneWidget);
+    expect(find.text('2 h 43 min'), findsOneWidget);
     expect(find.text('About one every 2 h 5 min until bed'), findsOneWidget);
     expect(find.text(prompt), findsNothing);
     expect(find.textContaining('Next one on schedule'), findsNothing);
@@ -134,7 +134,7 @@ void main() {
     // The even gap, with nothing carried from the time spent past zero.
     expect(find.text('2:00:00'), findsOneWidget);
     expect(find.text('2 of 8 · 6 left'), findsOneWidget);
-    expect(find.text('120 min'), findsOneWidget);
+    expect(find.text('2 h'), findsOneWidget);
     expect(find.byType(DrainingRing), findsNWidgets(2));
     await tester.disposeApp();
   });
@@ -165,7 +165,7 @@ void main() {
 
     expect(find.text('1:41:00'), findsOneWidget);
     expect(find.text('until your next'), findsOneWidget);
-    expect(find.text('101 min'), findsOneWidget);
+    expect(find.text('1 h 41 min'), findsOneWidget);
     expect(find.textContaining('About one every'), findsNothing);
     await tester.disposeApp();
   });
@@ -197,7 +197,7 @@ void main() {
 
     expect(find.text('1 of 8 · 7 left'), findsOneWidget);
     expect(find.text('2:33:15'), findsOneWidget);
-    expect(find.text('154 min'), findsOneWidget);
+    expect(find.text('2 h 34 min'), findsOneWidget);
     expect(find.text('About one every 2 h 5 min until bed'), findsOneWidget);
     await tester.disposeApp();
   });
@@ -221,7 +221,7 @@ void main() {
 
       // 125 min for the new gap, plus the 30 that were left.
       expect(find.text('2:35:00'), findsOneWidget);
-      expect(find.text('155 min'), findsOneWidget);
+      expect(find.text('2 h 35 min'), findsOneWidget);
 
       await tester.runAsync(
         () => sl<HabitLogRepository>().deleteLog(
@@ -277,7 +277,7 @@ void main() {
 
     // The limit is 8 today: 16 h / 8 from wake, not from last night's log.
     expect(find.text('2:00:00'), findsOneWidget);
-    expect(find.text('120 min'), findsOneWidget);
+    expect(find.text('2 h'), findsOneWidget);
     await tester.disposeApp();
   });
 
@@ -289,7 +289,7 @@ void main() {
     await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
 
-    expect(find.text('163 min'), findsOneWidget);
+    expect(find.text('2 h 43 min'), findsOneWidget);
     await tester.disposeApp();
   });
 
@@ -306,7 +306,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.bySemanticsLabel('Next one on schedule in 163 min'),
+      find.bySemanticsLabel('Next one on schedule in 2 h 43 min'),
       findsOneWidget,
     );
     handle.dispose();

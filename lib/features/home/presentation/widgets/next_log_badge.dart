@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Around the + button while the countdown runs: a draining ring and a chip in
-/// whole minutes. Fills the button's bounds and paints outside them.
+/// hours and minutes. Fills the button's bounds and paints outside them.
 class NextLogBadge extends ConsumerWidget {
   const NextLogBadge({required this.buttonSize, super.key});
 
@@ -24,10 +24,10 @@ class NextLogBadge extends ConsumerWidget {
     if (timer == null || timer.isPast) return const SizedBox.shrink();
 
     final colors = context.colors;
-    final minutes = AppFormat.minutes(timer.left);
+    final left = AppFormat.hoursMinutes(timer.left);
     return Semantics(
       container: true,
-      label: 'Next one on schedule in $minutes',
+      label: 'Next one on schedule in $left',
       excludeSemantics: true,
       child: IgnorePointer(
         child: Stack(
@@ -65,7 +65,7 @@ class NextLogBadge extends ConsumerWidget {
                   child: MediaQuery.withClampedTextScaling(
                     maxScaleFactor: 1.5,
                     child: Text(
-                      minutes,
+                      left,
                       style: context.textTheme.labelLarge?.copyWith(
                         color: colors.primary,
                         fontWeight: FontWeight.w700,

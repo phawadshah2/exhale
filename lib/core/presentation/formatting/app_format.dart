@@ -126,9 +126,6 @@ abstract final class AppFormat {
     return rest == 0 ? '${total ~/ 60} h' : '${total ~/ 60} h $rest min';
   }
 
-  /// Whole minutes, even past an hour: 87 min.
-  static String minutes(Duration duration) => '${_ceilMinutes(duration)} min';
-
   static int _ceilMinutes(Duration duration) =>
       (duration.inMicroseconds / Duration.microsecondsPerMinute).ceil();
 

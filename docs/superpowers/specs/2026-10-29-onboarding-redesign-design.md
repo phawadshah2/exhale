@@ -262,7 +262,7 @@ Updated each second while on screen.
 | `next` passed (Fawad, 2026-11-01: no count-up), at or over the limit, limit 0, before wake, no wake/bed, a past day | The count, as before; no inner ring. A log that puts `next` in the future starts the timer again |
 
 **+ button.** While `next` is in the future: a ring around it draining the same way
-and a chip above it with whole minutes only (`47 min`, `87 min`). Otherwise neither.
+and a chip above it with no seconds (`47 min`, `1 h 27 min`; Fawad, 2026-11-01). Otherwise neither.
 It shows on every tab.
 
 **Motion.** Both rings use `AppMotion.fill` and `fillCurve`, like the main ring: they

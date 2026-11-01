@@ -110,12 +110,6 @@ void main() {
     expect(AppFormat.hoursMinutes(const Duration(minutes: 960)), '16 h');
   });
 
-  test('minutes never become hours', () {
-    expect(AppFormat.minutes(const Duration(minutes: 47)), '47 min');
-    expect(AppFormat.minutes(const Duration(minutes: 87)), '87 min');
-    expect(AppFormat.minutes(const Duration(seconds: 1)), '1 min');
-  });
-
   test('weekday initial', () {
     expect(AppFormat.weekdayInitial(oct16), 'F');
   });

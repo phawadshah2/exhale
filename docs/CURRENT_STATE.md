@@ -23,8 +23,12 @@ quit reached, Edit plan and Change habit, after-bed live, Reduce Motion in motio
 only). Two spare QA simulators may still be booted, one with Reduce Motion and
 Reduce Transparency on.
 
-**Next action:** settle the unanswered question below, walk the unseen states on a
-simulator, then the launch PR, with the iPhone pass listed as pending.
+**Next action:** walk the unseen states on a simulator, then the launch PR, with the
+iPhone pass listed as pending.
+
++ chip (Fawad, 2026-11-01): hours and minutes from 60 minutes (`1 h 27 min`, was `87 min`),
+which settles `703 min`. VoiceOver reads the same. Spec 8.2 is updated. Not seen on a
+simulator, so how a long chip like `11 h 43 min` looks is unchecked.
 
 Timer past zero (Fawad, 2026-11-01): no more count-up. When the timer reaches zero, the
 timer, its inner ring and the + ring and chip hide, and the ring shows the count with a
@@ -48,7 +52,7 @@ minors in `.superpowers/sdd/2026-10-21-home-details-logs/progress.md` (kept for 
 Product calls to reverse if disliked: text capped at 200%; the timer runs after bed; the
 stage pill stacks name above target when both don't fit.
 
-Unanswered, for Fawad: large numbers after bursts of logs (`703 min`). The "exhale" simulator needs a relaunch
+The "exhale" simulator needs a relaunch
 to show the timer; its files were deleted outside the session, cause unknown.
 
 Later: Live Activity with the widgets, roadmap "Post-launch backlog".
