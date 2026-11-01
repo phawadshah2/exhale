@@ -22,10 +22,15 @@ class ExhaleApp extends ConsumerWidget {
       darkTheme: AppTheme.of(Brightness.dark, accent: accent),
       themeMode: ref.watch(themeModeProvider),
       routerConfig: ref.watch(routerProvider),
+      // Text stops at 200%, Apple's bar for Larger Text: Flutter scales every
+      // style alike, so past this titles grow far beyond iOS's own.
       // Glass follows the iOS Reduce Transparency setting.
-      builder: (context, child) => GlassMode(
-        enabled: !(ref.watch(reduceTransparencyProvider).value ?? false),
-        child: child!,
+      builder: (context, child) => MediaQuery.withClampedTextScaling(
+        maxScaleFactor: 2,
+        child: GlassMode(
+          enabled: !(ref.watch(reduceTransparencyProvider).value ?? false),
+          child: child!,
+        ),
       ),
     );
   }

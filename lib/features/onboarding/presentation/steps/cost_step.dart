@@ -4,7 +4,7 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/core/widgets/glow_button.dart';
+import 'package:exhale/core/widgets/primary_button.dart';
 import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
@@ -74,7 +74,7 @@ class _CostStepState extends ConsumerState<CostStep> {
     final muted = text.bodySmall?.copyWith(color: colors.onSurfaceVariant);
 
     return OnboardingStepFrame(
-      button: GlowButton(
+      button: PrimaryButton(
         label: OnboardingCopy.continueButton,
         onPressed: _continue,
       ),
@@ -119,33 +119,40 @@ class _CostStepState extends ConsumerState<CostStep> {
                       children: [
                         CurrencyChip(
                           symbol: form.currency,
-                          onChanged: controller.setCurrency,
+                          onChanged: form.isChangingHabit
+                              ? null
+                              : controller.setCurrency,
                         ),
                         Expanded(
-                          child: TextField(
-                            controller: _price,
-                            onChanged: (value) {
-                              controller.setPriceText(value);
-                              if (_showError) {
-                                setState(() => _showError = false);
-                              }
-                            },
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp('[0-9.,]'),
-                              ),
-                            ],
-                            style: text.headlineLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                            decoration: InputDecoration.collapsed(
-                              hintText: container == null ? '3.50' : '14.50',
-                              hintStyle: text.headlineLarge?.copyWith(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(minHeight: 44),
+                            child: TextField(
+                              controller: _price,
+                              textAlignVertical: TextAlignVertical.center,
+                              onChanged: (value) {
+                                controller.setPriceText(value);
+                                if (_showError) {
+                                  setState(() => _showError = false);
+                                }
+                              },
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp('[0-9.,]'),
+                                ),
+                              ],
+                              style: text.headlineLarge?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: colors.outlineVariant,
+                              ),
+                              decoration: InputDecoration.collapsed(
+                                hintText: container == null ? '3.50' : '14.50',
+                                hintStyle: text.headlineLarge?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: colors.outlineVariant,
+                                ),
                               ),
                             ),
                           ),

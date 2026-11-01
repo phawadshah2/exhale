@@ -1,12 +1,243 @@
 # Current state
 
-Updated 2026-10-31 (phase O4, its review and the simulator walk committed;
-branch pushed, onboarding PR being opened by Fawad; `gh` is not installed on
-this Mac). Hook gotcha: the global
+Updated 2026-11-01. Onboarding redesign merged to `main` (PR #26, 686246e).
+`gh` is deliberately not installed on this Mac: Fawad opens PRs from a prefilled
+compare link.
+
+**Scope change (Fawad, 2026-10-31):** the first release tracks one habit.
+Multiple habits ship in a later release (version not fixed).
+
+**Git (Fawad, 2026-10-31):** Claude branches and commits, under Fawad's identity
+and with no attribution, so Claude never shows up as a contributor. See `CLAUDE.md`.
+
+The single-habit docs are committed (0541760) on `docs/single-habit-launch` and
+merged into local `main`, one commit ahead of `origin/main` and not pushed; they
+go up with the launch PR. No app code changed.
+
+`feat/launch-states` has no upstream; nothing on it is pushed. Head is the Ink docs
+commit; only this handoff note is uncommitted.
+
+M5 so far: Tasks 5.1, 5.1b (9d52e82) and 5.1c (eed0676, dfc2271) are committed. Tasks
+5.2, 5.3 and the M5 review are not done.
+
+Checks: last run on 4ac7580, format clean, `analyze --fatal-infos` clean, full suite 517
+passed. Only docs changed after that. Not run at handoff (handoff skips them).
+
+**Next action:** M5 Task 5.2, light mode, Reduce Transparency and accessibility
+(Sonnet 5.5 at medium), in `docs/superpowers/plans/2026-10-21-home-details-logs.md`, on
+`feat/launch-states`, with `superpowers:executing-plans`. M5's deferred list below stays
+for M5, and 5.2 also owns the overflows at 3× text noted under Task 5.1c. Task 5.3 also
+removes "or start tracking another habit" from the hold hint and "You can add another
+later." from the first-run habit step.
+
+Read first: `CLAUDE.md`, plan Task 5.2, Task 5.1c and "Ink accent and no glows" below.
+5.2's light-mode walk should cover all three accents.
+
+Unanswered, for Fawad (timer, both noted under Task 5.1c): Home counting up on a late
+first open with no logs; very large numbers after bursts of logs. Nothing blocks 5.2.
+
+Later: Live Activity with the widgets, roadmap "Post-launch backlog".
+
+## Ink accent and no glows (2026-11-01, committed)
+
+Fawad asked. Ink is the third accent in Settings (stored index 2; Eucalyptus and Ocean
+keep 0 and 1). `emphasis` now always follows the accent, so Eucalyptus and Ocean are no
+longer black in light mode. Glows are gone everywhere: `PrimaryButton` (was `GlowButton`,
+renamed because it no longer glows), `ExhaleColors.glow` and `accentGlow`, the ring halo,
+the splash's radial wash and logo shadow, the snackbar dot, the unused history chart. The
+splash dust stays, unblurred. Neutral black drop shadows under glass stay: they are depth.
+
+Fawad confirmed: new installs start on Ink (`AppPalette.defaultAccentIndex`), so light
+onboarding stays black; a saved setting keeps its accent. My calls, easy to reverse: the
+table's column default is still 0, unused because every save writes the index, so no
+migration. Ink shows paper on dark surfaces, where ink would vanish, so dark onboarding is
+now paper, not teal. Under Ink the ring has no green (`ExhaleColors.ringStart`). Status
+colours (green, amber, red for on track, at limit, over) stay in every accent.
+
+Not seen on a simulator: Ink in light and dark, the splash without its wash, the + button
+in Ink (glass over the page, the mid-grey note below may apply).
+
+## Task 5.1c, next-log timer (2026-10-31, committed)
+
+Fawad chose it from mockups (https://claude.ai/artifact/NBe5B8VGM6iMXDaiuysb88,
+"Chosen design"); onboarding spec 8.1 and 8.2 hold the rules. The ring's main number
+is the timer, always with hours (`0:47:12`), inside a thin draining ring; past zero it
+counts up in green (`+0:12:03`, "You're on schedule"). The + button gets a draining
+ring and a chip in whole minutes (`87 min`), on every tab, and neither past zero. One
+text under the ring. Both new rings use `AppMotion.fill`. A log with time left adds
+that time to the next gap (Fawad), replayed from today's logs. It may run past bed
+(`3:00:00` at 10 PM, Fawad removed my cap); the timer still ends at bed.
+`pace_line.dart` is gone (`pace_text.dart`, `draining_ring.dart`, `next_log_badge.dart`,
+`nextLogTimerProvider`, `secondTickProvider`).
+
+Fixed on the way: `BackwardPager._current` was `late`, so a first step with no earlier
+rebuild read the new page and never animated. The past-day test caught it, red seen.
+Also closes three M5 minors below (marked).
+
+My calls, easy to reverse (ledger has them): the order under the ring is over note,
+first-day note, prompt, pace (I told Fawad prompt before first-day, then swapped: only
+pre-v9 data has no window, and it kept the existing tests); the first log of a day
+counts against the timer from wake, so a log soon after waking adds most of a gap;
+waiting past zero earns no credit.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 494
+passed. Red seen on assertions: the pager, and three carry-over tests with the carry
+removed, and the past-bed test with the cap still in. Otherwise red on compile errors
+only.
+
+Simulator walk (2026-10-31, "exhale", from stills, light and dark): the timer ticks; the
+rings, chip and pace text match the design; the chip is not clipped by the glass bar; a
+log, a delete and a past day all work; one frame caught both rings filling in step. Not
+walked: the count-up past zero, Undo from the snackbar (the log was removed from Edit
+log), carry-over, Reduce Motion, and how the seconds feel. The walk ran with a cap at
+bed: at 9:49 PM the timer already equalled the time to bed, so a log did not change the
+number, and Fawad removed the cap. Second walk without the cap (bedtime set to 3:30 AM
+for it, then restored): after bed Home shows the count and no + ring; a log took
+`10:03:11` to `11:42:53`, and the rings refilled. Open from that walk: two-digit hours
+fit but sit close to the inner ring, and bursts of logs make large numbers (`703 min`).
+The simulator's data is back as it was.
+
+For Fawad to look at: a new user finishing onboarding in the afternoon has no logs, so
+the timer has already passed and Home opens counting up from their first due time
+(`+5:10:00`, "You're on schedule"). The same applies to any day's first open with no
+logs. For Task 5.2: at 3× text, `today_logs_card.dart`, `log_row.dart` and the ring
+card's header row overflow; not caused by this.
+
+## Task 5.1b (2026-10-31, committed)
+
+Edit plan has a "Change habit" button (`/change-habit/:habitId`, `ChangeHabitPage`).
+It runs Habit, Daily amount, Cost and The deal. "Shake on it" asks first, then
+`ChangeHabit` archives the old habit and starts the new one in one transaction, and
+the app goes Home. Wake, bed and currency are not asked for or written; the currency
+chip is read-only. Old logs stay stored and hidden.
+
+My calls, easy to reverse (ledger has them): `replacedHabitProvider` instead of an
+`OnboardingMode` enum; `page_visits.dart` was not taken from 5369b50, because
+`didPopNext` never fires here (Edit plan sits between Home and the flow); `ChangeHabit`
+fails with `NotFoundFailure` when the old habit is no longer active; a stale link
+redirects Home; Home's dashboard is keyed by habit id; the habit step's prompt, title
+and lead are my copy.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 465
+passed. Red seen: the two rollback tests with the rethrow missing, "two presses" and
+"a press during the save" with each guard removed. Not seen failing beyond compile
+errors: the other flow tests, including the stale link. The dashboard key has no test
+of its own. Swipe back on the first step has no test. Not seen on a simulator: the
+button, the Replace alert (tests use the Flutter fallback, not the native alert) and
+the entrance on Home after replacing.
+
+## Task 5.1 (2026-10-31, committed 2e131b0)
+
+Over limit and first day already worked; their copy is now pinned exactly. New:
+quit reached. `ProgressRing` draws a full success ring on a day at zero;
+`_FreeDaysCentre` shows "3 / days vape-free / Nothing logged today" (today only);
+`QuitReachedCard` sits under the ring with Keep at zero (sets `quitAcknowledgedAt`)
+and New goal (Edit plan); `quitCardDueProvider`; `HomeStats.freeDays`; the QUIT pill
+is green. The old "so far today" note is gone. `habit_dashboard.dart` needed no
+change.
+
+My calls, easy to reverse (ledger has them): the count is consecutive days at zero
+including today, so a slip restarts it and the quit day reads "1 day"; a slip today
+shows the over state and keeps the card; Keep at zero applies to one quit date, so
+a new goal offers the card again; Keep at zero uses the `emphasis` button, not the
+design's green.
+
+Checks observed by me: format (1 file), `analyze --fatal-infos` clean, full suite
+439 passed. Red seen for the quit tests that needed the state (8 of 11) and for
+`freeDays`. Not seen failing: the over-limit and first-day tests (they pin existing
+behaviour) and the three guards that the card stays hidden. A failed Keep at zero's
+snackbar has no test. Not seen on a simulator.
+
+Stage pill (Fawad asked, 2026-10-31, committed 10f0d2a): now matches spec 4.3 and the
+designs: habit icon, "Vaping · Drops to 10 in 4d", "STAGE 2 / 9", and on a plan's
+first day "Vaping · Day 1, plan starts today". `nextTarget` moved to `HabitWording`,
+as on `feat/multi-habit`, though that branch's `stageLine` and pill will conflict
+when it resumes. My calls: a long name truncates before the target; the chip's text
+scale is capped at 1.5, because the chip overflowed at 3×. Checks observed by me:
+format clean, `analyze --fatal-infos` clean, full suite 442 passed; red seen first.
+Not seen on a simulator, and the test font is wider than the real one, so how real
+names fit is unchecked.
+
+`splash_page.dart` is restored; the stash stays for the next walk.
+
+Read first: `CLAUDE.md`, plan Task 5.1b, roadmap "M5: Release candidate", and the
+ledger's rulings (`.superpowers/sdd/2026-10-21-home-details-logs/progress.md`).
+
+## Parked: multiple habits (`feat/multi-habit`, not merged)
+
+Tasks 4.1 (5369b50), 4.2 (747347d) and 4.3 (8aab391) and the checkpoint docs
+(ae8d6c1) are committed on the branch, and the branch matches its last known
+`origin` ref. Task 4.4 and the M4 review are not done; see plan Phase 4 for
+how to resume and what is open. The sections on 4.1 to 4.3 below are the record.
+Ledger: `.superpowers/sdd/2026-10-21-home-details-logs/progress.md` (rulings for
+4.1 to 4.3).
+
+Checks on the branch (2026-10-31), before these commits, on the same files:
+format (0 changed), `analyze --fatal-infos` clean, full suite 463 passed. They
+were not run on the 4.2 commit alone, and CI on those commits was not read.
+`main` has none of this work, and its suite was not run for this docs change.
+
+## Task 4.3 (2026-10-31, committed 8aab391)
+
+Details has a back bar: `CircleIconButton` back (moved out of `LogsPage`), the
+`HabitSwitcher` pill, tune. With several habits the pill opens a "Switch habit"
+sheet; picking one calls `context.replace`, so Back still goes Home, and the
+dashboard is keyed by habit id. With one habit the pill only names it. Edit plan
+gains "Stop tracking <habit>" with a confirm. `TrackedHabitGuard` wraps Details,
+Edit plan and Logs: once the habit is no longer active it goes Home, or to
+onboarding when none are left.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite
+463 passed, rerun after the splash hack was restored (Fawad's OK; the stash is
+kept for the next walk). **Red was not observed:** the first run and a run with the guard disabled both
+hung without reporting (failed tests skip `disposeApp`, see Test gotchas), so
+these tests were never seen failing on an assertion. A failed archive's snackbar
+has no test. Not seen on a simulator.
+
+## Task 4.2 (2026-10-31, committed 747347d)
+
+With two or more habits Home is `HabitListHome`: greeting, "Today's habits ·
+N active", a `HabitSummaryCard` per habit (opens `/habit/:id`),
+`CombinedImpactCard`, `RecentLogsCard` (latest 6, "See all logs" opens Logs
+with `habit=all`), quote. New: `ProgressCalculator.combinedStreak`,
+`habitDaysProvider`, `combinedImpactProvider`, `recentLogsProvider`,
+`AppFormat.ago` and `dayAndTime`, `AppRoutes.habitFor`. `HabitWording` gains
+`stageLine`, `nextTarget`, `avoidedTitle` (moved out of `StagePill` and
+`RingCard`); `LogsCardHeader` is shared with `TodayLogsCard`; `LogRow` takes
+optional `habit` and `when`. The + menu's "Add a missed log" now asks which
+habit with a second glass menu. The pace line under Details needed no code
+(`HabitDashboard` has it); a test now covers it.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite
+453 passed. Red was seen only for `combinedStreak`; the widget tests were
+written with the code, so they were not seen failing first. Not seen on a
+simulator, so the cards' look against `HomeMulti.dc.html` is unchecked. Until
+4.4, "See all logs" shows the oldest habit's logs, because Logs has no All view
+yet. `home_page_test.dart` lost the interim test "with two habits Home shows
+the oldest until it lists them".
+
+## Task 4.1 (2026-10-31, committed 5369b50, pushed)
+
+`/add-habit` (`AddHabitPage`) runs Habit, Daily amount, Cost and The deal; the
++ menu's new "Add a habit" row opens it. `onboardingModeProvider` is overridden
+in a nested `ProviderScope`, and `onboardingFormProvider` depends on it. Tracked
+presets show "TRACKING" and are disabled; the form opens on the first untracked
+preset. Currency, wake and bed come from settings and are not saved; the
+currency chip is read-only. The first step's chevron leaves the flow. Also
+fixed: `context.go` over a pushed page threw, because `didPopNext` bumped a
+provider during a build (`ShellReturnListener` now waits for the frame's end).
+
+Checks observed by me: red first, then format, `analyze --fatal-infos` clean,
+full suite 434 passed. Not seen on a simulator; swipe back on the first step has no test; the
+prompt "Another one? We can take it." is my copy, not from a spec. Those checks
+ran on the working tree before the commit; none ran at handoff, and CI on the
+push was not read.
+
+Open for Fawad: the + button reads mid-grey in light mode. Hook gotcha: the global
 hook blocks any Bash call whose text mentions "format"/"test" next to
 other commands (including `git add` of `formatting/` paths, `git rm` of
 `*_test.dart` and `task-done`); run checks bare, stage with `git add -A`
-/ `-u`, write ledger lines by hand. Stay on `feat/onboarding-redesign`.
+/ `-u`, write ledger lines by hand.
 
 ## Phase O4 (2026-10-31, committed)
 
@@ -35,12 +266,11 @@ and `next` use `max((bed − wake) / limit, (bed − from) / remaining)`, so lim
 12 at 22:00 reads as The deal's 80 min, not 8. The second line hides when one
 gap would run past bed. Spec 8.1 and 8.2 are updated.
 
-Deferred to M5 (minors from the review): the pace line stays when the ring
-is swiped to another day; Reduce Motion misses `SmoothSwitcher`, `PressScale`,
-`deal_step`, `exhale_bubble`, `day_window_picker`, `habit_step`; back chevron
-44 × 36 pt since the polish; pace figures only in minutes (960 min); older
-tap targets under 44 pt (Deal chips, currency chip, units stepper); without a
-day window the prompt also shows at the limit and on quit day (pre-v9 only).
+Deferred to M5 (minors from the review): Reduce Motion misses `SmoothSwitcher`,
+`PressScale`, `deal_step`, `exhale_bubble`, `day_window_picker`, `habit_step`; back
+chevron 44 × 36 pt since the polish; older tap targets under 44 pt (Deal chips,
+currency chip, units stepper). Closed by Task 5.1c: the pace line on a swiped day,
+pace figures only in minutes, the prompt at the limit and on quit day.
 
 Simulator walk (2026-10-31, "exhale", from stills): onboarding in dark
 (vaping, 6 steps) and light (social media, 5 steps), Home, the prompt, the Your
@@ -56,7 +286,7 @@ motion feel. The simulator's data gained a day window and one pouches log; its
 theme is back on Dark. For Fawad to look at: the + button reads mid-grey in
 light mode, not ink (glass over the page).
 
-**Next action:** the onboarding PR (needs "Analyze & test" green), then M4.
+The onboarding PR merged as #26; see the top of this file for the next action.
 
 **Stash:** `stash@{0}` "sim-walk splash hack" holds the debug edit to
 `splash_page.dart` (always starts onboarding). `git stash apply` it only
@@ -229,8 +459,6 @@ price only.
 - `home/presentation/widgets/history_chart.dart` is unused since 2.4; not
   removed.
 - Plan roadmap page is a later design decision.
-- M4 (4.2): the multi-habit menu's "Add a missed log" always uses the first
-  habit; it needs a habit choice.
 - M5 (5.2): the + button's `Semantics(excludeSemantics: true)` drops the
   tap and long-press semantic actions (VoiceOver falls back to a touch; the
   menu has no action).

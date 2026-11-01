@@ -1,11 +1,12 @@
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/app/shell/app_shell.dart';
 import 'package:exhale/app/shell/page_visits.dart';
-import 'package:exhale/features/design_system/presentation/design_system_page.dart';
+import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/home/presentation/pages/habit_details_page.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
+import 'package:exhale/features/onboarding/presentation/pages/change_habit_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
 import 'package:exhale/features/plan/presentation/pages/edit_plan_page.dart';
@@ -42,10 +43,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: AppRoutes.designSystem,
-        builder: (context, state) => const DesignSystemPage(),
-      ),
-      GoRoute(
         path: AppRoutes.habit,
         builder: (context, state) => HabitDetailsPage(
           habitId: int.parse(state.pathParameters['habitId']!),
@@ -55,6 +52,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.editPlan,
         builder: (context, state) =>
             EditPlanPage(habitId: int.parse(state.pathParameters['habitId']!)),
+      ),
+      GoRoute(
+        path: AppRoutes.changeHabit,
+        redirect: (context, state) {
+          final habitId = int.parse(state.pathParameters['habitId']!);
+          return ref.read(habitProvider(habitId)) == null
+              ? AppRoutes.home
+              : null;
+        },
+        builder: (context, state) => ChangeHabitPage(
+          habitId: int.parse(state.pathParameters['habitId']!),
+        ),
       ),
       GoRoute(
         path: AppRoutes.logs,

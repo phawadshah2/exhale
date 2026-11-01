@@ -16,14 +16,22 @@ abstract final class AppPalette {
 
   static const Color ocean = Color(0xFF3B82F6);
 
-  /// Light-mode emphasis: primary buttons, Exhale's bubbles, the stepper.
+  /// The Ink accent on light surfaces, and its text on [paper].
   static const Color ink = Color(0xFF111418);
 
-  /// Accent choices offered in Settings > Appearance, by stored index.
+  /// The Ink accent on dark surfaces, where [ink] would not show.
+  static const Color paper = Color(0xFFF4F7FA);
+
+  /// Accent choices offered in Settings > Appearance, by stored index. Add
+  /// new ones at the end: saved settings hold the index.
   static const List<AccentSwatch> accents = [
     AccentSwatch(name: 'Eucalyptus', color: eucalyptus),
     AccentSwatch(name: 'Ocean', color: ocean),
+    AccentSwatch(name: 'Ink', color: ink, darkColor: paper),
   ];
+
+  /// The accent a new install starts on.
+  static const int defaultAccentIndex = 2;
 
   /// The accent for a stored index; unknown indexes fall back to the first.
   static AccentSwatch accentAt(int index) =>
@@ -66,10 +74,16 @@ abstract final class AppPalette {
 
 @immutable
 class AccentSwatch {
-  const AccentSwatch({required this.name, required this.color});
+  const AccentSwatch({required this.name, required this.color, this.darkColor});
 
   final String name;
   final Color color;
+
+  /// Replaces [color] on dark surfaces; null keeps it.
+  final Color? darkColor;
+
+  Color colorIn(Brightness brightness) =>
+      brightness == Brightness.dark ? darkColor ?? color : color;
 }
 
 @immutable

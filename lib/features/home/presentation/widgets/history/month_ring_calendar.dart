@@ -135,6 +135,7 @@ class _DayCell extends StatelessWidget {
       button: !future,
       label: semantics,
       excludeSemantics: true,
+      onTap: future ? null : () => onTap(slot.day),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: future ? null : () => onTap(slot.day),

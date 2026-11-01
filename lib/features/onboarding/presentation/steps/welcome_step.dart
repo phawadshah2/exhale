@@ -1,6 +1,6 @@
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/core/widgets/glow_button.dart';
+import 'package:exhale/core/widgets/primary_button.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/exhale_bubble.dart';
@@ -93,7 +93,7 @@ class _WelcomeStepState extends State<WelcomeStep>
 
     return OnboardingStepFrame(
       onTapBody: _skip,
-      button: GlowButton(
+      button: PrimaryButton(
         label: OnboardingCopy.welcomeButton,
         onPressed: () => OnboardingScope.of(context).next(),
       ),
@@ -193,11 +193,15 @@ class _WelcomeStepState extends State<WelcomeStep>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      OnboardingCopy.welcomeTitle,
-                      style: text.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        height: 1.15,
+                    // Capped: past this "negotiating" no longer fits a line.
+                    MediaQuery.withClampedTextScaling(
+                      maxScaleFactor: 1.5,
+                      child: Text(
+                        OnboardingCopy.welcomeTitle,
+                        style: text.headlineLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          height: 1.15,
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),

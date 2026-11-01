@@ -7,6 +7,7 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/liquid_glass.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
+import 'package:exhale/features/home/presentation/widgets/next_log_badge.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/presentation/log_flow.dart';
 import 'package:exhale/features/tracking/presentation/widgets/log_menu.dart';
@@ -195,7 +196,16 @@ class FloatingTabBar extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              _LogButton(onTap: onLog, onLongPress: onLogMenu),
+              // Under the button, so a touch or VoiceOver finds Log first.
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Positioned.fill(
+                    child: NextLogBadge(buttonSize: height),
+                  ),
+                  _LogButton(onTap: onLog, onLongPress: onLogMenu),
+                ],
+              ),
             ],
           ),
         ),
@@ -225,12 +235,14 @@ class _LogButton extends StatelessWidget {
         label: 'Log',
         hint: 'Long-press for more',
         excludeSemantics: true,
+        onTap: () => onTap(_anchor(context)),
+        onLongPress: () => onLongPress(_anchor(context)),
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => onTap(_anchor(context)),
           onLongPress: () => onLongPress(_anchor(context)),
           child: AppGlass(
-            tint: exhale.emphasis.withValues(alpha: 0.6),
+            tint: exhale.emphasis.withValues(alpha: 0.85),
             child: SizedBox.square(
               dimension: FloatingTabBar.height,
               child: Icon(AppIcons.add, size: 28, color: exhale.onEmphasis),
@@ -263,6 +275,7 @@ class _TabButton extends StatelessWidget {
       selected: selected,
       label: tab.label,
       excludeSemantics: true,
+      onTap: onTap,
       child: Tooltip(
         message: tab.label,
         child: GestureDetector(

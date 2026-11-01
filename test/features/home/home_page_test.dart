@@ -3,14 +3,18 @@ import 'dart:async';
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/presentation/app_icons.dart';
+import 'package:exhale/core/theme/app_theme.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/archive_habit.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
+import 'package:exhale/features/home/presentation/widgets/stage_pill.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
+import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/usecases/save_settings.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
@@ -18,10 +22,12 @@ import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/repositories/habit_log_repository.dart';
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../helpers/fixed_clock.dart';
+import '../../helpers/large_text.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
@@ -95,7 +101,8 @@ void main() {
       find.text('No cigarettes logged today. Nice start.'),
       findsOneWidget,
     );
-    expect(find.text('Stage 1 of 9 · Daily limit: 9'), findsOneWidget);
+    expect(find.text('Day 1, plan starts today'), findsOneWidget);
+    expect(find.text('STAGE 1 / 9'), findsOneWidget);
     expect(find.text('Plan started today'), findsOneWidget);
     expect(find.text('Drops to 8 in 7d'), findsOneWidget);
     expect(find.text('D1'), findsOneWidget);
@@ -413,10 +420,108 @@ void main() {
     );
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text('Quit day in 3d'), findsOneWidget);
-    expect(find.text('Stage 3 of 3 · Daily limit: 1'), findsOneWidget);
+    // The stage pill and the next-target cell.
+    expect(find.text('Quit day in 3d'), findsNWidgets(2));
+    expect(find.text('STAGE 3 / 3'), findsOneWidget);
 
     await tester.disposeApp();
+  });
+
+  testWidgets('the stage pill names the habit and its next drop', (
+    tester,
+  ) async {
+    await seedHabit(
+      PlanDraft(
+        startDay: today.addDays(-8),
+        startLimit: 9,
+        quitDay: today.addDays(55),
+      ),
+      habit: Habit.vaping,
+    );
+    await tester.pumpAppPastSplash(height: 2400);
+
+    final pill = find.byType(StagePill);
+    expect(
+      find.descendant(of: pill, matching: find.byIcon(AppIcons.vaping)),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: pill, matching: find.text('Vaping')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: pill, matching: find.text('Drops to 7 in 6d')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: pill, matching: find.text('STAGE 2 / 9')),
+      findsOneWidget,
+    );
+
+    await tester.disposeApp();
+  });
+
+  Future<void> pumpStagePill(
+    WidgetTester tester, {
+    required Habit habit,
+    required double width,
+    double textScale = 1,
+  }) => tester.pumpWidget(
+    MaterialApp(
+      theme: AppTheme.dark,
+      home: Scaffold(
+        body: Center(
+          child: SizedBox(
+            width: width,
+            child: MediaQuery(
+              data: MediaQueryData(textScaler: TextScaler.linear(textScale)),
+              child: StagePill(
+                plan: ReductionPlan(
+                  startDay: today.addDays(-8),
+                  startLimit: 9,
+                  quitDay: today.addDays(55),
+                ),
+                today: today,
+                habit: habit,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  testWidgets('a long habit name gives way to the next drop', (tester) async {
+    const name = 'A habit with a name far too long to fit on one pill';
+    await pumpStagePill(
+      tester,
+      habit: Habit.custom(name: name, unit: 'time'),
+      width: 350,
+    );
+
+    expect(
+      tester.renderObject<RenderParagraph>(find.text(name)).didExceedMaxLines,
+      isTrue,
+    );
+    expect(
+      tester
+          .renderObject<RenderParagraph>(find.text('Drops to 7 in 6d'))
+          .didExceedMaxLines,
+      isFalse,
+    );
+  });
+
+  testWidgets('the stage pill fits at the largest text size', (tester) async {
+    await loadAppFonts();
+    await pumpStagePill(
+      tester,
+      habit: Habit.nicotinePouches,
+      width: 350,
+      textScale: 2,
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(tester.clippedTexts(), isEmpty);
   });
 
   testWidgets('after the quit date the limit is 0 and the day is smoke-free', (
@@ -431,8 +536,8 @@ void main() {
     );
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(countText(tester), '0 / 0');
-    expect(find.text('Smoke-free day'), findsOneWidget);
+    expect(countText(tester), '3');
+    expect(find.text('days smoke-free'), findsOneWidget);
     expect(find.text('Smoke-free since Oct 14'), findsOneWidget);
     expect(find.text('QUIT'), findsOneWidget);
 
@@ -482,7 +587,7 @@ void main() {
     );
     await tester.pumpAppPastSplash(height: 2400);
 
-    expect(find.text('Vape-free day'), findsOneWidget);
+    expect(find.text('days vape-free'), findsOneWidget);
     expect(find.text('Vape-free since Oct 14'), findsOneWidget);
     expect(find.text('Vape-free'), findsWidgets);
 

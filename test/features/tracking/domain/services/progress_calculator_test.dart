@@ -206,6 +206,40 @@ void main() {
       expect(stats.streakDays, 3);
     });
 
+    test('free days count back from today through days at zero', () {
+      DailyProgress day(int offset, {required int count, required int limit}) =>
+          DailyProgress(day: start.addDays(offset), count: count, limit: limit);
+
+      final stats = ProgressCalculator.homeStats(
+        days: [
+          day(0, count: 0, limit: 2),
+          day(1, count: 0, limit: 0),
+          day(2, count: 1, limit: 0),
+          day(3, count: 0, limit: 0),
+          day(4, count: 0, limit: 0),
+        ],
+        history: history,
+        today: start.addDays(4),
+        unitPriceCents: null,
+      );
+
+      expect(stats.freeDays, 2);
+    });
+
+    test('free days stop at a day with a limit', () {
+      final stats = ProgressCalculator.homeStats(
+        days: [
+          DailyProgress(day: start, count: 0, limit: 2),
+          DailyProgress(day: start.addDays(1), count: 0, limit: 0),
+        ],
+        history: history,
+        today: start.addDays(1),
+        unitPriceCents: null,
+      );
+
+      expect(stats.freeDays, 1);
+    });
+
     test('an over-limit today ends the streak', () {
       final stats = ProgressCalculator.homeStats(
         days: days([5, 6, 10]),

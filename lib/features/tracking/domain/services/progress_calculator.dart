@@ -212,6 +212,12 @@ abstract final class ProgressCalculator {
       streak++;
     }
 
+    var freeDays = 0;
+    for (final day in days.reversed) {
+      if (day.limit != 0 || day.count != 0) break;
+      freeDays++;
+    }
+
     final recent = completed.length > recentWindowDays
         ? completed.sublist(completed.length - recentWindowDays)
         : completed;
@@ -227,6 +233,7 @@ abstract final class ProgressCalculator {
     return HomeStats(
       dayNumber: math.max(1, today.daysSince(history.firstDay) + 1),
       streakDays: streak,
+      freeDays: freeDays,
       baseline: baseline,
       recentAverage: recentAverage,
       avoided: avoided,

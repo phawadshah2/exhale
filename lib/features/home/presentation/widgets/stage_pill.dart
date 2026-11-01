@@ -1,13 +1,14 @@
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
-import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/presentation/habit_icon.dart';
 import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:flutter/material.dart';
 
-/// "Week 1 of 9 · Daily limit: 9" with a STAGE chip.
+/// "Vaping · Drops to 10 in 4d" with a "STAGE 2 / 9" chip; outside the stages,
+/// the plan's start or quit date.
 class StagePill extends StatelessWidget {
   const StagePill({
     required this.plan,
@@ -23,27 +24,40 @@ class StagePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final style = context.textTheme.titleSmall;
     final stage = plan.stageOn(today);
+    final quit = stage == null && plan.hasStartedOn(today);
+    final success = context.exhale.success.foreground;
+    final tint = quit ? success : colors.primaryContainer;
+    final foreground = quit ? success : colors.primary;
 
-    final (label, chip) = !plan.hasStartedOn(today)
-        ? (
-            'Plan starts ${AppFormat.monthDay(plan.startDay)} · '
-                'Daily limit: ${plan.startLimit}',
-            'SOON',
-          )
-        : stage == null
-        ? (
-            '${habit.freeTitle} since ${AppFormat.monthDay(plan.quitDay)}',
-            'QUIT',
-          )
-        : (
-            'Stage ${stage.number} of ${plan.stageCount} · '
-                'Daily limit: ${stage.limit}',
-            'STAGE ${stage.number}',
-          );
+    final String chip;
+    final Widget label;
+    if (stage != null) {
+      chip = 'STAGE ${stage.number} / ${plan.stageCount}';
+      label = _NameAndTarget(
+        name: habit.name,
+        target: today == plan.startDay
+            ? 'Day 1, plan starts today'
+            : habit.nextTarget(plan, today),
+        style: style,
+      );
+    } else {
+      chip = quit ? 'QUIT' : 'SOON';
+      final large = context.hasLargeText;
+      label = Text(
+        quit
+            ? '${habit.freeTitle} since ${AppFormat.monthDay(plan.quitDay)}'
+            : 'Plan starts ${AppFormat.monthDay(plan.startDay)} · '
+                  'Daily limit: ${plan.startLimit}',
+        style: style,
+        maxLines: large ? null : 1,
+        overflow: large ? null : TextOverflow.ellipsis,
+      );
+    }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 10, 10),
+      padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
       decoration: ShapeDecoration(
         color: colors.surfaceContainerHigh,
         shape: StadiumBorder(
@@ -51,39 +65,27 @@ class StagePill extends StatelessWidget {
         ),
       ),
       child: Row(
+        spacing: 10,
         children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: colors.primaryContainer,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              label,
-              style: context.textTheme.titleSmall,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-            decoration: ShapeDecoration(
-              color: colors.primaryContainer.withValues(alpha: 0.12),
-              shape: StadiumBorder(
-                side: BorderSide(
-                  color: colors.primaryContainer.withValues(alpha: 0.4),
+          Icon(habit.kind.icon, size: 20, color: foreground),
+          Expanded(child: label),
+          // Capped so large text leaves the label room.
+          MediaQuery.withClampedTextScaling(
+            maxScaleFactor: 1.5,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+              decoration: ShapeDecoration(
+                color: tint.withValues(alpha: 0.12),
+                shape: StadiumBorder(
+                  side: BorderSide(color: tint.withValues(alpha: 0.4)),
                 ),
               ),
-            ),
-            child: Text(
-              chip,
-              style: context.textTheme.labelMedium?.copyWith(
-                color: colors.primary,
-                letterSpacing: 0.6,
+              child: Text(
+                chip,
+                style: context.textTheme.labelMedium?.copyWith(
+                  color: foreground,
+                  letterSpacing: 0.6,
+                ),
               ),
             ),
           ),
@@ -91,4 +93,60 @@ class StagePill extends StatelessWidget {
       ),
     );
   }
+}
+
+/// On one line when both fit; otherwise the name above the target, so neither
+/// hides the other.
+class _NameAndTarget extends StatelessWidget {
+  const _NameAndTarget({
+    required this.name,
+    required this.target,
+    required this.style,
+  });
+
+  final String name;
+  final String target;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) {
+      final oneLine = TextPainter(
+        text: TextSpan(text: '$name · $target', style: style),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+        maxLines: 1,
+      )..layout();
+      final fits = oneLine.width < box.maxWidth - 1;
+      oneLine.dispose();
+      if (fits) {
+        return Row(
+          children: [
+            Flexible(
+              child: Text(
+                name,
+                style: style,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Text(' · ', style: style),
+            Text(target, style: style),
+          ],
+        );
+      }
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            name,
+            style: style,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(target, style: style),
+        ],
+      );
+    },
+  );
 }

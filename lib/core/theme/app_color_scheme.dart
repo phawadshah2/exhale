@@ -19,7 +19,9 @@ ColorScheme buildColorScheme({
     dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
   );
 
-  final base = seeded(accent);
+  final base = accent == AppPalette.ink
+      ? _withInkRoles(seeded(accent))
+      : seeded(accent);
   final success = seeded(AppPalette.emerald);
   final warning = seeded(AppPalette.amber);
   final danger = seeded(AppPalette.coral);
@@ -52,5 +54,19 @@ ColorScheme buildColorScheme({
     outlineVariant: neutrals.hairline,
     inverseSurface: neutrals.inverseSurface,
     onInverseSurface: neutrals.onInverseSurface,
+  );
+}
+
+/// The seed algorithm turns a near-black seed into pure black and grey, so
+/// Ink sets its accent roles by hand.
+ColorScheme _withInkRoles(ColorScheme seeded) {
+  final isDark = seeded.brightness == Brightness.dark;
+  final fill = isDark ? AppPalette.paper : AppPalette.ink;
+  final onFill = isDark ? AppPalette.ink : Colors.white;
+  return seeded.copyWith(
+    primary: fill,
+    onPrimary: onFill,
+    primaryContainer: fill,
+    onPrimaryContainer: onFill,
   );
 }

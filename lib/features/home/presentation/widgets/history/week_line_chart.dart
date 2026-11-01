@@ -102,6 +102,7 @@ class _DayColumn extends StatelessWidget {
       button: onTap != null,
       label: label,
       excludeSemantics: true,
+      onTap: onTap,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,

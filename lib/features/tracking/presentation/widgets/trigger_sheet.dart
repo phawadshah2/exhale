@@ -80,7 +80,7 @@ class _TriggerSheetState extends ConsumerState<_TriggerSheet> {
         ? habit.name
         : '${habit.name} · ${progress.count + 1} of ${progress.limit} '
               'after this';
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
         0,
@@ -111,9 +111,8 @@ class _TriggerSheetState extends ConsumerState<_TriggerSheet> {
                   Flexible(
                     child: Text(
                       chip,
-                      overflow: TextOverflow.ellipsis,
                       style: text.labelMedium?.copyWith(
-                        color: colors.primary,
+                        color: colors.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

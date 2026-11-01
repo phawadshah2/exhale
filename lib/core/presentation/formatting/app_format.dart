@@ -109,6 +109,33 @@ abstract final class AppFormat {
     return hours == 0 ? '${duration.inDays}d' : '${duration.inDays}d ${hours}h';
   }
 
+  /// 0:47:12 while counting down, rounded up so it reaches zero only at zero;
+  /// +0:12:03 from zero on.
+  static String timer(Duration left) {
+    final past = left <= Duration.zero;
+    final micros = left.inMicroseconds.abs();
+    final seconds = past
+        ? micros ~/ Duration.microsecondsPerSecond
+        : (micros / Duration.microsecondsPerSecond).ceil();
+    final minute = (seconds ~/ 60 % 60).toString().padLeft(2, '0');
+    final second = (seconds % 60).toString().padLeft(2, '0');
+    return '${past ? '+' : ''}${seconds ~/ 3600}:$minute:$second';
+  }
+
+  /// 47 min, 1 h, 1 h 27 min; part minutes round up.
+  static String hoursMinutes(Duration duration) {
+    final total = _ceilMinutes(duration);
+    if (total < 60) return '$total min';
+    final rest = total % 60;
+    return rest == 0 ? '${total ~/ 60} h' : '${total ~/ 60} h $rest min';
+  }
+
+  /// Whole minutes, even past an hour: 87 min.
+  static String minutes(Duration duration) => '${_ceilMinutes(duration)} min';
+
+  static int _ceilMinutes(Duration duration) =>
+      (duration.inMicroseconds / Duration.microsecondsPerMinute).ceil();
+
   /// One-letter weekday: M T W T F S S
   static String weekdayInitial(LogicalDay day) =>
       _weekdays[day.weekday - 1].substring(0, 1);

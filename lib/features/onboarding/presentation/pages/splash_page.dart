@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/domain/result/result.dart';
-import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
+import 'package:exhale/core/widgets/load_failure.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/splash_scene.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +40,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
   bool _introFinished = false;
   bool _navigated = false;
   bool _started = false;
+  bool _readFailed = false;
   int _playId = 0;
 
   bool get _reduceMotion => MediaQuery.disableAnimationsOf(context);
@@ -60,14 +61,21 @@ class _SplashPageState extends ConsumerState<SplashPage>
 
   Future<void> _resolveDestination() async {
     final habits = await ref.read(habitRepositoryProvider).getActive();
-    final hasHabit =
-        habits is Success<List<TrackedHabit>> && habits.value.isNotEmpty;
-    if (hasHabit) {
-      _destination = AppRoutes.home;
-      _maybeNavigate();
-    } else {
-      _startTalking();
+    switch (habits) {
+      case Success(value: [_, ...]):
+        _destination = AppRoutes.home;
+        _maybeNavigate();
+      case Success():
+        _startTalking();
+      // A returning user must not land in onboarding as if their data had gone.
+      case FailureResult():
+        if (mounted) setState(() => _readFailed = true);
     }
+  }
+
+  void _retryRead() {
+    setState(() => _readFailed = false);
+    unawaited(_resolveDestination());
   }
 
   /// First launch: no long intro, a short line, then onboarding.
@@ -134,6 +142,14 @@ class _SplashPageState extends ConsumerState<SplashPage>
 
   @override
   Widget build(BuildContext context) {
+    if (_readFailed) {
+      return Scaffold(
+        body: LoadFailure(
+          message: "Couldn't open your data.",
+          onRetry: _retryRead,
+        ),
+      );
+    }
     return Scaffold(
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,

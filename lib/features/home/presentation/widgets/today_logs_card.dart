@@ -68,21 +68,27 @@ class _TodayLogsCardState extends ConsumerState<TodayLogsCard> {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 6, 4, 8),
-          child: Row(
+          // Wraps at large text sizes instead of overflowing.
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Expanded(child: Text("Today's logs", style: text.titleLarge)),
+              Text("Today's logs", style: text.titleLarge),
               InkWell(
                 onTap: seeAll,
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(minHeight: 44),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     spacing: 4,
                     children: [
-                      Text(
-                        'See all logs',
-                        style: text.labelLarge?.copyWith(
-                          color: colors.primary,
-                          fontWeight: FontWeight.w700,
+                      Flexible(
+                        child: Text(
+                          'See all logs',
+                          style: text.labelLarge?.copyWith(
+                            color: colors.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                       Icon(

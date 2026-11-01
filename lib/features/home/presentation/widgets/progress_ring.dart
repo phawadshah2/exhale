@@ -6,10 +6,11 @@ import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:flutter/material.dart';
 
-/// A day's ring: fills toward the limit. While it fills it is the safe
-/// green; once it has filled, the whole ring takes the colour of the day's
-/// status (amber at the limit, red over it). With no [progress] (a day before
-/// the plan) only the track is drawn.
+/// A day's ring: fills toward the limit. While it fills it is the accent's
+/// gradient; once it has filled, the whole ring takes the colour of the day's
+/// status (amber at the limit, red over it). A day at zero after the quit date
+/// is a full success ring. With no [progress] (a day before the plan) only the
+/// track is drawn.
 class ProgressRing extends StatelessWidget {
   const ProgressRing({
     required this.progress,
@@ -29,12 +30,15 @@ class ProgressRing extends StatelessWidget {
     final colors = context.colors;
     final status = context.exhale;
     final progress = this.progress;
-    final target = progress?.usedFraction ?? 0;
-    final finalColor = switch (progress?.status) {
-      LimitStatus.at => status.warning.solid,
-      LimitStatus.over => status.danger.solid,
-      _ => null,
-    };
+    final atZero = progress?.limit == 0 && progress?.count == 0;
+    final target = atZero ? 1.0 : progress?.usedFraction ?? 0;
+    final finalColor = atZero
+        ? status.success.solid
+        : switch (progress?.status) {
+            LimitStatus.at => status.warning.solid,
+            LimitStatus.over => status.danger.solid,
+            _ => null,
+          };
 
     return SizedBox.square(
       dimension: size,
@@ -50,7 +54,7 @@ class ProgressRing extends StatelessWidget {
             settle: target == 0 ? 1 : (fill / target).clamp(0.0, 1.0),
             strokeWidth: strokeWidth,
             track: colors.surfaceContainerHigh,
-            gradient: [colors.secondaryContainer, colors.primaryContainer],
+            gradient: [status.ringStart, colors.primaryContainer],
             finalColor: finalColor,
           ),
           child: Center(child: child),
@@ -105,23 +109,7 @@ class _RingPainter extends CustomPainter {
       colors: gradient,
       transform: GradientRotation(_start - cap),
     ).createShader(rect);
-    // Faint halo: the arc blurred and drawn at low opacity.
-    canvas
-      ..saveLayer(
-        rect.inflate(strokeWidth * 2),
-        Paint()..color = const Color(0x2E000000),
-      )
-      ..drawArc(
-        rect,
-        _start,
-        sweep,
-        false,
-        stroke()
-          ..shader = shader
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
-      )
-      ..restore()
-      ..drawArc(rect, _start, sweep, false, stroke()..shader = shader);
+    canvas.drawArc(rect, _start, sweep, false, stroke()..shader = shader);
 
     final end = finalColor;
     final blend = Curves.easeInOut.transform(

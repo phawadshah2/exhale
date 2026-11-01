@@ -8,9 +8,9 @@ import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Two-column grid of the habit's trigger pills; tapping the selected one
-/// clears it. A selected trigger from another habit is still shown; a last
-/// pill left alone on its row spans the full width.
+/// Two-column grid of the habit's trigger pills, one column with large text;
+/// tapping the selected one clears it. A selected trigger from another habit
+/// is still shown; a last pill left alone on its row spans the full width.
 class TriggerPicker extends StatelessWidget {
   const TriggerPicker({
     required this.habitKind,
@@ -40,7 +40,9 @@ class TriggerPicker extends StatelessWidget {
           children: [
             for (final (i, trigger) in triggers.indexed)
               SizedBox(
-                width: i == triggers.length - 1 && triggers.length.isOdd
+                width:
+                    context.hasLargeText ||
+                        (i == triggers.length - 1 && triggers.length.isOdd)
                     ? constraints.maxWidth
                     : half,
                 child: _TriggerPill(
@@ -87,8 +89,8 @@ class _TriggerPill extends StatelessWidget {
           customBorder: const StadiumBorder(),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            height: 52,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            constraints: const BoxConstraints(minHeight: 52),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: ShapeDecoration(
               color: isSelected
                   ? colors.primaryContainer

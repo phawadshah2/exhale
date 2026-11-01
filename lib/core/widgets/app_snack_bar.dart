@@ -154,12 +154,6 @@ class _AppSnackBarContentState extends State<AppSnackBarContent>
                   decoration: BoxDecoration(
                     color: toneColor,
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: toneColor.withValues(alpha: 0.25),
-                        blurRadius: 4,
-                      ),
-                    ],
                   ),
                 ),
               ),

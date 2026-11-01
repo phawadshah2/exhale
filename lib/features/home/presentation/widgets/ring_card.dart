@@ -7,15 +7,21 @@ import 'package:exhale/core/presentation/providers/clock_providers.dart';
 import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/load_failure.dart';
 import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/core/widgets/status_badge.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
+import 'package:exhale/features/home/domain/pace_guide.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
+import 'package:exhale/features/home/presentation/providers/next_log_timer_provider.dart';
 import 'package:exhale/features/home/presentation/widgets/backward_pager.dart';
 import 'package:exhale/features/home/presentation/widgets/day_triggers.dart';
+import 'package:exhale/features/home/presentation/widgets/draining_ring.dart';
+import 'package:exhale/features/home/presentation/widgets/pace_text.dart';
 import 'package:exhale/features/home/presentation/widgets/progress_ring.dart';
+import 'package:exhale/features/home/presentation/widgets/quit_reached_card.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
@@ -75,32 +81,36 @@ class RingCard extends ConsumerWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              // Today shows a badge and other days a chip; a fixed height
+              // Today shows a badge and other days a chip; a minimum height
               // keeps the card from shifting when switching between them.
-              child: SizedBox(
-                height: 40,
-                child: Row(
-                  children: [
-                    Icon(AppIcons.breath, color: colors.primary, size: 22),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        isToday
-                            ? "Today's Consumption"
-                            : AppFormat.weekdayDate(day),
-                        style: text.titleLarge,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 40),
+                child: _CardHeader(
+                  title: Row(
+                    children: [
+                      Icon(AppIcons.breath, color: colors.primary, size: 22),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          isToday
+                              ? "Today's Consumption"
+                              : AppFormat.weekdayDate(day),
+                          style: text.titleLarge,
+                        ),
                       ),
-                    ),
-                    if (!isToday)
-                      _TodayChip(onTap: picker.showToday)
-                    else if (progress != null)
-                      StatusBadge(
-                        label: progress.badgeLabel(habit),
-                        colors: progress.status.colors(context),
-                      ),
-                  ],
+                    ],
+                  ),
+                  trailing: !isToday
+                      ? MediaQuery.withClampedTextScaling(
+                          maxScaleFactor: 1.5,
+                          child: _TodayChip(onTap: picker.showToday),
+                        )
+                      : progress != null
+                      ? StatusBadge(
+                          label: progress.badgeLabel(habit),
+                          colors: progress.status.colors(context),
+                        )
+                      : null,
                 ),
               ),
             ),
@@ -165,18 +175,31 @@ class RingCard extends ConsumerWidget {
                       ),
                     ),
                     _Reveal(
-                      show: isToday && progress != null && progress.count == 0,
+                      show:
+                          isToday &&
+                          progress != null &&
+                          progress.count == 0 &&
+                          progress.limit > 0,
                       child: Padding(
                         padding: const EdgeInsets.only(top: AppSpacing.md),
                         child: _Note(
-                          label: progress == null
-                              ? ''
-                              : progress.limit == 0
-                              ? habit.freeLabel == null
-                                    ? 'None so far today.'
-                                    : '${habit.freeTitle} so far today.'
-                              : 'No ${habit.units} logged today. Nice start.',
+                          label: 'No ${habit.units} logged today. Nice start.',
                         ),
+                      ),
+                    ),
+                    _Reveal(
+                      show:
+                          isToday &&
+                          progress != null &&
+                          progress.count > 0 &&
+                          progress.status == LimitStatus.under,
+                      child: PaceText(habitId: habitId),
+                    ),
+                    _Reveal(
+                      show: isToday && ref.watch(quitCardDueProvider(habitId)),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.md),
+                        child: QuitReachedCard(habitId: habitId),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
@@ -266,24 +289,47 @@ class _DayRing extends ConsumerWidget {
   final PlanHistory history;
   final Habit habit;
 
+  static const double _centreSize = 176;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progress = ref
-        .watch(dayProgressProvider((habitId: habitId, day: day)))
-        .value;
+    final key = (habitId: habitId, day: day);
+    final loaded = ref.watch(dayProgressProvider(key));
+    final progress = loaded.value;
     if (progress == null) {
-      return const Center(child: CircularProgressIndicator.adaptive());
+      return loaded.failedToLoad
+          ? LoadFailure(
+              message: "Couldn't load this day.",
+              onRetry: () => ref.invalidate(logsForDayProvider(key)),
+            )
+          : const Center(child: CircularProgressIndicator.adaptive());
     }
     final beforePlan = day.isBefore(history.firstDay);
+    final isToday = day == ref.watch(todayProvider);
+    final freeDays = isToday && progress.limit == 0 && progress.count == 0
+        ? ref.watch(habitStatsProvider(habitId)).value?.freeDays ?? 0
+        : 0;
+    final timer = isToday ? ref.watch(nextLogTimerProvider(habitId)) : null;
     return Center(
       child: ProgressRing(
         progress: beforePlan ? null : progress,
-        child: beforePlan
-            ? _BeforePlanCentre(count: progress.count)
-            : _RingCentre(
-                progress: progress,
-                habit: habit,
-                isToday: day == ref.watch(todayProvider),
+        child: timer != null && !beforePlan && freeDays == 0
+            ? _TimerCentre(timer: timer, progress: progress)
+            : SizedBox.square(
+                dimension: _centreSize,
+                // Large text shrinks to stay inside the ring.
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: beforePlan
+                      ? _BeforePlanCentre(count: progress.count)
+                      : freeDays > 0
+                      ? _FreeDaysCentre(days: freeDays, habit: habit)
+                      : _RingCentre(
+                          progress: progress,
+                          habit: habit,
+                          isToday: isToday,
+                        ),
+                ),
               ),
       ),
     );
@@ -366,18 +412,6 @@ class _TodayDetails extends ConsumerWidget {
   final LogicalDay today;
   final Habit habit;
 
-  String _nextTarget() {
-    final plan = history.planOn(today);
-    final days = plan.daysUntilNextDrop(today);
-    if (days == null) return habit.freeTitle;
-    final next = plan.limitOn(plan.nextDropOn(today)!);
-    return next == 0
-        ? (days == 1 ? 'Quit day tomorrow' : 'Quit day in ${days}d')
-        : (days == 1
-              ? 'Drops to $next tomorrow'
-              : 'Drops to $next in ${days}d');
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = ref.watch(nowProvider).value ?? ref.watch(clockProvider).now();
@@ -396,7 +430,11 @@ class _TodayDetails extends ConsumerWidget {
 
     final _Cell right;
     if (latest == null) {
-      right = (AppIcons.trendDown, 'Next target', _nextTarget());
+      right = (
+        AppIcons.trendDown,
+        'Next target',
+        habit.nextTarget(history.planOn(today), today),
+      );
     } else {
       right = (
         AppIcons.stress,
@@ -405,6 +443,32 @@ class _TodayDetails extends ConsumerWidget {
       );
     }
     return _Details(left: (AppIcons.clock, 'Last entry', entry), right: right);
+  }
+}
+
+/// The title with [trailing] at its end, or under it with large text.
+class _CardHeader extends StatelessWidget {
+  const _CardHeader({required this.title, required this.trailing});
+
+  final Widget title;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final end = trailing;
+    if (end == null) return title;
+    return context.hasLargeText
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: AppSpacing.xs,
+            children: [title, end],
+          )
+        : Row(
+            children: [
+              Expanded(child: title),
+              end,
+            ],
+          );
   }
 }
 
@@ -418,12 +482,94 @@ class _Details extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (context.hasLargeText) {
+      return Column(
+        spacing: AppSpacing.sm,
+        children: [
+          _InfoCell(cell: left),
+          _InfoCell(cell: right),
+        ],
+      );
+    }
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(child: _InfoCell(cell: left)),
         Expanded(child: _InfoCell(cell: right)),
       ],
+    );
+  }
+}
+
+/// The countdown to the next log, inside its own thin ring; the day's count
+/// drops to a small line.
+class _TimerCentre extends StatelessWidget {
+  const _TimerCentre({required this.timer, required this.progress});
+
+  final NextLogTimer timer;
+  final DailyProgress progress;
+
+  static const double _ringSize = 164;
+  static const double _contentSize = 148;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = context.textTheme;
+    final colors = context.colors;
+    final past = timer.isPast;
+    final accent = past ? context.exhale.success.foreground : colors.primary;
+    final count = '${progress.count} of ${progress.limit}';
+    final spoken = past
+        ? "You're on schedule."
+        : 'Next one on schedule in ${AppFormat.hoursMinutes(timer.left)}.';
+
+    return Semantics(
+      label: '$spoken $count today, ${progress.remaining} left.',
+      excludeSemantics: true,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          DrainingRing(
+            fraction: timer.fraction,
+            restartKey: timer.guide.next,
+            size: _ringSize,
+            strokeWidth: 4,
+            color: colors.onSurface,
+            track: colors.surfaceContainerHigh,
+          ),
+          SizedBox.square(
+            dimension: _contentSize,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 2,
+                children: [
+                  Text(
+                    AppFormat.timer(timer.left),
+                    style: text.displayLarge?.copyWith(
+                      fontSize: 34,
+                      height: 1.15,
+                      color: past ? accent : null,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                  Text(
+                    past ? "You're on schedule" : 'until your next',
+                    style: text.labelLarge?.copyWith(color: accent),
+                  ),
+                  Text(
+                    '$count · ${progress.remaining} left',
+                    style: text.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -496,6 +642,38 @@ class _RingCentre extends StatelessWidget {
         Text(
           caption,
           style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+        ),
+      ],
+    );
+  }
+}
+
+/// Today after the quit date, with nothing logged: "3 days vape-free".
+class _FreeDaysCentre extends StatelessWidget {
+  const _FreeDaysCentre({required this.days, required this.habit});
+
+  final int days;
+  final Habit habit;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = context.textTheme;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('$days', key: const Key('day-count'), style: text.displayLarge),
+        Text(
+          '${days == 1 ? 'day' : 'days'} ${habit.freeLabel ?? 'at zero'}',
+          style: text.titleLarge?.copyWith(
+            color: context.exhale.success.foreground,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          'Nothing logged today',
+          style: text.bodySmall?.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
         ),
       ],
     );

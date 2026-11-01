@@ -88,6 +88,14 @@ class StatsGrid extends StatelessWidget {
       ),
     ];
 
+    if (context.hasLargeText) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: AppSpacing.gutterSm,
+        children: tiles,
+      );
+    }
+
     return Column(
       spacing: AppSpacing.gutterSm,
       children: [

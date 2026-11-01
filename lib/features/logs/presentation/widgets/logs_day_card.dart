@@ -49,7 +49,7 @@ class LogsDayCard extends StatelessWidget {
       child: Padding(
         padding: AppSpacing.card,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: AppSpacing.gutterSm,
           children: [
             Text(
@@ -63,14 +63,16 @@ class LogsDayCard extends StatelessWidget {
                 style: text.titleMedium,
               )
             else
-              Row(
+              // Wraps at large text sizes instead of overflowing.
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: AppSpacing.sm,
                 children: [
-                  Expanded(
-                    child: Text(
-                      '${entry.count} logged',
-                      key: const Key('logs-day-summary'),
-                      style: text.titleMedium,
-                    ),
+                  Text(
+                    '${entry.count} logged',
+                    key: const Key('logs-day-summary'),
+                    style: text.titleMedium,
                   ),
                   if (progress != null)
                     StatusBadge(

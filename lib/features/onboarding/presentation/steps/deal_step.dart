@@ -8,7 +8,7 @@ import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
-import 'package:exhale/core/widgets/glow_button.dart';
+import 'package:exhale/core/widgets/primary_button.dart';
 import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
@@ -36,6 +36,9 @@ class _DealStepState extends ConsumerState<DealStep> {
   /// The chart waits for the sheet when the date came from Pick.
   Duration _chartDelay = Duration.zero;
 
+  /// The replace alert is up, so another press must not open a second one.
+  bool _asking = false;
+
   Future<void> _pickDate() async {
     final controller = ref.read(onboardingFormProvider.notifier);
     final picked = await showWheelPicker(
@@ -56,7 +59,28 @@ class _DealStepState extends ConsumerState<DealStep> {
   }
 
   Future<void> _shake() async {
+    final form = ref.read(onboardingFormProvider);
+    if (_asking || form.isSubmitting) return;
     unawaited(HapticFeedback.mediumImpact());
+    final replaced = form.replaced;
+    if (replaced != null) {
+      _asking = true;
+      final confirmed = await showAppConfirm(
+        context,
+        title: OnboardingCopy.replaceTitle(
+          replaced.habit.name,
+          form.habit.name,
+        ),
+        message: OnboardingCopy.replaceMessage(
+          replaced.habit.name,
+          form.habit.name,
+        ),
+        confirmLabel: OnboardingCopy.replaceConfirm,
+        destructive: true,
+      );
+      _asking = false;
+      if (!confirmed || !mounted) return;
+    }
     final saved = await ref.read(onboardingFormProvider.notifier).submit();
     if (saved && mounted) context.go(AppRoutes.home);
   }
@@ -72,7 +96,7 @@ class _DealStepState extends ConsumerState<DealStep> {
     final muted = text.bodySmall?.copyWith(color: colors.onSurfaceVariant);
 
     return OnboardingStepFrame(
-      button: GlowButton(
+      button: PrimaryButton(
         label: OnboardingCopy.dealButton,
         isBusy: form.isSubmitting,
         onPressed: plan == null ? null : _shake,
@@ -130,7 +154,6 @@ class _DealStepState extends ConsumerState<DealStep> {
             index: 3,
             child: Wrap(
               spacing: 7,
-              runSpacing: 7,
               children: [
                 for (final preset in QuitPreset.values)
                   _DealChip(
@@ -273,33 +296,45 @@ class _DealChip extends StatelessWidget {
           unawaited(HapticFeedback.selectionClick());
           onTap();
         },
-        child: PressScale(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOut,
-            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
-            decoration: ShapeDecoration(
-              color: selected ? pick.fill : pick.idleFill,
-              shape: StadiumBorder(
-                side: BorderSide(
-                  color: selected ? pick.line : pick.idleLine,
-                  width: selected ? 1.5 : 1,
+        // The pill stays small; the touch is 44 pt.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Center(
+            widthFactor: 1,
+            child: PressScale(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 13,
+                  vertical: 8,
                 ),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: 5,
-              children: [
-                if (icon != null) Icon(icon, size: 15, color: foreground),
-                Text(
-                  label,
-                  style: context.textTheme.labelLarge?.copyWith(
-                    color: foreground,
-                    fontWeight: selected ? FontWeight.w600 : null,
+                decoration: ShapeDecoration(
+                  color: selected ? pick.fill : pick.idleFill,
+                  shape: StadiumBorder(
+                    side: BorderSide(
+                      color: selected ? pick.line : pick.idleLine,
+                      width: selected ? 1.5 : 1,
+                    ),
                   ),
                 ),
-              ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 5,
+                  children: [
+                    if (icon != null) Icon(icon, size: 15, color: foreground),
+                    Flexible(
+                      child: Text(
+                        label,
+                        style: context.textTheme.labelLarge?.copyWith(
+                          color: foreground,
+                          fontWeight: selected ? FontWeight.w600 : null,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

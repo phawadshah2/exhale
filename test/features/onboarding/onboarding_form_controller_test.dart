@@ -3,10 +3,13 @@ import 'package:exhale/core/domain/error/failure.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
+import 'package:exhale/features/habit/domain/usecases/start_tracking.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
+import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/repositories/plan_repository.dart';
@@ -370,5 +373,67 @@ void main() {
     expect((state().wakeMinute, state().bedMinute), (420, 60));
     final habits = await sl<HabitRepository>().getActive();
     expect((habits as Success<List<TrackedHabit>>).value, isEmpty);
+  });
+
+  group('changing the habit', () {
+    late TrackedHabit vaping;
+
+    setUp(() async {
+      final started = await sl<StartTracking>()((
+        habit: const HabitDraft(habit: Habit.vaping),
+        plan: PlanDraft(
+          startDay: today,
+          startLimit: 10,
+          quitDay: today.addDays(70),
+        ),
+      ));
+      vaping = (started as Success<TrackedHabit>).value;
+    });
+
+    List<Override> changing({List<Override> more = const []}) => [
+      replacedHabitProvider.overrideWithValue(vaping),
+      ...more,
+    ];
+
+    test('steps skip Welcome and Your day', () {
+      container = open(overrides: changing());
+
+      expect(state().steps, [
+        OnboardingStep.habit,
+        OnboardingStep.amount,
+        OnboardingStep.cost,
+        OnboardingStep.deal,
+      ]);
+
+      controller().selectHabit(HabitKind.socialMedia);
+
+      expect(state().steps, [
+        OnboardingStep.habit,
+        OnboardingStep.amount,
+        OnboardingStep.deal,
+      ]);
+    });
+
+    test('submit replaces the habit without saving settings', () async {
+      container = open(
+        overrides: changing(
+          more: [
+            saveSettingsProvider.overrideWithValue(
+              SaveSettings(_FailingSaves(sl<SettingsRepository>())),
+            ),
+          ],
+        ),
+      );
+      controller().selectHabit(HabitKind.alcohol);
+
+      expect(await controller().submit(), isTrue);
+
+      expect(state().errorMessage, isNull);
+      final habits = await sl<HabitRepository>().getActive();
+      expect(
+        (habits as Success<List<TrackedHabit>>).value.map((h) => h.habit),
+        [Habit.alcohol],
+      );
+    });
   });
 }

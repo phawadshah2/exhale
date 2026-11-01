@@ -29,8 +29,14 @@ class _BackwardPagerState extends State<BackwardPager> {
   late final PageController _controller = PageController(
     initialPage: widget.page,
   );
-  late int _current = widget.page;
+  late int _current;
   bool _animating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _current = widget.page;
+  }
 
   @override
   void didUpdateWidget(BackwardPager oldWidget) {

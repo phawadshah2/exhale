@@ -3,6 +3,7 @@ import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../helpers/no_glow.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
@@ -43,6 +44,22 @@ void main() {
     final settled = tester.getTopLeft(find.text('Logged at 3:42 PM')).dy;
 
     expect(settled, lessThan(midway));
+  });
+
+  testWidgets('the tone dot has no glow', (tester) async {
+    await show(tester);
+    await tester.pump(const Duration(milliseconds: 600));
+
+    // The glass keeps its neutral drop shadow; a glow is tinted.
+    expect(
+      shadowsUnder(
+        tester,
+        find.byType(SnackBar),
+      ).where((shadow) => shadow.color.withValues(alpha: 1) != Colors.black),
+      isEmpty,
+    );
+
+    await tester.pump(const Duration(seconds: 3));
   });
 
   testWidgets('closes on its own after the duration', (tester) async {

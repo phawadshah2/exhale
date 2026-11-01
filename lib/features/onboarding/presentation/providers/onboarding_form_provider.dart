@@ -6,12 +6,14 @@ import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
+import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
+import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/currency_choices.dart';
 import 'package:exhale/features/settings/domain/entities/day_window.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
@@ -20,6 +22,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum OnboardingStep { welcome, habit, amount, cost, day, deal }
+
+/// The habit this form takes the place of; null on a first run. Overridden by
+/// a nested scope in `ChangeHabitPage`.
+final replacedHabitProvider = Provider<TrackedHabit?>(
+  (ref) => null,
+  dependencies: const [],
+);
 
 /// Quick quit-date choices, in chip order. While one is selected the quit
 /// date follows the daily amount (for [suggested]).
@@ -52,6 +61,7 @@ class OnboardingFormState {
     required this.startLimit,
     required this.unitsPerContainer,
     required this.currency,
+    this.replaced,
     this.quitPreset = QuitPreset.suggested,
     this.habitKind = defaultHabit,
     this.customName = '',
@@ -76,10 +86,38 @@ class OnboardingFormState {
     );
   }
 
+  /// A habit to replace [replaced]: starts on the first other preset, with the
+  /// saved day and currency. Those stay as they are, so the form never edits
+  /// them.
+  factory OnboardingFormState.changing(
+    LogicalDay today,
+    AppSettings settings,
+    TrackedHabit replaced,
+  ) {
+    final habit = Habit.presets.firstWhere(
+      (h) => h.kind != replaced.habit.kind,
+    );
+    final window = settings.dayWindow;
+    return OnboardingFormState(
+      replaced: replaced,
+      habitKind: habit.kind,
+      startDay: today,
+      startLimit: habit.defaultDailyAmount,
+      unitsPerContainer: habit.defaultUnitsPerContainer,
+      quitDay: QuitPreset.suggested.quitDayFor(today, habit.defaultDailyAmount),
+      currency: settings.currencySymbol,
+      wakeMinute: window?.wakeMinute ?? DayWindow.defaultWake,
+      bedMinute: window?.bedMinute ?? DayWindow.defaultBed,
+    );
+  }
+
   static const HabitKind defaultHabit = HabitKind.vaping;
 
   /// Dots shown before each dot stands for more than one unit.
   static const int maxDots = 12;
+
+  /// The habit this form takes the place of; null on a first run.
+  final TrackedHabit? replaced;
 
   final LogicalDay startDay;
   final LogicalDay quitDay;
@@ -103,10 +141,20 @@ class OnboardingFormState {
       ? Habit.custom(name: customName, unit: customUnit)
       : Habit.presets.firstWhere((h) => h.kind == habitKind);
 
-  /// Cost is skipped for habits that do not track it.
+  bool get isChangingHabit => replaced != null;
+
+  /// The preset being replaced, which a fresh start on belongs to Edit plan.
+  bool isTracked(HabitKind kind) =>
+      kind != HabitKind.custom && replaced?.habit.kind == kind;
+
+  /// Cost is skipped for habits that do not track it. Changing the habit also
+  /// skips Welcome and Your day.
   List<OnboardingStep> get steps => [
     for (final step in OnboardingStep.values)
-      if (step != OnboardingStep.cost || habit.tracksCost) step,
+      if ((step != OnboardingStep.cost || habit.tracksCost) &&
+          (!isChangingHabit ||
+              (step != OnboardingStep.welcome && step != OnboardingStep.day)))
+        step,
   ];
 
   int get total => steps.length;
@@ -189,6 +237,7 @@ class OnboardingFormState {
     bool? isSubmitting,
     String? Function()? errorMessage,
   }) => OnboardingFormState(
+    replaced: replaced,
     startDay: startDay,
     quitDay: quitDay ?? this.quitDay,
     quitPreset: quitPreset != null ? quitPreset() : this.quitPreset,
@@ -209,14 +258,22 @@ class OnboardingFormState {
 final NotifierProvider<OnboardingFormController, OnboardingFormState>
 onboardingFormProvider = NotifierProvider.autoDispose(
   OnboardingFormController.new,
+  dependencies: [replacedHabitProvider],
 );
 
 class OnboardingFormController extends Notifier<OnboardingFormState> {
   @override
-  OnboardingFormState build() => OnboardingFormState.initial(
-    ref.read(todayProvider),
-    CurrencyChoices.forRegion(ref.read(deviceRegionProvider)),
-  );
+  OnboardingFormState build() => switch (ref.read(replacedHabitProvider)) {
+    null => OnboardingFormState.initial(
+      ref.read(todayProvider),
+      CurrencyChoices.forRegion(ref.read(deviceRegionProvider)),
+    ),
+    final replaced => OnboardingFormState.changing(
+      ref.read(todayProvider),
+      ref.read(currentSettingsProvider),
+      replaced,
+    ),
+  };
 
   /// Earliest quit day; there is no latest.
   LogicalDay get earliestQuitDay =>
@@ -224,7 +281,7 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
 
   /// Switches habit and resets the amounts to that habit's defaults.
   void selectHabit(HabitKind kind) {
-    if (kind == state.habitKind) return;
+    if (kind == state.habitKind || state.isTracked(kind)) return;
     final habit = state.copyWith(habitKind: kind).habit;
     state = _withQuitFollowingPreset(
       state.copyWith(
@@ -287,7 +344,8 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
   }
 
   /// Saves the day and currency, then the habit with its plan. Returns true
-  /// when all are stored.
+  /// when all are stored. Changing the habit saves only the new habit and its
+  /// plan, in place of the old one.
   Future<bool> submit() async {
     if (state.isSubmitting) return false;
     if (state.hasInvalidPrice) {
@@ -297,37 +355,50 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
     final form = state;
     state = state.copyWith(isSubmitting: true, errorMessage: () => null);
 
-    // A second submit (onboarding reached again) must not add a second
-    // habit.
-    final existing = await ref.read(habitRepositoryProvider).getActive();
-    if (!ref.mounted) return false;
-    if (existing case Success(value: [_, ...])) {
-      state = state.copyWith(isSubmitting: false);
-      return true;
+    final replaced = form.replaced;
+    if (replaced == null) {
+      // A second submit (onboarding reached again) must not add a second
+      // habit.
+      final existing = await ref.read(habitRepositoryProvider).getActive();
+      if (!ref.mounted) return false;
+      if (existing case FailureResult(:final failure)) {
+        return _fail(failureMessage(failure));
+      }
+      if (existing case Success(value: [_, ...])) {
+        state = state.copyWith(isSubmitting: false);
+        return true;
+      }
+
+      final settingsResult = await ref
+          .read(settingsActionsProvider)
+          .update(
+            (current) => current.copyWith(
+              wakeMinute: () => form.wakeMinute,
+              bedMinute: () => form.bedMinute,
+              currencySymbol: form.currency,
+            ),
+          );
+      if (!ref.mounted) return false;
+      if (settingsResult case FailureResult(:final failure)) {
+        return _fail(failureMessage(failure));
+      }
     }
 
-    final settingsResult = await ref
-        .read(settingsActionsProvider)
-        .update(
-          (current) => current.copyWith(
-            wakeMinute: () => form.wakeMinute,
-            bedMinute: () => form.bedMinute,
-            currencySymbol: form.currency,
-          ),
-        );
-    if (!ref.mounted) return false;
-    if (settingsResult case FailureResult(:final failure)) {
-      return _fail(failureMessage(failure));
-    }
-
-    final result = await ref.read(startTrackingProvider)((
-      habit: HabitDraft(
-        habit: form.habit,
-        priceCents: form.priceCents,
-        unitsPerContainer: form.unitsPerContainer,
-      ),
-      plan: form.draft,
-    ));
+    final draft = HabitDraft(
+      habit: form.habit,
+      priceCents: form.priceCents,
+      unitsPerContainer: form.unitsPerContainer,
+    );
+    final result = replaced == null
+        ? await ref.read(startTrackingProvider)((
+            habit: draft,
+            plan: form.draft,
+          ))
+        : await ref.read(changeHabitProvider)((
+            replacedHabitId: replaced.id,
+            habit: draft,
+            plan: form.draft,
+          ));
     if (!ref.mounted) return false;
     if (result case FailureResult(:final failure)) {
       return _fail(failureMessage(failure));

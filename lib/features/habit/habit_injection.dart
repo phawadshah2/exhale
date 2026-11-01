@@ -6,6 +6,7 @@ import 'package:exhale/features/habit/data/repositories/local_habit_repository.d
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
 import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/archive_habit.dart';
+import 'package:exhale/features/habit/domain/usecases/change_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/start_tracking.dart';
 import 'package:exhale/features/habit/domain/usecases/update_habit.dart';
 import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
@@ -28,6 +29,14 @@ void initHabitDependencies(GetIt getIt) {
       () => StartTracking(
         getIt<AddHabit>(),
         getIt<SavePlan>(),
+        getIt<TransactionRunner>(),
+      ),
+    )
+    ..registerFactory(
+      () => ChangeHabit(
+        getIt<HabitRepository>(),
+        getIt<ArchiveHabit>(),
+        getIt<StartTracking>(),
         getIt<TransactionRunner>(),
       ),
     );

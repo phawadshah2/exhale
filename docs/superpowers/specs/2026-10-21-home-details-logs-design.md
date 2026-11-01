@@ -2,6 +2,19 @@
 
 Date: 21 Oct 2026 · Branch: `feat/home-details-logs` · Status: awaiting review
 
+**Scope change, 31 Oct 2026:** the first release tracks one habit. Everything
+here about two or more habits ships in a later release: 4.2 (habit list), the
+Details back bar and switcher, Logs habit tabs and `habit=all` (4.6), the
+two-habit + menu and "Add a habit" (4.8), Add a habit (4.9) and stop tracking.
+In the launch build the + hold menu is "Log now" and "Add a missed log", and
+the hint reads "Hold + for more · Add a missed log." The design stays as written
+for that later release.
+
+The launch adds "Change habit" to Edit plan (4.10) in place of stop tracking: the
+Habit, Daily amount, Cost and The deal steps, then a confirm, then the old habit
+is archived and the new one starts in one transaction. Its logs stay stored but
+hidden. Details and copy: plan Task 5.1b.
+
 ## 1. Why
 
 Home tried to be both a quick glance and an analysis screen, and became
@@ -13,7 +26,7 @@ buttons under every day. This redesign splits the jobs:
   history, the plan, impact and today's logs.
 - **Logs** holds every log, filterable by habit, period and trigger.
 
-It also prepares the app for several habits at once (free at launch).
+It also prepares the app for several habits at once, in a later release.
 
 ## 2. Design source
 

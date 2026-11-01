@@ -213,11 +213,36 @@ class _LogEditorSheetState extends ConsumerState<LogEditorSheet> {
               ),
             ),
             clipBehavior: Clip.antiAlias,
-            child: ListTile(
-              leading: Icon(AppIcons.clock, color: colors.primary),
-              title: const Text('Time'),
-              trailing: Text(time, style: text.titleLarge),
-              onTap: _pickTime,
+            child: Semantics(
+              button: true,
+              child: InkWell(
+                onTap: _pickTime,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 40),
+                    child: Row(
+                      spacing: AppSpacing.md,
+                      children: [
+                        Icon(AppIcons.clock, color: colors.primary),
+                        Expanded(
+                          child: Wrap(
+                            alignment: WrapAlignment.spaceBetween,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text('Time', style: text.bodyLarge),
+                              Text(time, style: text.titleLarge),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.lg),

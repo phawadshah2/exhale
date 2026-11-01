@@ -21,13 +21,14 @@ log each use with one tap (logging is always allowed, even over the limit).
 
 ## Working rules (Fawad's preferences)
 
-- **Git:** you create branches and edit files only. Fawad commits and pushes.
-  At each checkpoint, give him the git commands in order with a Conventional
-  Commit message (`.githooks/commit-msg` enforces it), as set out in his
-  global session rhythm. Branches are `feat/<name>` off an up-to-date `main`.
-  Never add Co-Authored-By trailers.
+- **Git:** you branch and commit (Fawad, 2026-10-31), with Conventional Commit
+  messages (`.githooks/commit-msg` enforces it). This replaces the global rule
+  about giving him the commands. Branches are `feat/<name>` off an up-to-date
+  `main`. You must not show up as a contributor: commit only under his git
+  identity, and never add Co-Authored-By trailers or any Claude attribution,
+  in commits or PRs. Push only when he asks, or give him the command.
 - **Model per task:** the global default applies. Use Opus 5.5 (high) for each
-  milestone-end independent review and for Task 4.1–4.4 (multi-habit).
+  milestone-end independent review and for Task 4.4 when multi-habit resumes.
 - **Toolchain:** only `fvm flutter` / `fvm dart` (Flutter 3.47.2, Dart 3.13).
   Never `gem install`, `fvm global` or Homebrew node.
 - **Style:** no tutorials, teaching comments or learning notes. Keep
@@ -55,8 +56,8 @@ log each use with one tap (logging is always allowed, even over the limit).
   (`Result`/`Failure`, `Clock`, `LogicalDay`, `DayBoundary`), `presentation`,
   `theme`, `widgets`.
 - `lib/features/<feature>/{data,domain,presentation}`: clean architecture.
-  Each feature has a `*_injection.dart`. Features: habit, home, onboarding,
-  plan, settings, tracking, design_system.
+  Each feature has a `*_injection.dart`. Features: habit, home, logs,
+  onboarding, plan, settings, tracking.
 - **State:** Riverpod 3 with hand-written providers. **No riverpod_generator.**
   Providers read repositories and use cases from `sl`.
 - **Storage:** drift, fully offline, currently **schema v9** (`habits`;
@@ -96,16 +97,21 @@ Approved on 2026-10-21. Read these before working on it:
   https://www.figma.com/design/KMF3WeQgfFv5g2MhOiwXMM, canvas
   https://claude.ai/artifact/Es7ju6TWmMj5pkNon4tbHu
 
-The design in short: with one habit, Home is the habit dashboard (ring, impact
-tiles, History with Week line / Month rings / All vs plan, plan card, why,
-today's logs). With two or more habits, Home lists habit cards and tapping one
-opens Details (the same dashboard plus a switcher). A new Logs page shows
-"allowed" per period and supports filters and swipe-to-delete with Undo. With
-one habit, tapping + logs and holding it opens the menu (shown once by a
-hint). The second habit is free.
+**Launch scope (Fawad, 2026-10-31):** the first release tracks one habit.
+Multiple habits ship in a later release, so don't offer a second habit in the
+launch build. Tasks 4.1 to 4.3 are parked, unmerged, on `feat/multi-habit`;
+launch work branches from `main`.
+
+The design in short: Home is the habit dashboard (ring, impact tiles, History
+with Week line / Month rings / All vs plan, plan card, why, today's logs). A new
+Logs page shows "allowed" per period and supports filters and swipe-to-delete
+with Undo. Tapping + logs and holding it opens the menu (shown once by a hint).
+
+Later release: with two or more habits, Home lists habit cards and tapping one
+opens Details (the same dashboard plus a switcher).
 
 **How to execute:** natively in the session with the
-`superpowers:executing-plans` skill, phase by phase (M1 to M5), with an
+`superpowers:executing-plans` skill, phase by phase (M5 is next), with an
 independent review at the end of each milestone. Give Fawad a commit message
 at each checkpoint.
 
@@ -114,5 +120,5 @@ at each checkpoint.
 Current progress and the next action are in `docs/CURRENT_STATE.md`. Read it
 first and update it when a task or milestone finishes.
 
-After launch: time-of-day insights, reminders, widgets, the Pro paywall,
-habit reordering, export.
+After launch: multiple habits first, then time-of-day insights, reminders,
+widgets and the Live Activity, the Pro paywall, habit reordering, export.

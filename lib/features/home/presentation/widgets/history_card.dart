@@ -114,9 +114,12 @@ class _HistoryCardState extends ConsumerState<HistoryCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                runSpacing: AppSpacing.sm,
                 children: [
-                  Expanded(child: Text('History', style: text.headlineSmall)),
+                  Text('History', style: text.headlineSmall),
                   SizedBox(
                     width: 216,
                     child: PillSegmentedControl<HistoryPeriod>(
@@ -354,18 +357,21 @@ class _Total extends StatelessWidget {
           ),
         ),
         if (showPill)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: tone.soft,
-              border: Border.all(color: tone.solid.withValues(alpha: 0.45)),
-              borderRadius: AppRadius.pill,
-            ),
-            child: Text(
-              under ? '${stats.underBy} under' : '${-stats.underBy} over',
-              style: text.labelMedium?.copyWith(
-                color: tone.foreground,
-                fontWeight: FontWeight.w700,
+          MediaQuery.withClampedTextScaling(
+            maxScaleFactor: 1.5,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: tone.soft,
+                border: Border.all(color: tone.solid.withValues(alpha: 0.45)),
+                borderRadius: AppRadius.pill,
+              ),
+              child: Text(
+                under ? '${stats.underBy} under' : '${-stats.underBy} over',
+                style: text.labelMedium?.copyWith(
+                  color: tone.foreground,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),

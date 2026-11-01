@@ -314,13 +314,16 @@ class _MarkerDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final number = Text(
-      '${step.number}',
-      style: context.textTheme.labelSmall?.copyWith(
-        color: step.marker == _Marker.current
-            ? colors.primary
-            : colors.onSurface,
-        fontWeight: FontWeight.w700,
+    // Fixed, as the dot is; the row beside it says the stage in full.
+    final number = MediaQuery.withNoTextScaling(
+      child: Text(
+        '${step.number}',
+        style: context.textTheme.labelSmall?.copyWith(
+          color: step.marker == _Marker.current
+              ? colors.primary
+              : colors.onSurface,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
     return Container(

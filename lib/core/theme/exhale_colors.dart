@@ -39,10 +39,10 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
     required this.success,
     required this.warning,
     required this.danger,
-    required this.glow,
     required this.inset,
     required this.emphasis,
     required this.onEmphasis,
+    required this.ringStart,
   });
 
   /// Derived from the scheme so there is a single source of truth.
@@ -64,15 +64,19 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
         onSolid: scheme.onErrorContainer,
         foreground: scheme.error,
       ),
-      glow: scheme.primaryContainer.withValues(alpha: isDark ? 0.14 : 0.16),
       // Dark cards are already containerLow, so insets step up to stay
       // visible; light insets stay barely off-white.
       inset: isDark
           ? scheme.surfaceContainerHigh
           : scheme.surfaceContainerLow.withValues(alpha: 0.6),
-      // Light mode leads with ink so the accent is left for state.
-      emphasis: isDark ? scheme.primaryContainer : AppPalette.ink,
-      onEmphasis: isDark ? scheme.onPrimaryContainer : Colors.white,
+      emphasis: scheme.primaryContainer,
+      onEmphasis: scheme.onPrimaryContainer,
+      // Ink is one colour; green in its ring would read as a second accent.
+      ringStart:
+          scheme.primaryContainer == AppPalette.ink ||
+              scheme.primaryContainer == AppPalette.paper
+          ? scheme.primaryContainer
+          : scheme.secondaryContainer,
     );
   }
 
@@ -85,40 +89,36 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
   /// Over the daily limit.
   final StatusColors danger;
 
-  /// Soft accent halo around the primary log button and active ring.
-  final Color glow;
-
   /// Fill for boxes inside a card (steppers, date rows, chips).
   final Color inset;
 
   /// Primary actions and Exhale's voice: filled buttons, chat bubbles, the
-  /// onboarding stepper. The accent stays for state (selection, ring).
+  /// onboarding stepper. Always the chosen accent.
   final Color emphasis;
 
   /// Text and icons placed on [emphasis].
   final Color onEmphasis;
 
-  List<BoxShadow> get accentGlow => [
-    BoxShadow(color: glow, blurRadius: 14, spreadRadius: -4),
-  ];
+  /// Where a filling ring's gradient starts; it ends in the accent.
+  final Color ringStart;
 
   @override
   ExhaleColors copyWith({
     StatusColors? success,
     StatusColors? warning,
     StatusColors? danger,
-    Color? glow,
     Color? inset,
     Color? emphasis,
     Color? onEmphasis,
+    Color? ringStart,
   }) => ExhaleColors(
     success: success ?? this.success,
     warning: warning ?? this.warning,
     danger: danger ?? this.danger,
-    glow: glow ?? this.glow,
     inset: inset ?? this.inset,
     emphasis: emphasis ?? this.emphasis,
     onEmphasis: onEmphasis ?? this.onEmphasis,
+    ringStart: ringStart ?? this.ringStart,
   );
 
   // Called by AnimatedTheme while switching light <-> dark, so colours
@@ -130,10 +130,10 @@ class ExhaleColors extends ThemeExtension<ExhaleColors> {
       success: StatusColors.lerp(success, other.success, t),
       warning: StatusColors.lerp(warning, other.warning, t),
       danger: StatusColors.lerp(danger, other.danger, t),
-      glow: Color.lerp(glow, other.glow, t)!,
       inset: Color.lerp(inset, other.inset, t)!,
       emphasis: Color.lerp(emphasis, other.emphasis, t)!,
       onEmphasis: Color.lerp(onEmphasis, other.onEmphasis, t)!,
+      ringStart: Color.lerp(ringStart, other.ringStart, t)!,
     );
   }
 }

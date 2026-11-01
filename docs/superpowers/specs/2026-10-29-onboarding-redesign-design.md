@@ -72,7 +72,7 @@ habit exists): the short splash goes straight to Home, as today.
 ### 4.2 Habit (2/6)
 
 - Exhale: "Let's start with the obvious." Title "What are we quitting?",
-  lead "Pick the main one. You can add another later."
+  lead "Pick the main one."
 - 2-column grid of the 8 presets (icon + name), selected card in the accent
   with a check. Default: vaping.
 - **Something else** (full width, dashed) expands name and unit fields in
@@ -184,18 +184,19 @@ when an active habit exists (no new flag).
 
 ## 6. Colour role: emphasis
 
-`ExhaleColors` gains `emphasis` and `onEmphasis`:
+`ExhaleColors` gains `emphasis` and `onEmphasis`, which are always the chosen
+accent (`primaryContainer`, `onPrimaryContainer`). Black is its own accent
+since 2026-11-01, not a light-mode override (Fawad):
 
-| Mode | emphasis | onEmphasis |
+| Accent | Light | Dark |
 | --- | --- | --- |
-| Light | ink (`#111418`) | white |
-| Dark | accent (`primaryContainer`) | `onPrimaryContainer` |
+| Ink (new installs) | ink `#111418`, white text | paper `#F4F7FA`, ink text |
+| Eucalyptus, Ocean | the accent | the accent |
 
 Used for primary filled buttons app-wide (onboarding buttons, the Home +
 button, sheet confirm buttons, Edit plan save), Exhale's bubbles and
-avatar, stepper segments and the dots. The accent keeps state: selected
-cards and chips, the ring, charts, accent text. The splash and avatar glyph
-use the accent. Reverting means changing the light row only.
+avatar, stepper segments and the dots. The splash and avatar glyph use the
+accent. Nothing in the app glows, in any accent.
 
 ## 7. Copy
 
@@ -233,29 +234,53 @@ lastLogToday)`:
 - `even = (bed − wake) / limit`, the gap for the whole day
 - `gap(from) = max(even, (bed − from) / remaining)`
 - `pace = gap(max(now, wake))`
-- `next = anchor + gap(anchor)`, with `anchor = max(lastLogToday ?? wake, wake)`
+- `next = anchor + gap(anchor) + carried`, with
+  `anchor = max(lastLogToday ?? wake, wake)`. It may fall after bed. The timer keeps
+  running after bed until the day resets (Fawad, 2026-11-01); a log there starts the
+  even gap.
+- `carried` is the time that was left on the timer when the last log came, which
+  already includes anything carried into that gap (Fawad, 2026-10-31). With 30 min
+  left, a log adds those 30 min to the new gap. It is replayed from today's logs in
+  order, never stored, so Undo, deleting a log and adding a missed log correct it.
+  Tomorrow starts clean. A log before wake carries nothing.
 
 `next` is recalculated after every log, so it adapts: logging early stretches
 later gaps. Waiting never shortens them below the even rate, because a guide
-to cutting down must not suggest going faster (changed 2026-10-31).
+to cutting down must not suggest going faster (changed 2026-10-31). Waiting past
+`next` earns no credit against the next gap.
 
-### 8.2 Home line
+### 8.2 Next-log timer (changed 2026-10-31, replaces the pace line)
 
-Under the ring on the single-habit dashboard, updated each minute:
+Designs: https://claude.ai/artifact/NBe5B8VGM6iMXDaiuysb88 ("Chosen design").
+Updated each second while on screen.
+
+**Ring centre, today only.** `gap = next − anchor`.
 
 | Case | Shows |
 | --- | --- |
-| `next` in the future | "Next one on schedule in N min" |
-| `next` passed | "You're on schedule" |
-| Second line | "About one every N min until bed"; hidden when one gap would run past bed |
-| At or over the limit | The existing over-limit state; no pace line |
-| Limit 0 (quit day or later) | The quit-day state; no pace line |
-| Before wake or after bed | Hidden |
-| Wake/bed not set | One-time prompt "Set your day to get a pace guide", opens a Your day sheet |
+| `next` in the future | `0:47:12` (always with hours), "until your next", "4 of 11 · 7 left", and a thin inner ring draining from full over `gap` |
+| `next` passed | `+0:12:03` in the success colour, "You're on schedule", the count line, an empty inner ring |
+| At or over the limit, limit 0, before wake, no wake/bed, a past day | The count, as before; no inner ring |
+
+**+ button.** While `next` is in the future: a ring around it draining the same way
+and a chip above it with whole minutes only (`47 min`, `87 min`). Otherwise neither.
+It shows on every tab.
+
+**Motion.** Both rings use `AppMotion.fill` and `fillCurve`, like the main ring: they
+fill from empty on opening and move to the new position after a log. Reduce Motion
+skips this.
+
+**Under the ring, one text at most, first match wins, today only:**
+
+1. Over the limit: the existing note.
+2. No logs today: "No {units} logged today. Nice start."
+3. Wake/bed not set, under the limit: "Set your day to get a pace guide", which opens
+   a Your day sheet.
+4. "About one every 1 h 27 min until bed"; hidden when one gap would run past bed.
 
 Settings gets a "Your day" row (the same arc and wheel in a sheet).
-Multi-habit Home cards get a compact "next in N min" in M4, from the same
-function.
+Multi-habit Home cards get a compact "next in N min" in M4 (a release after
+launch), from the same function.
 
 ## 9. Suggested quit date
 
@@ -275,8 +300,8 @@ it. Part of phase 2.
 4. **Pace guide**: `PaceGuide`, the ring line, the prompt and the Settings
    row.
 
-Then the Home, Details and Logs roadmap continues with M4, whose Task 4.1
-reuses the steps.
+Then the Home, Details and Logs roadmap continues with M5 and the launch. M4,
+whose Task 4.1 reuses the steps, moved to a later release on 31 Oct 2026.
 
 ## 11. Out of scope
 

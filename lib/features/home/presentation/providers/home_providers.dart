@@ -191,6 +191,23 @@ final FutureProviderFamily<AllTimeSeries?, int> allTimeSeriesProvider =
       );
     });
 
+/// Whether to offer the quit-date card: the plan in force has reached its quit
+/// date and "Keep at zero" has not been chosen for that date.
+final ProviderFamily<bool, int> quitCardDueProvider =
+    Provider.family<bool, int>((ref, habitId) {
+      final quitDay = ref
+          .watch(planHistoryProvider(habitId))
+          .value
+          ?.current
+          .quitDay;
+      final habit = ref.watch(habitProvider(habitId));
+      if (quitDay == null || habit == null) return false;
+      if (ref.watch(todayProvider).isBefore(quitDay)) return false;
+      final acknowledged = habit.quitAcknowledgedAt;
+      return acknowledged == null ||
+          ref.watch(dayBoundaryProvider).dayOf(acknowledged).isBefore(quitDay);
+    });
+
 /// Streak, baseline change, avoided and saved; null before the habit has a
 /// plan.
 final FutureProviderFamily<HomeStats?, int> habitStatsProvider = FutureProvider

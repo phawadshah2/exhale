@@ -137,7 +137,6 @@ class QuitDateCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.gutterSm),
           Wrap(
             spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
             children: [
               for (final preset in presets)
                 _PresetPill(
@@ -187,18 +186,30 @@ class _PresetPill extends StatelessWidget {
       button: true,
       selected: selected,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: ShapeDecoration(
-            color: selected ? colors.primaryContainer : context.exhale.inset,
-            shape: const StadiumBorder(),
-          ),
-          child: Text(
-            label,
-            style: context.textTheme.labelLarge?.copyWith(
-              color: selected ? colors.onPrimaryContainer : colors.onSurface,
+        // The pill stays small; the touch is 44 pt.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Center(
+            widthFactor: 1,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: ShapeDecoration(
+                color: selected
+                    ? colors.primaryContainer
+                    : context.exhale.inset,
+                shape: const StadiumBorder(),
+              ),
+              child: Text(
+                label,
+                style: context.textTheme.labelLarge?.copyWith(
+                  color: selected
+                      ? colors.onPrimaryContainer
+                      : colors.onSurface,
+                ),
+              ),
             ),
           ),
         ),

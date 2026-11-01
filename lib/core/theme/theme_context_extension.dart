@@ -8,6 +8,9 @@ extension ThemeContextExtension on BuildContext {
 
   TextTheme get textTheme => theme.textTheme;
 
-  /// Status colours and accent glow. Always present: AppTheme registers it.
+  /// Status colours and emphasis. Always present: AppTheme registers it.
   ExhaleColors get exhale => theme.extension<ExhaleColors>()!;
+
+  /// Text this big no longer fits side by side, so layouts stack.
+  bool get hasLargeText => MediaQuery.textScalerOf(this).scale(1) > 1.5;
 }

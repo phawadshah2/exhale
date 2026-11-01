@@ -89,6 +89,41 @@ void main() {
     expect(AppFormat.elapsed(const Duration(days: 4)), '4d');
   });
 
+  test('timer: always with hours, up to the next second while counting', () {
+    expect(
+      AppFormat.timer(const Duration(minutes: 47, seconds: 12)),
+      '0:47:12',
+    );
+    expect(AppFormat.timer(const Duration(hours: 1, minutes: 27)), '1:27:00');
+    expect(AppFormat.timer(const Duration(milliseconds: 400)), '0:00:01');
+  });
+
+  test('timer: past zero counts up with a plus', () {
+    expect(AppFormat.timer(Duration.zero), '+0:00:00');
+    expect(
+      AppFormat.timer(const Duration(minutes: -12, seconds: -3)),
+      '+0:12:03',
+    );
+    expect(AppFormat.timer(const Duration(milliseconds: -1900)), '+0:00:01');
+  });
+
+  test('hours and minutes round up', () {
+    expect(AppFormat.hoursMinutes(const Duration(minutes: 47)), '47 min');
+    expect(AppFormat.hoursMinutes(const Duration(minutes: 60)), '1 h');
+    expect(AppFormat.hoursMinutes(const Duration(minutes: 87)), '1 h 27 min');
+    expect(
+      AppFormat.hoursMinutes(const Duration(minutes: 124, seconds: 1)),
+      '2 h 5 min',
+    );
+    expect(AppFormat.hoursMinutes(const Duration(minutes: 960)), '16 h');
+  });
+
+  test('minutes never become hours', () {
+    expect(AppFormat.minutes(const Duration(minutes: 47)), '47 min');
+    expect(AppFormat.minutes(const Duration(minutes: 87)), '87 min');
+    expect(AppFormat.minutes(const Duration(seconds: 1)), '1 min');
+  });
+
   test('weekday initial', () {
     expect(AppFormat.weekdayInitial(oct16), 'F');
   });

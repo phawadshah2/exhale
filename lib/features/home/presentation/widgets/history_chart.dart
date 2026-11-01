@@ -213,14 +213,6 @@ class _BarSlot extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected ? color : color.withValues(alpha: 0.82),
             borderRadius: BorderRadius.vertical(top: radius),
-            boxShadow: isSelected && progress != null
-                ? [
-                    BoxShadow(
-                      color: color.withValues(alpha: 0.18),
-                      blurRadius: 8,
-                    ),
-                  ]
-                : null,
           ),
         ),
       );

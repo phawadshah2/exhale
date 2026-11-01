@@ -68,7 +68,7 @@ class OnboardingStepper extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           SizedBox(
-            height: 36,
+            height: 44,
             child: Row(
               children: [
                 SizedBox(
