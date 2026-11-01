@@ -55,6 +55,13 @@ extension TriggerUi on Trigger {
     return HSLColor.fromAHSL(1, _hue, 0.62, dark ? 0.66 : 0.46).toColor();
   }
 
+  /// [tint] with enough contrast for small text, on a card or on the tint
+  /// itself at low alpha.
+  Color textTint(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return HSLColor.fromAHSL(1, _hue, 0.62, dark ? 0.76 : 0.27).toColor();
+  }
+
   double get _hue => switch (this) {
     Trigger.stress => 4,
     Trigger.coffee => 22,

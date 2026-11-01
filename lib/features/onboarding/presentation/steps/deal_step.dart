@@ -154,7 +154,6 @@ class _DealStepState extends ConsumerState<DealStep> {
             index: 3,
             child: Wrap(
               spacing: 7,
-              runSpacing: 7,
               children: [
                 for (final preset in QuitPreset.values)
                   _DealChip(
@@ -297,33 +296,45 @@ class _DealChip extends StatelessWidget {
           unawaited(HapticFeedback.selectionClick());
           onTap();
         },
-        child: PressScale(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOut,
-            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
-            decoration: ShapeDecoration(
-              color: selected ? pick.fill : pick.idleFill,
-              shape: StadiumBorder(
-                side: BorderSide(
-                  color: selected ? pick.line : pick.idleLine,
-                  width: selected ? 1.5 : 1,
+        // The pill stays small; the touch is 44 pt.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Center(
+            widthFactor: 1,
+            child: PressScale(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 13,
+                  vertical: 8,
                 ),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: 5,
-              children: [
-                if (icon != null) Icon(icon, size: 15, color: foreground),
-                Text(
-                  label,
-                  style: context.textTheme.labelLarge?.copyWith(
-                    color: foreground,
-                    fontWeight: selected ? FontWeight.w600 : null,
+                decoration: ShapeDecoration(
+                  color: selected ? pick.fill : pick.idleFill,
+                  shape: StadiumBorder(
+                    side: BorderSide(
+                      color: selected ? pick.line : pick.idleLine,
+                      width: selected ? 1.5 : 1,
+                    ),
                   ),
                 ),
-              ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 5,
+                  children: [
+                    if (icon != null) Icon(icon, size: 15, color: foreground),
+                    Flexible(
+                      child: Text(
+                        label,
+                        style: context.textTheme.labelLarge?.copyWith(
+                          color: foreground,
+                          fontWeight: selected ? FontWeight.w600 : null,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

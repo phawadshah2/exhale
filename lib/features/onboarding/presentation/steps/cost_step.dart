@@ -124,30 +124,35 @@ class _CostStepState extends ConsumerState<CostStep> {
                               : controller.setCurrency,
                         ),
                         Expanded(
-                          child: TextField(
-                            controller: _price,
-                            onChanged: (value) {
-                              controller.setPriceText(value);
-                              if (_showError) {
-                                setState(() => _showError = false);
-                              }
-                            },
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp('[0-9.,]'),
-                              ),
-                            ],
-                            style: text.headlineLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                            decoration: InputDecoration.collapsed(
-                              hintText: container == null ? '3.50' : '14.50',
-                              hintStyle: text.headlineLarge?.copyWith(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(minHeight: 44),
+                            child: TextField(
+                              controller: _price,
+                              textAlignVertical: TextAlignVertical.center,
+                              onChanged: (value) {
+                                controller.setPriceText(value);
+                                if (_showError) {
+                                  setState(() => _showError = false);
+                                }
+                              },
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp('[0-9.,]'),
+                                ),
+                              ],
+                              style: text.headlineLarge?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: colors.outlineVariant,
+                              ),
+                              decoration: InputDecoration.collapsed(
+                                hintText: container == null ? '3.50' : '14.50',
+                                hintStyle: text.headlineLarge?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: colors.outlineVariant,
+                                ),
                               ),
                             ),
                           ),

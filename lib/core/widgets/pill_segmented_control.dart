@@ -36,11 +36,16 @@ class PillSegmentedControl<T> extends StatelessWidget {
     // Alignment.x runs from -1 (first segment) to 1 (last segment).
     final thumbX = -1 + 2 * index / (segments.length - 1);
 
+    // The labels fill the height, for 44 pt targets; only the thumb is inset.
+    // A border on the main decoration would pad them by its width.
     return Container(
       height: 44,
-      padding: const EdgeInsets.all(AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
       decoration: ShapeDecoration(
         color: colors.surfaceContainerHigh,
+        shape: const StadiumBorder(),
+      ),
+      foregroundDecoration: ShapeDecoration(
         shape: StadiumBorder(
           side: BorderSide(color: colors.outlineVariant.withValues(alpha: .5)),
         ),
@@ -48,17 +53,20 @@ class PillSegmentedControl<T> extends StatelessWidget {
       child: Stack(
         children: [
           if (index >= 0)
-            AnimatedAlign(
-              duration: _duration,
-              curve: Curves.easeOutCubic,
-              alignment: Alignment(thumbX, 0),
-              child: FractionallySizedBox(
-                widthFactor: 1 / segments.length,
-                heightFactor: 1,
-                child: DecoratedBox(
-                  decoration: ShapeDecoration(
-                    color: colors.primaryContainer,
-                    shape: const StadiumBorder(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+              child: AnimatedAlign(
+                duration: _duration,
+                curve: Curves.easeOutCubic,
+                alignment: Alignment(thumbX, 0),
+                child: FractionallySizedBox(
+                  widthFactor: 1 / segments.length,
+                  heightFactor: 1,
+                  child: DecoratedBox(
+                    decoration: ShapeDecoration(
+                      color: colors.primaryContainer,
+                      shape: const StadiumBorder(),
+                    ),
                   ),
                 ),
               ),

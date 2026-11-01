@@ -1,12 +1,16 @@
 import 'dart:async';
 
+import 'package:exhale/app/bootstrap.dart';
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
+import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
+import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
@@ -54,6 +58,43 @@ void main() {
     unawaited(GoRouter.of(context).push(query.toUri().toString()));
     await tester.pumpAndSettle();
   }
+
+  testWidgets('a failed log stream shows an error and can retry', (
+    tester,
+  ) async {
+    await startPlan();
+    var attempts = 0;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...await startupOverrides(),
+          logsInRangeProvider.overrideWith((ref, key) {
+            attempts++;
+            return attempts == 1
+                ? Stream.error(StateError('storage'))
+                : const Stream.empty();
+          }),
+        ],
+        child: MaterialApp(
+          home: LogsPage(
+            query: LogsQuery(habitId: 1, from: today, to: today),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text("Couldn't load your logs."), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+
+    await tester.tap(find.text('Try again'));
+    await tester.pump();
+    await tester.pump();
+    expect(find.text("Couldn't load your logs."), findsNothing);
+    expect(attempts, 2);
+    await tester.disposeApp();
+  });
 
   testWidgets('groups by logical day with allowed counts', (tester) async {
     await startPlan();

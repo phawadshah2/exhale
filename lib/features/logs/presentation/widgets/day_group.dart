@@ -78,19 +78,33 @@ class _DayGroupState extends State<DayGroup> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-          child: Row(
+          // Wraps at large text sizes instead of overflowing.
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.sm,
             children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  _title,
-                  style: text.labelLarge?.copyWith(fontWeight: FontWeight.w700),
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: AppSpacing.sm,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: dot,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      _title,
+                      style: text.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               Text(
                 _summary,

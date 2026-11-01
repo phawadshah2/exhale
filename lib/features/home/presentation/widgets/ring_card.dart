@@ -80,10 +80,10 @@ class RingCard extends ConsumerWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              // Today shows a badge and other days a chip; a fixed height
+              // Today shows a badge and other days a chip; a minimum height
               // keeps the card from shifting when switching between them.
-              child: SizedBox(
-                height: 40,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 40),
                 child: Row(
                   children: [
                     Icon(AppIcons.breath, color: colors.primary, size: 22),
@@ -99,7 +99,10 @@ class RingCard extends ConsumerWidget {
                       ),
                     ),
                     if (!isToday)
-                      _TodayChip(onTap: picker.showToday)
+                      MediaQuery.withClampedTextScaling(
+                        maxScaleFactor: 1.5,
+                        child: _TodayChip(onTap: picker.showToday),
+                      )
                     else if (progress != null)
                       StatusBadge(
                         label: progress.badgeLabel(habit),

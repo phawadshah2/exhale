@@ -235,12 +235,14 @@ class _LogButton extends StatelessWidget {
         label: 'Log',
         hint: 'Long-press for more',
         excludeSemantics: true,
+        onTap: () => onTap(_anchor(context)),
+        onLongPress: () => onLongPress(_anchor(context)),
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => onTap(_anchor(context)),
           onLongPress: () => onLongPress(_anchor(context)),
           child: AppGlass(
-            tint: exhale.emphasis.withValues(alpha: 0.6),
+            tint: exhale.emphasis.withValues(alpha: 0.85),
             child: SizedBox.square(
               dimension: FloatingTabBar.height,
               child: Icon(AppIcons.add, size: 28, color: exhale.onEmphasis),
@@ -273,6 +275,7 @@ class _TabButton extends StatelessWidget {
       selected: selected,
       label: tab.label,
       excludeSemantics: true,
+      onTap: onTap,
       child: Tooltip(
         message: tab.label,
         child: GestureDetector(

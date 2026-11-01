@@ -395,8 +395,6 @@ void main() {
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
     await tester.pumpAppPastSplash(height: 2400);
-    // Other cards overflow at this size; Task 5.2 owns them.
-    tester.takeException();
 
     final inner = tester.getSize(find.byType(DrainingRing).first).width;
     expect(

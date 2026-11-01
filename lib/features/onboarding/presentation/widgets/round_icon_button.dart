@@ -29,19 +29,26 @@ class RoundIconButton extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        child: AnimatedOpacity(
-          opacity: enabled ? 1 : 0.4,
-          duration: const Duration(milliseconds: 150),
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              color:
-                  context.theme.cardTheme.color ?? colors.surfaceContainerLow,
-              shape: BoxShape.circle,
-              border: Border.all(color: colors.outlineVariant),
+        // A small button still takes a 44 pt touch.
+        child: SizedBox.square(
+          dimension: size < 44 ? 44 : size,
+          child: Center(
+            child: AnimatedOpacity(
+              opacity: enabled ? 1 : 0.4,
+              duration: const Duration(milliseconds: 150),
+              child: Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  color:
+                      context.theme.cardTheme.color ??
+                      colors.surfaceContainerLow,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: colors.outlineVariant),
+                ),
+                child: Icon(icon, size: size * 0.42, color: colors.onSurface),
+              ),
             ),
-            child: Icon(icon, size: size * 0.42, color: colors.onSurface),
           ),
         ),
       ),

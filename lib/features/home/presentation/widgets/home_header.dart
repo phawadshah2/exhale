@@ -63,7 +63,7 @@ class _Avatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final initials = _initials(name);
-    return SizedBox(
+    final avatar = SizedBox(
       width: 52,
       height: 56,
       child: Stack(
@@ -94,18 +94,23 @@ class _Avatar extends StatelessWidget {
             Positioned(
               left: 0,
               bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: ShapeDecoration(
-                  color: colors.primaryContainer,
-                  shape: StadiumBorder(
-                    side: BorderSide(color: colors.surface, width: 2),
+              child: ExcludeSemantics(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 1,
                   ),
-                ),
-                child: Text(
-                  'D$dayNumber',
-                  style: context.textTheme.labelSmall?.copyWith(
-                    color: colors.onPrimaryContainer,
+                  decoration: ShapeDecoration(
+                    color: colors.primaryContainer,
+                    shape: StadiumBorder(
+                      side: BorderSide(color: colors.surface, width: 2),
+                    ),
+                  ),
+                  child: Text(
+                    'D$dayNumber',
+                    style: context.textTheme.labelSmall?.copyWith(
+                      color: colors.onPrimaryContainer,
+                    ),
                   ),
                 ),
               ),
@@ -113,6 +118,9 @@ class _Avatar extends StatelessWidget {
         ],
       ),
     );
+    return dayNumber == null
+        ? avatar
+        : Semantics(label: 'Day $dayNumber', child: avatar);
   }
 
   static String? _initials(String? name) {

@@ -22,35 +22,43 @@ class AllTimeChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return SizedBox(
-      height: height,
-      width: double.infinity,
-      // The line draws from the first day onward when the chart appears.
-      child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: 1),
-        duration: AppMotion.fill,
-        curve: AppMotion.fillCurve,
-        builder: (context, reveal, _) => CustomPaint(
-          painter: _AllTimePainter(
-            reveal: reveal,
-            series: series,
-            quitDay: quitDay,
-            accent: colors.primaryContainer,
-            marker: colors.primary,
-            flag: context.exhale.warning.solid,
-            plan: colors.onSurface.withValues(alpha: 0.7),
-            grid: colors.outlineVariant.withValues(alpha: 0.35),
-            surface: colors.surfaceContainerHigh,
-            labelStyle: context.textTheme.labelMedium!.copyWith(
-              color: colors.onSurfaceVariant,
-            ),
-            markerStyle: context.textTheme.labelSmall!.copyWith(
-              color: colors.primary,
-              fontWeight: FontWeight.w700,
-            ),
-            flagStyle: context.textTheme.labelSmall!.copyWith(
-              color: context.exhale.warning.solid,
-              fontWeight: FontWeight.w700,
+    final logged = series.counts.fold(0, (sum, count) => sum + count);
+    return Semantics(
+      label:
+          'All time chart: $logged logged since '
+          '${AppFormat.monthDay(series.start)}, plan ends '
+          '${AppFormat.monthDay(quitDay)}',
+      image: true,
+      child: SizedBox(
+        height: height,
+        width: double.infinity,
+        // The line draws from the first day onward when the chart appears.
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: AppMotion.fill,
+          curve: AppMotion.fillCurve,
+          builder: (context, reveal, _) => CustomPaint(
+            painter: _AllTimePainter(
+              reveal: reveal,
+              series: series,
+              quitDay: quitDay,
+              accent: colors.primaryContainer,
+              marker: colors.primary,
+              flag: context.exhale.warning.solid,
+              plan: colors.onSurface.withValues(alpha: 0.7),
+              grid: colors.outlineVariant.withValues(alpha: 0.35),
+              surface: colors.surfaceContainerHigh,
+              labelStyle: context.textTheme.labelMedium!.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+              markerStyle: context.textTheme.labelSmall!.copyWith(
+                color: colors.primary,
+                fontWeight: FontWeight.w700,
+              ),
+              flagStyle: context.textTheme.labelSmall!.copyWith(
+                color: context.exhale.warning.solid,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),

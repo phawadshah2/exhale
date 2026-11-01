@@ -83,22 +83,26 @@ class _EditPlanForm extends ConsumerWidget {
         onPressed: form.preview == null ? null : save,
       ),
       children: [
-        SizedBox(
-          height: 40,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  tooltip: 'Back',
-                  onPressed: context.pop,
-                  icon: Icon(AppIcons.back, color: colors.onSurface),
-                ),
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                tooltip: 'Back',
+                onPressed: context.pop,
+                icon: Icon(AppIcons.back, color: colors.onSurface),
               ),
-              Text('Edit plan', style: text.titleLarge),
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 48),
+              child: Text(
+                'Edit plan',
+                textAlign: TextAlign.center,
+                style: text.titleLarge,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: AppSpacing.lg),
         Text(habit.name, style: text.headlineLarge),

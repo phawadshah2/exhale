@@ -36,16 +36,17 @@ class TopTriggers extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
+          // Wraps at large text sizes instead of overflowing.
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Expanded(
-                child: Text(
-                  sinceStart ? 'TOP TRIGGERS SINCE DAY 1' : 'TOP TRIGGERS',
-                  style: text.labelSmall?.copyWith(
-                    color: colors.onSurfaceVariant,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.9,
-                  ),
+              Text(
+                sinceStart ? 'TOP TRIGGERS SINCE DAY 1' : 'TOP TRIGGERS',
+                style: text.labelSmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.9,
                 ),
               ),
               GestureDetector(

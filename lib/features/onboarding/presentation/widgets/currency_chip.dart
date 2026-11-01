@@ -55,28 +55,38 @@ class CurrencyChip extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => unawaited(_pick(context)),
-        child: PressScale(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-            decoration: BoxDecoration(
-              color: pick.fill,
-              borderRadius: const BorderRadius.all(Radius.circular(999)),
-              border: Border.all(color: accent),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: 5,
-              children: [
-                Text(
-                  symbol,
-                  style: context.textTheme.labelLarge?.copyWith(
-                    color: accent,
-                    fontWeight: FontWeight.w600,
-                  ),
+        // The pill stays small; the touch is 44 pt.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+          child: Center(
+            widthFactor: 1,
+            child: PressScale(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 11,
+                  vertical: 6,
                 ),
-                if (editable)
-                  Icon(AppIcons.chevronDown, size: 13, color: accent),
-              ],
+                decoration: BoxDecoration(
+                  color: pick.fill,
+                  borderRadius: const BorderRadius.all(Radius.circular(999)),
+                  border: Border.all(color: accent),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 5,
+                  children: [
+                    Text(
+                      symbol,
+                      style: context.textTheme.labelLarge?.copyWith(
+                        color: accent,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (editable)
+                      Icon(AppIcons.chevronDown, size: 13, color: accent),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

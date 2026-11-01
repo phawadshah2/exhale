@@ -104,53 +104,69 @@ class _TriggerRow extends StatelessWidget {
     final colors = context.colors;
     final text = context.textTheme;
     final percent = (share.fraction * 100).round();
-    return InkWell(
-      onTap: onTap == null ? null : () => onTap!(share.trigger),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 28),
-        child: Row(
-          spacing: 10,
-          children: [
-            SizedBox(
-              width: 78,
-              child: Text(
-                share.trigger.label,
-                style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+    final tap = onTap == null ? null : () => onTap!(share.trigger);
+    final logs = share.count == 1 ? '1 log' : '${share.count} logs';
+    return Semantics(
+      container: true,
+      button: tap != null,
+      label:
+          '${share.trigger.label}: $logs, $percent percent.'
+          '${tap == null ? '' : ' Open logs.'}',
+      excludeSemantics: true,
+      onTap: tap,
+      child: InkWell(
+        onTap: tap,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Row(
+            spacing: 10,
+            children: [
+              SizedBox(
+                width: 78,
+                child: Text(
+                  share.trigger.label,
+                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(99),
-                // Keyed by day, so each day's bars fill from empty.
-                child: TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0, end: share.fraction),
-                  duration: AppMotion.fill,
-                  curve: AppMotion.fillCurve,
-                  builder: (context, value, _) => LinearProgressIndicator(
-                    value: value,
-                    minHeight: 8,
-                    color: color,
-                    backgroundColor: colors.outlineVariant,
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(99),
+                  // Keyed by day, so each day's bars fill from empty.
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0, end: share.fraction),
+                    duration: AppMotion.fill,
+                    curve: AppMotion.fillCurve,
+                    builder: (context, value, _) => LinearProgressIndicator(
+                      value: value,
+                      minHeight: 8,
+                      color: color,
+                      backgroundColor: colors.outlineVariant,
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(
-              width: 56,
-              child: Text(
-                '${share.count} · $percent%',
-                textAlign: TextAlign.right,
-                style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+              MediaQuery.withClampedTextScaling(
+                maxScaleFactor: 1.5,
+                child: SizedBox(
+                  width: 56,
+                  child: Text(
+                    '${share.count} · $percent%',
+                    textAlign: TextAlign.right,
+                    style: text.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                ),
               ),
-            ),
-            Icon(
-              AppIcons.chevronRight,
-              size: 14,
-              color: colors.onSurfaceVariant,
-            ),
-          ],
+              Icon(
+                AppIcons.chevronRight,
+                size: 14,
+                color: colors.onSurfaceVariant,
+              ),
+            ],
+          ),
         ),
       ),
     );

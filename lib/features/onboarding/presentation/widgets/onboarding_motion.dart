@@ -126,7 +126,7 @@ class _PressScaleState extends State<PressScale> {
     onPointerUp: (_) => _set(false),
     onPointerCancel: (_) => _set(false),
     child: AnimatedScale(
-      scale: _down ? 0.96 : 1,
+      scale: _down && !MediaQuery.disableAnimationsOf(context) ? 0.96 : 1,
       duration: Duration(milliseconds: _down ? 90 : 220),
       curve: _down ? Curves.easeOut : Curves.easeOutBack,
       child: widget.child,

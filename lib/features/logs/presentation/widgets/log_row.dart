@@ -13,6 +13,9 @@ class LogRow extends StatelessWidget {
   final HabitLog log;
   final VoidCallback onTap;
 
+  /// Past this text scale the chip moves under the note, where it fits.
+  static const double _chipBelowScale = 1.5;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -20,6 +23,41 @@ class LogRow extends StatelessWidget {
     final trigger = log.trigger;
     final note = log.note;
     final tint = trigger?.tint(context) ?? colors.onSurfaceVariant;
+    final chipBelow =
+        MediaQuery.textScalerOf(context).scale(1) > _chipBelowScale;
+
+    final chip = trigger == null
+        ? Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: ShapeDecoration(
+              shape: StadiumBorder(
+                side: BorderSide(color: colors.outlineVariant),
+              ),
+            ),
+            child: Text(
+              'No trigger',
+              style: text.labelMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          )
+        : Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: ShapeDecoration(
+              color: tint.withValues(alpha: 0.1),
+              shape: StadiumBorder(
+                side: BorderSide(color: tint.withValues(alpha: 0.35)),
+              ),
+            ),
+            child: Text(
+              trigger.label,
+              style: text.labelMedium?.copyWith(
+                color: trigger.textTint(context),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          );
 
     return InkWell(
       onTap: onTap,
@@ -62,48 +100,11 @@ class LogRow extends StatelessWidget {
                       color: colors.onSurfaceVariant,
                     ),
                   ),
+                  if (chipBelow) chip,
                 ],
               ),
             ),
-            if (trigger == null)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 3,
-                ),
-                decoration: ShapeDecoration(
-                  shape: StadiumBorder(
-                    side: BorderSide(color: colors.outlineVariant),
-                  ),
-                ),
-                child: Text(
-                  'No trigger',
-                  style: text.labelMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              )
-            else
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 3,
-                ),
-                decoration: ShapeDecoration(
-                  color: tint.withValues(alpha: 0.1),
-                  shape: StadiumBorder(
-                    side: BorderSide(color: tint.withValues(alpha: 0.35)),
-                  ),
-                ),
-                child: Text(
-                  trigger.label,
-                  style: text.labelMedium?.copyWith(
-                    color: tint,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+            if (!chipBelow) chip,
           ],
         ),
       ),

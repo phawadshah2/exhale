@@ -197,7 +197,7 @@ class _HabitCard extends StatelessWidget {
     final card = AnimatedContainer(
       duration: const Duration(milliseconds: 240),
       curve: Curves.easeOut,
-      height: dashed ? 56 : 66,
+      constraints: BoxConstraints(minHeight: dashed ? 56 : 66),
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
         color: selected ? pick.fill : pick.idleFill,

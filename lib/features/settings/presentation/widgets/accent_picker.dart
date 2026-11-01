@@ -18,8 +18,9 @@ class AccentPicker extends ConsumerWidget {
     final selected = ref.watch(
       currentSettingsProvider.select((s) => s.accentIndex),
     );
-    return Row(
+    return Wrap(
       spacing: AppSpacing.md,
+      runSpacing: AppSpacing.sm,
       children: [
         for (var i = 0; i < AppPalette.accents.length; i++)
           _Swatch(
@@ -58,6 +59,7 @@ class _Swatch extends StatelessWidget {
       button: true,
       selected: selected,
       label: '${swatch.name} accent',
+      onTap: onTap,
       excludeSemantics: true,
       child: GestureDetector(
         onTap: onTap,

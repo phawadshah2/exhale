@@ -36,7 +36,7 @@ class PrimaryButton extends StatelessWidget {
               spacing: 10,
               children: [
                 if (icon != null) Icon(icon),
-                Text(label),
+                Flexible(child: Text(label, textAlign: TextAlign.center)),
                 if (trailingIcon != null) Icon(trailingIcon),
               ],
             ),

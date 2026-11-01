@@ -201,10 +201,12 @@ class _TimeTile extends StatelessWidget {
                   spacing: 6,
                   children: [
                     Icon(icon, size: 15, color: colors.onSurfaceVariant),
-                    Text(
-                      label,
-                      style: text.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
+                    Flexible(
+                      child: Text(
+                        label,
+                        style: text.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   ],

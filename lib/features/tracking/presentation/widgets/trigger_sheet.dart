@@ -113,7 +113,7 @@ class _TriggerSheetState extends ConsumerState<_TriggerSheet> {
                       chip,
                       overflow: TextOverflow.ellipsis,
                       style: text.labelMedium?.copyWith(
-                        color: colors.primary,
+                        color: colors.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

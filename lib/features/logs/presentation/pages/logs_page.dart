@@ -13,6 +13,7 @@ import 'package:exhale/features/logs/presentation/providers/logs_providers.dart'
 import 'package:exhale/features/logs/presentation/widgets/day_group.dart';
 import 'package:exhale/features/logs/presentation/widgets/logs_day_card.dart';
 import 'package:exhale/features/logs/presentation/widgets/logs_period_card.dart';
+import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
@@ -115,6 +116,15 @@ class _LogsPageState extends ConsumerState<LogsPage> {
     final earliest = habitId == null
         ? today
         : ref.watch(earliestDayProvider(habitId));
+    // A retry keeps the old error while it loads; that shows the spinner.
+    bool stillFailed(AsyncValue<Object?> value) =>
+        value.hasError && !value.isLoading;
+    final failed =
+        habitId != null &&
+        (stillFailed(
+              ref.watch(logsInRangeProvider((habitId: habitId, range: _range))),
+            ) ||
+            stillFailed(ref.watch(planHistoryProvider(habitId))));
 
     return Scaffold(
       body: SafeArea(
@@ -153,7 +163,39 @@ class _LogsPageState extends ConsumerState<LogsPage> {
                 ),
               ),
             ),
-            if (view == null || habit == null || habitId == null)
+            if (failed)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: AppSpacing.sm,
+                    children: [
+                      Text(
+                        "Couldn't load your logs.",
+                        textAlign: TextAlign.center,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          ref
+                            ..invalidate(
+                              logsInRangeProvider((
+                                habitId: habitId,
+                                range: _range,
+                              )),
+                            )
+                            ..invalidate(planHistoryProvider(habitId));
+                        },
+                        child: const Text('Try again'),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else if (view == null || habit == null || habitId == null)
               const SliverFillRemaining(
                 hasScrollBody: false,
                 child: Center(child: CircularProgressIndicator.adaptive()),
@@ -352,27 +394,38 @@ class _FilterChip extends StatelessWidget {
       child: GestureDetector(
         onTap: onRemove,
         behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: ShapeDecoration(
-            color: colors.primary.withValues(alpha: 0.14),
-            shape: StadiumBorder(
-              side: BorderSide(color: colors.primary.withValues(alpha: 0.45)),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 6,
-            children: [
-              Text(
-                label,
-                style: context.textTheme.labelMedium?.copyWith(
-                  color: colors.primary,
-                  fontWeight: FontWeight.w700,
+        // The pill stays small; the touch is 44 pt.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Center(
+            widthFactor: 1,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: ShapeDecoration(
+                color: colors.primary.withValues(alpha: 0.14),
+                shape: StadiumBorder(
+                  side: BorderSide(
+                    color: colors.primary.withValues(alpha: 0.45),
+                  ),
                 ),
               ),
-              Icon(AppIcons.close, size: 12, color: colors.primary),
-            ],
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 6,
+                children: [
+                  Flexible(
+                    child: Text(
+                      label,
+                      style: context.textTheme.labelMedium?.copyWith(
+                        color: colors.onSurface,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Icon(AppIcons.close, size: 12, color: colors.onSurface),
+                ],
+              ),
+            ),
           ),
         ),
       ),
