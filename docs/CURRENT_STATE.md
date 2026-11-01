@@ -7,7 +7,7 @@ prefilled compare link.
 
 **M5 is done on `feat/launch-states` (head fefc700) except the real iPhone pass.**
 Tasks 5.1 to 5.3, the independent review (0541760..43131f4, verdict "With fixes") and
-all its fixes are committed. Nothing is pushed; the branch has no upstream. Local `main`
+all its fixes are committed. The branch is on `origin`; check `git status` for what is not pushed. Local `main`
 has one docs commit (0541760) that goes up with the launch PR. Uncommitted: this file,
 `CLAUDE.md`, the plan and the roadmap (docs only).
 
