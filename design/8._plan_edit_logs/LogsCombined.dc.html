@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logs, calendar, bar and rail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--inner:#F1F4F7;--good:#00704A;--warn:#B26B00;--danger:#BA1A1A;--stress:#BA1A1A;--work:#855300;--meal:#00796B;--social:#1D5FD1;--dash:#AEB6C1;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--inner:#1E252F;--good:#4EDEA3;--warn:#FFB95F;--danger:#FFB4AB;--stress:#FFB4AB;--work:#FFB95F;--meal:#57F1DB;--social:#A9C7FF;--dash:#5A6370;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1640px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 28px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+    <button aria-label="Add a missed log" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.64px">The evidence.</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">You logged it, so it counts. Pick a day, any day.</p>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; padding: 4px; border-radius: 99px; background: var(--pill)">
+      <button onClick="{{toWeek}}" style="flex: 1 1 0; min-height: 36px; border: 0; border-radius: 99px; background: {{weekBg}}; color: {{weekFg}}; font-family: inherit; font-size: 13px; font-weight: 700">Week</button>
+      <button onClick="{{toMonth}}" style="flex: 1 1 0; min-height: 36px; border: 0; border-radius: 99px; background: {{monthBg}}; color: {{monthFg}}; font-family: inherit; font-size: 13px; font-weight: 700">Month</button>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <button onClick="{{prev}}" aria-label="Earlier" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink); padding: 0; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+      <button onClick="{{togglePicker}}" aria-expanded="{{pickerOpen}}" aria-label="Choose a month" style="min-height: 44px; border: 0; background: transparent; color: inherit; font-family: inherit; padding: 0 8px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+        <span style="display: flex; align-items: center; gap: 4px; font-size: 15px; line-height: 20px; font-weight: 700">{{title}}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></span>
+        <span style="font-size: 12px; line-height: 16px; color: var(--muted)">{{subtitle}}</span>
+      </button>
+      <button onClick="{{next}}" aria-label="Later" disabled="{{atEnd}}" style="width: 44px; height: 44px; border: 0; background: transparent; color: {{nextColor}}; padding: 0; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+    </div>
+
+    <sc-if value="{{pickerOpen}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; gap: 8px; justify-content: center">
+        <sc-for list="{{months}}" as="m" hint-placeholder-count="2">
+          <button onClick="{{m.pick}}" style="min-height: 44px; padding: 0 16px; border-radius: 99px; border: 1px solid {{m.border}}; background: {{m.bg}}; color: {{m.fg}}; font-family: inherit; font-size: 13px; font-weight: 600">{{m.label}}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr))">
+      <sc-for list="{{weekdays}}" as="w" hint-placeholder-count="7">
+        <span style="text-align: center; font-size: 11px; line-height: 16px; font-weight: 600; color: var(--muted)">{{w}}</span>
+      </sc-for>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: 2px; margin-top: -6px">
+      <sc-for list="{{cells}}" as="c" hint-placeholder-count="7">
+        <div style="min-height: 48px">
+          <sc-if value="{{c.isDay}}" hint-placeholder-val="{{true}}">
+            <button onClick="{{c.pick}}" disabled="{{c.disabled}}" aria-label="{{c.aria}}" style="width: 100%; height: 48px; border: 0; border-radius: 12px; background: {{c.bg}}; color: {{c.fg}}; font-family: inherit; padding: 0; display: flex; align-items: center; justify-content: center">
+              <span style="position: relative; width: 38px; height: 38px">
+                <svg width="38" height="38" viewBox="0 0 44 44" aria-hidden="true">
+                  <circle cx="22" cy="22" r="18" fill="none" stroke="{{c.track}}" stroke-width="4" stroke-dasharray="{{c.trackDash}}"></circle>
+                  <circle cx="22" cy="22" r="18" fill="none" stroke="{{c.ring}}" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="{{c.dash}}" transform="rotate(-90 22 22)"></circle>
+                </svg>
+                <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: {{c.weight}}">{{c.date}}</span>
+              </span>
+            </button>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; justify-content: center; gap: 14px; font-size: 12px; line-height: 16px; color: var(--muted)">
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent)"></span>Under</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--warn)"></span>At limit</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--danger)"></span>Over</span>
+    </div>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 8px">
+      <div style="display: flex; flex-direction: column">
+        <span style="font-size: 12px; line-height: 16px; color: var(--muted)">{{periodLabel}}</span>
+        <span><span style="font-family: Manrope, sans-serif; font-size: 28px; line-height: 36px; font-weight: 800; font-variant-numeric: tabular-nums">{{logged}}</span><span style="font-family: Manrope, sans-serif; font-size: 16px; font-weight: 600; color: var(--muted)"> / {{allowed}} allowed</span></span>
+      </div>
+      <span style="font-size: 12px; font-weight: 700; color: {{pillColor}}; background: color-mix(in srgb, {{pillColor}} 12%, transparent); border: 1px solid color-mix(in srgb, {{pillColor}} 40%, transparent); border-radius: 99px; padding: 4px 10px; white-space: nowrap">{{pill}}</span>
+    </div>
+    <div style="display: flex; height: 10px; gap: 2px; border-radius: 99px; overflow: hidden" role="img" aria-label="{{barLabel}}">
+      <sc-for list="{{triggers}}" as="t" hint-placeholder-count="5">
+        <span style="flex: {{t.count}} 1 0; background: {{t.color}}"></span>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <sc-for list="{{triggers}}" as="t" hint-placeholder-count="5">
+        <button style="min-height: 34px; font-family: inherit; font-size: 12px; font-weight: 600; color: {{t.color}}; background: color-mix(in srgb, {{t.color}} 10%, transparent); border: 1px solid color-mix(in srgb, {{t.color}} 35%, transparent); border-radius: 99px; padding: 0 10px">{{t.label}} {{t.count}}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+        <span style="font-size: 16px; line-height: 24px; font-weight: 600">{{dayTitle}}</span>
+        <span style="font-size: 12px; font-weight: 600; color: {{dayColor}}; white-space: nowrap">{{dayCount}}</span>
+      </div>
+      <div style="display: flex; gap: 4px" role="img" aria-label="{{dayCount}}">
+        <sc-for list="{{slots}}" as="s" hint-placeholder-count="9">
+          <span style="flex: 1 1 0; height: 6px; border-radius: 99px; background: {{s.c}}"></span>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column">
+      <sc-for list="{{rail}}" as="n" hint-placeholder-count="12">
+        <div style="display: flex; gap: 12px; align-items: stretch">
+          <div style="width: 40px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center">
+            <sc-if value="{{n.isLog}}" hint-placeholder-val="{{true}}">
+              <span style="width: 40px; height: 40px; border-radius: 14px; background: {{n.tile}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{n.color}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.icon}}"></path></svg></span>
+            </sc-if>
+            <sc-if value="{{n.isMark}}" hint-placeholder-val="{{false}}">
+              <span style="width: 12px; height: 12px; box-sizing: border-box; border-radius: 50%; border: 2px solid {{n.markColor}}; margin: 4px 0; flex-shrink: 0"></span>
+            </sc-if>
+            <sc-if value="{{n.hasLine}}" hint-placeholder-val="{{true}}">
+              <span style="flex-grow: 1; min-height: 8px; width: 0; border-left: 2px {{n.lineStyle}} {{n.lineColor}}"></span>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{n.isLog}}" hint-placeholder-val="{{true}}">
+            <button aria-label="{{n.aria}}" style="flex: 1 1 0; min-width: 0; min-height: 44px; border: 0; background: transparent; color: inherit; font-family: inherit; text-align: left; padding: 0 0 2px; display: flex; flex-direction: column; justify-content: center">
+              <span style="display: flex; justify-content: space-between; gap: 8px">
+                <span style="font-size: 15px; line-height: 20px; font-weight: 700">{{n.time}}</span>
+                <span style="font-size: 12px; line-height: 20px; font-weight: 600; color: {{n.color}}">{{n.trigger}}</span>
+              </span>
+              <span style="font-size: 12px; line-height: 16px; color: var(--muted)">{{n.note}}</span>
+            </button>
+          </sc-if>
+
+          <sc-if value="{{n.isMark}}" hint-placeholder-val="{{false}}">
+            <div style="flex: 1 1 0; display: flex; justify-content: space-between; gap: 8px; padding-bottom: 6px; font-size: 12px; line-height: 20px; color: {{n.markText}}">
+              <span style="font-weight: 600">{{n.label}}</span>
+              <span>{{n.time}}</span>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{n.isGap}}" hint-placeholder-val="{{false}}">
+            <div style="flex: 1 1 0; display: flex; align-items: center; min-height: {{n.h}}px; font-size: 12px; line-height: 16px; color: {{n.gapColor}}; font-weight: {{n.gapWeight}}">{{n.label}}</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <span style="font-size: 12px; line-height: 18px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px">Forgot one? Tap + at the top to add it to this day. I'll pretend it was on time.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1640}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const DAY = 86400000;
+    const dayOf = (y, m, d) => Math.round(Date.UTC(y, m, d) / DAY);
+    const toDate = (n) => new Date(n * DAY);
+    const planStart = dayOf(2026, 9, 8);
+    const today = dayOf(2026, 10, 1);
+    const used = [11, 12, 11, 14, 11, 10, 10, 11, 11, 13, 12, 11, 10, 10, 9, 9, 12, 9, 9, 8, 10, 8, 11, 9, 5];
+    const limitOn = (n) => Math.ceil((84 - (n - planStart)) / 7);
+    const usedOn = (n) => (n < planStart || n > today ? null : used[n - planStart]);
+    const fmt = (n, opts) => toDate(n).toLocaleDateString('en-US', { timeZone: 'UTC', ...opts });
+    const short = (n) => fmt(n, { month: 'short', day: 'numeric' });
+
+    const mode = s.mode ?? 'week';
+    const selected = s.selected ?? today;
+    const pickerOpen = s.pickerOpen ?? false;
+    // Mondays: weekday of a UTC day number, Monday first.
+    const mondayOf = (n) => n - ((toDate(n).getUTCDay() + 6) % 7);
+    const weekStart = s.weekStart ?? mondayOf(today);
+    const month = s.month ?? 10;
+
+    const cell = (n) => {
+      const u = usedOn(n);
+      const isFuture = n > today;
+      const isBefore = n < planStart;
+      const limit = limitOn(n);
+      const isSel = n === selected;
+      return {
+        isDay: true,
+        date: toDate(n).getUTCDate(),
+        disabled: isFuture || isBefore,
+        pick: () => this.setState({ selected: n }),
+        bg: isSel ? 'var(--accent)' : 'transparent',
+        fg: isSel ? 'var(--on-accent)' : isFuture || isBefore ? 'var(--muted)' : 'var(--ink)',
+        weight: isSel || n === today ? 800 : 600,
+        track: isFuture || isBefore ? 'var(--dash)' : isSel ? 'var(--muted)' : 'var(--high)',
+        trackDash: isFuture || isBefore ? '3 3' : 'none',
+        ring: u === null ? 'transparent' : isSel ? 'var(--on-accent)' : u > limit ? 'var(--danger)' : u === limit ? 'var(--warn)' : 'var(--accent)',
+        dash: (u === null ? 0 : Math.min(100, (u / limit) * 100)) + ' 100',
+        aria: short(n) + (u === null ? '' : ', ' + u + ' of ' + limit),
+      };
+    };
+
+    let cells = [];
+    let from;
+    let to;
+    let title;
+    let subtitle;
+    let periodLabel;
+    if (mode === 'week') {
+      from = weekStart;
+      to = weekStart + 6;
+      for (let n = from; n <= to; n++) cells.push(cell(n));
+      title = short(from) + ' – ' + short(to);
+      const ago = Math.round((mondayOf(today) - weekStart) / 7);
+      subtitle = ago === 0 ? 'This week' : ago === 1 ? 'Last week' : ago + ' weeks ago';
+      periodLabel = subtitle;
+    } else {
+      from = dayOf(2026, month, 1);
+      to = dayOf(2026, month + 1, 0);
+      const lead = from - mondayOf(from);
+      for (let i = 0; i < lead; i++) cells.push({ isDay: false });
+      for (let n = from; n <= to; n++) cells.push(cell(n));
+      title = fmt(from, { month: 'long', year: 'numeric' });
+      subtitle = month === 10 ? 'This month' : 'Last month';
+      periodLabel = fmt(from, { month: 'long' });
+    }
+
+    // The shown period, stopping at today and at the plan's start.
+    let logged = 0;
+    let allowed = 0;
+    let allowedByToday = 0;
+    for (let n = Math.max(from, planStart); n <= to; n++) {
+      allowed += limitOn(n);
+      if (n <= today) {
+        logged += usedOn(n);
+        allowedByToday += limitOn(n);
+      }
+    }
+    const gapToLimit = allowedByToday - logged;
+    const share = (p) => Math.round(logged * p);
+    const trig = [share(0.37), share(0.23), share(0.18), share(0.12)];
+    const rest = logged - trig.reduce((a, b) => a + b, 0);
+    const triggers = [
+      { label: 'Stress', count: trig[0], color: 'var(--stress)' },
+      { label: 'Work', count: trig[1], color: 'var(--work)' },
+      { label: 'After meal', count: trig[2], color: 'var(--meal)' },
+      { label: 'Social', count: trig[3], color: 'var(--social)' },
+      { label: 'None', count: rest, color: 'var(--muted)' },
+    ];
+
+    // The selected day's rail.
+    const kinds = {
+      Stress: { color: 'var(--stress)', icon: 'M13 2L4 14h7l-1 8 9-12h-7z' },
+      Work: { color: 'var(--work)', icon: 'M3 7h18v13H3zM9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2' },
+      'After meal': { color: 'var(--meal)', icon: 'M7 3v7a2 2 0 0 0 4 0V3M9 10v11M17 3c-2 2-2 6 0 8v10' },
+      Social: { color: 'var(--social)', icon: 'M16 11a4 4 0 1 0-8 0M4 21a8 8 0 0 1 16 0' },
+      None: { color: 'var(--muted)', icon: 'M5 12h14' },
+    };
+    const clock = (m) => {
+      const h24 = Math.floor(m / 60) % 24;
+      const h = h24 % 12 === 0 ? 12 : h24 % 12;
+      return h + ':' + String(m % 60).padStart(2, '0') + (h24 < 12 ? ' AM' : ' PM');
+    };
+    const gapText = (m) => {
+      const h = Math.floor(m / 60);
+      const r = m % 60;
+      return h === 0 ? r + ' min' : r === 0 ? h + ' h' : h + ' h ' + r;
+    };
+    const dayUsed = usedOn(selected);
+    const dayLimit = limitOn(selected);
+    const isToday = selected === today;
+    const order = ['Work', 'Stress', 'After meal', 'None', 'Social', 'Stress', 'Work', 'After meal', 'Stress', 'None', 'Work', 'Stress', 'Social', 'Work'];
+    let logs;
+    if (isToday) {
+      logs = [[482, 'None'], [581, 'Work', 'Stand-up ran long'], [690, 'Work'], [795, 'After meal'], [942, 'Stress', 'Deadline call ran late']].map(([at, trigger, note]) => ({ at, trigger, note }));
+    } else {
+      logs = [];
+      const span = 900;
+      for (let i = 0; i < dayUsed; i++) {
+        const wobble = ((i * 37 + selected) % 23) - 11;
+        logs.push({ at: Math.round(490 + (i * span) / dayUsed + wobble), trigger: order[(i + selected) % order.length] });
+      }
+    }
+    const gaps = logs.slice(1).map((l, i) => l.at - logs[i].at);
+    const longest = gaps.length ? Math.max(...gaps) : 0;
+    const solid = { hasLine: true, lineStyle: 'solid', lineColor: 'var(--line)' };
+    const dashed = { hasLine: true, lineStyle: 'dashed', lineColor: 'var(--dash)' };
+    const none = { isLog: false, isMark: false, isGap: false };
+    const mark = (label, time, line, color, text) => ({ ...none, isMark: true, label, time, markColor: color, markText: text || 'var(--muted)', ...line });
+    const gapRow = (label, h, best) => ({ ...none, isGap: true, label, h, gapColor: best ? 'var(--good)' : 'var(--muted)', gapWeight: best ? 700 : 500, ...solid });
+    const rail = [mark('Woke up', '7:30 AM', solid, 'var(--muted)')];
+    logs.forEach((l, i) => {
+      const over = i >= dayLimit;
+      if (i === dayLimit) rail.push(mark('Limit reached here', dayLimit + ' of ' + dayLimit, solid, 'var(--danger)', 'var(--danger)'));
+      rail.push({
+        ...none,
+        isLog: true,
+        hasLine: false,
+        lineStyle: 'solid',
+        lineColor: 'transparent',
+        time: clock(l.at),
+        trigger: l.trigger === 'None' ? 'No trigger' : l.trigger,
+        note: over ? (l.note || 'Over the limit. Noted.') : l.note || 'No note',
+        tile: over ? 'color-mix(in srgb, var(--danger) 12%, transparent)' : 'var(--pill)',
+        aria: clock(l.at) + '. Tap to edit, swipe to delete.',
+        ...kinds[l.trigger],
+      });
+      if (i < logs.length - 1) {
+        const g = gaps[i];
+        const best = g === longest;
+        rail.push(gapRow(gapText(g) + (best ? (isToday ? '. Longest today. Frame it.' : '. Longest that day.') : ''), Math.round(28 + g / 5), best));
+      }
+    });
+    if (isToday) {
+      rail.push(mark('Next on schedule', '4:54 PM', dashed, 'var(--accent)'));
+      rail.push({ ...gapRow('Nothing here yet. Keep it that way.', 44), ...dashed, lineStyle: 'dashed', lineColor: 'var(--dash)' });
+    } else if (logs.length) {
+      rail.push({ ...gapRow('Then nothing. Well done, or asleep.', 36) });
+    }
+    rail.push(mark('Bed', '11:30 PM', { hasLine: false }, 'var(--muted)'));
+
+    const slots = [];
+    const slotCount = Math.max(dayLimit, dayUsed);
+    for (let i = 0; i < slotCount; i++) slots.push({ c: i >= dayLimit ? 'var(--danger)' : i < dayUsed ? 'var(--accent)' : 'var(--high)' });
+
+    const dayCount = dayUsed > dayLimit
+      ? dayUsed + ' of ' + dayLimit + ' · ' + (dayUsed - dayLimit) + ' over'
+      : isToday
+        ? dayUsed + ' of ' + dayLimit + ' · ' + (dayLimit - dayUsed) + ' left'
+        : dayUsed === dayLimit
+          ? dayUsed + ' of ' + dayLimit + ' · at limit'
+          : dayUsed + ' of ' + dayLimit;
+
+    const go = (patch) => () => this.setState(patch);
+    const atEnd = mode === 'week' ? weekStart >= mondayOf(today) : month >= 10;
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      cells,
+      title,
+      subtitle,
+      pickerOpen,
+      atEnd,
+      nextColor: atEnd ? 'var(--line)' : 'var(--ink)',
+      weekBg: mode === 'week' ? 'var(--accent)' : 'transparent',
+      weekFg: mode === 'week' ? 'var(--on-accent)' : 'var(--ink)',
+      monthBg: mode === 'month' ? 'var(--accent)' : 'transparent',
+      monthFg: mode === 'month' ? 'var(--on-accent)' : 'var(--ink)',
+      toWeek: go({ mode: 'week' }),
+      toMonth: go({ mode: 'month' }),
+      togglePicker: go({ pickerOpen: !pickerOpen }),
+      prev: mode === 'week' ? go({ weekStart: Math.max(mondayOf(planStart), weekStart - 7) }) : go({ month: Math.max(9, month - 1) }),
+      next: mode === 'week' ? go({ weekStart: Math.min(mondayOf(today), weekStart + 7) }) : go({ month: Math.min(10, month + 1) }),
+      months: [
+        { label: 'Oct 2026', m: 9 },
+        { label: 'Nov 2026', m: 10 },
+      ].map(({ label, m }) => ({
+        label,
+        pick: go({ month: m, mode: 'month', pickerOpen: false }),
+        bg: mode === 'month' && month === m ? 'var(--accent)' : 'transparent',
+        fg: mode === 'month' && month === m ? 'var(--on-accent)' : 'var(--ink)',
+        border: mode === 'month' && month === m ? 'var(--accent)' : 'var(--line)',
+      })),
+      periodLabel,
+      logged,
+      allowed: allowedByToday === allowed ? allowed : allowed + ' (' + allowedByToday + ' so far)',
+      pill: gapToLimit >= 0 ? gapToLimit + ' under' : -gapToLimit + ' over',
+      pillColor: gapToLimit >= 0 ? 'var(--good)' : 'var(--danger)',
+      triggers,
+      barLabel: 'Triggers for ' + periodLabel,
+      dayTitle: (isToday ? 'Today · ' : '') + fmt(selected, { weekday: 'short', month: 'short', day: 'numeric' }),
+      dayCount,
+      dayColor: dayUsed > dayLimit ? 'var(--danger)' : dayUsed === dayLimit ? 'var(--warn)' : 'var(--good)',
+      slots,
+      rail,
+    };
+  }
+}
+</script>
+</body>
+</html>

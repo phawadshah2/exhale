@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Highlighted stage, dot columns</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--inner:#F1F4F7;--good:#00704A;--warn:#855300;--danger:#BA1A1A;--dash:#AEB6C1;}
+.t-dark{--bg:#0E141D;--card:#161C25;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--inner:#1E252F;--good:#4EDEA3;--warn:#FFB95F;--danger:#FFB4AB;--dash:#5A6370;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 520px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; display: flex; flex-direction: column; gap: 8px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; padding: 0 4px">
+    <span style="font-size: 11px; line-height: 16px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted)">YOU, REGRETTABLY</span>
+    <span style="font-size: 12px; line-height: 16px; color: var(--muted)">Stage 4 of 12</span>
+  </div>
+  <div style="background: var(--card); border: 2px solid var(--accent); border-radius: 24px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="position: relative; width: 56px; height: 56px; flex-shrink: 0">
+        <svg width="56" height="56" viewBox="0 0 44 44" aria-hidden="true">
+          <circle cx="22" cy="22" r="18" fill="none" stroke="var(--high)" stroke-width="4"></circle>
+          <circle cx="22" cy="22" r="18" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="52 100" transform="rotate(-90 22 22)"></circle>
+        </svg>
+        <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: Manrope, sans-serif; font-size: 18px; font-weight: 700">9</span>
+      </span>
+      <div style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column">
+        <span style="display: flex; align-items: center; gap: 6px"><span style="font-size: 14px; line-height: 20px; font-weight: 600">Stage 4</span><span style="font-size: 10px; line-height: 14px; font-weight: 700; letter-spacing: 0.08em; background: var(--accent); color: var(--on-accent); border-radius: 99px; padding: 2px 7px">NOW</span></span>
+        <span style="font-size: 12px; line-height: 16px; color: var(--muted)">Oct 29 – Nov 4 · day 4 of 7</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end">
+        <span style="font-size: 14px; line-height: 20px; font-weight: 700; color: var(--good)">$6.00</span>
+        <span style="font-size: 11px; line-height: 16px; color: var(--muted)">of $8.40</span>
+      </div>
+    </div>
+
+    <div style="position: relative; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px" role="img" aria-label="Thursday 8 of 9, Friday 11 of 9, Saturday 9 of 9, today 5 of 9, then three days to come">
+      <div style="position: absolute; left: 0; right: 0; bottom: 148px; border-top: 1.5px dashed var(--muted); opacity: 0.6"></div>
+      <span style="position: absolute; right: 2px; bottom: 151px; font-size: 10px; line-height: 12px; font-weight: 600; color: var(--muted)">limit 9</span>
+      <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; border-radius: 12px; background: {{d.bg}}; padding: 4px 0 6px">
+          <div style="height: 132px; display: flex; flex-direction: column-reverse; gap: 4px">
+            <sc-for list="{{d.dots}}" as="o" hint-placeholder-count="9">
+              <span style="width: 8px; height: 8px; box-sizing: border-box; border-radius: 50%; background: {{o.fill}}; border: {{o.border}}; flex-shrink: 0"></span>
+            </sc-for>
+          </div>
+          <span style="font-size: 11px; line-height: 14px; font-weight: {{d.weight}}; color: {{d.nameColor}}">{{d.name}}</span>
+          <span style="font-size: 11px; line-height: 14px; font-weight: 700; color: {{d.countColor}}; font-variant-numeric: tabular-nums">{{d.count}}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11px; line-height: 14px; color: var(--muted)">
+      <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent)"></span>Used</span>
+      <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--good)"></span>Skipped</span>
+      <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--danger)"></span>Over</span>
+      <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--dash)"></span>To come</span>
+    </div>
+
+    <div style="border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 13px; line-height: 18px; font-weight: 600">33 of 63 used · 1 day over</span>
+      <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Drops to 8 in 4 days. Try to look surprised.</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":520}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const limit = 9;
+    const hollow = { fill: 'transparent', border: '1.5px solid var(--dash)' };
+    const days = [['Thu', 8], ['Fri', 11], ['Sat', 9], ['Sun', 5, true], ['Mon'], ['Tue'], ['Wed']].map(([name, used, isToday]) => {
+      const dots = [];
+      const known = used !== undefined;
+      for (let i = 0; i < Math.max(limit, used || 0); i++) {
+        if (known && i >= limit) dots.push({ fill: 'var(--danger)', border: '0' });
+        else if (known && i < used) dots.push({ fill: 'var(--accent)', border: '0' });
+        else if (known && !isToday) dots.push({ fill: 'var(--good)', border: '0' });
+        else dots.push(hollow);
+      }
+      return {
+        name,
+        dots,
+        bg: isToday ? 'var(--inner)' : 'transparent',
+        weight: isToday ? 800 : 600,
+        nameColor: isToday ? 'var(--ink)' : 'var(--muted)',
+        count: known ? used : '–',
+        countColor: used > limit ? 'var(--danger)' : known ? 'var(--ink)' : 'var(--muted)',
+      };
+    });
+    return { themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'), days };
+  }
+}
+</script>
+</body>
+</html>

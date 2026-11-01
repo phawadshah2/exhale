@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Edit plan, dial and ruler</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--inner:#F1F4F7;--good:#00704A;--warn:#855300;--dash:#AEB6C1;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--inner:#1E252F;--good:#4EDEA3;--warn:#FFB95F;--dash:#5A6370;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1370px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 28px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; gap: 12px">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </button>
+    <span style="font-family: Manrope, sans-serif; font-size: 18px; line-height: 26px; font-weight: 600">Edit plan</span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.64px">Turn it down. Not up.</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">It does go up. I'd just rather not watch.</p>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 10px; align-items: center">
+    <span style="align-self: flex-start; font-size: 16px; line-height: 24px; font-weight: 600">Daily limit from today</span>
+    <div style="position: relative; width: 220px; height: 220px">
+      <svg width="220" height="220" viewBox="0 0 220 220" role="img" aria-label="Dial set to 9 a day">
+        <circle cx="110" cy="110" r="96" fill="none" stroke="var(--high)" stroke-width="14"></circle>
+        <circle cx="110" cy="110" r="96" fill="none" stroke="var(--accent)" stroke-width="14" stroke-linecap="round" pathLength="100" stroke-dasharray="45 100" transform="rotate(-90 110 110)"></circle>
+        <circle cx="139.7" cy="201.3" r="14" fill="var(--card)" stroke="var(--accent)" stroke-width="3"></circle>
+      </svg>
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
+        <span style="font-family: Manrope, sans-serif; font-size: 48px; line-height: 56px; font-weight: 700; letter-spacing: -1.44px; font-variant-numeric: tabular-nums">9</span>
+        <span style="font-size: 13px; color: var(--muted)">sessions a day</span>
+        <span style="font-size: 12px; color: var(--muted)">One every 1 h 47 min</span>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px">
+      <button aria-label="Fewer" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); font-size: 22px; line-height: 1; padding: 0">−</button>
+      <span style="font-size: 12px; color: var(--muted)">Drag the ring, or tap</span>
+      <button aria-label="More" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); font-size: 22px; line-height: 1; padding: 0">+</button>
+    </div>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <span style="font-size: 16px; line-height: 24px; font-weight: 600">Quit date</span>
+      <span style="font-family: Manrope, sans-serif; font-size: 18px; line-height: 26px; font-weight: 700">Dec 31</span>
+    </div>
+    <div style="position: relative; height: 48px" role="img" aria-label="Ruler of weeks, set to Dec 31, 60 days away">
+      <div style="position: absolute; left: 0; right: 0; top: 0; height: 30px; display: flex; justify-content: space-between; align-items: flex-end">
+        <sc-for list="{{ticks}}" as="t" hint-placeholder-count="29">
+          <span style="width: 2px; height: {{t.h}}px; border-radius: 1px; background: {{t.c}}"></span>
+        </sc-for>
+      </div>
+      <div style="position: absolute; left: 65%; top: -4px; width: 4px; height: 38px; margin-left: -2px; border-radius: 2px; background: var(--accent)"></div>
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; font-size: 11px; line-height: 14px; color: var(--muted)">
+        <span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span>
+      </div>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <button style="min-height: 44px; padding: 0 12px; border-radius: 99px; border: 0; background: var(--accent); color: var(--on-accent); font-family: inherit; font-size: 13px; font-weight: 600">Keep current</button>
+      <button style="min-height: 44px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 600">Suggested</button>
+      <button style="min-height: 44px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 600">8 wks</button>
+      <button style="min-height: 44px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 600">16 wks</button>
+    </div>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <span style="font-size: 16px; line-height: 24px; font-weight: 600">What that makes</span>
+      <span style="font-size: 12px; color: var(--muted)">9 stages · one fewer every 7 days</span>
+    </div>
+    <div style="display: flex; justify-content: space-between">
+      <sc-for list="{{rings}}" as="r" hint-placeholder-count="10">
+        <span style="position: relative; width: 30px; height: 30px">
+          <svg width="30" height="30" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="18" fill="none" stroke="{{r.stroke}}" stroke-width="4" stroke-dasharray="{{r.dash}}"></circle></svg>
+          <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: Manrope, sans-serif; font-size: 11px; font-weight: 700; color: {{r.fg}}">{{r.n}}</span>
+        </span>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <span style="font-size: 16px; line-height: 24px; font-weight: 600">Price of a pack</span>
+      <span style="font-size: 12px; color: var(--muted)">Was $8.00</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px">
+      <label style="flex: 1 1 0; min-width: 0; min-height: 52px; box-sizing: border-box; display: flex; align-items: center; gap: 8px; border-radius: 16px; background: var(--inner); padding: 0 14px">
+        <span style="font-size: 16px; font-weight: 600; color: var(--muted)">$</span>
+        <input aria-label="Price of a pack" value="9.00" readonly style="flex: 1 1 0; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-family: Manrope, sans-serif; font-size: 20px; font-weight: 700">
+      </label>
+      <div style="display: flex; align-items: center; gap: 6px">
+        <button aria-label="Fewer sessions per pack" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); font-size: 20px; line-height: 1; padding: 0">−</button>
+        <span style="display: flex; flex-direction: column; align-items: center; width: 34px"><span style="font-family: Manrope, sans-serif; font-size: 16px; line-height: 20px; font-weight: 700">20</span><span style="font-size: 10px; line-height: 12px; color: var(--muted)">a pack</span></span>
+        <button aria-label="More sessions per pack" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); font-size: 20px; line-height: 1; padding: 0">+</button>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <div style="background: var(--inner); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column"><span style="font-size: 12px; line-height: 16px; color: var(--muted)">One session</span><span style="font-size: 15px; line-height: 22px; font-weight: 700">$0.45</span></div>
+      <div style="background: var(--inner); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column"><span style="font-size: 12px; line-height: 16px; color: var(--muted)">At your old 12 a day</span><span style="font-size: 15px; line-height: 22px; font-weight: 700">$1,971 a year</span></div>
+    </div>
+    <span style="align-self: flex-end; max-width: 280px; background: var(--accent); color: var(--on-accent); border-radius: 20px 20px 6px 20px; padding: 10px 14px; font-size: 14px; line-height: 20px">Up again? Almost like they want you to quit.</span>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+      <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Counts from today. What you've saved so far stays as it is.</span>
+      <button style="min-height: 44px; flex-shrink: 0; border: 0; background: transparent; color: var(--accent-text); font-family: inherit; font-size: 12px; font-weight: 700; padding: 0">I'd rather not know</button>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 8px">
+    <button style="flex: 1 1 0; min-height: 44px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 600">Your why</button>
+    <button style="flex: 1 1 0; min-height: 44px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 600">Change habit</button>
+  </div>
+
+  <button style="min-height: 56px; border-radius: 99px; border: 0; background: var(--accent); color: var(--on-accent); font-family: inherit; font-size: 16px; font-weight: 600">Shake on it again</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1370}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ticks = [];
+    for (let i = 0; i < 29; i++) ticks.push({ h: i % 4 === 0 ? 26 : 14, c: i <= 18 ? 'var(--accent)' : 'var(--dash)' });
+    const rings = [];
+    for (let n = 9; n >= 1; n--) rings.push({ n, stroke: 'var(--dash)', dash: n === 9 ? 'none' : '3 3', fg: 'var(--ink)' });
+    rings[0].stroke = 'var(--accent)';
+    rings.push({ n: 0, stroke: 'var(--good)', dash: 'none', fg: 'var(--good)' });
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      ticks,
+      rings,
+    };
+  }
+}
+</script>
+</body>
+</html>

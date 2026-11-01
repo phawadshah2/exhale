@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Edit plan, reopen the deal</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--inner:#F1F4F7;--good:#00704A;--warn:#855300;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--inner:#1E252F;--good:#4EDEA3;--warn:#FFB95F;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1000px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 28px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+  <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+  </button>
+
+  <div style="display: flex; align-items: flex-end; gap: 9px">
+    <span style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"></path></svg></span>
+    <span style="max-width: 280px; background: var(--accent); color: var(--on-accent); border-radius: 20px 20px 20px 6px; padding: 10px 14px; font-size: 16px; line-height: 22px">Back already? Fine. Tap whatever you want to change.</span>
+  </div>
+
+  <h1 style="margin: 4px 0 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 50px; font-weight: 600; letter-spacing: -0.64px">
+    <button aria-label="Daily limit, 9. Change" style="display: inline-block; min-height: 44px; padding: 0 12px; border-radius: 14px; border: 0; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); color: inherit; font: inherit; letter-spacing: inherit; vertical-align: baseline">9</button> a day from today.<br>
+    Zero by <button aria-label="Quit date, Dec 31. Change" style="display: inline-block; min-height: 44px; padding: 0 12px; border-radius: 14px; border: 0; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); color: inherit; font: inherit; letter-spacing: inherit; vertical-align: baseline">Dec 31</button>.
+  </h1>
+
+  <div style="display: flex; gap: 8px; overflow: hidden">
+    <button style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 0; background: var(--accent); color: var(--on-accent); font-family: inherit; font-size: 13px; font-weight: 600; white-space: nowrap">Keep current</button>
+    <button style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 600; white-space: nowrap">Suggested</button>
+    <button style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 600; white-space: nowrap">8 weeks</button>
+    <button style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 600; white-space: nowrap">16 weeks</button>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <svg width="316" height="110" viewBox="0 0 316 110" role="img" aria-label="Limit falling from 9 today to zero on Dec 31" style="align-self: center">
+      <text x="4" y="12" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="600" fill="var(--muted)">9 today</text>
+      <path d="{{chart}}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"></path>
+    </svg>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; border-top: 1px solid var(--line); padding-top: 12px">
+      <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 12px; line-height: 16px; color: var(--muted)">Tomorrow</span><span style="font-size: 16px; line-height: 24px; font-weight: 600">9</span></div>
+      <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 12px; line-height: 16px; color: var(--muted)">Quit in</span><span style="font-size: 16px; line-height: 24px; font-weight: 600">60 days</span></div>
+      <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 12px; line-height: 16px; color: var(--muted)">Back a year</span><span style="font-size: 16px; line-height: 24px; font-weight: 600">$1,752</span></div>
+    </div>
+    <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Today that's about one every 1 h 47 min. It gets slower from here.</span>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 2px 16px; display: flex; flex-direction: column">
+    <button style="min-height: 48px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: inherit; font-family: inherit; display: flex; align-items: center; justify-content: space-between; padding: 0; font-size: 14px"><span style="font-weight: 600">Price</span><span style="color: var(--muted)">$8.00 a pack ›</span></button>
+    <button style="min-height: 48px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: inherit; font-family: inherit; display: flex; align-items: center; justify-content: space-between; padding: 0; font-size: 14px"><span style="font-weight: 600">Your why</span><span style="color: var(--muted)">Morning runs ›</span></button>
+    <button style="min-height: 48px; border: 0; background: transparent; color: inherit; font-family: inherit; display: flex; align-items: center; justify-content: space-between; padding: 0; font-size: 14px"><span style="font-weight: 600">Change habit</span><span style="color: var(--muted)">Vaping ›</span></button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 8px; align-items: center">
+    <button style="width: 100%; min-height: 56px; border-radius: 99px; border: 0; background: var(--accent); color: var(--on-accent); font-family: inherit; font-size: 16px; font-weight: 600">Shake on it again</button>
+    <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Past days keep the limits they had. Nice try.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const at = (d) => (d >= 60 ? 0 : Math.ceil((60 - d) / 7));
+    const x = (d) => 4 + (d / 60) * 308;
+    const y = (l) => 104 - (l / 9) * 84;
+    let p = 'M' + x(0) + ' ' + y(at(0));
+    for (let d = 1; d <= 60; d++) p += ' L' + x(d) + ' ' + y(at(d - 1)) + ' L' + x(d) + ' ' + y(at(d));
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      chart: p,
+    };
+  }
+}
+</script>
+</body>
+</html>

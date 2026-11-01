@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan stages, everything out</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--inner:#F1F4F7;--good:#00704A;--warn:#855300;--warn-bar:#B26B00;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--inner:#1E252F;--good:#4EDEA3;--warn:#FFB95F;--warn-bar:#FFB95F;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1860px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 32px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </button>
+    <button style="min-height: 44px; display: flex; align-items: center; background: transparent; border: 0; padding: 0; font-family: inherit">
+      <span style="padding: 5px 11px; border-radius: 99px; border: 1px solid var(--accent-text); color: var(--accent-text); font-size: 12px; font-weight: 600">Edit</span>
+    </button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.64px">Every stage. No hiding.</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">The whole plan, receipts included.</p>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <span style="font-size: 16px; line-height: 24px; font-weight: 600">The whole plan</span>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <sc-for list="{{totals}}" as="t" hint-placeholder-count="4">
+        <div style="background: var(--inner); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 12px; line-height: 16px; color: var(--muted)">{{t.label}}</span>
+          <span style="white-space: nowrap"><span style="font-family: Manrope, sans-serif; font-size: 20px; line-height: 28px; font-weight: 700; font-variant-numeric: tabular-nums">{{t.value}}</span><span style="font-family: Manrope, sans-serif; font-size: 13px; font-weight: 600; color: var(--muted)"> / {{t.of}}</span></span>
+          <div style="height: 4px; border-radius: 99px; background: var(--high); margin-top: 2px"><div style="height: 4px; width: {{t.pct}}%; border-radius: 99px; background: var(--accent)"></div></div>
+        </div>
+      </sc-for>
+    </div>
+    <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Without a plan: 1,008 sessions and $403.20. Nobody said it was cheap.</span>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 16px; line-height: 24px; font-weight: 600">Stage by stage</span>
+      <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Later stages pay more. Funny how that works.</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column">
+      <sc-for list="{{stages}}" as="s" hint-placeholder-count="12">
+        <div style="display: flex; gap: 12px; align-items: stretch">
+          <div style="width: 26px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center">
+            <sc-if value="{{s.isDone}}" hint-placeholder-val="{{false}}">
+              <span style="width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span>
+            </sc-if>
+            <sc-if value="{{s.isNow}}" hint-placeholder-val="{{false}}">
+              <span style="width: 26px; height: 26px; box-sizing: border-box; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent-text); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0">{{s.n}}</span>
+            </sc-if>
+            <sc-if value="{{s.isFuture}}" hint-placeholder-val="{{true}}">
+              <span style="width: 26px; height: 26px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0">{{s.n}}</span>
+            </sc-if>
+            <div style="flex-grow: 1; width: 2px; margin: 3px 0; background: {{s.lineColor}}"></div>
+          </div>
+
+          <sc-if value="{{s.isNow}}" hint-placeholder-val="{{false}}">
+            <div style="flex: 1 1 0; min-width: 0; padding-bottom: 14px">
+              <div style="border-radius: 16px; background: var(--accent); color: var(--on-accent); padding: 14px; display: flex; flex-direction: column; gap: 10px">
+                <div style="display: flex; align-items: center; justify-content: space-between">
+                  <span style="font-size: 16px; line-height: 24px; font-weight: 700">Stage 4 · 9 a day</span>
+                  <span style="font-size: 10px; line-height: 14px; font-weight: 700; letter-spacing: 0.08em; background: var(--on-accent); color: var(--accent); border-radius: 99px; padding: 3px 8px">NOW</span>
+                </div>
+                <span style="font-size: 12px; line-height: 16px; opacity: 0.78">Oct 29 – Nov 4 · day 4 of 7</span>
+                <div style="height: 6px; border-radius: 99px; position: relative; overflow: hidden">
+                  <div style="position: absolute; inset: 0; background: currentColor; opacity: 0.25"></div>
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 52%; border-radius: 99px; background: currentColor"></div>
+                </div>
+                <span style="font-size: 13px; line-height: 18px; font-weight: 600">33 of 63 sessions used</span>
+                <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+                  <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Manrope, sans-serif; font-size: 16px; line-height: 22px; font-weight: 700; white-space: nowrap">5 of 9</span><span style="font-size: 11px; line-height: 14px; opacity: 0.78">today</span></div>
+                  <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Manrope, sans-serif; font-size: 16px; line-height: 22px; font-weight: 700">1</span><span style="font-size: 11px; line-height: 14px; opacity: 0.78">day over</span></div>
+                  <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Manrope, sans-serif; font-size: 16px; line-height: 22px; font-weight: 700">$6.00</span><span style="font-size: 11px; line-height: 14px; opacity: 0.78">saved of $8.40</span></div>
+                </div>
+                <span style="font-size: 12px; line-height: 18px; opacity: 0.78">Drops to 8 in 4 days. Try to look surprised.</span>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{s.isDone}}" hint-placeholder-val="{{false}}">
+            <div style="flex: 1 1 0; min-width: 0; padding: 2px 0 14px; display: flex; flex-direction: column; gap: 2px">
+              <div style="display: flex; justify-content: space-between; gap: 8px">
+                <span style="font-size: 14px; line-height: 20px; font-weight: 600">Stage {{s.n}} · {{s.limit}} a day</span>
+                <span style="font-size: 14px; line-height: 20px; font-weight: 700; color: var(--good); font-variant-numeric: tabular-nums">{{s.money}}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px; line-height: 16px; color: var(--muted)">
+                <span>{{s.dates}}</span>
+                <span>saved</span>
+              </div>
+              <div style="height: 4px; border-radius: 99px; background: var(--high); margin: 6px 0 4px"><div style="height: 4px; width: {{s.pct}}%; border-radius: 99px; background: {{s.barColor}}"></div></div>
+              <span style="font-size: 12px; line-height: 18px"><span style="font-weight: 600">{{s.used}} of {{s.allowed}} used</span><span style="color: var(--muted)"> · </span><span style="font-weight: 600; color: var(--warn)">{{s.overText}}</span></span>
+              <span style="font-size: 12px; line-height: 18px; color: var(--muted)">{{s.detail}}</span>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{s.isFuture}}" hint-placeholder-val="{{true}}">
+            <div style="flex: 1 1 0; min-width: 0; padding: 2px 0 14px; display: flex; flex-direction: column; gap: 2px">
+              <div style="display: flex; justify-content: space-between; gap: 8px">
+                <span style="font-size: 14px; line-height: 20px; font-weight: 600">Stage {{s.n}} · {{s.limit}} a day</span>
+                <span style="font-size: 14px; line-height: 20px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums">{{s.money}}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px; line-height: 16px; color: var(--muted)">
+                <span>{{s.dates}}{{s.startsIn}}</span>
+                <span>to save</span>
+              </div>
+              <span style="font-size: 12px; line-height: 18px; color: var(--muted)">{{s.allowed}} sessions · one every {{s.gap}}</span>
+              <sc-if value="{{s.hasNote}}" hint-placeholder-val="{{false}}">
+                <span style="font-size: 12px; line-height: 18px; color: var(--muted)">{{s.note}}</span>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+
+      <div style="display: flex; gap: 12px">
+        <span style="width: 26px; height: 26px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--line); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--warn)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4M6 4h11l-2 4 2 4H6"></path></svg></span>
+        <div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 2px; padding-top: 2px">
+          <span style="font-size: 14px; line-height: 20px; font-weight: 600">Vape-free from Dec 31</span>
+          <span style="font-size: 12px; line-height: 18px; color: var(--muted)">60 days to go. After that, every day saves $4.80. Forever. Annoying, isn't it?</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1860}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const price = 0.4;
+    const baseline = 12;
+    const money = (units) => '$' + (units * price).toFixed(2);
+    const gapOf = (l) => {
+      const minutes = Math.round(960 / l);
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      return m === 0 ? h + ' h' : h + ' h ' + m + ' min';
+    };
+    const dates = ['Oct 8 – 14', 'Oct 15 – 21', 'Oct 22 – 28', 'Oct 29 – Nov 4', 'Nov 5 – 11', 'Nov 12 – 18', 'Nov 19 – 25', 'Nov 26 – Dec 2', 'Dec 3 – 9', 'Dec 10 – 16', 'Dec 17 – 23', 'Dec 24 – 30'];
+    const done = {
+      1: { used: 79, over: 1, detail: 'About 11.3 a day · mostly Stress' },
+      2: { used: 78, over: 2, detail: 'One over for the whole stage. Bold.' },
+      3: { used: 66, over: 1, detail: 'About 9.4 a day · mostly After meal' },
+    };
+    const notes = { 12: 'The last one. Literally.' };
+    const stages = dates.map((d, i) => {
+      const n = i + 1;
+      const l = 13 - n;
+      const allowed = l * 7;
+      const past = done[n];
+      const used = past ? past.used : 0;
+      return {
+        n,
+        limit: l,
+        dates: d,
+        isDone: n < 4,
+        isNow: n === 4,
+        isFuture: n > 4,
+        allowed,
+        used,
+        pct: Math.min(100, Math.round((used / allowed) * 100)),
+        barColor: used > allowed ? 'var(--warn-bar)' : 'var(--accent)',
+        overText: past ? past.over + (past.over === 1 ? ' day over' : ' days over') : '',
+        detail: past ? past.detail : '',
+        money: past ? money(baseline * 7 - past.used) : money((baseline - l) * 7),
+        gap: gapOf(l),
+        startsIn: n === 5 ? ' · in 4 days' : '',
+        hasNote: Boolean(notes[n]),
+        note: notes[n] || '',
+        lineColor: n < 4 ? 'var(--accent)' : 'var(--line)',
+      };
+    });
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      stages,
+      totals: [
+        { label: 'Sessions used', value: '256', of: '546', pct: 47 },
+        { label: 'Sessions avoided', value: '44', of: '462', pct: 10 },
+        { label: 'Money saved', value: '$17.60', of: '$184.80', pct: 10 },
+        { label: 'Days kept', value: '19', of: '24', pct: 79 },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

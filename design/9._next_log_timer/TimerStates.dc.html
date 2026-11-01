@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ring timer states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1192px; height: 1010px; box-sizing: border-box; background: #0E141D; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 32px; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+<sc-for list="{{cells}}" as="cell" hint-placeholder-count="8">
+<div style="background: {{cell.card}}; border: 1px solid {{cell.line}}; border-radius: 24px; padding: 14px 12px; height: 324px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 8px">
+<span style="align-self: flex-start; font-size: 12px; font-weight: 700; color: {{cell.muted}}">{{cell.title}}</span>
+<div style="position: relative; width: 200px; height: 200px; flex-shrink: 0">
+<svg width="200" height="200" viewBox="0 0 220 220" aria-hidden="true">
+<circle cx="110" cy="110" r="96" fill="none" stroke="{{cell.track}}" stroke-width="14"></circle>
+<circle cx="110" cy="110" r="96" fill="none" stroke="{{cell.ring}}" stroke-width="14" stroke-linecap="round" stroke-dasharray="{{cell.mainDash}}" transform="rotate(-90 110 110)"></circle>
+</svg>
+<sc-if value="{{cell.timer}}" hint-placeholder-val="{{ true }}">
+<svg width="200" height="200" viewBox="0 0 220 220" aria-hidden="true" style="position: absolute; inset: 0">
+<circle cx="110" cy="110" r="80" fill="none" stroke="{{cell.track}}" stroke-width="4"></circle>
+<circle cx="110" cy="110" r="80" fill="none" stroke="{{cell.ink}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="{{cell.innerDash}}" transform="rotate(-90 110 110)"></circle>
+</svg>
+<div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px">
+<span style="font-family: Manrope, sans-serif; font-size: 31px; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; line-height: 1.15; color: {{cell.clockColor}}">{{cell.clock}}</span>
+<span style="font-size: 12px; font-weight: 600; color: {{cell.accent}}">{{cell.label}}</span>
+<span style="font-size: 12px; color: {{cell.muted}}">{{cell.countLine}}</span>
+</div>
+</sc-if>
+<sc-if value="{{cell.plain}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px">
+<div style="display: flex; align-items: baseline; gap: 4px"><span style="font-family: Manrope, sans-serif; font-size: 50px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1">{{cell.count}}</span><span style="font-family: Manrope, sans-serif; font-size: 22px; font-weight: 600; color: {{cell.muted}}">/ 11</span></div>
+<span style="font-family: Manrope, sans-serif; font-size: 16px; font-weight: 600; color: {{cell.accent}}">{{cell.label}}</span>
+<span style="font-size: 12px; color: {{cell.muted}}">{{cell.countLine}}</span>
+</div>
+</sc-if>
+</div>
+<span style="font-size: 13px; line-height: 1.35; text-align: center; color: {{cell.noteColor}}; font-weight: {{cell.noteWeight}}">{{cell.note}}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; flex-grow: 1">
+<sc-for list="{{buttons}}" as="b" hint-placeholder-count="4">
+<div style="background: {{b.card}}; border: 1px solid {{b.line}}; border-radius: 24px; padding: 14px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between">
+<span style="font-size: 12px; font-weight: 700; color: {{b.muted}}">{{b.title}}</span>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding-bottom: 8px">
+<sc-if value="{{b.showChip}}" hint-placeholder-val="{{ true }}">
+<div style="height: 32px; box-sizing: border-box; padding: 0 12px; border-radius: 99px; background: {{b.chip}}; border: 1px solid {{b.chipLine}}; display: flex; align-items: center"><span style="font-size: 13px; font-weight: 700; color: {{b.accent}}; font-variant-numeric: tabular-nums">{{b.minutes}}</span></div>
+</sc-if>
+<div style="position: relative; width: 80px; height: 80px">
+<sc-if value="{{b.showRing}}" hint-placeholder-val="{{ true }}">
+<svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true" style="position: absolute; inset: 0">
+<circle cx="40" cy="40" r="37" fill="none" stroke="{{b.track}}" stroke-width="4"></circle>
+<circle cx="40" cy="40" r="37" fill="none" stroke="{{b.ring}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="{{b.dash}}" transform="rotate(-90 40 40)"></circle>
+</svg>
+</sc-if>
+<div style="position: absolute; left: 8px; top: 8px; width: 64px; height: 64px; border-radius: 50%; background: {{b.fill}}; display: flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="{{b.icon}}" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></div>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1192,"height":1010}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dark = { card: '#161C25', line: '#2C333D', muted: '#93A0AE', track: '#242A34', ink: '#DDE2F0', ring: '#2DD4BF', accent: '#57F1DB', clockColor: '#DDE2F0', noteColor: '#A9B4C0', noteWeight: '400' };
+    const light = { card: '#FFFFFF', line: '#E4E9EF', muted: '#566270', track: '#E6EBF0', ink: '#161C25', ring: '#0F9D8A', accent: '#0B6B5E', clockColor: '#161C25', noteColor: '#566270', noteWeight: '400' };
+    const main = (n) => (n / 11 * 603.2).toFixed(1) + ' 603.2';
+    const inner = (f) => (f * 502.7).toFixed(1) + ' 502.7';
+    const timer = (o) => ({ ...dark, timer: true, plain: false, label: 'until your next', countLine: '4 of 11 · 7 left', mainDash: main(4), ...o });
+    const plain = (o) => ({ ...dark, timer: false, plain: true, innerDash: '0 502.7', ...o });
+    const pace = 'About one every 1 h 27 min until bed';
+    const plus = (o) => ({ ...dark, showChip: true, showRing: true, chip: 'rgba(36,42,52,0.96)', chipLine: 'rgba(255,255,255,0.12)', fill: '#2DD4BF', icon: '#003731', track: '#2F353F', ...o });
+    return {
+      cells: [
+        timer({ title: 'Under an hour', clock: '0:47:12', innerDash: inner(0.54), note: pace }),
+        timer({ title: 'Just logged: over an hour', clock: '1:27:00', innerDash: inner(1), countLine: '5 of 11 · 6 left', mainDash: main(5), note: pace }),
+        timer({ title: 'Past zero: counts up', clock: '+0:12:03', innerDash: inner(0), clockColor: '#4EDEA3', accent: '#4EDEA3', label: "You're on schedule", note: pace }),
+        timer({ title: 'First day: the note wins', clock: '0:31:40', innerDash: inner(0.36), countLine: '0 of 11 · 11 left', mainDash: '0 603.2', note: 'No sessions logged today. Nice start.' }),
+        plain({ title: 'At the limit: no timer', count: '11', label: 'Limit reached', countLine: 'You can still log.', accent: '#FFB95F', ring: '#FFB95F', mainDash: main(11), note: ' ' }),
+        plain({ title: 'Over the limit: its note', count: '13', label: '2 over limit', countLine: '118% of daily limit', accent: '#FFB4AB', ring: '#FFB4AB', mainDash: main(11), note: 'A harder day. Tomorrow starts fresh at 10.' }),
+        plain({ title: 'Day not set: the prompt', count: '4', label: '7 left today', countLine: '36% of daily limit', mainDash: main(4), noteColor: '#57F1DB', noteWeight: '700', note: 'Set your day to get a pace guide' }),
+        timer({ ...light, title: 'Light mode', clock: '0:47:12', innerDash: inner(0.54), note: pace }),
+      ],
+      buttons: [
+        plus({ title: 'Counting: minutes only', minutes: '47 min', ring: '#2DD4BF', accent: '#57F1DB', dash: '126 232.5' }),
+        plus({ title: 'Over an hour: still minutes', minutes: '87 min', ring: '#2DD4BF', accent: '#57F1DB', dash: '232.5 232.5' }),
+        plus({ title: 'Past zero, or no timer', showChip: false, showRing: false, minutes: '', ring: '#2DD4BF', accent: '#57F1DB', dash: '0 232.5' }),
+        plus({ ...light, title: 'Light mode', minutes: '47 min', chip: '#FFFFFF', chipLine: '#E4E9EF', fill: '#111418', icon: '#FFFFFF', track: '#E6EBF0', ring: '#0F9D8A', dash: '126 232.5' }),
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

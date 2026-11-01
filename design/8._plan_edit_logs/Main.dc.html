@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan details, the stairs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--ink:#161C25;--muted:#5B6470;--line:#E4E9EF;--high:#E6EBF0;--accent:#111418;--on-accent:#FFFFFF;--tint:#C9D0D9;--good:#006C49;--warn:#855300;}
+.t-dark{--bg:#0E141D;--card:#1A2029;--ink:#DDE2F0;--muted:#A3ACB9;--line:#2C333D;--high:#2F353F;--accent:#F4F7FA;--on-accent:#111418;--tint:#4A525E;--good:#4EDEA3;--warn:#FFB95F;}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1120px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 32px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </button>
+    <span style="font-size: 14px; font-weight: 600">Your plan</span>
+    <button style="min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-family: inherit; font-size: 12px; font-weight: 600">Edit plan</button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 6px; padding: 8px 0 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.64px">It's just stairs.</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">Twelve of them, all going down. Even your knees can't object.</p>
+  </div>
+
+  <div style="background: var(--card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <span style="font-size: 14px; font-weight: 600">12 a day to zero</span>
+      <span style="font-size: 12px; color: var(--muted)">Day 25 of 84</span>
+    </div>
+    <div style="height: 208px; display: flex; align-items: flex-end; position: relative">
+      <sc-for list="{{steps}}" as="s" hint-placeholder-count="13">
+        <div style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; position: relative">
+          <sc-if value="{{s.isNow}}" hint-placeholder-val="{{false}}">
+            <span style="font-size: 10px; line-height: 14px; font-weight: 700; color: var(--on-accent); background: var(--accent); border-radius: 999px; padding: 2px 7px; margin-bottom: 4px; white-space: nowrap">You</span>
+          </sc-if>
+          <sc-if value="{{s.hasLimit}}" hint-placeholder-val="{{true}}">
+            <span style="font-size: 10px; line-height: 14px; font-weight: 600; color: {{s.numColor}}; margin-bottom: 3px; font-variant-numeric: tabular-nums">{{s.limit}}</span>
+          </sc-if>
+          <sc-if value="{{s.isQuit}}" hint-placeholder-val="{{false}}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Quit date"><path d="M6 21V4"></path><path d="M6 4h12l-3 4 3 4H6"></path></svg>
+          </sc-if>
+          <div style="width: 100%; height: {{s.h}}px; background: {{s.fill}}; position: relative; overflow: hidden">
+            <sc-if value="{{s.isNow}}" hint-placeholder-val="{{false}}">
+              <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 57%; background: var(--accent)"></div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px">
+      <span>Thu, Oct 8</span>
+      <span>Thu, Dec 31</span>
+    </div>
+  </div>
+
+  <div style="background: var(--card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <span style="font-size: 12px; font-weight: 600; color: var(--muted)">THIS STEP, 4 OF 12</span>
+        <span style="font-size: 12px; color: var(--muted)">Oct 29 – Nov 4</span>
+      </div>
+      <span style="font-family: Manrope, sans-serif; font-size: 24px; line-height: 32px; font-weight: 600">9 a day</span>
+      <div style="height: 4px; border-radius: 999px; background: var(--high); overflow: hidden"><div style="height: 4px; width: 57%; background: var(--accent)"></div></div>
+      <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Day 4 of 7. Standing still counts, for now.</span>
+    </div>
+    <div style="height: 1px; background: var(--line)"></div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; font-weight: 600; color: var(--muted)">NEXT STEP, IN 4 DAYS</span>
+      <span style="font-size: 14px; line-height: 20px; font-weight: 600">8 a day from Thu, Nov 5</span>
+      <span style="font-size: 12px; line-height: 18px; color: var(--muted)">One fewer. You've survived worse Mondays.</span>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+    <div style="background: var(--card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-family: Manrope, sans-serif; font-size: 24px; line-height: 32px; font-weight: 700; font-variant-numeric: tabular-nums">462</span>
+      <span style="font-size: 12px; line-height: 18px; color: var(--muted)">sessions you won't have by Dec 31. They won't send a card.</span>
+    </div>
+    <div style="background: var(--card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-family: Manrope, sans-serif; font-size: 24px; line-height: 32px; font-weight: 700; font-variant-numeric: tabular-nums">$185</span>
+      <span style="font-size: 12px; line-height: 18px; color: var(--muted)">still yours by then. Your rent says hello.</span>
+    </div>
+  </div>
+
+  <button style="min-height: 48px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-family: inherit; font-size: 14px; font-weight: 600">See all 12 steps</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":390,"height":1120}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const steps = [];
+    for (let n = 1; n <= 13; n++) {
+      const limit = 13 - n;
+      const isNow = n === 4;
+      const isPast = n < 4;
+      steps.push({
+        limit,
+        isNow,
+        isQuit: n === 13,
+        hasLimit: n !== 13,
+        h: n === 13 ? 2 : limit * 13,
+        fill: isPast ? 'var(--accent)' : isNow ? 'var(--tint)' : n === 13 ? 'var(--line)' : 'var(--high)',
+        numColor: isPast || isNow ? 'var(--ink)' : 'var(--muted)',
+      });
+    }
+    return { themeClass: this.props.dark ? 't-dark' : 't-light', steps };
+  }
+}
+</script>
+</body>
+</html>

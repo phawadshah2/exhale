@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Timer states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1060px; height: 760px; box-sizing: border-box; background: #0E141D; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 32px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 24px; align-content: start">
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">Counting down</span>
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 12px; font-weight: 600; color: #93A0AE">Next one on schedule in</span><span style="font-family: Manrope, sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1">47:12</span></div>
+<span style="font-size: 13px; font-weight: 600; color: #57F1DB; padding-bottom: 6px; white-space: nowrap">at 5:09 PM</span>
+</div>
+<div style="height: 6px; border-radius: 99px; background: #2F353F"><div style="width: 54%; height: 6px; border-radius: 99px; background: #2DD4BF"></div></div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">Just logged: the gap restarts</span>
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 12px; font-weight: 600; color: #93A0AE">Next one on schedule in</span><span style="font-family: Manrope, sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1">1:27:00</span></div>
+<span style="font-size: 13px; font-weight: 600; color: #57F1DB; padding-bottom: 6px; white-space: nowrap">at 5:49 PM</span>
+</div>
+<div style="height: 6px; border-radius: 99px; background: #2DD4BF"></div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">Past zero: counts up instead</span>
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 12px; font-weight: 600; color: #93A0AE">You're on schedule. Holding out</span><span style="font-family: Manrope, sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1; color: #4EDEA3">+12:03</span></div>
+<span style="font-size: 13px; font-weight: 600; color: #4EDEA3; padding-bottom: 6px; white-space: nowrap">since 5:09 PM</span>
+</div>
+<div style="height: 6px; border-radius: 99px; background: #2F353F"></div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">Hidden, as the pace line is today</span>
+<div style="border: 1.5px dashed #3C4A46; border-radius: 24px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #A9B4C0; line-height: 1.5">
+<span>At or over the limit</span>
+<span>Quit day and after</span>
+<span>Before wake, after bed</span>
+<span>The ring on a past day</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">Day not set: no timer yet</span>
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 14px 18px; min-height: 44px; display: flex; align-items: center; justify-content: center">
+<a href="#" style="font-size: 14px; font-weight: 700; color: #57F1DB; text-decoration: none; min-height: 44px; display: flex; align-items: center">Set your day to get a pace guide</a>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">Light mode</span>
+<div style="background: #F4F7FA; border-radius: 28px; padding: 12px">
+<div style="background: #FFFFFF; border: 1px solid #E4E9EF; border-radius: 22px; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; color: #161C25">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 12px; font-weight: 600; color: #566270">Next one on schedule in</span><span style="font-family: Manrope, sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1">47:12</span></div>
+<span style="font-size: 13px; font-weight: 600; color: #0B6B5E; padding-bottom: 6px; white-space: nowrap">at 5:09 PM</span>
+</div>
+<div style="height: 6px; border-radius: 99px; background: #E6EBF0"><div style="width: 54%; height: 6px; border-radius: 99px; background: #0F9D8A"></div></div>
+</div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1060,"height":760}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

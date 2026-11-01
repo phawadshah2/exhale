@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Back near the start sheet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--inner:#F1F4F7;--glass:rgba(255,255,255,0.72);--scrim:rgba(14,20,29,0.28);--glass-line:rgba(255,255,255,0.7);}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--inner:#1E252F;--glass:rgba(36,42,52,0.72);--scrim:rgba(0,0,0,0.45);--glass-line:rgba(255,255,255,0.08);}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 900px; box-sizing: border-box; position: relative; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 0; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+  <div style="display: flex; flex-direction: column; gap: 2px">
+    <span style="font-size: 13px; color: var(--muted)">Monday, Nov 9</span>
+    <span style="font-family: Manrope, sans-serif; font-size: 23px; font-weight: 700">Good morning</span>
+  </div>
+  <div style="height: 48px; flex-shrink: 0; border-radius: 99px; background: var(--pill)"></div>
+  <div style="height: 300px; flex-shrink: 0; border-radius: 24px; background: var(--card); border: 1px solid var(--card-line)"></div>
+
+  <div style="position: absolute; inset: 0; background: var(--scrim)"></div>
+
+  <div style="position: absolute; left: 8px; right: 8px; bottom: 8px; border-radius: 32px; background: var(--glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--glass-line); box-shadow: 0 12px 32px rgba(0,0,0,0.18); padding: 12px 18px 18px; display: flex; flex-direction: column; gap: 14px">
+    <span style="align-self: center; width: 36px; height: 5px; border-radius: 99px; background: var(--muted); opacity: 0.4"></span>
+
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-family: Manrope, sans-serif; font-size: 20px; line-height: 28px; font-weight: 600">Back around where you started</span>
+      <span style="font-size: 13px; line-height: 18px; color: var(--muted)">About 12 a day these last two weeks. It happens, and none of this gets wiped.</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 13px; line-height: 18px; font-weight: 600">Still yours</span>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+        <div style="background: var(--card); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 22px; font-weight: 700">12</span><span style="font-size: 12px; line-height: 16px; color: var(--muted)">avoided</span></div>
+        <div style="background: var(--card); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 22px; font-weight: 700">$5.40</span><span style="font-size: 12px; line-height: 16px; color: var(--muted)">saved</span></div>
+        <div style="background: var(--card); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 22px; font-weight: 700">9</span><span style="font-size: 12px; line-height: 16px; color: var(--muted)">days kept</span></div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <sc-for list="{{choices}}" as="c" hint-placeholder-count="2">
+        <button onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="min-height: 72px; box-sizing: border-box; border-radius: 18px; border: 2px solid {{c.border}}; background: var(--card); color: var(--ink); font-family: inherit; padding: 10px 12px; display: flex; align-items: center; gap: 10px; text-align: left">
+          <span style="width: 20px; height: 20px; box-sizing: border-box; border-radius: 50%; border: {{c.ring}}; flex-shrink: 0"></span>
+          <span style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+            <span style="font-size: 14px; line-height: 20px; font-weight: 700">{{c.title}}</span>
+            <span style="font-size: 12px; line-height: 16px; color: var(--muted)">{{c.detail}}</span>
+          </span>
+          <span style="display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0">
+            <span style="font-family: Manrope, sans-serif; font-size: 15px; line-height: 22px; font-weight: 700">{{c.date}}</span>
+            <span style="font-size: 11px; line-height: 16px; color: var(--muted)">{{c.change}}</span>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+
+    <button style="min-height: 56px; border-radius: 99px; border: 0; background: var(--accent); color: var(--on-accent); font-family: inherit; font-size: 16px; font-weight: 600">{{cta}}</button>
+
+    <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; line-height: 18px; color: var(--muted)">
+      <span>If this keeps being hard, a doctor, pharmacist or local quit service can help.</span>
+      <sc-if value="{{alcohol}}" hint-placeholder-val="{{false}}">
+        <span style="color: var(--ink); font-weight: 600">If you drink heavily, don't stop suddenly without medical advice. It can be dangerous.</span>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"alcohol":{"editor":"boolean","default":false},"$preview":{"width":390,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const picked = (this.state || {}).picked ?? 0;
+    const options = [
+      { title: 'Start again from 12', detail: 'One fewer every 7 days', date: 'Feb 1', change: '4 weeks later' },
+      { title: 'Keep my plan', detail: '8 today, one fewer every 7 days', date: 'Jan 4', change: 'No change' },
+    ];
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      alcohol: this.props.alcohol ?? false,
+      choices: options.map((o, i) => ({
+        ...o,
+        pressed: i === picked ? 'true' : 'false',
+        border: i === picked ? 'var(--accent)' : 'transparent',
+        ring: i === picked ? '6px solid var(--accent)' : '1.5px solid var(--muted)',
+        pick: () => this.setState({ picked: i }),
+      })),
+      cta: picked === 1 ? 'Keep my plan' : 'Shake on it again',
+    };
+  }
+}
+</script>
+</body>
+</html>

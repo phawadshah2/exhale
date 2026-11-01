@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan details, the wall</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--ink:#161C25;--muted:#5B6470;--line:#E4E9EF;--high:#E6EBF0;--accent:#111418;--on-accent:#FFFFFF;--good:#006C49;--good-bg:#D7F3E6;--warn:#7A4C00;--warn-bg:#FCE9C8;}
+.t-dark{--bg:#0E141D;--card:#1A2029;--ink:#DDE2F0;--muted:#A3ACB9;--line:#2C333D;--high:#2F353F;--accent:#F4F7FA;--on-accent:#111418;--good:#4EDEA3;--good-bg:#123B2C;--warn:#FFB95F;--warn-bg:#46320F;}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1120px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 32px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </button>
+    <span style="font-size: 14px; font-weight: 600">Your plan</span>
+    <button style="min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-family: inherit; font-size: 12px; font-weight: 600">Edit plan</button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 6px; padding: 8px 0 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.64px">84 days. 24 down.</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">The other 60 haven't heard the news yet.</p>
+  </div>
+
+  <div style="background: var(--card); border-radius: 24px; padding: 12px; display: flex; flex-direction: column; gap: 2px">
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; padding-bottom: 2px">
+      <sc-for list="{{weekdays}}" as="w" hint-placeholder-count="7">
+        <span style="text-align: center; font-size: 10px; line-height: 16px; font-weight: 600; color: var(--muted)">{{w}}</span>
+      </sc-for>
+    </div>
+    <sc-for list="{{weeks}}" as="week" hint-placeholder-count="13">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <sc-if value="{{week.hasMonth}}" hint-placeholder-val="{{false}}">
+          <span style="font-size: 12px; line-height: 18px; font-weight: 600; padding-left: 4px">{{week.month}}</span>
+        </sc-if>
+        <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px">
+          <sc-for list="{{week.days}}" as="c" hint-placeholder-count="7">
+            <div style="height: 44px">
+              <sc-if value="{{c.isDay}}" hint-placeholder-val="{{true}}">
+                <button aria-label="{{c.label}}" style="width: 100%; height: 44px; padding: 0; border-radius: 12px; border: {{c.border}}; background: {{c.bg}}; color: {{c.fg}}; font-family: Manrope, sans-serif; font-size: 14px; font-weight: {{c.weight}}; font-variant-numeric: tabular-nums; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px">
+                  <sc-if value="{{c.isQuit}}" hint-placeholder-val="{{false}}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"></path><path d="M6 4h12l-3 4 3 4H6"></path></svg>
+                  </sc-if>
+                  <sc-if value="{{c.showLimit}}" hint-placeholder-val="{{true}}">
+                    <span style="line-height: 16px">{{c.limit}}</span>
+                  </sc-if>
+                  <sc-if value="{{c.isOver}}" hint-placeholder-val="{{false}}">
+                    <span style="width: 4px; height: 4px; border-radius: 999px; background: var(--warn)"></span>
+                  </sc-if>
+                </button>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+    <div style="display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 10px 4px 2px; font-size: 12px; line-height: 16px; color: var(--muted)">
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 4px; background: var(--good-bg)"></span>Kept</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 4px; background: var(--warn-bg)"></span>Over</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 4px; background: var(--accent)"></span>Today</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 4px; border: 1px solid var(--muted); box-sizing: border-box"></span>Coming for you</span>
+    </div>
+  </div>
+
+  <div style="background: var(--card); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 4px">
+    <span style="font-size: 14px; line-height: 20px; font-weight: 600">19 of 24 days kept. 5 over.</span>
+    <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Nobody's counting. Except me. Tap any day to see it.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":390,"height":1120}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const over = [3, 9, 10, 16, 22];
+    const today = 24;
+    const quit = 84;
+    const months = { 0: 'October', 4: 'November', 8: 'December' };
+    const start = new Date(2026, 9, 8);
+    const weeks = [];
+    for (let w = 0; w < 13; w++) {
+      const days = [];
+      for (let c = 0; c < 7; c++) {
+        const d = w * 7 + c - 3;
+        const isDay = d >= 0 && d <= quit;
+        const limit = d >= quit ? 0 : 12 - Math.floor(d / 7);
+        const isOver = over.includes(d);
+        const isPast = d < today;
+        const isToday = d === today;
+        const isQuit = d === quit;
+        const date = new Date(start.getTime());
+        date.setDate(date.getDate() + d);
+        const name = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        let bg = 'transparent';
+        let fg = 'var(--ink)';
+        let border = '1px solid var(--line)';
+        if (isToday) { bg = 'var(--accent)'; fg = 'var(--on-accent)'; border = 'none'; }
+        else if (isOver) { bg = 'var(--warn-bg)'; fg = 'var(--warn)'; border = 'none'; }
+        else if (isPast) { bg = 'var(--good-bg)'; fg = 'var(--good)'; border = 'none'; }
+        else if (isQuit) { fg = 'var(--good)'; border = '1.5px solid var(--good)'; }
+        const state = isToday ? ', today' : isOver ? ', went over' : isPast ? ', kept' : '';
+        days.push({
+          isDay,
+          limit,
+          isOver,
+          isQuit,
+          showLimit: !isQuit,
+          bg,
+          fg,
+          border,
+          weight: isToday ? 800 : 600,
+          label: isQuit ? name + ', quit date' : name + ', limit ' + limit + state,
+        });
+      }
+      weeks.push({ days, hasMonth: months[w] !== undefined, month: months[w] || '' });
+    }
+    return {
+      themeClass: this.props.dark ? 't-dark' : 't-light',
+      weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      weeks,
+    };
+  }
+}
+</script>
+</body>
+</html>
