@@ -98,11 +98,13 @@ simulator).
   one text under the ring; time left when logging early carries over.
 - Light mode and Reduce Transparency checked on every new screen.
 - 44 pt tap targets, VoiceOver labels on charts and trigger rows.
+- Text stays whole up to the 200% cap.
 - Release blockers from the earlier roadmap: remove the Design system
   link; settings caption matches what Settings can do.
-- No copy or path in the launch build offers a second habit (the hold hint
-  says "start tracking another habit" today).
-- Real iPhone pass: glass performance, chart scrolling with 90+ days.
+- No copy or path in the launch build offers a second habit.
+- Done on the branch, with the milestone review and its fixes (2026-11-01).
+  **Still open, needs a real iPhone:** glass performance, chart scrolling with
+  90+ days, and returning from the background (is the day right straight away?).
 
 ## Scope cuts if time runs short (product owner call)
 

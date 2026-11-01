@@ -111,7 +111,7 @@ Later release: with two or more habits, Home lists habit cards and tapping one
 opens Details (the same dashboard plus a switcher).
 
 **How to execute:** natively in the session with the
-`superpowers:executing-plans` skill, phase by phase (M5 is next), with an
+`superpowers:executing-plans` skill, phase by phase (M5 is on `feat/launch-states`), with an
 independent review at the end of each milestone. Give Fawad a commit message
 at each checkpoint.
 

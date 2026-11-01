@@ -375,16 +375,16 @@ Fawad chose this from the mockups: the timer as the ring's main number, plus a r
 **Files:** new widgets from Phases 2–4 as needed; Test `test/features/home/accessibility_test.dart`
 
 **Interfaces:** every new surface reads colours from `ColorScheme`/`ExhaleColors`; glass falls back to solid with Reduce Transparency; `meetsGuideline(androidTapTargetGuideline)` and `textContrastGuideline` pass on Home, Logs and both sheets.
-- [ ] **Steps 1–4:** guideline tests on Home (dark and light) and Logs; simulator pass in light mode with both accents.
-- [ ] **Step 5: Checkpoint:** `fix(ui): light mode and accessibility for new screens`
+- [x] **Steps 1–4:** guideline tests on Home (dark and light) and Logs; simulator pass in light mode with both accents.
+- [x] **Step 5: Checkpoint:** `fix(ui): light mode and accessibility for new screens`
 
 ### Task 5.3: Release blockers and device QA
 
 **Files:** Modify `settings_page.dart` (remove Design system link), `setup_chrome.dart` captions to match Settings, `lib/app/shell/log_hint.dart` (drop "or start tracking another habit", so the line reads "Add a missed log."); Delete `lib/features/design_system/` and its route
-- [ ] **Step 1:** remove the link and route; update tests that referenced them.
-- [ ] **Step 2:** change the hint copy and its tests; confirm no launch screen offers a second habit (`OnboardingCopy.habitLead` still says "You can add another later.").
-- [ ] **Step 3:** run the full checks.
+- [x] **Step 1:** remove the link and route; update tests that referenced them.
+- [x] **Step 2:** change the hint copy and its tests; confirm no launch screen offers a second habit (`OnboardingCopy.habitLead` still says "You can add another later.").
+- [x] **Step 3:** run the full checks.
 - [ ] **Step 4:** real-iPhone pass using the roadmap's M5 checklist; record results in the PR.
-- [ ] **Step 5: Checkpoint:** `chore: release blockers for launch`
+- [x] **Step 5: Checkpoint:** `chore: release blockers for launch`
 
 **Milestone M5 reached: release candidate.**
