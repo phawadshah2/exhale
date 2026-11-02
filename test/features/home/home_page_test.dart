@@ -10,6 +10,7 @@ import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/archive_habit.dart';
+import 'package:exhale/features/habit/domain/usecases/set_habit_price.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/home/presentation/widgets/stage_pill.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
@@ -389,6 +390,27 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('2 logged'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('a price change leaves earlier days at their price', (
+    tester,
+  ) async {
+    final id = await startPlan(LogicalDay(2026, 10, 14), priceCents: 1600);
+    await logOn(DateTime(2026, 10, 14, 9), times: 6);
+    await logOn(DateTime(2026, 10, 15, 9), times: 6);
+    await sl<SetHabitPrice>()((
+      habitId: id,
+      day: LogicalDay(2026, 10, 15),
+      priceCents: 2000,
+      unitsPerContainer: 20,
+    ));
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.ensureVisible(find.text('Money saved'));
+    await tester.pumpAndSettle();
+    expect(find.text(r'$5.40'), findsOneWidget);
 
     await tester.disposeApp();
   });

@@ -228,10 +228,11 @@ final FutureProviderFamily<HomeStats?, int> habitStatsProvider = FutureProvider
         from: history.firstDay,
         to: today,
       );
+      final prices = await ref.watch(priceHistoryProvider(habitId).future);
       return ProgressCalculator.homeStats(
         days: days,
         history: history,
         today: today,
-        unitPriceCents: ref.watch(habitProvider(habitId))?.unitPriceCents,
+        prices: prices,
       );
     });

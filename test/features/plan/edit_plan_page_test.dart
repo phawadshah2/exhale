@@ -1,6 +1,7 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/habit/domain/entities/price_history.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
@@ -104,6 +105,13 @@ void main() {
     );
     final habit = (habits! as Success<List<TrackedHabit>>).value.single;
     expect(habit.priceCents, 1450);
+
+    final points = await tester.runAsync(
+      () => sl<HabitRepository>().watchPrices(1).first,
+    );
+    expect(points, [
+      PricePoint(fromDay: today, priceCents: 1450, unitsPerContainer: 20),
+    ]);
 
     await tester.disposeApp();
   });

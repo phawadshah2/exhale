@@ -5,10 +5,9 @@ import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
-import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
+import 'package:exhale/features/habit/domain/usecases/start_tracking.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
-import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:flutter/material.dart';
@@ -27,11 +26,11 @@ Future<int> seedHabit(
   String? reason,
   int? priceCents,
 }) async {
-  final added = await sl<AddHabit>()(
-    HabitDraft(habit: habit, reason: reason, priceCents: priceCents),
-  ) as Success<TrackedHabit>;
-  await sl<SavePlan>()((habitId: added.value.id, draft: plan));
-  return added.value.id;
+  final started = await sl<StartTracking>()((
+    habit: HabitDraft(habit: habit, reason: reason, priceCents: priceCents),
+    plan: plan,
+  )) as Success<TrackedHabit>;
+  return started.value.id;
 }
 
 /// Registers real dependencies on an in-memory database. The one-time "Hold +"

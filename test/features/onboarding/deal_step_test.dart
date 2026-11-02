@@ -5,6 +5,7 @@ import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
+import 'package:exhale/features/habit/domain/entities/price_history.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
@@ -325,6 +326,23 @@ class _FailReadsRepository implements HabitRepository {
   @override
   Future<Result<void>> archive(int id, {required DateTime at}) =>
       _real.archive(id, at: at);
+
+  @override
+  Stream<List<PricePoint>> watchPrices(int habitId) =>
+      _real.watchPrices(habitId);
+
+  @override
+  Future<Result<void>> setPrice(
+    int habitId, {
+    required LogicalDay day,
+    required int? priceCents,
+    required int unitsPerContainer,
+  }) => _real.setPrice(
+    habitId,
+    day: day,
+    priceCents: priceCents,
+    unitsPerContainer: unitsPerContainer,
+  );
 }
 
 /// The real repository, except the first [add] fails as storage would.
@@ -359,4 +377,21 @@ class _FailOnceHabitRepository implements HabitRepository {
   @override
   Future<Result<void>> archive(int id, {required DateTime at}) =>
       _real.archive(id, at: at);
+
+  @override
+  Stream<List<PricePoint>> watchPrices(int habitId) =>
+      _real.watchPrices(habitId);
+
+  @override
+  Future<Result<void>> setPrice(
+    int habitId, {
+    required LogicalDay day,
+    required int? priceCents,
+    required int unitsPerContainer,
+  }) => _real.setPrice(
+    habitId,
+    day: day,
+    priceCents: priceCents,
+    unitsPerContainer: unitsPerContainer,
+  );
 }

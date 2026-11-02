@@ -2,7 +2,6 @@ import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
-import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
@@ -205,9 +204,22 @@ class EditPlanController extends Notifier<EditPlanState> {
     final form = state;
     state = form.copyWith(isSubmitting: true, errorMessage: () => null);
 
-    final updated = await ref.read(updateHabitProvider)(_updatedHabit(habit));
+    final updated = await ref.read(updateHabitProvider)(
+      habit.copyWith(reason: () => form.reason),
+    );
     if (!ref.mounted) return false;
     if (updated case FailureResult(:final failure)) {
+      return _fail(failureMessage(failure));
+    }
+
+    final priced = await ref.read(setHabitPriceProvider)((
+      habitId: habitId,
+      day: form.today,
+      priceCents: habit.habit.tracksCost ? form.priceCents : null,
+      unitsPerContainer: form.unitsPerContainer,
+    ));
+    if (!ref.mounted) return false;
+    if (priced case FailureResult(:final failure)) {
       return _fail(failureMessage(failure));
     }
 
@@ -223,12 +235,6 @@ class EditPlanController extends Notifier<EditPlanState> {
     state = state.copyWith(isSubmitting: false);
     return true;
   }
-
-  TrackedHabit _updatedHabit(TrackedHabit habit) => habit.copyWith(
-    priceCents: () => habit.habit.tracksCost ? state.priceCents : null,
-    unitsPerContainer: state.unitsPerContainer,
-    reason: () => state.reason,
-  );
 
   bool _fail(String message) {
     state = state.copyWith(isSubmitting: false, errorMessage: () => message);

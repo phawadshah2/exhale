@@ -7,11 +7,13 @@ import 'package:exhale/features/habit/data/datasources/habit_local_data_source.d
 import 'package:exhale/features/habit/data/repositories/local_habit_repository.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
+import 'package:exhale/features/habit/domain/entities/price_history.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
 import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/archive_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/change_habit.dart';
+import 'package:exhale/features/habit/domain/usecases/set_habit_price.dart';
 import 'package:exhale/features/habit/domain/usecases/start_tracking.dart';
 import 'package:exhale/features/plan/data/datasources/plan_local_data_source.dart';
 import 'package:exhale/features/plan/data/repositories/local_plan_repository.dart';
@@ -50,6 +52,7 @@ void main() {
       StartTracking(
         AddHabit(habits, clock),
         SavePlan(planRepository ?? plans),
+        SetHabitPrice(habits),
         transactions,
       ),
       transactions,
@@ -73,6 +76,7 @@ void main() {
     final started = await StartTracking(
       AddHabit(habits, clock),
       SavePlan(plans),
+      SetHabitPrice(habits),
       DriftTransactionRunner(database),
     )((habit: const HabitDraft(habit: Habit.vaping), plan: plan));
     oldId = (started as Success<TrackedHabit>).value.id;
@@ -202,4 +206,21 @@ class _FailingArchive implements HabitRepository {
   @override
   Future<Result<void>> archive(int id, {required DateTime at}) async =>
       const FailureResult<void>(StorageFailure());
+
+  @override
+  Stream<List<PricePoint>> watchPrices(int habitId) =>
+      _inner.watchPrices(habitId);
+
+  @override
+  Future<Result<void>> setPrice(
+    int habitId, {
+    required LogicalDay day,
+    required int? priceCents,
+    required int unitsPerContainer,
+  }) => _inner.setPrice(
+    habitId,
+    day: day,
+    priceCents: priceCents,
+    unitsPerContainer: unitsPerContainer,
+  );
 }

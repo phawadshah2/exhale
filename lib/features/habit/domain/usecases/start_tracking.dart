@@ -5,6 +5,7 @@ import 'package:exhale/core/domain/usecase/usecase.dart';
 import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
+import 'package:exhale/features/habit/domain/usecases/set_habit_price.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
 
@@ -13,9 +14,15 @@ typedef StartTrackingInput = ({HabitDraft habit, PlanDraft plan});
 /// Adds a habit together with its first plan; neither is kept without the
 /// other.
 class StartTracking implements UseCase<TrackedHabit, StartTrackingInput> {
-  const StartTracking(this._addHabit, this._savePlan, this._transactions);
+  const StartTracking(
+    this._addHabit,
+    this._savePlan,
+    this._setHabitPrice,
+    this._transactions,
+  );
   final AddHabit _addHabit;
   final SavePlan _savePlan;
+  final SetHabitPrice _setHabitPrice;
   final TransactionRunner _transactions;
 
   @override
@@ -28,6 +35,15 @@ class StartTracking implements UseCase<TrackedHabit, StartTrackingInput> {
         };
         final saved = await _savePlan((habitId: habit.id, draft: input.plan));
         if (saved case FailureResult(:final failure)) throw _Abort(failure);
+        if (input.habit.priceCents != null) {
+          final priced = await _setHabitPrice((
+            habitId: habit.id,
+            day: input.plan.startDay,
+            priceCents: input.habit.priceCents,
+            unitsPerContainer: input.habit.unitsPerContainer,
+          ));
+          if (priced case FailureResult(:final failure)) throw _Abort(failure);
+        }
         return Success<TrackedHabit>(habit);
       });
     } on _Abort catch (abort) {

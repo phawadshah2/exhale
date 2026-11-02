@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:exhale/core/domain/time/day_boundary.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/habit/domain/entities/price_history.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/tracking/domain/entities/all_time_series.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
@@ -201,7 +202,7 @@ abstract final class ProgressCalculator {
     required List<DailyProgress> days,
     required PlanHistory history,
     required LogicalDay today,
-    required double? unitPriceCents,
+    required PriceHistory? prices,
   }) {
     final baseline = history.plans.first.startLimit;
     final completed = days.where((d) => d.day.isBefore(today)).toList();
@@ -230,6 +231,18 @@ abstract final class ProgressCalculator {
       completed.fold<int>(0, (sum, d) => sum + baseline - d.count),
     );
 
+    final saved = prices?.currentUnitPriceCents == null
+        ? null
+        : math.max(
+            0,
+            completed.fold<double>(
+              0,
+              (sum, d) =>
+                  sum +
+                  (baseline - d.count) * (prices!.unitPriceCentsOn(d.day) ?? 0),
+            ),
+          );
+
     return HomeStats(
       dayNumber: math.max(1, today.daysSince(history.firstDay) + 1),
       streakDays: streak,
@@ -237,7 +250,7 @@ abstract final class ProgressCalculator {
       baseline: baseline,
       recentAverage: recentAverage,
       avoided: avoided,
-      moneySavedCents: unitPriceCents == null ? null : avoided * unitPriceCents,
+      moneySavedCents: saved?.toDouble(),
     );
   }
 }
