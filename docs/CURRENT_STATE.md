@@ -13,16 +13,26 @@ all its fixes are committed. PR #27 (up to fefc700) and PR #28 (up to 1b21134) a
 Checks at 56ddde4, the last code commit: format clean, `analyze --fatal-infos` clean, full
 suite 680 passed. Not run at this handoff (docs only). CI on PR #28 was not read.
 
-**Next action (2026-11-02):** Fawad reviews
-`docs/superpowers/plans/2026-11-02-plan-and-stages.md` (20 tasks, milestones M6 and M7). Then build
-from Task 1 on Sonnet 5.5 medium, with `superpowers:executing-plans`, on `feat/plan-and-stages`.
-Both specs are approved: `docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md` (section 8
-lists Claude's calls) and `docs/superpowers/specs/2026-11-02-stage-management-design.md`. The real
-iPhone pass stays pending.
+**Next action (Sonnet 5.5 medium):** build Task 2 (`PriceHistory`, `SetHabitPrice`, saved money)
+of `docs/superpowers/plans/2026-11-02-plan-and-stages.md` with `superpowers:executing-plans`, on
+`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 2, section 2 of
+`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, and the ledger
+`.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`, which carries a ruling on Task 2's
+same-day write and says which pre-flight rows are still to do. The M6 and M7 reviews (Tasks 12 and
+20) are Opus 5.5 high. The real iPhone pass stays pending and must include these screens.
 
-State: design only, no app code changed. `feat/plan-and-stages` is from `origin/main` (51e0bc6),
-local only. Left uncommitted on purpose:
-`design/all-designs.html` (6.7 MB) and `design/figma-import/` (3 MB, temporary).
+Fawad approved both specs (the other is `2026-11-02-stage-management-design.md`) and the plan (20
+tasks, milestones M6 and M7). Spec section 8 lists Claude's calls, which he can still reverse.
+
+**Task 1 done (c44c839, 2026-11-02):** `habit_prices` table at schema v10; the migration gives each
+priced habit one point on its earliest plan day, or the local day it was created when it has no
+plan. Nothing reads or writes the table yet. Added beyond the plan's two tests: earliest of several
+plans, no plan, and a v5 upgrade reaching the point. Checks observed by me: new tests red on
+`no such table: habit_prices`, not on an assertion; format clean, `analyze --fatal-infos` clean, full
+suite 687 passed. Not seen on a simulator, and CI not run (local only).
+
+State: `feat/plan-and-stages` is from `origin/main` (51e0bc6), local only. Left uncommitted on
+purpose: `design/all-designs.html` (6.7 MB) and `design/figma-import/` (3 MB, temporary).
 
 ## Design round in progress (2026-11-01): Plan details, Edit plan, Logs
 
