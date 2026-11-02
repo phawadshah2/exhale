@@ -1,23 +1,41 @@
 # Current state
 
 Updated 2026-11-02. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
-(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 5 of 20 are done. The first
+(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 6 of 20 are done. The first
 release tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled
 compare link.
 
 Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
 pass. CI on PR #28 was not read.
 
-Checks at c5f6a19, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 816
-passed. None of Tasks 1 to 5 has been seen on a simulator. Nothing on this branch is pushed.
+Checks at 4d799f3, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 838
+passed (run before two lint fixes in the new test file; that file alone reran after them, 22 passed).
+None of Tasks 1 to 6 has been seen on a simulator. Nothing on this branch is pushed.
 
-**Next action (Sonnet 5.5 medium):** build Task 6 (saving without a new plan) of
+**Next action (Sonnet 5.5 medium):** build Task 7 (dial and ruler) of
 `docs/superpowers/plans/2026-11-02-plan-and-stages.md` with `superpowers:executing-plans`, on
-`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 6, section 4.6 of
+`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 7, sections 4.1 and 4.2 of
 `docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, and the ledger
 `.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`, which holds the rulings and says which
 pre-flight rows are still to do. The M6 and M7 reviews (Tasks 12 and 20) are Opus 5.5 high. The real
 iPhone pass stays pending and must include these screens.
+
+**Task 6 done (4d799f3, 2026-11-02):** `EditPlanController.save` writes the price only when
+`priceChanged` and starts a plan only when `planChanged`, so a price-only save keeps the plan and its
+stage numbers. With neither, `canSave` is false and the old page's footer is disabled. New for Task 7:
+`rulerSpanDays` and `setQuitDayFromRuler`. `reason` left the state.
+
+Until Task 8, on this branch: **Your why on Edit plan is read-only**, and the page keeps its old copy
+("Save changes"), so spec 4.6's footer labels and caption aren't built yet.
+
+Rulings (ledger): an invalid price counts as changed, so a press shows its error. After a price write the
+stored values move on in the state, so typing the old price back after a failed plan save counts as a
+change. The ruler's span is also computed on opening.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 838 passed. Red seen on
+assertions against stubs for 15 of the 22 new tests. The other 7 passed against the stubs, because the old
+`save()` already did what they check, so they were not seen failing: both changed, no-cost habit, changes
+put back, invalid price, failed plan with retry, failed price, two calls. Not seen on a simulator.
 
 **Task 5 done (c5f6a19, 2026-11-02):** `CurrentStageCard` replaces the header-only stub, finishing
 Plan details: rings with counts up to 14 days (frame Y), one dot per day past that (frame Z, drawn by
@@ -33,7 +51,8 @@ assertions: all eight `DotLayout` tests, the first widget test against an empty 
 label, which `Card` merged away until it became a container. The other widget tests were written before
 the code, but the run against the stub was stopped because it hung after the first failure, so they were
 not seen failing. No test: rings at 320 pt wide. Not seen on a simulator, so how the page matches frames
-Y and Z is unchecked.
+Y and Z is unchecked. Fawad chose to skip a simulator look before Task 6 (2026-11-02); checks were not
+rerun at this handoff (docs only).
 
 **Task 4 done (f333ce5, 2026-11-02):** tapping Home's plan card opens `PlanDetailsPage`
 (`/habit/:habitId/stages`): the whole plan's tiles, BEHIND YOU with earlier-plan labels, YOU, AHEAD OF
