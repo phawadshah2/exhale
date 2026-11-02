@@ -222,8 +222,7 @@ accents.
 
 ## 6. Data
 
-Schema v10. The price-history migration in the screens pass also targets v10: whichever is built
-second moves to the next version or joins the same one, as the plan decides.
+Schema v11. The price-history migration in the screens pass takes v10.
 
 **`plan_holds`:** `id`; `plan_id` (references `plans`); `start_day` (yyyy-mm-dd); `days` (7).
 Unique on `plan_id`, `start_day`.
@@ -290,7 +289,7 @@ Repositories return `Result` and use `guardStorage`, like the rest of the app.
 **The choices.** The AC and AD example dates (Feb 1, Mar 22, Jan 11; Feb 1, Jan 4), the 80 cap,
 rounding, `pace` under 1.5 days, and the later-of rule.
 
-**Migration.** A v9 fixture to v10, following `_expectLatest`.
+**Migration.** A v10 fixture to v11, following `_expectLatest`.
 
 **Widgets**
 

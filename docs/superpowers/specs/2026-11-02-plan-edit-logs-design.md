@@ -42,8 +42,7 @@ Nov 1's $1.20 as it was.
 
 ### 2.2 Data
 
-Schema v10. Stage management also targets v10; the implementation plan decides whether it joins
-this version or takes v11.
+Schema v10. Stage management takes v11.
 
 **`habit_prices`:** `id`; `habit_id` (references `habits`); `from_day` (yyyy-mm-dd); `price_cents`
 (nullable); `units_per_container`. Unique on `habit_id`, `from_day`.
@@ -57,6 +56,7 @@ same transaction:
 - a habit created with a price gets a point on its first plan's start day
 - a habit with no price and no earlier point gets no point when it is saved without one, so a
   point with no price is only ever written after a priced one
+- clearing the only point on the day it was written deletes it, for the same reason
 
 **Migration.** Each habit with a price gets one point: its earliest plan's `start_day`, or
 `created_at`'s date when it has no plan. A habit with no price gets none.
@@ -83,7 +83,7 @@ plan too, and the page updates when that closes. Everything else that opens Edit
 
 ### 3.2 `PlanReport`
 
-A pure builder, `PlanReport.build(logs, boundary, history, prices, window, today)`, in
+A pure builder, `PlanReport.build(logs, boundary, history, prices, today)`, in
 `lib/features/plan/domain/services/`. Widgets only format what it returns. Stage management reads
 its totals.
 
@@ -441,6 +441,8 @@ Hidden on a filtered day.
 - **Save order:** the price is saved first, then the plan, as today. If the plan fails, the price
   stays saved and a retry is safe.
 - **Plan details and Logs** react to log and plan streams, so changes elsewhere show at once.
+- **No day window:** data from before v9 can have none. Pace and "One every" are then hidden, and
+  the rail has no Woke up, Bed or Next on schedule, as Home's timer already does.
 
 **Every surface:** the iOS look in `CLAUDE.md`, light, dark and all three accents, text up to the
 app's 200% cap, 44 pt targets, Reduce Motion and Reduce Transparency. Rings and dots don't scale with

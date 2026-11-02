@@ -13,13 +13,12 @@ all its fixes are committed. PR #27 (up to fefc700) and PR #28 (up to 1b21134) a
 Checks at 56ddde4, the last code commit: format clean, `analyze --fatal-infos` clean, full
 suite 680 passed. Not run at this handoff (docs only). CI on PR #28 was not read.
 
-**Next action (2026-11-02):** Fawad reviews both specs:
-`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md` (section 8 lists Claude's calls) and
-`docs/superpowers/specs/2026-11-02-stage-management-design.md` (rules and frames AA to AD approved,
-decisions added while writing not yet reviewed).
-
-Then one plan for both specs, Opus 5.5 high (risks: price-history migration, replans on K, holds),
-then build on Sonnet 5.5 medium, on `feat/plan-and-stages`. The real iPhone pass stays pending.
+**Next action (2026-11-02):** Fawad reviews
+`docs/superpowers/plans/2026-11-02-plan-and-stages.md` (20 tasks, milestones M6 and M7). Then build
+from Task 1 on Sonnet 5.5 medium, with `superpowers:executing-plans`, on `feat/plan-and-stages`.
+Both specs are approved: `docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md` (section 8
+lists Claude's calls) and `docs/superpowers/specs/2026-11-02-stage-management-design.md`. The real
+iPhone pass stays pending.
 
 State: design only, no app code changed. `feat/plan-and-stages` is from `origin/main` (51e0bc6),
 local only. Left uncommitted on purpose:
