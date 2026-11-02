@@ -8,23 +8,22 @@ prefilled compare link.
 **M5 is done on `feat/launch-states` (head 1b21134) except the real iPhone pass.**
 Tasks 5.1 to 5.3, the independent review (0541760..43131f4, verdict "With fixes") and
 all its fixes are committed. PR #27 (up to fefc700) and PR #28 (up to 1b21134) are merged to
-`main` (51e0bc6, same tree as 1b21134). Local `main` is still behind `origin/main`.
+`main` (51e0bc6, same tree as 1b21134), which local `main` now matches.
 
 Checks at 56ddde4, the last code commit: format clean, `analyze --fatal-infos` clean, full
-suite 680 passed. Not run at handoff (docs only).
+suite 680 passed. Not run at this handoff (docs only). CI on PR #28 was not read.
 
-**Next action (2026-11-02):** Fawad reviews
-`docs/superpowers/specs/2026-11-02-stage-management-design.md` (rules and frames AA to AD approved).
-Then write the spec for Plan details, Edit plan and Logs, which is built first, and a plan for
-both (Opus 5.5 high:
-price-history migration, replans on K), then build on Sonnet 5.5 medium, on a new branch from an updated `main`. CI on PR #28 was not
-read here. The real iPhone pass stays pending. Read first: `CLAUDE.md`, `design/README.md`, the
-"Design round" section below.
+**Next action (2026-11-02):** Fawad reviews both specs:
+`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md` (section 8 lists Claude's calls) and
+`docs/superpowers/specs/2026-11-02-stage-management-design.md` (rules and frames AA to AD approved,
+decisions added while writing not yet reviewed).
 
-State: design only, no app code changed. Checks not run (docs and designs only); last code
-checks are noted below. Branch `feat/plan-and-stages` from `origin/main` (51e0bc6), local only.
-Left uncommitted on purpose: `design/all-designs.html` (6.7 MB) and `design/figma-import/`
-(3 MB, temporary).
+Then one plan for both specs, Opus 5.5 high (risks: price-history migration, replans on K, holds),
+then build on Sonnet 5.5 medium, on `feat/plan-and-stages`. The real iPhone pass stays pending.
+
+State: design only, no app code changed. `feat/plan-and-stages` is from `origin/main` (51e0bc6),
+local only. Left uncommitted on purpose:
+`design/all-designs.html` (6.7 MB) and `design/figma-import/` (3 MB, temporary).
 
 ## Design round in progress (2026-11-01): Plan details, Edit plan, Logs
 
