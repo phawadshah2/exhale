@@ -14,6 +14,9 @@ abstract final class AppFormat {
   static String monthDay(LogicalDay day) =>
       '${_months[day.month - 1]} ${day.day}';
 
+  /// Oct
+  static String shortMonth(LogicalDay day) => _months[day.month - 1];
+
   /// Oct 12 – 18, or Sep 28 – Oct 4 across months.
   static String dayRange(LogicalDay from, LogicalDay to) =>
       from.month == to.month
