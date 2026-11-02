@@ -1,28 +1,44 @@
 # Current state
 
 Updated 2026-11-02. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
-(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 7 of 20 are done. The first
+(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 8 of 20 are done. The first
 release tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled
 compare link.
 
 Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
 pass. CI on PR #28 was not read.
 
-Checks at e37bb98, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 868
-passed. None of Tasks 1 to 7 has been seen on a simulator. Nothing on this branch is pushed.
+Checks at e32e0b1, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 902
+passed. None of Tasks 1 to 8 has been seen on a simulator. Nothing on this branch is pushed.
 
-**Next action (Sonnet 5.5 medium):** build Task 8 (Edit plan page) of
+**Next action (Sonnet 5.5 medium):** build Task 9 (`LogsSelection`) of
 `docs/superpowers/plans/2026-11-02-plan-and-stages.md` with `superpowers:executing-plans`, on
-`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 8, all of section 4 of
-`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, frame N
-(`design/8._plan_edit_logs/EditDial.dc.html`), and the ledger
+`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 9, section 5 of
+`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, frame T
+(`design/8._plan_edit_logs/`), and the ledger
 `.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`, which holds the rulings and says which
 pre-flight rows are still to do. The M6 and M7 reviews (Tasks 12 and 20) are Opus 5.5 high. The real
 iPhone pass stays pending and must include these screens.
 
-**Task 7 done (e37bb98, 2026-11-02):** `LimitDial` and `QuitRuler` exist with `RulerLayout`, and no page
-uses them yet. Task 8 must supply the plan's start limit, which `EditPlanState` doesn't hold, and a
-`unitsLabel` that is singular at 1.
+**Task 8 done (e32e0b1, 2026-11-02):** Edit plan is frame N: `LimitDial`, `QuitRuler`, the chips,
+`PlanPreviewCard`, `PriceCard`, and Your why and Change habit as outlined buttons. Your why is
+`showYourWhySheet` and saves alone. The footer reads "Shake on it again" or "Save price". `CostCard`,
+`ProjectionCard` and `QuitDateCard` are gone, and `EditCard` is new.
+
+Rulings (ledger): a failed Your why save shows inline, not as the plan's snackbar, which would sit behind
+the sheet. `SetupScaffold` now measures its footer, because a fixed height left the last buttons under it
+at 200%. At large text the price stepper, tiles, fine print and last two buttons stack. A quit date a year
+or more away shows its year. The baseline is the first plan's start limit. `SetupFooter` lost its icon.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 902 passed, including Edit
+plan in `accessibility_test` for every theme and accent. The rewritten page tests ran against the old page
+and failed on assertions, 28 of the first 29 before I stopped that run, so the last ones were not seen
+failing. Also seen failing, each fixed: the two buttons clipped at 200%, the last buttons under the footer,
+and the price field's 26 pt VoiceOver target. Not seen on a simulator, so how the page matches frame N, the
+sheet's keyboard, the field's vertical centring and how the drags feel on the page are unchecked. No test:
+the year on far dates, the chip and stepper haptics.
+
+**Task 7 done (e37bb98, 2026-11-02):** `LimitDial` and `QuitRuler` exist with `RulerLayout`.
 
 Rulings (ledger): the ring takes a touch at once within 30 pt of its line, because a plain pan loses
 vertical drags to the page; the middle of the dial still scrolls. A drag holds `R` until the finger lifts,
@@ -42,9 +58,6 @@ and how the drags feel, is unchecked.
 `priceChanged` and starts a plan only when `planChanged`, so a price-only save keeps the plan and its
 stage numbers. With neither, `canSave` is false and the old page's footer is disabled. New for Task 7:
 `rulerSpanDays` and `setQuitDayFromRuler`. `reason` left the state.
-
-Until Task 8, on this branch: **Your why on Edit plan is read-only**, and the page keeps its old copy
-("Save changes"), so spec 4.6's footer labels and caption aren't built yet.
 
 Rulings (ledger): an invalid price counts as changed, so a press shows its error. After a price write the
 stored values move on in the state, so typing the old price back after a failed plan save counts as a
