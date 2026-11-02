@@ -1,24 +1,42 @@
 # Current state
 
 Updated 2026-11-02. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
-(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 6 of 20 are done. The first
+(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 7 of 20 are done. The first
 release tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled
 compare link.
 
 Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
 pass. CI on PR #28 was not read.
 
-Checks at 4d799f3, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 838
-passed (run before two lint fixes in the new test file; that file alone reran after them, 22 passed).
-None of Tasks 1 to 6 has been seen on a simulator. Nothing on this branch is pushed.
+Checks at e37bb98, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 868
+passed. None of Tasks 1 to 7 has been seen on a simulator. Nothing on this branch is pushed.
 
-**Next action (Sonnet 5.5 medium):** build Task 7 (dial and ruler) of
+**Next action (Sonnet 5.5 medium):** build Task 8 (Edit plan page) of
 `docs/superpowers/plans/2026-11-02-plan-and-stages.md` with `superpowers:executing-plans`, on
-`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 7, sections 4.1 and 4.2 of
-`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, and the ledger
+`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 8, all of section 4 of
+`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, frame N
+(`design/8._plan_edit_logs/EditDial.dc.html`), and the ledger
 `.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`, which holds the rulings and says which
 pre-flight rows are still to do. The M6 and M7 reviews (Tasks 12 and 20) are Opus 5.5 high. The real
 iPhone pass stays pending and must include these screens.
+
+**Task 7 done (e37bb98, 2026-11-02):** `LimitDial` and `QuitRuler` exist with `RulerLayout`, and no page
+uses them yet. Task 8 must supply the plan's start limit, which `EditPlanState` doesn't hold, and a
+`unitsLabel` that is singular at 1.
+
+Rulings (ledger): the ring takes a touch at once within 30 pt of its line, because a plain pan loses
+vertical drags to the page; the middle of the dial still scrolls. A drag holds `R` until the finger lifts,
+so the ring never moves under it. A press on the ring sets the value at once. The ruler's haptic plays per
+tick, not per day. Month names closer than 30 pt drop the later one. The number and month names don't scale
+with text, and the dial's labels shrink to fit the ring. − and + use `RoundIconButton`, so they are
+outlined, not frame N's filled pill.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 868 passed. Red seen on
+assertions against stubs for 28 of the 30 new tests. Also seen failing by breaking the finished code on
+purpose: the eager touch, the held scale, and the 200% test with the labels' fit removed. Two tests were
+written wrong and corrected after the first real run, the dial's haptic test and the ruler's vertical drag.
+That corrected vertical-drag test was not seen failing. Not seen on a simulator, so how both match frame N,
+and how the drags feel, is unchecked.
 
 **Task 6 done (4d799f3, 2026-11-02):** `EditPlanController.save` writes the price only when
 `priceChanged` and starts a plan only when `planChanged`, so a price-only save keeps the plan and its
