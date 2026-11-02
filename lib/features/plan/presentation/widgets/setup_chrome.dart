@@ -5,13 +5,11 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
-
-/// Room the floating footer takes above the bottom inset.
-const double setupFooterHeight = 96;
+import 'package:flutter/rendering.dart';
 
 /// Edge-to-edge scrolling form with a footer the keyboard slides over.
 /// Tapping outside a field or scrolling closes the keyboard.
-class SetupScaffold extends StatelessWidget {
+class SetupScaffold extends StatefulWidget {
   const SetupScaffold({
     required this.children,
     required this.footer,
@@ -20,6 +18,19 @@ class SetupScaffold extends StatelessWidget {
 
   final List<Widget> children;
   final Widget Function(double bottomInset) footer;
+
+  @override
+  State<SetupScaffold> createState() => _SetupScaffoldState();
+}
+
+class _SetupScaffoldState extends State<SetupScaffold> {
+  /// The footer as last laid out; it grows with its caption and with text
+  /// size, and the form has to scroll clear of all of it.
+  double _footerHeight = 0;
+
+  void _footerResized(Size size) {
+    if (mounted) setState(() => _footerHeight = size.height);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,23 +48,56 @@ class SetupScaffold extends StatelessWidget {
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: AppSpacing.page.copyWith(
                 top: insets.top + AppSpacing.md,
-                bottom: math.max(
-                  keyboard + AppSpacing.lg,
-                  insets.bottom + setupFooterHeight + AppSpacing.lg,
-                ),
+                bottom: math.max(keyboard + AppSpacing.lg, _footerHeight),
               ),
-              children: children,
+              children: widget.children,
             ),
           ),
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
-            child: footer(insets.bottom),
+            child: _SizeReporter(
+              onResized: _footerResized,
+              child: widget.footer(insets.bottom),
+            ),
           ),
         ],
       ),
     );
+  }
+}
+
+/// Reports its child's size after a frame that changed it.
+class _SizeReporter extends SingleChildRenderObjectWidget {
+  const _SizeReporter({required this.onResized, required super.child});
+
+  final ValueChanged<Size> onResized;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderSizeReporter(onResized);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderSizeReporter renderObject,
+  ) => renderObject.onResized = onResized;
+}
+
+class _RenderSizeReporter extends RenderProxyBox {
+  _RenderSizeReporter(this.onResized);
+
+  ValueChanged<Size> onResized;
+  Size? _reported;
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    final current = size;
+    if (current == _reported) return;
+    _reported = current;
+    WidgetsBinding.instance.addPostFrameCallback((_) => onResized(current));
   }
 }
 
@@ -98,13 +142,13 @@ class SetupFooter extends StatelessWidget {
     required this.label,
     required this.bottomInset,
     required this.onPressed,
-    required this.caption,
+    this.caption,
     this.isBusy = false,
     super.key,
   });
 
   final String label;
-  final String caption;
+  final String? caption;
   final double bottomInset;
   final bool isBusy;
   final VoidCallback? onPressed;
@@ -134,29 +178,26 @@ class SetupFooter extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            PrimaryButton(
-              label: label,
-              trailingIcon: AppIcons.forward,
-              isBusy: isBusy,
-              onPressed: onPressed,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: 6,
-              children: [
-                Icon(AppIcons.tune, size: 16, color: colors.onSurfaceVariant),
-                Flexible(
-                  child: Text(
-                    caption,
-                    textAlign: TextAlign.center,
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
+            PrimaryButton(label: label, isBusy: isBusy, onPressed: onPressed),
+            if (caption case final caption?) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 6,
+                children: [
+                  Icon(AppIcons.tune, size: 16, color: colors.onSurfaceVariant),
+                  Flexible(
+                    child: Text(
+                      caption,
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ],
         ),
       ),

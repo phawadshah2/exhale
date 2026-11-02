@@ -1,30 +1,37 @@
 import 'dart:async';
 
 import 'package:exhale/app/router/app_routes.dart';
+import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
+import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
+import 'package:exhale/core/widgets/circle_icon_button.dart';
 import 'package:exhale/core/widgets/load_failure.dart';
-import 'package:exhale/core/widgets/number_stepper.dart';
-import 'package:exhale/core/widgets/section_card.dart';
-import 'package:exhale/features/habit/domain/entities/habit.dart';
-import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
-import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
+import 'package:exhale/features/plan/domain/entities/plan_history.dart';
+import 'package:exhale/features/plan/presentation/plan_copy.dart';
 import 'package:exhale/features/plan/presentation/providers/edit_plan_provider.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
-import 'package:exhale/features/plan/presentation/widgets/cost_card.dart';
-import 'package:exhale/features/plan/presentation/widgets/projection_card.dart';
-import 'package:exhale/features/plan/presentation/widgets/quit_date_card.dart';
+import 'package:exhale/features/plan/presentation/widgets/edit_card.dart';
+import 'package:exhale/features/plan/presentation/widgets/limit_dial.dart';
+import 'package:exhale/features/plan/presentation/widgets/plan_preview_card.dart';
+import 'package:exhale/features/plan/presentation/widgets/price_card.dart';
+import 'package:exhale/features/plan/presentation/widgets/quit_ruler.dart';
 import 'package:exhale/features/plan/presentation/widgets/setup_chrome.dart';
+import 'package:exhale/features/plan/presentation/widgets/your_why_sheet.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Changes a habit's daily limit, quit date and price. Changing the limit or
-/// date starts a new plan today; past days keep the limits they had.
+/// date starts a new plan today; past days keep the limits they had. Changing
+/// only the price keeps the plan.
 class EditPlanPage extends ConsumerWidget {
   const EditPlanPage({required this.habitId, super.key});
 
@@ -34,7 +41,8 @@ class EditPlanPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tracked = ref.watch(habitProvider(habitId));
     final history = ref.watch(planHistoryProvider(habitId));
-    if (tracked == null || history.value == null) {
+    final loaded = history.value;
+    if (tracked == null || loaded == null) {
       return Scaffold(
         body: SafeArea(
           child: Column(
@@ -59,32 +67,35 @@ class EditPlanPage extends ConsumerWidget {
         ),
       );
     }
-    return _EditPlanForm(habitId: habitId);
+    return _EditPlanForm(habitId: habitId, history: loaded);
   }
 }
 
-/// Price of one unit from the form, or null without a price or cost.
-double? _unitPriceCents(Habit habit, EditPlanState form) {
-  final price = form.priceCents;
-  if (!habit.tracksCost || price == null) return null;
-  return habit.hasContainer ? price / form.unitsPerContainer : price.toDouble();
-}
-
 class _EditPlanForm extends ConsumerWidget {
-  const _EditPlanForm({required this.habitId});
+  const _EditPlanForm({required this.habitId, required this.history});
 
   final int habitId;
+  final PlanHistory history;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = editPlanProvider(habitId);
     final form = ref.watch(provider);
     final controller = ref.read(provider.notifier);
-    final tracked = ref.watch(habitProvider(habitId))!;
-    final habit = tracked.habit;
-    final currency = ref.watch(currentSettingsProvider).currencySymbol;
+    final habit = ref.watch(habitProvider(habitId))!.habit;
+    final settings = ref.watch(currentSettingsProvider);
     final colors = context.colors;
     final text = context.textTheme;
+    final preview = form.preview;
+    final yourWhy = _OutlinedAction(
+      label: 'Your why',
+      onPressed: () => unawaited(showYourWhySheet(context, habitId: habitId)),
+    );
+    final changeHabit = _OutlinedAction(
+      label: 'Change habit',
+      onPressed: () =>
+          unawaited(context.push(AppRoutes.changeHabitFor(habitId))),
+    );
 
     ref.listen(provider.select((s) => s.errorMessage), (_, message) {
       if (message == null) return;
@@ -98,129 +109,259 @@ class _EditPlanForm extends ConsumerWidget {
 
     return SetupScaffold(
       footer: (bottomInset) => SetupFooter(
-        label: 'Save changes',
-        caption: 'Past days keep the limits they had.',
+        label: form.planChanged || !form.priceChanged
+            ? 'Shake on it again'
+            : 'Save price',
+        caption: form.planChanged
+            ? 'Past days keep their limits. Stages start again at 1.'
+            : null,
         bottomInset: bottomInset,
         isBusy: form.isSubmitting,
         onPressed: form.canSave ? save : null,
       ),
       children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                tooltip: 'Back',
-                onPressed: context.pop,
-                icon: Icon(AppIcons.back, color: colors.onSurface),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 48),
-              child: Text(
-                'Edit plan',
-                textAlign: TextAlign.center,
-                style: text.titleLarge,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        Text(habit.name, style: text.headlineLarge),
-        const SizedBox(height: AppSpacing.sm),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: AppSpacing.sm,
+          spacing: AppSpacing.gutterSm,
           children: [
-            Icon(AppIcons.info, size: 18, color: colors.primary),
-            Expanded(
-              child: Text(
-                'Changes start today. Past days keep the limits they had.',
-                style: text.bodyMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
+            CircleIconButton(
+              tooltip: 'Back',
+              icon: AppIcons.back,
+              onPressed: context.pop,
+            ),
+            Expanded(child: Text('Edit plan', style: text.titleLarge)),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Text('Turn it down. Not up.', style: text.headlineLarge),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          "It does go up. I'd just rather not watch.",
+          style: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        EditCard(
+          title: 'Daily limit from today',
+          children: [
+            Center(
+              child: LimitDial(
+                value: form.startLimit,
+                planStartLimit: history.current.startLimit,
+                unitsLabel: '${habit.unitsFor(form.startLimit)} a day',
+                gapLabel: PlanCopy.paceEvery(
+                  settings.dayWindow,
+                  form.startLimit,
                 ),
+                onChanged: controller.setDailyLimit,
               ),
             ),
           ],
         ),
-        const SizedBox(height: AppSpacing.lg),
-        SectionCard(
-          title: 'Daily limit from today',
-          subtitle: '${habit.units} on a normal day',
-          child: NumberStepper(
-            value: form.startLimit,
-            min: PlanValidation.minStartLimit,
-            max: PlanValidation.maxStartLimit,
-            onChanged: controller.setDailyLimit,
-            unit: form.startLimit == 1 ? habit.unit : habit.shortUnits,
-            caption: 'per day',
-            semanticLabel: 'daily limit',
-          ),
-        ),
         const SizedBox(height: AppSpacing.md),
-        QuitDateCard(
-          startDay: form.today,
-          quitDay: form.quitDay,
-          plan: form.preview,
-          isSteep: form.isSteep,
-          earliest: controller.earliestQuitDay,
-          onPickDate: controller.setQuitDay,
-          presets: [
-            for (final preset in EditQuitPreset.values)
-              QuitPresetOption(
-                label: preset.label,
-                selected: form.quitPreset == preset,
-                onSelect: () => controller.selectQuitPreset(preset),
+        EditCard(
+          title: 'Quit date',
+          side: _QuitDateButton(
+            label: _quitLabel(form),
+            onTap: () => unawaited(_pickQuitDay(context, form, controller)),
+          ),
+          children: [
+            QuitRuler(
+              today: form.today,
+              selected: form.quitDay,
+              spanDays: form.rulerSpanDays,
+              onChanged: controller.setQuitDayFromRuler,
+            ),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                for (final preset in EditQuitPreset.values)
+                  if (preset != EditQuitPreset.keepCurrent ||
+                      form.canKeepCurrent)
+                    _QuitChip(
+                      label: preset.label,
+                      selected: form.quitPreset == preset,
+                      onTap: () {
+                        unawaited(HapticFeedback.selectionClick());
+                        controller.selectQuitPreset(preset);
+                      },
+                    ),
+              ],
+            ),
+            if (form.isSteep)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: AppSpacing.sm,
+                children: [
+                  Icon(
+                    AppIcons.stress,
+                    size: 18,
+                    color: context.exhale.warning.foreground,
+                  ),
+                  Expanded(
+                    child: Text(
+                      "That's more than one fewer a day. A later date may "
+                      'feel easier.',
+                      style: text.bodySmall?.copyWith(
+                        color: context.exhale.warning.foreground,
+                      ),
+                    ),
+                  ),
+                ],
               ),
           ],
         ),
-        const SizedBox(height: AppSpacing.md),
-        ProjectionCard(
-          plan: form.preview,
-          habit: habit,
-          unitPriceCents: _unitPriceCents(habit, form),
-          currencySymbol: currency,
-        ),
+        if (preview != null) ...[
+          const SizedBox(height: AppSpacing.md),
+          PlanPreviewCard(plan: preview),
+        ],
         if (habit.tracksCost) ...[
           const SizedBox(height: AppSpacing.md),
-          CostCard(
+          PriceCard(
             habit: habit,
-            currencySymbol: currency,
-            unitsPerContainer: form.unitsPerContainer,
-            showPriceError: form.hasInvalidPrice,
-            initialPriceText: form.priceText,
+            form: form,
+            currencySymbol: settings.currencySymbol,
+            baseline: history.plans.first.startLimit,
             onPriceChanged: controller.setPriceText,
-            onUnitsPerContainerChanged: controller.setUnitsPerContainer,
+            onUnitsChanged: controller.setUnitsPerContainer,
           ),
         ],
         const SizedBox(height: AppSpacing.md),
-        SectionCard(
-          title: 'Your why',
-          subtitle: "Optional. We'll show it on the hard days.",
-          child: TextFormField(
-            initialValue: tracked.reason,
-            readOnly: true,
-            textCapitalization: TextCapitalization.sentences,
-            textInputAction: TextInputAction.done,
-            maxLength: HabitValidation.maxReasonLength,
-            decoration: const InputDecoration(
-              hintText: 'More energy for the people I love',
-              hintMaxLines: 3,
-              counterText: '',
+        if (context.hasLargeText)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: AppSpacing.sm,
+            children: [yourWhy, changeHabit],
+          )
+        else
+          Row(
+            spacing: AppSpacing.sm,
+            children: [
+              Expanded(child: yourWhy),
+              Expanded(child: changeHabit),
+            ],
+          ),
+      ],
+    );
+  }
+
+  /// Dec 16, with the year once it's a year or more away.
+  String _quitLabel(EditPlanState form) {
+    final date = AppFormat.monthDay(form.quitDay);
+    return form.quitDay.daysSince(form.today) >= 365
+        ? '$date, ${form.quitDay.year}'
+        : date;
+  }
+
+  Future<void> _pickQuitDay(
+    BuildContext context,
+    EditPlanState form,
+    EditPlanController controller,
+  ) async {
+    final picked = await showWheelPicker(
+      context,
+      title: 'Quit date',
+      mode: CupertinoDatePickerMode.date,
+      initial: form.quitDay.toLocalDate(),
+      minimum: controller.earliestQuitDay.toLocalDate(),
+    );
+    if (picked != null) controller.setQuitDay(LogicalDay.fromDate(picked));
+  }
+}
+
+class _QuitDateButton extends StatelessWidget {
+  const _QuitDateButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Change quit date, $label',
+      onTap: onTap,
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Center(
+            widthFactor: 1,
+            child: Text(
+              label,
+              style: context.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
-        Center(
-          child: TextButton(
-            style: TextButton.styleFrom(minimumSize: const Size(0, 44)),
-            onPressed: () =>
-                unawaited(context.push(AppRoutes.changeHabitFor(habitId))),
-            child: const Text('Change habit'),
+      ),
+    );
+  }
+}
+
+class _QuitChip extends StatelessWidget {
+  const _QuitChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      onTap: onTap,
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 44),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: ShapeDecoration(
+            color: selected ? colors.primaryContainer : null,
+            shape: StadiumBorder(
+              side: selected
+                  ? BorderSide.none
+                  : BorderSide(color: colors.outlineVariant),
+            ),
+          ),
+          child: Center(
+            widthFactor: 1,
+            child: Text(
+              label,
+              style: context.textTheme.labelLarge?.copyWith(
+                color: selected ? colors.onPrimaryContainer : colors.onSurface,
+              ),
+            ),
           ),
         ),
-      ],
+      ),
+    );
+  }
+}
+
+class _OutlinedAction extends StatelessWidget {
+  const _OutlinedAction({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
+      onPressed: onPressed,
+      child: Text(label, textAlign: TextAlign.center),
     );
   }
 }

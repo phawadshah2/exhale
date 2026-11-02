@@ -116,7 +116,7 @@ void main() {
     await seedHabit(plan, habit: Habit.vaping);
     await openEditPlan(tester);
 
-    final button = find.widgetWithText(TextButton, 'Change habit');
+    final button = find.widgetWithText(OutlinedButton, 'Change habit');
     expect(button, findsOneWidget);
     expect(tester.getSize(button).height, greaterThanOrEqualTo(44));
 

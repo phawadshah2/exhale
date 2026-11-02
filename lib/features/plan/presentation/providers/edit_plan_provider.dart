@@ -20,8 +20,8 @@ import 'package:flutter_riverpod/misc.dart';
 enum EditQuitPreset {
   keepCurrent('Keep current'),
   suggested('Suggested'),
-  weeks8('8 weeks'),
-  weeks16('16 weeks');
+  weeks8('8 wks'),
+  weeks16('16 wks');
 
   EditQuitPreset(this.label);
 
@@ -98,6 +98,9 @@ class EditPlanState {
       unitsPerContainer != storedUnits;
 
   bool get canSave => planChanged ? preview != null : priceChanged;
+
+  /// A plan that reached its quit date cannot be kept as it is.
+  bool get canKeepCurrent => currentQuitDay.isAfter(today);
 
   bool get isSteep => PlanValidation.isSteep(draft);
 
