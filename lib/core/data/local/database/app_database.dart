@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:exhale/core/data/local/database/tables/habit_logs_table.dart';
+import 'package:exhale/core/data/local/database/tables/habit_prices_table.dart';
 import 'package:exhale/core/data/local/database/tables/habits_table.dart';
 import 'package:exhale/core/data/local/database/tables/plans_table.dart';
 import 'package:exhale/core/data/local/database/tables/settings_table.dart';
@@ -8,13 +9,13 @@ import 'package:path_provider/path_provider.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Habits, Plans, HabitLogs, Settings])
+@DriftDatabase(tables: [Habits, Plans, HabitLogs, Settings, HabitPrices])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
     : super(executor ?? _createConnection());
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -30,6 +31,19 @@ class AppDatabase extends _$AppDatabase {
       if (from == 8) {
         await migrator.addColumn(settings, settings.wakeMinute);
         await migrator.addColumn(settings, settings.bedMinute);
+      }
+      if (from < 10) {
+        await migrator.createTable(habitPrices);
+        await customStatement('''
+          INSERT INTO habit_prices (habit_id, from_day, price_cents,
+            units_per_container)
+          SELECT h.id,
+            COALESCE((SELECT MIN(p.start_day) FROM plans p
+                      WHERE p.habit_id = h.id),
+                     date(h.created_at, 'unixepoch', 'localtime')),
+            h.price_cents, h.units_per_container
+          FROM habits h WHERE h.price_cents IS NOT NULL
+        ''');
       }
       // drift writes the version only after the migration returns; writing it
       // here too keeps a kill in between from rerunning a finished step.

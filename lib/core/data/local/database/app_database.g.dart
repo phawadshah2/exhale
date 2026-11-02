@@ -2180,6 +2180,379 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
   }
 }
 
+class $HabitPricesTable extends HabitPrices
+    with TableInfo<$HabitPricesTable, HabitPriceRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HabitPricesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _habitIdMeta = const VerificationMeta(
+    'habitId',
+  );
+  @override
+  late final GeneratedColumn<int> habitId = GeneratedColumn<int>(
+    'habit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES habits (id)',
+    ),
+  );
+  static const VerificationMeta _fromDayMeta = const VerificationMeta(
+    'fromDay',
+  );
+  @override
+  late final GeneratedColumn<String> fromDay = GeneratedColumn<String>(
+    'from_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _priceCentsMeta = const VerificationMeta(
+    'priceCents',
+  );
+  @override
+  late final GeneratedColumn<int> priceCents = GeneratedColumn<int>(
+    'price_cents',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _unitsPerContainerMeta = const VerificationMeta(
+    'unitsPerContainer',
+  );
+  @override
+  late final GeneratedColumn<int> unitsPerContainer = GeneratedColumn<int>(
+    'units_per_container',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    habitId,
+    fromDay,
+    priceCents,
+    unitsPerContainer,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'habit_prices';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<HabitPriceRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('habit_id')) {
+      context.handle(
+        _habitIdMeta,
+        habitId.isAcceptableOrUnknown(data['habit_id']!, _habitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_habitIdMeta);
+    }
+    if (data.containsKey('from_day')) {
+      context.handle(
+        _fromDayMeta,
+        fromDay.isAcceptableOrUnknown(data['from_day']!, _fromDayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fromDayMeta);
+    }
+    if (data.containsKey('price_cents')) {
+      context.handle(
+        _priceCentsMeta,
+        priceCents.isAcceptableOrUnknown(data['price_cents']!, _priceCentsMeta),
+      );
+    }
+    if (data.containsKey('units_per_container')) {
+      context.handle(
+        _unitsPerContainerMeta,
+        unitsPerContainer.isAcceptableOrUnknown(
+          data['units_per_container']!,
+          _unitsPerContainerMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_unitsPerContainerMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {habitId, fromDay},
+  ];
+  @override
+  HabitPriceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HabitPriceRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      habitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}habit_id'],
+      )!,
+      fromDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}from_day'],
+      )!,
+      priceCents: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}price_cents'],
+      ),
+      unitsPerContainer: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}units_per_container'],
+      )!,
+    );
+  }
+
+  @override
+  $HabitPricesTable createAlias(String alias) {
+    return $HabitPricesTable(attachedDatabase, alias);
+  }
+}
+
+class HabitPriceRow extends DataClass implements Insertable<HabitPriceRow> {
+  final int id;
+  final int habitId;
+
+  /// LogicalDay in yyyy-mm-dd form; the price counts from this day.
+  final String fromDay;
+
+  /// Per container when the habit has one, else per unit. Null counts nothing
+  /// from this day until the next priced point.
+  final int? priceCents;
+  final int unitsPerContainer;
+  const HabitPriceRow({
+    required this.id,
+    required this.habitId,
+    required this.fromDay,
+    this.priceCents,
+    required this.unitsPerContainer,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['habit_id'] = Variable<int>(habitId);
+    map['from_day'] = Variable<String>(fromDay);
+    if (!nullToAbsent || priceCents != null) {
+      map['price_cents'] = Variable<int>(priceCents);
+    }
+    map['units_per_container'] = Variable<int>(unitsPerContainer);
+    return map;
+  }
+
+  HabitPricesCompanion toCompanion(bool nullToAbsent) {
+    return HabitPricesCompanion(
+      id: Value(id),
+      habitId: Value(habitId),
+      fromDay: Value(fromDay),
+      priceCents: priceCents == null && nullToAbsent
+          ? const Value.absent()
+          : Value(priceCents),
+      unitsPerContainer: Value(unitsPerContainer),
+    );
+  }
+
+  factory HabitPriceRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HabitPriceRow(
+      id: serializer.fromJson<int>(json['id']),
+      habitId: serializer.fromJson<int>(json['habitId']),
+      fromDay: serializer.fromJson<String>(json['fromDay']),
+      priceCents: serializer.fromJson<int?>(json['priceCents']),
+      unitsPerContainer: serializer.fromJson<int>(json['unitsPerContainer']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'habitId': serializer.toJson<int>(habitId),
+      'fromDay': serializer.toJson<String>(fromDay),
+      'priceCents': serializer.toJson<int?>(priceCents),
+      'unitsPerContainer': serializer.toJson<int>(unitsPerContainer),
+    };
+  }
+
+  HabitPriceRow copyWith({
+    int? id,
+    int? habitId,
+    String? fromDay,
+    Value<int?> priceCents = const Value.absent(),
+    int? unitsPerContainer,
+  }) => HabitPriceRow(
+    id: id ?? this.id,
+    habitId: habitId ?? this.habitId,
+    fromDay: fromDay ?? this.fromDay,
+    priceCents: priceCents.present ? priceCents.value : this.priceCents,
+    unitsPerContainer: unitsPerContainer ?? this.unitsPerContainer,
+  );
+  HabitPriceRow copyWithCompanion(HabitPricesCompanion data) {
+    return HabitPriceRow(
+      id: data.id.present ? data.id.value : this.id,
+      habitId: data.habitId.present ? data.habitId.value : this.habitId,
+      fromDay: data.fromDay.present ? data.fromDay.value : this.fromDay,
+      priceCents: data.priceCents.present
+          ? data.priceCents.value
+          : this.priceCents,
+      unitsPerContainer: data.unitsPerContainer.present
+          ? data.unitsPerContainer.value
+          : this.unitsPerContainer,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HabitPriceRow(')
+          ..write('id: $id, ')
+          ..write('habitId: $habitId, ')
+          ..write('fromDay: $fromDay, ')
+          ..write('priceCents: $priceCents, ')
+          ..write('unitsPerContainer: $unitsPerContainer')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, habitId, fromDay, priceCents, unitsPerContainer);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HabitPriceRow &&
+          other.id == this.id &&
+          other.habitId == this.habitId &&
+          other.fromDay == this.fromDay &&
+          other.priceCents == this.priceCents &&
+          other.unitsPerContainer == this.unitsPerContainer);
+}
+
+class HabitPricesCompanion extends UpdateCompanion<HabitPriceRow> {
+  final Value<int> id;
+  final Value<int> habitId;
+  final Value<String> fromDay;
+  final Value<int?> priceCents;
+  final Value<int> unitsPerContainer;
+  const HabitPricesCompanion({
+    this.id = const Value.absent(),
+    this.habitId = const Value.absent(),
+    this.fromDay = const Value.absent(),
+    this.priceCents = const Value.absent(),
+    this.unitsPerContainer = const Value.absent(),
+  });
+  HabitPricesCompanion.insert({
+    this.id = const Value.absent(),
+    required int habitId,
+    required String fromDay,
+    this.priceCents = const Value.absent(),
+    required int unitsPerContainer,
+  }) : habitId = Value(habitId),
+       fromDay = Value(fromDay),
+       unitsPerContainer = Value(unitsPerContainer);
+  static Insertable<HabitPriceRow> custom({
+    Expression<int>? id,
+    Expression<int>? habitId,
+    Expression<String>? fromDay,
+    Expression<int>? priceCents,
+    Expression<int>? unitsPerContainer,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (habitId != null) 'habit_id': habitId,
+      if (fromDay != null) 'from_day': fromDay,
+      if (priceCents != null) 'price_cents': priceCents,
+      if (unitsPerContainer != null) 'units_per_container': unitsPerContainer,
+    });
+  }
+
+  HabitPricesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? habitId,
+    Value<String>? fromDay,
+    Value<int?>? priceCents,
+    Value<int>? unitsPerContainer,
+  }) {
+    return HabitPricesCompanion(
+      id: id ?? this.id,
+      habitId: habitId ?? this.habitId,
+      fromDay: fromDay ?? this.fromDay,
+      priceCents: priceCents ?? this.priceCents,
+      unitsPerContainer: unitsPerContainer ?? this.unitsPerContainer,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (habitId.present) {
+      map['habit_id'] = Variable<int>(habitId.value);
+    }
+    if (fromDay.present) {
+      map['from_day'] = Variable<String>(fromDay.value);
+    }
+    if (priceCents.present) {
+      map['price_cents'] = Variable<int>(priceCents.value);
+    }
+    if (unitsPerContainer.present) {
+      map['units_per_container'] = Variable<int>(unitsPerContainer.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HabitPricesCompanion(')
+          ..write('id: $id, ')
+          ..write('habitId: $habitId, ')
+          ..write('fromDay: $fromDay, ')
+          ..write('priceCents: $priceCents, ')
+          ..write('unitsPerContainer: $unitsPerContainer')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2187,6 +2560,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PlansTable plans = $PlansTable(this);
   late final $HabitLogsTable habitLogs = $HabitLogsTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
+  late final $HabitPricesTable habitPrices = $HabitPricesTable(this);
   late final Index idxHabitLogsLoggedAt = Index(
     'idx_habit_logs_logged_at',
     'CREATE INDEX idx_habit_logs_logged_at ON habit_logs (logged_at)',
@@ -2204,6 +2578,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     plans,
     habitLogs,
     settings,
+    habitPrices,
     idxHabitLogsLoggedAt,
     idxHabitLogsHabitIdLoggedAt,
   ];
@@ -2270,6 +2645,24 @@ final class $$HabitsTableReferences
     ).filter((f) => f.habitId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_habitLogsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$HabitPricesTable, List<HabitPriceRow>>
+  _habitPricesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.habitPrices,
+    aliasName: 'habits__id__habit_prices__habit_id',
+  );
+
+  $$HabitPricesTableProcessedTableManager get habitPricesRefs {
+    final manager = $$HabitPricesTableTableManager(
+      $_db,
+      $_db.habitPrices,
+    ).filter((f) => f.habitId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_habitPricesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -2376,6 +2769,31 @@ class $$HabitsTableFilterComposer
           }) => $$HabitLogsTableFilterComposer(
             $db: $db,
             $table: $db.habitLogs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> habitPricesRefs(
+    Expression<bool> Function($$HabitPricesTableFilterComposer f) f,
+  ) {
+    final $$HabitPricesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.habitPrices,
+      getReferencedColumn: (t) => t.habitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HabitPricesTableFilterComposer(
+            $db: $db,
+            $table: $db.habitPrices,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2546,6 +2964,31 @@ class $$HabitsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> habitPricesRefs<T extends Object>(
+    Expression<T> Function($$HabitPricesTableAnnotationComposer a) f,
+  ) {
+    final $$HabitPricesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.habitPrices,
+      getReferencedColumn: (t) => t.habitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HabitPricesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.habitPrices,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$HabitsTableTableManager
@@ -2561,7 +3004,11 @@ class $$HabitsTableTableManager
           $$HabitsTableUpdateCompanionBuilder,
           (HabitRow, $$HabitsTableReferences),
           HabitRow,
-          PrefetchHooks Function({bool plansRefs, bool habitLogsRefs})
+          PrefetchHooks Function({
+            bool plansRefs,
+            bool habitLogsRefs,
+            bool habitPricesRefs,
+          })
         > {
   $$HabitsTableTableManager(_$AppDatabase db, $HabitsTable table)
     : super(
@@ -2630,47 +3077,85 @@ class $$HabitsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({plansRefs = false, habitLogsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (plansRefs) db.plans,
-                if (habitLogsRefs) db.habitLogs,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (plansRefs)
-                    await $_getPrefetchedData<HabitRow, $HabitsTable, PlanRow>(
-                      currentTable: table,
-                      referencedTable: $$HabitsTableReferences._plansRefsTable(
-                        db,
-                      ),
-                      managerFromTypedResult: (p0) =>
-                          $$HabitsTableReferences(db, table, p0).plansRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.habitId == item.id),
-                      typedResults: items,
-                    ),
-                  if (habitLogsRefs)
-                    await $_getPrefetchedData<
-                      HabitRow,
-                      $HabitsTable,
-                      HabitLogRow
-                    >(
-                      currentTable: table,
-                      referencedTable: $$HabitsTableReferences
-                          ._habitLogsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$HabitsTableReferences(db, table, p0).habitLogsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.habitId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({
+                plansRefs = false,
+                habitLogsRefs = false,
+                habitPricesRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (plansRefs) db.plans,
+                    if (habitLogsRefs) db.habitLogs,
+                    if (habitPricesRefs) db.habitPrices,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (plansRefs)
+                        await $_getPrefetchedData<
+                          HabitRow,
+                          $HabitsTable,
+                          PlanRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$HabitsTableReferences
+                              ._plansRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$HabitsTableReferences(db, table, p0).plansRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.habitId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (habitLogsRefs)
+                        await $_getPrefetchedData<
+                          HabitRow,
+                          $HabitsTable,
+                          HabitLogRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$HabitsTableReferences
+                              ._habitLogsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$HabitsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).habitLogsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.habitId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (habitPricesRefs)
+                        await $_getPrefetchedData<
+                          HabitRow,
+                          $HabitsTable,
+                          HabitPriceRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$HabitsTableReferences
+                              ._habitPricesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$HabitsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).habitPricesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.habitId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -2687,7 +3172,11 @@ typedef $$HabitsTableProcessedTableManager =
       $$HabitsTableUpdateCompanionBuilder,
       (HabitRow, $$HabitsTableReferences),
       HabitRow,
-      PrefetchHooks Function({bool plansRefs, bool habitLogsRefs})
+      PrefetchHooks Function({
+        bool plansRefs,
+        bool habitLogsRefs,
+        bool habitPricesRefs,
+      })
     >;
 typedef $$PlansTableCreateCompanionBuilder = PlansCompanion Function({
   Value<int> id,
@@ -3690,6 +4179,319 @@ typedef $$SettingsTableProcessedTableManager =
       SettingsRow,
       PrefetchHooks Function()
     >;
+typedef $$HabitPricesTableCreateCompanionBuilder =
+    HabitPricesCompanion Function({
+      Value<int> id,
+      required int habitId,
+      required String fromDay,
+      Value<int?> priceCents,
+      required int unitsPerContainer,
+    });
+typedef $$HabitPricesTableUpdateCompanionBuilder =
+    HabitPricesCompanion Function({
+      Value<int> id,
+      Value<int> habitId,
+      Value<String> fromDay,
+      Value<int?> priceCents,
+      Value<int> unitsPerContainer,
+    });
+
+final class $$HabitPricesTableReferences
+    extends BaseReferences<_$AppDatabase, $HabitPricesTable, HabitPriceRow> {
+  $$HabitPricesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $HabitsTable _habitIdTable(_$AppDatabase db) =>
+      db.habits.createAlias('habit_prices__habit_id__habits__id');
+
+  $$HabitsTableProcessedTableManager get habitId {
+    final $_column = $_itemColumn<int>('habit_id')!;
+
+    final manager = $$HabitsTableTableManager(
+      $_db,
+      $_db.habits,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_habitIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$HabitPricesTableFilterComposer
+    extends Composer<_$AppDatabase, $HabitPricesTable> {
+  $$HabitPricesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fromDay => $composableBuilder(
+    column: $table.fromDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get priceCents => $composableBuilder(
+    column: $table.priceCents,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get unitsPerContainer => $composableBuilder(
+    column: $table.unitsPerContainer,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$HabitsTableFilterComposer get habitId {
+    final $$HabitsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.habitId,
+      referencedTable: $db.habits,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HabitsTableFilterComposer(
+            $db: $db,
+            $table: $db.habits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$HabitPricesTableOrderingComposer
+    extends Composer<_$AppDatabase, $HabitPricesTable> {
+  $$HabitPricesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fromDay => $composableBuilder(
+    column: $table.fromDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get priceCents => $composableBuilder(
+    column: $table.priceCents,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get unitsPerContainer => $composableBuilder(
+    column: $table.unitsPerContainer,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$HabitsTableOrderingComposer get habitId {
+    final $$HabitsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.habitId,
+      referencedTable: $db.habits,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HabitsTableOrderingComposer(
+            $db: $db,
+            $table: $db.habits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$HabitPricesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HabitPricesTable> {
+  $$HabitPricesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get fromDay =>
+      $composableBuilder(column: $table.fromDay, builder: (column) => column);
+
+  GeneratedColumn<int> get priceCents => $composableBuilder(
+    column: $table.priceCents,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get unitsPerContainer => $composableBuilder(
+    column: $table.unitsPerContainer,
+    builder: (column) => column,
+  );
+
+  $$HabitsTableAnnotationComposer get habitId {
+    final $$HabitsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.habitId,
+      referencedTable: $db.habits,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HabitsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.habits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$HabitPricesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $HabitPricesTable,
+          HabitPriceRow,
+          $$HabitPricesTableFilterComposer,
+          $$HabitPricesTableOrderingComposer,
+          $$HabitPricesTableAnnotationComposer,
+          $$HabitPricesTableCreateCompanionBuilder,
+          $$HabitPricesTableUpdateCompanionBuilder,
+          (HabitPriceRow, $$HabitPricesTableReferences),
+          HabitPriceRow,
+          PrefetchHooks Function({bool habitId})
+        > {
+  $$HabitPricesTableTableManager(_$AppDatabase db, $HabitPricesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HabitPricesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HabitPricesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HabitPricesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> habitId = const Value.absent(),
+                Value<String> fromDay = const Value.absent(),
+                Value<int?> priceCents = const Value.absent(),
+                Value<int> unitsPerContainer = const Value.absent(),
+              }) => HabitPricesCompanion(
+                id: id,
+                habitId: habitId,
+                fromDay: fromDay,
+                priceCents: priceCents,
+                unitsPerContainer: unitsPerContainer,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int habitId,
+                required String fromDay,
+                Value<int?> priceCents = const Value.absent(),
+                required int unitsPerContainer,
+              }) => HabitPricesCompanion.insert(
+                id: id,
+                habitId: habitId,
+                fromDay: fromDay,
+                priceCents: priceCents,
+                unitsPerContainer: unitsPerContainer,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$HabitPricesTable, HabitPriceRow>(table),
+                  $$HabitPricesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({habitId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (habitId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.habitId,
+                        referencedTable: $$HabitPricesTableReferences
+                            ._habitIdTable(db),
+                        referencedColumn: $$HabitPricesTableReferences
+                            ._habitIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$HabitPricesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $HabitPricesTable,
+      HabitPriceRow,
+      $$HabitPricesTableFilterComposer,
+      $$HabitPricesTableOrderingComposer,
+      $$HabitPricesTableAnnotationComposer,
+      $$HabitPricesTableCreateCompanionBuilder,
+      $$HabitPricesTableUpdateCompanionBuilder,
+      (HabitPriceRow, $$HabitPricesTableReferences),
+      HabitPriceRow,
+      PrefetchHooks Function({bool habitId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3702,4 +4504,6 @@ class $AppDatabaseManager {
       $$HabitLogsTableTableManager(_db, _db.habitLogs);
   $$SettingsTableTableManager get settings =>
       $$SettingsTableTableManager(_db, _db.settings);
+  $$HabitPricesTableTableManager get habitPrices =>
+      $$HabitPricesTableTableManager(_db, _db.habitPrices);
 }

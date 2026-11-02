@@ -94,11 +94,11 @@ Future<Map<String, Object?>> _schema(AppDatabase db) async {
   };
 }
 
-/// Every upgrade ends on v9 with the fresh install's schema, consistent
-/// foreign keys and no moved columns left in settings.
+/// Every upgrade ends on the latest version with the fresh install's schema,
+/// consistent foreign keys and no moved columns left in settings.
 Future<void> _expectLatest(AppDatabase database) async {
   final [version] = await _rows(database, 'PRAGMA user_version');
-  expect(version.values.single, 9);
+  expect(version.values.single, database.schemaVersion);
   expect(await _rows(database, 'PRAGMA foreign_key_check'), isEmpty);
 
   final fresh = _open((_) {});
@@ -331,7 +331,7 @@ void main() {
       );
       tearDown(() => database.close());
 
-      test('ends on v9', () => _expectLatest(database));
+      test('ends on the latest version', () => _expectLatest(database));
 
       test('keeps settings; trigger prompt on', () async {
         final settings = await _settings(database);
@@ -382,7 +382,7 @@ void main() {
       );
       tearDown(() => database.close());
 
-      test('ends on v9', () => _expectLatest(database));
+      test('ends on the latest version', () => _expectLatest(database));
 
       test('keeps settings and trigger settings', () async {
         final settings = await _settings(database);
@@ -449,7 +449,7 @@ void main() {
     );
     tearDown(() => database.close());
 
-    test('ends on v9', () => _expectLatest(database));
+    test('ends on the latest version', () => _expectLatest(database));
 
     test('keeps settings; price and pack size move to habit 1', () async {
       expect((await _settings(database)).askForTrigger, isFalse);
@@ -462,6 +462,14 @@ void main() {
 
     test('moves its log to habit 1', () async {
       await _expectLegacyLogOnHabitOne(database);
+    });
+
+    test('the moved price gets a point on the first plan day', () async {
+      final rows = await _rows(database, 'SELECT * FROM habit_prices');
+      expect(rows.single['habit_id'], 1);
+      expect(rows.single['from_day'], '2026-10-16');
+      expect(rows.single['price_cents'], 900);
+      expect(rows.single['units_per_container'], 30);
     });
   });
 
@@ -507,7 +515,7 @@ void main() {
     );
     tearDown(() => database.close());
 
-    test('ends on v9', () => _expectLatest(database));
+    test('ends on the latest version', () => _expectLatest(database));
 
     test('the habit, reason and price move to habit 1', () async {
       final [habit] = await _activeHabits(database);
@@ -637,7 +645,7 @@ void main() {
       addTearDown(database.close);
     });
 
-    test('ends on v9', () => _expectLatest(database));
+    test('ends on the latest version', () => _expectLatest(database));
 
     test('keeps settings; wake and bed times start unset', () async {
       final settings = await _settings(database);
@@ -656,6 +664,70 @@ void main() {
       expect(plan.startDay, LogicalDay(2026, 10, 20));
       expect(plan.startLimit, 10);
       expect(plan.quitDay, LogicalDay(2026, 12, 1));
+    });
+  });
+
+  group('upgrade from v9', () {
+    AppDatabase openV9([void Function(sqlite.Database raw)? edit]) {
+      final dir = Directory.systemTemp.createTempSync('exhale_v9');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final file = File('test/fixtures/exhale_v9.sqlite')
+          .copySync('${dir.path}/exhale.sqlite');
+      if (edit != null) {
+        final raw = sqlite.sqlite3.open(file.path);
+        edit(raw);
+        raw.close();
+      }
+      driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+      final database = AppDatabase(NativeDatabase(file));
+      addTearDown(database.close);
+      return database;
+    }
+
+    test('ends on the latest version', () => _expectLatest(openV9()));
+
+    test('a priced habit gets one point on its first plan day', () async {
+      final rows = await _rows(openV9(), 'SELECT * FROM habit_prices');
+      expect(rows.single['habit_id'], 1);
+      expect(rows.single['from_day'], '2026-10-20');
+      expect(rows.single['price_cents'], 1500);
+      expect(rows.single['units_per_container'], 20);
+    });
+
+    test('a habit with no price gets no point', () async {
+      final database = openV9(
+        (raw) => raw.execute('UPDATE habits SET price_cents = NULL'),
+      );
+      expect(await _rows(database, 'SELECT * FROM habit_prices'), isEmpty);
+    });
+
+    test('several plans: the point is on the earliest', () async {
+      final database = openV9(
+        (raw) => raw.execute(
+          'INSERT INTO plans (habit_id, start_day, start_limit, quit_day) '
+          "VALUES (1, '2026-09-01', 12, '2026-10-19')",
+        ),
+      );
+      final rows = await _rows(database, 'SELECT * FROM habit_prices');
+      expect(rows.single['from_day'], '2026-09-01');
+    });
+
+    test('no plan: the point is on the local day it was created', () async {
+      final database = openV9((raw) {
+        raw
+          ..execute('DELETE FROM plans')
+          ..execute('UPDATE habits SET created_at = $_legacyLogSeconds');
+      });
+      final rows = await _rows(database, 'SELECT * FROM habit_prices');
+      expect(rows.single['from_day'], '2026-10-16');
+    });
+
+    test('keeps the habit and its plan', () async {
+      final database = openV9();
+      final [habit] = await _activeHabits(database);
+      expect(habit.priceCents, 1500);
+      final [plan] = (await _history(database, 1)).plans;
+      expect(plan.startDay, LogicalDay(2026, 10, 20));
     });
   });
 
@@ -687,7 +759,7 @@ void main() {
     ]);
   });
 
-  test('a fresh install creates v9 with no habit', () async {
+  test('a fresh install has the latest schema and no habit', () async {
     final database = _open((_) {});
     addTearDown(database.close);
 
