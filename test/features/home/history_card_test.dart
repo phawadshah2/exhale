@@ -146,8 +146,11 @@ void main() {
     await tester.tap(find.text('All triggers ›'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Logs'), findsOneWidget);
-    expect(find.text('16 logged'), findsOneWidget);
+    expect(find.text('The evidence.'), findsOneWidget);
+    expect(
+      find.text('16 / 45 (27 so far) allowed', findRichText: true),
+      findsOneWidget,
+    );
 
     await tester.disposeApp();
   });
@@ -160,8 +163,8 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Wednesday, Oct 14: 6 of 9'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Logs'), findsOneWidget);
-    expect(find.text('Wednesday, Oct 14'), findsOneWidget);
+    expect(find.text('The evidence.'), findsOneWidget);
+    expect(find.text('Wed, Oct 14'), findsOneWidget);
 
     await tester.disposeApp();
     semantics.dispose();
@@ -176,7 +179,13 @@ void main() {
     await tester.tap(find.textContaining('Work ·'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Logs'), findsOneWidget);
+    // Opens on today, which has no Work logs; Oct 14 has both.
+    expect(find.text('The evidence.'), findsOneWidget);
+    expect(find.text('No Work logs this day.'), findsOneWidget);
+
+    await tester.tap(find.byKey(ValueKey(LogicalDay(2026, 10, 14))));
+    await tester.pumpAndSettle();
+
     expect(find.byType(Dismissible), findsNWidgets(2));
 
     await tester.disposeApp();

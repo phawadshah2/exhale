@@ -1,5 +1,4 @@
 import 'package:exhale/core/domain/result/result.dart';
-import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
@@ -10,24 +9,22 @@ import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/circle_icon_button.dart';
 import 'package:exhale/core/widgets/load_failure.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
+import 'package:exhale/features/logs/domain/logs_selection.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/logs/presentation/providers/logs_providers.dart';
-import 'package:exhale/features/logs/presentation/widgets/day_group.dart';
-import 'package:exhale/features/logs/presentation/widgets/logs_day_card.dart';
-import 'package:exhale/features/logs/presentation/widgets/logs_period_card.dart';
+import 'package:exhale/features/logs/presentation/widgets/logs_calendar_card.dart';
+import 'package:exhale/features/logs/presentation/widgets/logs_rail_card.dart';
+import 'package:exhale/features/logs/presentation/widgets/logs_trigger_card.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
-import 'package:exhale/features/tracking/domain/entities/period_range.dart';
-import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
-import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
 import 'package:exhale/features/tracking/presentation/widgets/log_editor_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Every log of a habit, grouped by day, for a week, a range or one day.
+/// A habit's logs: pick a period and a day, and read that day's rail.
 class LogsPage extends ConsumerStatefulWidget {
   const LogsPage({required this.query, super.key});
 
@@ -38,33 +35,23 @@ class LogsPage extends ConsumerStatefulWidget {
 }
 
 class _LogsPageState extends ConsumerState<LogsPage> {
-  late PeriodRange _range;
-  late bool _weekly;
-  Trigger? _trigger;
+  late LogsSelection _selection;
 
-  bool get _singleDay => _range.from == _range.to;
+  /// The last selection with its data. A new period takes a moment to load,
+  /// and this stays up until it has, rather than a spinner for a frame.
+  ({LogsSelection selection, LogsView view})? _shown;
 
   @override
   void initState() {
     super.initState();
-    final query = widget.query;
-    final from = query.from;
-    final to = query.to;
-    _range = from != null && to != null
-        ? PeriodRange(from, to)
-        : PeriodRange.weekOf(ref.read(todayProvider));
-    _weekly = _range == PeriodRange.weekOf(_range.from);
-    _trigger = query.trigger;
+    _selection = LogsSelection.fromQuery(
+      widget.query,
+      today: ref.read(todayProvider),
+    );
   }
 
-  void _step(int weeks) => setState(
-    () => _range = PeriodRange.weekOf(_range.from.addDays(7 * weeks)),
-  );
-
-  void _clearDay() => setState(() {
-    _range = PeriodRange.weekOf(_range.from);
-    _weekly = true;
-  });
+  void _change(LogsSelection selection) =>
+      setState(() => _selection = selection);
 
   Future<void> _delete(int habitId, HabitLog log) async {
     final unit = ref.read(habitProvider(habitId))?.habit.unit ?? 'log';
@@ -107,14 +94,15 @@ class _LogsPageState extends ConsumerState<LogsPage> {
   @override
   Widget build(BuildContext context) {
     final habitId = widget.query.habitId ?? ref.watch(primaryHabitProvider)?.id;
-    final habit = habitId == null
-        ? null
-        : ref.watch(habitProvider(habitId))?.habit;
     final today = ref.watch(todayProvider);
-    final view = habitId == null
-        ? null
-        : ref.watch(logsViewProvider((habitId: habitId, range: _range)));
-    final addDay = _range.to.isAfter(today) ? today : _range.to;
+    final range = _selection.period;
+    if (habitId != null) {
+      final view = ref.watch(
+        logsViewProvider((habitId: habitId, range: range)),
+      );
+      if (view != null) _shown = (selection: _selection, view: view);
+    }
+    final shown = _shown;
     final earliest = habitId == null
         ? today
         : ref.watch(earliestDayProvider(habitId));
@@ -123,7 +111,7 @@ class _LogsPageState extends ConsumerState<LogsPage> {
         (habitId != null &&
             (ref
                     .watch(
-                      logsInRangeProvider((habitId: habitId, range: _range)),
+                      logsInRangeProvider((habitId: habitId, range: range)),
                     )
                     .failedToLoad ||
                 ref.watch(planHistoryProvider(habitId)).failedToLoad));
@@ -136,29 +124,22 @@ class _LogsPageState extends ConsumerState<LogsPage> {
               padding: AppSpacing.page.copyWith(top: AppSpacing.sm),
               sliver: SliverToBoxAdapter(
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CircleIconButton(
                       tooltip: 'Back',
                       icon: AppIcons.back,
                       onPressed: () => context.pop(),
                     ),
-                    Expanded(
-                      child: Text(
-                        'Logs',
-                        textAlign: TextAlign.center,
-                        style: context.textTheme.titleLarge,
-                      ),
-                    ),
                     CircleIconButton(
                       tooltip: 'Add a missed log',
                       icon: AppIcons.add,
-                      accent: true,
                       onPressed: habitId == null
                           ? null
                           : () => showLogEditorSheet(
                               context,
                               habitId: habitId,
-                              day: addDay,
+                              day: _selection.selected,
                             ),
                     ),
                   ],
@@ -175,88 +156,55 @@ class _LogsPageState extends ConsumerState<LogsPage> {
                     if (habitId == null) return;
                     ref
                       ..invalidate(
-                        logsInRangeProvider((habitId: habitId, range: _range)),
+                        logsInRangeProvider((habitId: habitId, range: range)),
                       )
                       ..invalidate(planHistoryProvider(habitId));
                   },
                 ),
               )
-            else if (view == null || habit == null || habitId == null)
+            else if (shown == null || habitId == null)
               const SliverFillRemaining(
                 hasScrollBody: false,
                 child: Center(child: CircularProgressIndicator.adaptive()),
               )
             else
               SliverPadding(
-                padding: AppSpacing.page.copyWith(bottom: AppSpacing.xl),
+                padding: AppSpacing.page.copyWith(
+                  top: AppSpacing.md,
+                  bottom: AppSpacing.xl,
+                ),
                 sliver: SliverList.list(
                   children: [
-                    if (_singleDay || _trigger != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                        child: Wrap(
-                          spacing: AppSpacing.sm,
-                          runSpacing: AppSpacing.sm,
-                          children: [
-                            if (_singleDay)
-                              _FilterChip(
-                                label: AppFormat.shortWeekdayDate(_range.from),
-                                removeTooltip: 'Remove day filter',
-                                onRemove: _clearDay,
-                              ),
-                            if (_trigger case final trigger?)
-                              _FilterChip(
-                                label: trigger.label,
-                                removeTooltip: 'Remove ${trigger.label} filter',
-                                onRemove: () => setState(() => _trigger = null),
-                              ),
-                          ],
-                        ),
-                      ),
-                    if (_singleDay && view.days.isNotEmpty)
-                      LogsDayCard(
-                        entry: view.days.first,
-                        today: today,
-                        habit: habit,
-                        trigger: _trigger,
-                      )
-                    else
-                      LogsPeriodCard(
-                        view: view,
-                        range: _range,
-                        today: today,
-                        weekly: _weekly,
-                        trigger: _trigger,
-                        onPrevious: _range.from.isAfter(earliest)
-                            ? () => _step(-1)
-                            : null,
-                        onNext: _range.to.isBefore(today)
-                            ? () => _step(1)
-                            : null,
-                        onTrigger: (trigger) =>
-                            setState(() => _trigger = trigger),
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.md,
-                      ),
-                      child: Text(
-                        'Newest first',
-                        style: context.textTheme.bodySmall?.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
+                    const _Header(),
+                    const SizedBox(height: AppSpacing.md),
+                    LogsCalendarCard(
+                      selection: shown.selection,
+                      view: shown.view,
+                      today: today,
+                      earliest: earliest,
+                      onChanged: _change,
                     ),
-                    ..._groups(view, habitId, today),
-                    Padding(
-                      padding: const EdgeInsets.only(top: AppSpacing.sm),
-                      child: Text(
-                        'Tap a log to edit · swipe left to delete',
-                        textAlign: TextAlign.center,
-                        style: context.textTheme.bodySmall?.copyWith(
-                          color: context.colors.onSurfaceVariant,
-                        ),
+                    const SizedBox(height: AppSpacing.md),
+                    LogsTriggerCard(
+                      selection: shown.selection,
+                      view: shown.view,
+                      today: today,
+                      onTrigger: (trigger) =>
+                          _change(shown.selection.toggleTrigger(trigger)),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    LogsRailCard(
+                      habitId: habitId,
+                      selection: shown.selection,
+                      view: shown.view,
+                      today: today,
+                      onEdit: (log) => showLogEditorSheet(
+                        context,
+                        habitId: habitId,
+                        day: shown.selection.selected,
+                        log: log,
                       ),
+                      onDelete: (log) => _delete(habitId, log),
                     ),
                   ],
                 ),
@@ -266,108 +214,26 @@ class _LogsPageState extends ConsumerState<LogsPage> {
       ),
     );
   }
-
-  List<Widget> _groups(LogsView view, int habitId, LogicalDay today) {
-    final trigger = _trigger;
-    final groups = <Widget>[];
-    for (final entry in view.days) {
-      final rows = trigger == null
-          ? entry.logs
-          : entry.logs.where((log) => log.trigger == trigger).toList();
-      if (trigger != null && rows.isEmpty) continue;
-      groups.add(
-        Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.md),
-          child: DayGroup(
-            key: ValueKey(entry.day),
-            entry: entry,
-            rows: rows,
-            today: today,
-            onAdd: () =>
-                showLogEditorSheet(context, habitId: habitId, day: entry.day),
-            onEdit: (log) => showLogEditorSheet(
-              context,
-              habitId: habitId,
-              day: entry.day,
-              log: log,
-            ),
-            onDelete: (log) => _delete(habitId, log),
-          ),
-        ),
-      );
-    }
-    if (groups.isEmpty) {
-      groups.add(
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
-          child: Text(
-            'No logs match.',
-            textAlign: TextAlign.center,
-            style: context.textTheme.bodyLarge?.copyWith(
-              color: context.colors.onSurfaceVariant,
-            ),
-          ),
-        ),
-      );
-    }
-    return groups;
-  }
 }
 
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({
-    required this.label,
-    required this.removeTooltip,
-    required this.onRemove,
-  });
-
-  final String label;
-  final String removeTooltip;
-  final VoidCallback onRemove;
+class _Header extends StatelessWidget {
+  const _Header();
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    return Tooltip(
-      message: removeTooltip,
-      child: GestureDetector(
-        onTap: onRemove,
-        behavior: HitTestBehavior.opaque,
-        // The pill stays small; the touch is 44 pt.
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 44),
-          child: Center(
-            widthFactor: 1,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: ShapeDecoration(
-                color: colors.primary.withValues(alpha: 0.14),
-                shape: StadiumBorder(
-                  side: BorderSide(
-                    color: colors.primary.withValues(alpha: 0.45),
-                  ),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 6,
-                children: [
-                  Flexible(
-                    child: Text(
-                      label,
-                      style: context.textTheme.labelMedium?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  Icon(AppIcons.close, size: 12, color: colors.onSurface),
-                ],
-              ),
-            ),
+    final text = context.textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: AppSpacing.xs,
+      children: [
+        Text('The evidence.', style: text.headlineLarge),
+        Text(
+          'You logged it, so it counts. Pick a day, any day.',
+          style: text.bodyMedium?.copyWith(
+            color: context.colors.onSurfaceVariant,
           ),
         ),
-      ),
+      ],
     );
   }
 }

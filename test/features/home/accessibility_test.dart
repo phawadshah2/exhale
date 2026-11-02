@@ -116,7 +116,7 @@ void main() {
             ),
           );
           await tester.pumpAndSettle();
-          expect(find.text('Logs'), findsOneWidget);
+          expect(find.text('The evidence.'), findsOneWidget);
           await expectGuidelines(tester, handle);
         });
 

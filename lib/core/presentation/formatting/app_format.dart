@@ -24,8 +24,10 @@ abstract final class AppFormat {
       : '${monthDay(from)} – ${monthDay(to)}';
 
   /// October 2026
-  static String monthYear(LogicalDay day) =>
-      '${_fullMonths[day.month - 1]} ${day.year}';
+  static String monthYear(LogicalDay day) => '${month(day)} ${day.year}';
+
+  /// October
+  static String month(LogicalDay day) => _fullMonths[day.month - 1];
 
   static const _fullMonths = [
     'January', 'February', 'March', 'April', 'May', 'June', //

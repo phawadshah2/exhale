@@ -235,8 +235,10 @@ void main() {
       ),
     );
 
-    expect(find.text('Logs'), findsOneWidget);
-    expect(find.text('2 of 3 logs today · 67%'), findsOneWidget);
+    expect(find.text('The evidence.'), findsOneWidget);
+    expect(find.text('Stress 2'), findsOneWidget);
+    expect(find.text('3 of 9 · 6 left'), findsOneWidget);
+    expect(find.byType(Dismissible), findsNWidgets(2));
 
     await tester.disposeApp();
   });

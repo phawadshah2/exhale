@@ -239,7 +239,9 @@ class _RingPainter extends CustomPainter {
 
 /// The colour key under the calendar.
 class MonthRingKey extends StatelessWidget {
-  const MonthRingKey({super.key});
+  const MonthRingKey({this.showBeforePlan = true, super.key});
+
+  final bool showBeforePlan;
 
   @override
   Widget build(BuildContext context) {
@@ -270,7 +272,8 @@ class MonthRingKey extends StatelessWidget {
         item('Under', LimitStatus.under.barColor(context)),
         item('At limit', LimitStatus.at.barColor(context)),
         item('Over', LimitStatus.over.barColor(context)),
-        item('Before plan', colors.outlineVariant, ring: true),
+        if (showBeforePlan)
+          item('Before plan', colors.outlineVariant, ring: true),
       ],
     );
   }

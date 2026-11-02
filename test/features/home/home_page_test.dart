@@ -225,7 +225,7 @@ void main() {
       LogsQuery(habitId: 1, from: today, to: today),
     );
     await tester.pumpAndSettle();
-    GoRouter.of(tester.element(find.text('Logs'))).pop();
+    GoRouter.of(tester.element(find.text('The evidence.'))).pop();
     await tester.pumpAndSettle();
 
     expect(
@@ -354,15 +354,15 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Logs'), findsOneWidget);
-    expect(find.text('2 logged'), findsOneWidget);
+    expect(find.text('The evidence.'), findsOneWidget);
+    expect(find.text('2 of 9'), findsOneWidget);
 
     await tester.drag(find.byType(Dismissible).first, const Offset(-500, 0));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Delete').last);
     await tester.pumpAndSettle();
 
-    expect(find.text('1 logged'), findsOneWidget);
+    expect(find.text('1 of 9'), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -389,7 +389,7 @@ void main() {
     await tester.scrollAndTap(find.text('Add log'));
     await tester.pumpAndSettle();
 
-    expect(find.text('2 logged'), findsOneWidget);
+    expect(find.text('2 of 9'), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -740,7 +740,7 @@ void main() {
     await tester.scrollAndTap(find.text('+1 more today'));
     await tester.pumpAndSettle();
     expect(find.text('9:00 AM'), findsOneWidget);
-    expect(find.text('Logs'), findsNothing);
+    expect(find.text('The evidence.'), findsNothing);
 
     await tester.scrollAndTap(find.text('Show less'));
     await tester.pumpAndSettle();
@@ -750,10 +750,9 @@ void main() {
     await tester.scrollAndTap(find.text('See all logs'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Logs'), findsOneWidget);
+    expect(find.text('The evidence.'), findsOneWidget);
     expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
-    expect(find.byType(Dismissible), findsNWidgets(3));
-    expect(find.text('Show 1 more'), findsOneWidget);
+    expect(find.byType(Dismissible), findsNWidgets(4));
 
     await tester.disposeApp();
   });
