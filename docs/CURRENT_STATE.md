@@ -1,24 +1,37 @@
 # Current state
 
 Updated 2026-11-02. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
-(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 8 of 20 are done. The first
+(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 9 of 20 are done. The first
 release tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled
 compare link.
 
 Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
 pass. CI on PR #28 was not read.
 
-Checks at e32e0b1, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 902
-passed. None of Tasks 1 to 8 has been seen on a simulator. Nothing on this branch is pushed.
+Checks at 3083f1b, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 936
+passed. None of Tasks 1 to 9 has been seen on a simulator. Nothing on this branch is pushed.
 
-**Next action (Sonnet 5.5 medium):** build Task 9 (`LogsSelection`) of
+**Next action (Sonnet 5.5 medium):** build Task 10 (`DayRail`) of
 `docs/superpowers/plans/2026-11-02-plan-and-stages.md` with `superpowers:executing-plans`, on
-`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 9, section 5 of
+`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 10, section 5.5 of
 `docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, frame T
 (`design/8._plan_edit_logs/`), and the ledger
 `.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`, which holds the rulings and says which
 pre-flight rows are still to do. The M6 and M7 reviews (Tasks 12 and 20) are Opus 5.5 high. The real
 iPhone pass stays pending and must include these screens.
+
+**Task 9 done (3083f1b, 2026-11-02):** `LogsSelection` in `lib/features/logs/domain/logs_selection.dart`:
+opening from a `LogsQuery`, `step`, `withMode`, `pickMonth`, `select`, `toggleTrigger`, and the arrows'
+limits. No screen reads it yet.
+
+Rulings (ledger): a range ending after today opens on today's period, and a step stops there. Seven days
+that aren't Monday to Sunday open as a Month. A Month opens on its last day even when the range ended
+earlier in it, as spec 5.1 reads. `select` outside the shown period moves the period. `LogsMode` carries its
+`ChartPeriod`. `domain` imports `LogsQuery` from `presentation`, as the plan's interface says.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 936 passed. Red seen on
+assertions against a stub for all 34 new tests. Left open past the reset hour is tested on the selection
+only; Task 11 tests it on the page. Not seen on a simulator.
 
 **Task 8 done (e32e0b1, 2026-11-02):** Edit plan is frame N: `LimitDial`, `QuitRuler`, the chips,
 `PlanPreviewCard`, `PriceCard`, and Your why and Change habit as outlined buttons. Your why is
