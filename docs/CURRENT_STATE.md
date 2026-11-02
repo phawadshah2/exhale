@@ -1,24 +1,46 @@
 # Current state
 
 Updated 2026-11-02. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
-(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 3 of 20 are done. The first
+(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 4 of 20 are done. The first
 release tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled
 compare link.
 
 Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
 pass. CI on PR #28 was not read.
 
-Checks at d2bb095, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 759
-passed. Not run at this handoff (docs only). No screen shows Tasks 1 to 3's work beyond Home's money
-saved, and none of it has been seen on a simulator. Nothing on this branch is pushed.
+Checks at f333ce5, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 793
+passed. None of Tasks 1 to 4 has been seen on a simulator. Nothing on this branch is pushed.
 
-**Next action (Sonnet 5.5 medium):** build Task 4 (Plan details page) of
+**Next action (Sonnet 5.5 medium):** build Task 5 (the current stage) of
 `docs/superpowers/plans/2026-11-02-plan-and-stages.md` with `superpowers:executing-plans`, on
-`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 4, sections 3.1 to 3.8 of
-`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, and the ledger
+`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 5, section 3.6 of
+`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, frames Y and Z, and the ledger
 `.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`, which holds the rulings and says which
 pre-flight rows are still to do. The M6 and M7 reviews (Tasks 12 and 20) are Opus 5.5 high. The real
 iPhone pass stays pending and must include these screens.
+
+**Task 4 done (f333ce5, 2026-11-02):** tapping Home's plan card opens `PlanDetailsPage`
+(`/habit/:habitId/stages`): the whole plan's tiles, BEHIND YOU with earlier-plan labels, YOU, AHEAD OF
+YOU, the finish row, and "You made it. Regrettably." from the quit date. `planReportProvider` combines
+the plan, price and log streams. Stage rows open independently. The current stage shows only its header
+(`_CurrentStageHeader`) until Task 5. `StageReport.toAvoid` is new. Logs' button is now
+`CircleIconButton` and Home's pill is `EditPill`, both shared.
+
+Rulings (ledger): the title is capped at 1.5× text, because "Regrettably." doesn't fit at 200% on an SE
+width. At large text a row's money joins the text column and a section header stacks. A one-day stage
+reads "Oct 8".
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 793 passed, including
+Plan details in `accessibility_test` for every theme and accent. Red seen on assertions: `toAvoid`, one
+entry test against an empty page, the title at 200%, and the plan card's unlabelled tap node (six
+`accessibility_test` failures). The other page tests were written before the code, but the run against
+the stub was stopped because each failure waits out its timeout, so they were not seen failing. No test:
+the one-day range, side money floored at 0, the haptics. Not seen on a simulator, so how the page matches
+frame K is unchecked.
+
+Read from the code, not run: with the page open across the reset hour, the logs' key changes, so a
+spinner shows briefly and open stages close. For Fawad: Home's Avoided tile truncates ("7360 sess…") at
+200% on an SE width at 80 a day; not caused by this and not fixed.
 
 Fawad approved both specs (the other is `2026-11-02-stage-management-design.md`) and the plan (20
 tasks, milestones M6 and M7). Spec section 8 lists Claude's calls, which he can still reverse.
