@@ -1,17 +1,16 @@
 # Current state
 
-Updated 2026-11-02. Goal: release candidate, M5 of
-`docs/superpowers/plans/2026-10-21-home-details-logs-roadmap.md`. The first release
-tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a
-prefilled compare link.
+Updated 2026-11-02. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
+(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 3 of 20 are done. The first
+release tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled
+compare link.
 
-**M5 is done on `feat/launch-states` (head 1b21134) except the real iPhone pass.**
-Tasks 5.1 to 5.3, the independent review (0541760..43131f4, verdict "With fixes") and
-all its fixes are committed. PR #27 (up to fefc700) and PR #28 (up to 1b21134) are merged to
-`main` (51e0bc6, same tree as 1b21134), which local `main` now matches.
+Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
+pass. CI on PR #28 was not read.
 
-Checks at 56ddde4, the last code commit: format clean, `analyze --fatal-infos` clean, full
-suite 680 passed. Not run at this handoff (docs only). CI on PR #28 was not read.
+Checks at d2bb095, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 759
+passed. Not run at this handoff (docs only). No screen shows Tasks 1 to 3's work beyond Home's money
+saved, and none of it has been seen on a simulator. Nothing on this branch is pushed.
 
 **Next action (Sonnet 5.5 medium):** build Task 4 (Plan details page) of
 `docs/superpowers/plans/2026-11-02-plan-and-stages.md` with `superpowers:executing-plans`, on
@@ -26,7 +25,7 @@ tasks, milestones M6 and M7). Spec section 8 lists Claude's calls, which he can 
 
 **Task 1 done (c44c839, 2026-11-02):** `habit_prices` table at schema v10; the migration gives each
 priced habit one point on its earliest plan day, or the local day it was created when it has no
-plan. Nothing reads or writes the table yet. Added beyond the plan's two tests: earliest of several
+plan. Added beyond the plan's two tests: earliest of several
 plans, no plan, and a v5 upgrade reaching the point. Checks observed by me: new tests red on
 `no such table: habit_prices`, not on an assertion; format clean, `analyze --fatal-infos` clean, full
 suite 687 passed. Not seen on a simulator, and CI not run (local only).
