@@ -13,9 +13,9 @@ all its fixes are committed. PR #27 (up to fefc700) and PR #28 (up to 1b21134) a
 Checks at 56ddde4, the last code commit: format clean, `analyze --fatal-infos` clean, full
 suite 680 passed. Not run at this handoff (docs only). CI on PR #28 was not read.
 
-**Next action (Sonnet 5.5 medium):** build Task 3 (`PlanReport`) of
+**Next action (Sonnet 5.5 medium):** build Task 4 (Plan details page) of
 `docs/superpowers/plans/2026-11-02-plan-and-stages.md` with `superpowers:executing-plans`, on
-`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 3, section 3 of
+`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 4, sections 3.1 to 3.8 of
 `docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, and the ledger
 `.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`, which holds the rulings and says which
 pre-flight rows are still to do. The M6 and M7 reviews (Tasks 12 and 20) are Opus 5.5 high. The real
@@ -46,6 +46,19 @@ three `homeStats` tests that depend on per-day pricing, and, by breaking the fin
 `setPrice`, `StartTracking` and Edit plan's write order. Not seen failing: a failed price write in
 Edit plan has no test, and neither does `priceHistoryProvider` alone (Home's test goes through it).
 Not seen on a simulator.
+
+**Task 3 done (d2bb095, 2026-11-02):** `PlanReport.build` in
+`lib/features/plan/domain/services/plan_report.dart`: totals, stages behind by plan, current, ahead and
+notes. No screen reads it yet. Frame K's 546, 462, $184.80 and 1,008 come out as the spec says. On K's
+data used is 256, avoided 37, saved $14.80 and kept 19 of 24; the spec already says these won't match
+K's samples.
+
+Rulings (ledger): from the quit date, or with days between two plans, the money tile can exceed BEHIND
+YOU's side text, because days with no stage still count on Home; the spec's sum holds while a plan runs.
+`build` is a factory, not a static method, for the lint; callers read the same. Checks observed by me:
+red on assertions against an empty builder, the note order also by swapping it on purpose; format
+clean, `analyze --fatal-infos` clean, full suite 759 passed. The two no-money tests that pass on an
+empty builder were not seen failing.
 
 State: `feat/plan-and-stages` is from `origin/main` (51e0bc6), local only. Left uncommitted on
 purpose: `design/all-designs.html` (6.7 MB) and `design/figma-import/` (3 MB, temporary).
