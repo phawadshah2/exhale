@@ -1,25 +1,42 @@
 # Current state
 
 Updated 2026-11-02. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
-(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 10 of 20 are done. The first
+(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 11 of 20 are done. The first
 release tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled
 compare link.
 
 Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
 pass. CI on PR #28 was not read.
 
-Checks at a2be2be, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 968
-passed. None of Tasks 1 to 10 has been seen on a simulator. Nothing on this branch is pushed.
+Checks at 33bdb78, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 1013
+passed. None of Tasks 1 to 11 has been seen on a simulator. Nothing on this branch is pushed.
 
-**Next action (Sonnet 5.5 medium):** build Task 11 (Logs page) of
-`docs/superpowers/plans/2026-11-02-plan-and-stages.md` with `superpowers:executing-plans`, on
-`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 11, section 5 of
-`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, frame T
-(`design/8._plan_edit_logs/LogsCombined.dc.html`), and the ledger
-`.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`, whose pre-flight rows for Task 11 name what
-to handle: a selected day missing from `LogsView.days`, `LogsDay.logs` being newest first, and the
-trigger bar's plan-days question. The M6 and M7 reviews (Tasks 12 and 20) are Opus 5.5 high. The real
-iPhone pass stays pending and must include these screens.
+**Next action (Opus 5.5 high, fresh session):** Task 12, the independent M6 review, in
+`docs/superpowers/plans/2026-11-02-plan-and-stages.md`. Read `docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`
+and the diff from `51e0bc6`, plus the `Ruling:` lines in
+`.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`. Focus: the price rules, `PlanReport` against
+Home, the price-only save, and Logs' query mapping. Fix findings, each seen red first where a test can
+show it. Then ask Fawad for the simulator walk in the plan's Step 3. The M7 review (Task 20) is also Opus
+5.5 high. The real iPhone pass stays pending and must include these screens.
+
+**Task 11 done (33bdb78, 2026-11-02):** Logs is frame T: `LogsCalendarCard`, `LogsTriggerCard` and
+`LogsRailCard`, read from `LogsSelection` and `DayRail`. `LogsPeriodCard`, `LogsDayCard` and `DayGroup` are
+gone. `LogsView` gains `hasPlanDays` and `dayOf`.
+
+Rulings (ledger): the bar and chips count plan days only, so a before-plan period's logs can't be filtered
+from a chip. The page keeps the last period up until a new one loads, rather than a spinner. Frame T and the
+spec differ twice, and the spec won: a gap reads "1 h 47 min", and today at its limit reads "0 left" in
+success colour. A selected chip fills with `textTint`. The swipe shows only the icon. A note shows whole. The
+weekday header stops scaling at 1.5×.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 1013 passed, including Logs in
+`accessibility_test` for every theme and accent, with logs that have no trigger. Red seen on assertions
+against the old page for the first 17 tests, including the calendar's cells, then that run was stopped because
+one test hung; the period card, trigger, day card and rail tests were not seen failing that way. Also seen
+failing: both reset-hour tests with the selection broken on purpose, and VoiceOver's row label before it
+became a container. No test: the old period staying up while one loads, how the slots and rail lines are
+painted, a selected chip's contrast. Not seen on a simulator, so how the page matches frame T and how the
+swipe feels are unchecked.
 
 **Task 10 done (a2be2be, 2026-11-02):** `DayRail.build` in `lib/features/logs/domain/day_rail.dart` turns
 a day's logs into the rail's ordered entries. `PaceGuide.onDay` is public. No screen reads it yet.
