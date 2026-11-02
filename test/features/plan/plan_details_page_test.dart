@@ -5,6 +5,7 @@ import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/fill_in.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
@@ -13,6 +14,7 @@ import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/repositories/plan_repository.dart';
 import 'package:exhale/features/plan/presentation/pages/plan_details_page.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
+import 'package:exhale/features/plan/presentation/widgets/current_stage_card.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
@@ -524,6 +526,262 @@ void main() {
     });
   });
 
+  group('the current stage', () {
+    final stageStart = LogicalDay(2026, 10, 25);
+
+    /// 2 a day for [days], then 1 a day for [days]. Today is day 8.
+    Future<void> seedStage(int days) => seedHabit(
+      PlanDraft(
+        startDay: stageStart,
+        startLimit: 2,
+        quitDay: stageStart.addDays(days * 2),
+      ),
+      habit: Habit.vaping,
+      priceCents: 800,
+    );
+
+    Future<void> logResults() async {
+      await logOn(stageStart, times: 3);
+      await logOn(stageStart.addDays(1), times: 2);
+      await logOn(stageStart.addDays(2));
+      await logOn(today);
+    }
+
+    Finder ringAt(int index) => find.byType(StageDayRing).at(index);
+
+    StageRingPainter dayPainter(WidgetTester tester, int index) =>
+        tester
+                .widget<CustomPaint>(
+                  find.descendant(
+                    of: ringAt(index),
+                    matching: find.byType(CustomPaint),
+                  ),
+                )
+                .painter!
+            as StageRingPainter;
+
+    testWidgets('14 days shows a ring per day, coloured by result', (
+      tester,
+    ) async {
+      await seedStage(14);
+      await logResults();
+      await openDetails(tester);
+
+      expect(find.byType(StageDayRing), findsNWidgets(14));
+      expect(find.text('Each dot is a day'), findsNothing);
+      expect(find.text('Oct 25 – Nov 7 · day 8 of 14'), findsOneWidget);
+
+      final context = tester.element(find.byType(StageDayRing).first);
+      final over = dayPainter(tester, 0);
+      expect(over.color, context.exhale.danger.solid);
+      expect(over.fill, 1);
+      expect(
+        find.descendant(of: ringAt(0), matching: find.text('3')),
+        findsOneWidget,
+      );
+      expect(dayPainter(tester, 1).color, context.exhale.warning.solid);
+      final under = dayPainter(tester, 2);
+      expect(under.color, context.colors.primaryContainer);
+      expect(under.fill, 0.5);
+      await tester.disposeApp();
+    });
+
+    testWidgets('today stands out and is coloured the same way', (
+      tester,
+    ) async {
+      await seedStage(14);
+      await logResults();
+      await openDetails(tester);
+
+      final context = tester.element(find.byType(StageDayRing).first);
+      expect(dayPainter(tester, 7).color, context.colors.primaryContainer);
+      expect(dayPainter(tester, 7).dashed, isFalse);
+      expect(tester.widget<StageDayRing>(ringAt(7)).isToday, isTrue);
+      expect(tester.widget<StageDayRing>(ringAt(6)).isToday, isFalse);
+
+      final weekday = find.descendant(
+        of: ringAt(7),
+        matching: find.text('Sun'),
+      );
+      expect(tester.widget<Text>(weekday).style?.fontWeight, FontWeight.w800);
+      await tester.disposeApp();
+    });
+
+    testWidgets('a day ahead has a dashed track and its limit inside', (
+      tester,
+    ) async {
+      await seedStage(14);
+      await logResults();
+      await openDetails(tester);
+
+      final ahead = dayPainter(tester, 8);
+      expect(ahead.dashed, isTrue);
+      expect(ahead.fill, 0);
+      expect(
+        find.descendant(of: ringAt(8), matching: find.text('2')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: ringAt(8), matching: find.text('Mon')),
+        findsOneWidget,
+      );
+      await tester.disposeApp();
+    });
+
+    testWidgets('15 days shows a dot per day and both dates', (tester) async {
+      await seedStage(15);
+      await logResults();
+      await openDetails(tester);
+
+      expect(find.byType(StageDayRing), findsNothing);
+      expect(find.text('Each dot is a day'), findsOneWidget);
+      expect(find.text('Oct 25'), findsOneWidget);
+      expect(find.text('Nov 8'), findsOneWidget);
+
+      final painter =
+          tester
+                  .widget<CustomPaint>(
+                    find.byWidgetPredicate(
+                      (widget) =>
+                          widget is CustomPaint &&
+                          widget.painter is DayDotsPainter,
+                    ),
+                  )
+                  .painter!
+              as DayDotsPainter;
+      expect(painter.dots, hasLength(15));
+      expect(painter.dots[0], DayDot.over);
+      expect(painter.dots[1], DayDot.atLimit);
+      expect(painter.dots[2], DayDot.under);
+      expect(painter.dots[3], DayDot.under);
+      expect(painter.dots[7], DayDot.today);
+      expect(painter.dots[8], DayDot.ahead);
+      expect(painter.layout.cols, 13);
+      await tester.disposeApp();
+    });
+
+    testWidgets("today's dot has no result even once it is over", (
+      tester,
+    ) async {
+      await seedStage(15);
+      await logOn(today, times: 3);
+      await openDetails(tester);
+
+      final painter =
+          tester
+                  .widget<CustomPaint>(
+                    find.byWidgetPredicate(
+                      (widget) =>
+                          widget is CustomPaint &&
+                          widget.painter is DayDotsPainter,
+                    ),
+                  )
+                  .painter!
+              as DayDotsPainter;
+      expect(painter.dots[7], DayDot.today);
+      expect(find.text('3 of 30 used · 1 day over'), findsOneWidget);
+      await tester.disposeApp();
+    });
+
+    testWidgets('the footer counts today once it has gone over', (
+      tester,
+    ) async {
+      await seedStage(14);
+      await logOn(stageStart, times: 3);
+      await logOn(today, times: 3);
+      await openDetails(tester);
+
+      expect(find.text('6 of 28 used · 2 days over'), findsOneWidget);
+      await tester.disposeApp();
+    });
+
+    testWidgets('the key names the three results', (tester) async {
+      await seedK();
+      await openDetails(tester);
+
+      expect(find.text('Under'), findsOneWidget);
+      expect(find.text('At limit'), findsOneWidget);
+      expect(find.text('Over'), findsOneWidget);
+      await tester.disposeApp();
+    });
+
+    testWidgets('it says when the limit drops', (tester) async {
+      await seedK();
+      await openDetails(tester);
+
+      expect(
+        find.text('Drops to 8 in 4 days. Try to look surprised.'),
+        findsOneWidget,
+      );
+      await tester.disposeApp();
+    });
+
+    testWidgets("on the stage's last day it drops tomorrow", (tester) async {
+      clock.current = DateTime(2026, 11, 4, 15);
+      await seedK();
+      await openDetails(tester);
+
+      expect(
+        find.text('Drops to 8 tomorrow. Try to look surprised.'),
+        findsOneWidget,
+      );
+      await tester.disposeApp();
+    });
+
+    testWidgets('on the last stage it drops to 0', (tester) async {
+      clock.current = DateTime(2026, 12, 28, 15);
+      await seedK();
+      await openDetails(tester);
+
+      expect(
+        find.text('Drops to 0 in 3 days. Try to look surprised.'),
+        findsOneWidget,
+      );
+      await tester.disposeApp();
+    });
+
+    testWidgets('a drop of two names the real next limit', (tester) async {
+      // 18 today and 16 tomorrow.
+      await seedHabit(
+        PlanDraft(
+          startDay: today.addDays(-2),
+          startLimit: 20,
+          quitDay: today.addDays(12),
+        ),
+      );
+      await openDetails(tester);
+
+      expect(
+        find.text('Drops to 16 tomorrow. Try to look surprised.'),
+        findsOneWidget,
+      );
+      await tester.disposeApp();
+    });
+
+    testWidgets('the days are one image to VoiceOver', (tester) async {
+      await seedStage(14);
+      await logResults();
+      final semantics = tester.ensureSemantics();
+      await openDetails(tester);
+
+      expect(
+        find.bySemanticsLabel('14 days, limit 2. 1 over. Today is day 8.'),
+        findsOneWidget,
+      );
+      semantics.dispose();
+      await tester.disposeApp();
+    });
+
+    testWidgets('the current stage has no chevron', (tester) async {
+      await seedK();
+      await openDetails(tester);
+
+      // One for each of the other 11 stages.
+      expect(find.byIcon(AppIcons.chevronDown), findsNWidgets(11));
+      await tester.disposeApp();
+    });
+  });
+
   testWidgets('a failed plan read shows an error and can retry', (
     tester,
   ) async {
@@ -564,6 +822,34 @@ void main() {
       binding.platformDispatcher.textScaleFactorTestValue = 3;
     });
     tearDown(binding.platformDispatcher.clearTextScaleFactorTestValue);
+
+    for (final (name, stageDays) in const [
+      ('a 365-day current stage', 365),
+      ('a 14-day current stage', 14),
+    ]) {
+      testWidgets('$name stays whole', (tester) async {
+        await seedHabit(
+          PlanDraft(
+            startDay: today.addDays(-7),
+            startLimit: 2,
+            quitDay: today.addDays(-7 + stageDays * 2),
+          ),
+          habit: Habit.vaping,
+          priceCents: 800,
+        );
+        await openDetails(tester);
+        tester.view.physicalSize = const Size(375 * 3, 812 * 3);
+        await tester.pumpAndSettle();
+
+        expect(find.text('NOW'), findsOneWidget);
+
+        final clipped = tester.clippedTexts(
+          within: find.byType(PlanDetailsPage),
+        );
+        await tester.disposeApp();
+        expect(clipped, isEmpty);
+      });
+    }
 
     testWidgets('80 stages stay whole', (tester) async {
       await seedHabit(

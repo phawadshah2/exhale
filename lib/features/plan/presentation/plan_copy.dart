@@ -35,6 +35,28 @@ abstract final class PlanCopy {
 
   static const quitReached = 'You reached your quit date';
 
+  static const eachDot = 'Each dot is a day';
+  static const under = 'Under';
+  static const atLimit = 'At limit';
+  static const over = 'Over';
+
+  /// 44 of 60 used · 2 days over
+  static String usedAndOver(int used, int allowed, int over) =>
+      '${usedOf(used, allowed)} · $over ${over == 1 ? 'day' : 'days'} over';
+
+  static String drops(int next, int inDays) =>
+      'Drops to $next ${inDays == 1 ? 'tomorrow' : 'in $inDays days'}. '
+      'Try to look surprised.';
+
+  static String daysImage({
+    required int days,
+    required int limit,
+    required int over,
+    required int dayNumber,
+  }) =>
+      '$days ${days == 1 ? 'day' : 'days'}, limit $limit. $over over. '
+      'Today is day $dayNumber.';
+
   /// Sessions
   static String unitsTitle(Habit habit) =>
       '${habit.units[0].toUpperCase()}${habit.units.substring(1)}';

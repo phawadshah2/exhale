@@ -57,7 +57,6 @@ class StageRing extends StatelessWidget {
   }
 }
 
-@visibleForTesting
 class StageRingPainter extends CustomPainter {
   const StageRingPainter({
     required this.fill,

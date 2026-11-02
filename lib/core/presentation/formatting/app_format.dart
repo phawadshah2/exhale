@@ -39,7 +39,11 @@ abstract final class AppFormat {
 
   /// Wed, Oct 21
   static String shortWeekdayDate(LogicalDay day) =>
-      '${_weekdays[day.weekday - 1].substring(0, 3)}, ${monthDay(day)}';
+      '${shortWeekday(day)}, ${monthDay(day)}';
+
+  /// Wed
+  static String shortWeekday(LogicalDay day) =>
+      _weekdays[day.weekday - 1].substring(0, 3);
 
   /// Today, Oct 16 / Tomorrow, Oct 17 / Wednesday, Oct 18
   static String relativeDate(LogicalDay day, {required LogicalDay today}) {

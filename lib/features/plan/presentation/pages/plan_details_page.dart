@@ -14,9 +14,9 @@ import 'package:exhale/features/plan/domain/services/plan_report.dart';
 import 'package:exhale/features/plan/presentation/plan_copy.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_report_provider.dart';
+import 'package:exhale/features/plan/presentation/widgets/current_stage_card.dart';
 import 'package:exhale/features/plan/presentation/widgets/edit_pill.dart';
 import 'package:exhale/features/plan/presentation/widgets/plan_totals_card.dart';
-import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_row.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
@@ -174,10 +174,10 @@ class _PlanDetails extends ConsumerWidget {
                 side: PlanCopy.stageOf(current.stage.number, report.stageCount),
                 highlighted: true,
                 children: [
-                  _CurrentStageHeader(
+                  CurrentStageCard(
                     report: current,
                     today: today,
-                    money: money,
+                    nextLimit: report.ahead.firstOrNull?.stage.limit ?? 0,
                   ),
                 ],
               ),
@@ -294,67 +294,6 @@ class _GroupLabel extends StatelessWidget {
       ),
     ),
   );
-}
-
-/// The current stage's header. Its days come with the current stage card.
-class _CurrentStageHeader extends StatelessWidget {
-  const _CurrentStageHeader({
-    required this.report,
-    required this.today,
-    required this.money,
-  });
-
-  final StageReport report;
-  final LogicalDay today;
-  final String Function(double cents) money;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final text = context.textTheme;
-    final saved = report.savedCents;
-    final toSave = report.toSaveCents;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: StageHeader(
-        ring: StageRing(report: report, size: 56),
-        title: Row(
-          spacing: 6,
-          children: [
-            Flexible(
-              child: Text(
-                PlanCopy.stage(report.stage.number),
-                style: text.titleSmall,
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-              decoration: BoxDecoration(
-                color: colors.primaryContainer,
-                borderRadius: AppRadius.pill,
-              ),
-              child: Text(
-                PlanCopy.now,
-                style: text.labelSmall?.copyWith(
-                  color: colors.onPrimaryContainer,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.8,
-                ),
-              ),
-            ),
-          ],
-        ),
-        dates: PlanCopy.currentRange(report, today),
-        money: saved == null || toSave == null
-            ? null
-            : StageMoney(
-                value: money(saved),
-                label: PlanCopy.ofToSave(money(toSave)),
-                color: context.exhale.success.foreground,
-              ),
-      ),
-    );
-  }
 }
 
 class _FinishRow extends StatelessWidget {
