@@ -1,30 +1,45 @@
 # Current state
 
 Updated 2026-11-02. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
-(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 4 of 20 are done. The first
+(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 5 of 20 are done. The first
 release tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled
 compare link.
 
 Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
 pass. CI on PR #28 was not read.
 
-Checks at f333ce5, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 793
-passed. None of Tasks 1 to 4 has been seen on a simulator. Nothing on this branch is pushed.
+Checks at c5f6a19, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 816
+passed. None of Tasks 1 to 5 has been seen on a simulator. Nothing on this branch is pushed.
 
-**Next action (Sonnet 5.5 medium):** build Task 5 (the current stage) of
+**Next action (Sonnet 5.5 medium):** build Task 6 (saving without a new plan) of
 `docs/superpowers/plans/2026-11-02-plan-and-stages.md` with `superpowers:executing-plans`, on
-`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 5, section 3.6 of
-`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, frames Y and Z, and the ledger
+`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 6, section 4.6 of
+`docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, and the ledger
 `.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`, which holds the rulings and says which
 pre-flight rows are still to do. The M6 and M7 reviews (Tasks 12 and 20) are Opus 5.5 high. The real
 iPhone pass stays pending and must include these screens.
 
+**Task 5 done (c5f6a19, 2026-11-02):** `CurrentStageCard` replaces the header-only stub, finishing
+Plan details: rings with counts up to 14 days (frame Y), one dot per day past that (frame Z, drawn by
+`DayDotsPainter` from `DotLayout`), the key, "{used} of {allowed} used · {n} days over" and "Drops to
+{next}…". The days are one image to VoiceOver.
+
+Rulings (ledger): the card takes `nextLimit`, not the plan's `stageCount` and `habit`, because a limit
+can drop by more than one. Rings shrink below 40 pt only when seven don't fit. The day block has one
+fade rather than one per ring.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 816 passed. Red seen on
+assertions: all eight `DotLayout` tests, the first widget test against an empty card, and the VoiceOver
+label, which `Card` merged away until it became a container. The other widget tests were written before
+the code, but the run against the stub was stopped because it hung after the first failure, so they were
+not seen failing. No test: rings at 320 pt wide. Not seen on a simulator, so how the page matches frames
+Y and Z is unchecked.
+
 **Task 4 done (f333ce5, 2026-11-02):** tapping Home's plan card opens `PlanDetailsPage`
 (`/habit/:habitId/stages`): the whole plan's tiles, BEHIND YOU with earlier-plan labels, YOU, AHEAD OF
 YOU, the finish row, and "You made it. Regrettably." from the quit date. `planReportProvider` combines
-the plan, price and log streams. Stage rows open independently. The current stage shows only its header
-(`_CurrentStageHeader`) until Task 5. `StageReport.toAvoid` is new. Logs' button is now
-`CircleIconButton` and Home's pill is `EditPill`, both shared.
+the plan, price and log streams. Stage rows open independently. `StageReport.toAvoid` is new. Logs'
+button is now `CircleIconButton` and Home's pill is `EditPill`, both shared.
 
 Rulings (ledger): the title is capped at 1.5× text, because "Regrettably." doesn't fit at 200% on an SE
 width. At large text a row's money joins the text column and a section header stacks. A one-day stage
