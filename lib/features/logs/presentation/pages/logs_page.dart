@@ -7,6 +7,7 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
+import 'package:exhale/core/widgets/circle_icon_button.dart';
 import 'package:exhale/core/widgets/load_failure.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
@@ -136,7 +137,7 @@ class _LogsPageState extends ConsumerState<LogsPage> {
               sliver: SliverToBoxAdapter(
                 child: Row(
                   children: [
-                    _CircleButton(
+                    CircleIconButton(
                       tooltip: 'Back',
                       icon: AppIcons.back,
                       onPressed: () => context.pop(),
@@ -148,7 +149,7 @@ class _LogsPageState extends ConsumerState<LogsPage> {
                         style: context.textTheme.titleLarge,
                       ),
                     ),
-                    _CircleButton(
+                    CircleIconButton(
                       tooltip: 'Add a missed log',
                       icon: AppIcons.add,
                       accent: true,
@@ -310,53 +311,6 @@ class _LogsPageState extends ConsumerState<LogsPage> {
       );
     }
     return groups;
-  }
-}
-
-class _CircleButton extends StatelessWidget {
-  const _CircleButton({
-    required this.tooltip,
-    required this.icon,
-    required this.onPressed,
-    this.accent = false,
-  });
-
-  final String tooltip;
-  final IconData icon;
-  final VoidCallback? onPressed;
-  final bool accent;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final tint = accent ? colors.primary : colors.onSurface;
-    return Tooltip(
-      message: tooltip,
-      child: Semantics(
-        button: true,
-        label: tooltip,
-        child: GestureDetector(
-          onTap: onPressed,
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: accent
-                  ? colors.primary.withValues(alpha: 0.14)
-                  : colors.surfaceContainerHigh,
-              border: Border.all(
-                color: accent
-                    ? colors.primary.withValues(alpha: 0.45)
-                    : colors.outlineVariant,
-              ),
-            ),
-            child: Icon(icon, size: 20, color: tint),
-          ),
-        ),
-      ),
-    );
   }
 }
 

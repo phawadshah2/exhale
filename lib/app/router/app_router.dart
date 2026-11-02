@@ -10,6 +10,7 @@ import 'package:exhale/features/onboarding/presentation/pages/change_habit_page.
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
 import 'package:exhale/features/plan/presentation/pages/edit_plan_page.dart';
+import 'package:exhale/features/plan/presentation/pages/plan_details_page.dart';
 import 'package:exhale/features/settings/presentation/pages/settings_page.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,6 +53,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.editPlan,
         builder: (context, state) =>
             EditPlanPage(habitId: int.parse(state.pathParameters['habitId']!)),
+      ),
+      GoRoute(
+        path: AppRoutes.planDetails,
+        builder: (context, state) => PlanDetailsPage(
+          habitId: int.parse(state.pathParameters['habitId']!),
+        ),
       ),
       GoRoute(
         path: AppRoutes.changeHabit,

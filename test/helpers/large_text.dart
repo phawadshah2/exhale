@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Loads the app's fonts, because the test font's square glyphs make any check
@@ -19,9 +20,15 @@ Future<void> loadAppFonts() async {
 
 extension LargeText on WidgetTester {
   /// Text an overflow check cannot see: ellipsized, too tall for its box, or
-  /// with a word too wide for its line.
-  List<String> clippedTexts() => [
-    for (final paragraph in allRenderObjects.whereType<RenderParagraph>())
+  /// with a word too wide for its line. [within] limits it to one page, as
+  /// pages under a pushed one are still laid out.
+  List<String> clippedTexts({Finder? within}) => [
+    for (final paragraph
+        in within == null
+            ? allRenderObjects.whereType<RenderParagraph>()
+            : renderObjectList<RenderParagraph>(
+                find.descendant(of: within, matching: find.byType(RichText)),
+              ))
       if (paragraph.hasSize && _isClipped(paragraph))
         paragraph.text.toPlainText(),
   ];

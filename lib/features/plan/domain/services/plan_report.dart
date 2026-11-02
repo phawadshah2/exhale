@@ -70,6 +70,7 @@ class StageReport {
     required this.average,
     required this.savedCents,
     required this.toSaveCents,
+    required this.toAvoid,
     required this.mostly,
     required this.note,
     required this.daily,
@@ -87,6 +88,9 @@ class StageReport {
   /// show it as at least 0.
   final double? savedCents;
   final double? toSaveCents;
+
+  /// Below the baseline over the whole stage, at least 0.
+  final int toAvoid;
   final Trigger? mostly;
   final StageNote? note;
 
@@ -105,6 +109,7 @@ class StageReport {
     average: average,
     savedCents: savedCents,
     toSaveCents: toSaveCents,
+    toAvoid: toAvoid,
     mostly: mostly,
     note: note,
     daily: daily,
@@ -394,6 +399,7 @@ class _StageBuilder {
       toSaveCents: current == null
           ? null
           : math.max(0, (baseline - stage.limit) * days * current),
+      toAvoid: math.max(0, (baseline - stage.limit) * days),
       mostly: ProgressCalculator.triggerBreakdown(
         daily.expand((d) => logs[d.day] ?? const <HabitLog>[]),
       ).shares.firstOrNull?.trigger,

@@ -73,15 +73,17 @@ abstract final class AppFormat {
     final dot = fixed.indexOf('.');
     final whole = dot < 0 ? fixed : fixed.substring(0, dot);
     final fraction = dot < 0 ? '' : fixed.substring(dot);
-    final grouped = whole.replaceAllMapped(
-      RegExp(r'\B(?=(\d{3})+$)'),
-      (_) => ',',
-    );
     final spaced = RegExp(r'\p{L}$', unicode: true).hasMatch(symbol)
         ? '$symbol '
         : symbol;
-    return '${cents < 0 ? '-' : ''}$spaced$grouped$fraction';
+    return '${cents < 0 ? '-' : ''}$spaced${_grouped(whole)}$fraction';
   }
+
+  /// 1,008
+  static String count(int value) => _grouped('$value');
+
+  static String _grouped(String digits) =>
+      digits.replaceAllMapped(RegExp(r'\B(?=(\d{3})+$)'), (_) => ',');
 
   /// Parses user input like "14.50" or "14,5" into cents.
   /// Returns null for blank, malformed or negative input.

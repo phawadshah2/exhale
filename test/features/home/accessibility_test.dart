@@ -141,6 +141,17 @@ void main() {
           await expectGuidelines(tester, handle);
         });
 
+        testWidgets('Plan details', (tester) async {
+          final handle = tester.ensureSemantics();
+          await seed(theme: theme, accent: accent);
+          await tester.pumpAppPastSplash(height: height);
+          final context = tester.element(find.byType(Scaffold).first);
+          unawaited(GoRouter.of(context).push(AppRoutes.planDetailsFor(1)));
+          await tester.pumpAndSettle();
+          expect(find.text('The whole plan'), findsOneWidget);
+          await expectGuidelines(tester, handle);
+        });
+
         testWidgets('the trigger sheet', (tester) async {
           final handle = tester.ensureSemantics();
           await seed(theme: theme, accent: accent);

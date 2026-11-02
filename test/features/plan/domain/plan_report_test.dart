@@ -165,6 +165,7 @@ void main() {
       expect(next.daily, isEmpty);
       expect(next.savedCents, 0);
       expect(next.toSaveCents, 1120);
+      expect(next.toAvoid, 28);
       expect(k.aheadToSaveCents, 16800);
     });
   });
@@ -317,6 +318,7 @@ void main() {
       expect(high.totals.avoidedOf, greaterThanOrEqualTo(0));
       expect(high.totals.savedOfCents, greaterThanOrEqualTo(0));
       expect(high.current!.toSaveCents, 0);
+      expect(high.current!.toAvoid, 0);
       expect(high.aheadToSaveCents, greaterThanOrEqualTo(0));
       expect(high.totals.withoutPlanUnits, greaterThan(0));
     });
