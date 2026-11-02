@@ -1,24 +1,40 @@
 # Current state
 
 Updated 2026-11-02. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
-(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 9 of 20 are done. The first
+(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 10 of 20 are done. The first
 release tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled
 compare link.
 
 Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
 pass. CI on PR #28 was not read.
 
-Checks at 3083f1b, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 936
-passed. None of Tasks 1 to 9 has been seen on a simulator. Nothing on this branch is pushed.
+Checks at a2be2be, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 968
+passed. None of Tasks 1 to 10 has been seen on a simulator. Nothing on this branch is pushed.
 
-**Next action (Sonnet 5.5 medium):** build Task 10 (`DayRail`) of
+**Next action (Sonnet 5.5 medium):** build Task 11 (Logs page) of
 `docs/superpowers/plans/2026-11-02-plan-and-stages.md` with `superpowers:executing-plans`, on
-`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 10, section 5.5 of
+`feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header and Task 11, section 5 of
 `docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`, frame T
-(`design/8._plan_edit_logs/`), and the ledger
-`.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`, which holds the rulings and says which
-pre-flight rows are still to do. The M6 and M7 reviews (Tasks 12 and 20) are Opus 5.5 high. The real
+(`design/8._plan_edit_logs/LogsCombined.dc.html`), and the ledger
+`.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`, whose pre-flight rows for Task 11 name what
+to handle: a selected day missing from `LogsView.days`, `LogsDay.logs` being newest first, and the
+trigger bar's plan-days question. The M6 and M7 reviews (Tasks 12 and 20) are Opus 5.5 high. The real
 iPhone pass stays pending and must include these screens.
+
+**Task 10 done (a2be2be, 2026-11-02):** `DayRail.build` in `lib/features/logs/domain/day_rail.dart` turns
+a day's logs into the rail's ordered entries. `PaceGuide.onDay` is public. No screen reads it yet.
+
+Rulings (ledger): a gap follows the earlier log, so a mark between two logs comes after it, as frame T
+does. When wake is later than the last log, the closing rows go after wake. Before the plan with no logs
+gives the one "Nothing logged" row, not an empty rail. Under a filter, `over` still counts the whole day.
+A log at the minute of waking follows wake; one at the minute of bed comes before bed. `build` takes no
+`DayBoundary`, so a wake before the reset hour or a bed past the day's end shows its set time.
+
+For Fawad: "Next on schedule" keeps its place above Bed even when the timer runs past bed, so "1:00 AM"
+can sit above "Bed 11:30 PM". The plan's order; no test.
+
+Checks observed by me: format clean, `analyze --fatal-infos` clean, full suite 968 passed. Red seen for all
+32 new tests against a stub, 30 on assertions and 2 on casts. Not seen on a simulator.
 
 **Task 9 done (3083f1b, 2026-11-02):** `LogsSelection` in `lib/features/logs/domain/logs_selection.dart`:
 opening from a `LogsQuery`, `step`, `withMode`, `pickMonth`, `select`, `toggleTrigger`, and the arrows'
