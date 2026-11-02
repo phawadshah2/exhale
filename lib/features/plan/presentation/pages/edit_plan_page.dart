@@ -23,8 +23,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Changes a habit's daily limit, quit date, price and reason. Saving starts
-/// a new plan today; past days keep the limits they had.
+/// Changes a habit's daily limit, quit date and price. Changing the limit or
+/// date starts a new plan today; past days keep the limits they had.
 class EditPlanPage extends ConsumerWidget {
   const EditPlanPage({required this.habitId, super.key});
 
@@ -80,7 +80,8 @@ class _EditPlanForm extends ConsumerWidget {
     final provider = editPlanProvider(habitId);
     final form = ref.watch(provider);
     final controller = ref.read(provider.notifier);
-    final habit = ref.watch(habitProvider(habitId))!.habit;
+    final tracked = ref.watch(habitProvider(habitId))!;
+    final habit = tracked.habit;
     final currency = ref.watch(currentSettingsProvider).currencySymbol;
     final colors = context.colors;
     final text = context.textTheme;
@@ -101,7 +102,7 @@ class _EditPlanForm extends ConsumerWidget {
         caption: 'Past days keep the limits they had.',
         bottomInset: bottomInset,
         isBusy: form.isSubmitting,
-        onPressed: form.preview == null ? null : save,
+        onPressed: form.canSave ? save : null,
       ),
       children: [
         Stack(
@@ -198,8 +199,8 @@ class _EditPlanForm extends ConsumerWidget {
           title: 'Your why',
           subtitle: "Optional. We'll show it on the hard days.",
           child: TextFormField(
-            initialValue: form.reason,
-            onChanged: controller.setReason,
+            initialValue: tracked.reason,
+            readOnly: true,
             textCapitalization: TextCapitalization.sentences,
             textInputAction: TextInputAction.done,
             maxLength: HabitValidation.maxReasonLength,

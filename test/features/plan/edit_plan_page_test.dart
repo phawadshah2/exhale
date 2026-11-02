@@ -98,7 +98,10 @@ void main() {
     await openEditPlan(tester);
 
     await tester.enterText(find.byType(TextField).first, '14.50');
+    await tester.pump();
     await save(tester);
+
+    expect((await history(tester)).plans, hasLength(1));
 
     final habits = await tester.runAsync(
       () => sl<HabitRepository>().getActive(),
