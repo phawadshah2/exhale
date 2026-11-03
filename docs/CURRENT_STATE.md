@@ -12,10 +12,19 @@ pass. CI on PR #28 was not read.
 Checks at the walk-fix commit: format clean, `analyze --fatal-infos` clean, full suite 1038 passed. Plan details and Edit plan were
 seen on a simulator in light mode; Logs only before its fixes. Nothing on this branch is pushed.
 
-**Next action:** finish Task 12 Step 3 on a fresh build: Logs in light and dark with triggers (the bar
-and chips fixed after the walk), Plan details and Edit plan in dark, and a long plan (the seed only
-runs on an install with no habit). Then Task 13 (Sonnet 5.5 medium). The M7 review (Task 20) is Opus
-5.5 high. The real iPhone pass stays pending and must include these screens.
+**Next action:** Task 13 (Sonnet 5.5 medium). M6 is done apart from a long plan on a simulator, which
+needs an install with no habit (the seed skips itself otherwise). The M7 review (Task 20) is Opus 5.5
+high. The real iPhone pass stays pending and must include these screens.
+
+**Task 12 walk, second pass (2026-11-03, same simulator, debug build of 5715c87, dark):** seen, all
+whole: Logs' trigger bar drawn in four colours and chips at their own width, month chips side by side,
+today's rail (Woke up, three logs with "22 min. Longest today. Frame it." and "1 min", Next on schedule
+3:45 PM, the closing line, Bed 11:30 PM, the hint). History's Commute chip opened Logs on Mon, Nov 2,
+its only Commute day, not today. + on that day opened "Add missed log" for Mon, Nov 2. Plan details
+in dark (Behind you, the current stage with 9 day rings, the earlier stage at A$8.75). Edit plan in
+dark with the price card. At the largest text size (200% cap): Edit plan, Home and Logs reflow with
+nothing clipped. One minor, deferred: at 200% "One every 1 h 36 min" inside the dial touches the
+ring on its right. Not seen: a long plan, light mode after the fixes, Plan details at 200%.
 
 **Task 12 simulator walk (2026-11-03, `exhale` simulator, iOS 26.5, debug build of 04a00a6):** the
 seed skipped itself, as the install already had a habit (Vaping, 12 a day from Oct 31, no price).
