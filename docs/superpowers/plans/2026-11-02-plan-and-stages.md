@@ -852,7 +852,7 @@ abstract final class StageChecks { static StageCheckResult? evaluate({required P
 - Produces: `AnswerWithNewPlan` with input `({int habitId, PlanDraft draft, LogicalDay planStartDay, LogicalDay windowEndDay})`,
   saving the plan and the answer in one transaction.
 
-- [ ] **Step 1: Write the failing tests.**
+- [x] **Step 1: Write the failing tests.**
   - review: tiles over the 14 days; top 3 triggers, hidden when none; three choices with the first selected; button and
     under-button text changing with the selection; detail and change labels (Stages spec 5.3)
   - reassess: "Still yours" totals match Plan details; saved hidden for a no-cost habit; the support line; the alcohol line
@@ -861,10 +861,10 @@ abstract final class StageChecks { static StageCheckResult? evaluate({required P
   - Keep answers with no new plan, and the next failure holds first
   - a failed save keeps the sheet and changes nothing; two presses save once
   - VoiceOver reads a choice's name, detail, date and change as one; scrolling works at 200%
-- [ ] **Step 2: Run, expect failure.**
-- [ ] **Step 3: Implement** against frames AC and AD with `showAppDraggableSheet`.
-- [ ] **Step 4: Run, expect pass.**
-- [ ] **Step 5: Commit** `feat(home): add the review and reassess sheets`.
+- [x] **Step 2: Run, expect failure.**
+- [x] **Step 3: Implement** against frames AC and AD with `showAppDraggableSheet`.
+- [x] **Step 4: Run, expect pass.**
+- [x] **Step 5: Commit** `feat(home): add the review and reassess sheets`.
 
 ### Task 20: Milestone M7 review and handoff
 

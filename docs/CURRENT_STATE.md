@@ -12,7 +12,7 @@ Updated 2026-11-03. The full log of earlier sessions is in
 | M6 Plan details, Edit plan, Logs (Tasks 1 to 12) | Done on `feat/plan-and-stages`: reviewed, two simulator walks |
 | UI fixes from Fawad's review (Phase 4b, F1 to F4) | Done; seen in the simulator, light mode |
 | UI review round 2 (Logs, Plan, Home, transitions) | Done, committed (a947c2d) |
-| M7 Stage management (Tasks 13 to 20) | Tasks 13 to 18 done; Task 19 next |
+| M7 Stage management (Tasks 13 to 20) | Tasks 13 to 19 done; Task 20 (M7 review) next |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 Plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md`. Spec for M7:
@@ -37,7 +37,6 @@ rows still to do).
   held days, `agreedQuitDay` is stored); schema v11 (`plan_holds`, `stage_checks`,
   `exhale_v10.sqlite` fixture), `StageCheck`, `StageCheckRepository`, `stageChecksProvider`.
   `record(closesHoldWindow:)` stamps the old hold card with midnight of the new check's day.
-- F1 to F4 seen working in the simulator (iOS 26.5, seeded, light mode).
 - Task 15: `StageChecks.evaluate` (`stage_checks.dart`); a skipped result closes no hold.
 - Task 16: `RunStageCheck` (one transaction) and `StageCheckListener` in the shell; runs at
   start and on a day change. Added `HabitLogRepository.getLogs`.
@@ -46,6 +45,8 @@ rows still to do).
 - Task 18: `stageCardProvider` (current plan's unanswered row only), `StageCards` in the
   ring card's slot like `QuitReachedCard` (the mock draws separate cards; the spec says the
   slot), `AnswerStageCheck`, `KeepOriginalDate`. Not seen in the simulator or dark mode.
+- Task 19: `StageChoiceSheet` (shared), review and reassess sheets, `AnswerWithNewPlan`
+  (answer first, one transaction), `stageWindowStatsProvider`. Not seen in the simulator.
 
 ## UI review round 2 (a947c2d, 2026-11-03)
 
@@ -65,11 +66,10 @@ rows still to do).
 
 ## Next action
 
-Task 19, review and reassess sheets (Sonnet 5.5 medium): read its block in the plan and Stages
-spec sections 4 and 5.3 to 5.5. The cards call `showReviewSheet` / `showReassessSheet` in
-`stage_sheets.dart`, which are empty stubs to replace. Open point: a choice's quit date can
-fall before the current one, and the spec has only "later" labels. Fawad may still ask for
-round 2 fixes after a full restart. The M7 review (Task 20) runs on Opus 5.5 high.
+Task 20, the M7 review (Opus 5.5 at high): independent review, fix findings, full suite with
+the JSON report, then the simulator walk. Fawad may still ask for round 2 fixes after a full
+restart. The spec has only "later" labels, so a choice that moves the quit date earlier reads
+"N days/weeks earlier" (my call; say if wrong).
 
 ## Open checks
 
