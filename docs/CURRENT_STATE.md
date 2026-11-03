@@ -42,10 +42,15 @@ UI fixes done 2026-11-03 (commits 543ecc0, 203877e, 381598e, 389f483, plus the d
 - F3 Plan card: Edit pill removed; the card opens Plan details.
 - F4 Logs: weeks only, a calendar sheet from the title, swipe by week, the selected day
   uses the current-stage inset highlight, the log row sits on the card colour in light mode.
-- Not seen: the simulator, light mode, 200% text on the new calendar sheet. The Logs
+- Checked 2026-11-03: full suite 1033 passed at 389f483. Simulator walk (iOS 26.5, seeded,
+  light mode): F1 to F4 seen working: thin trigger bars and centred tile icons, Week and
+  Month History (dotted future rings, grey neighbour days, six rows), no Edit pill and the
+  Plan card opens Plan details, Logs weeks only, calendar sheet jump, week swipe, selected
+  day highlight, log row on the card colour.
+- Not seen: dark mode of these screens (the app stayed light), Reduce Transparency, text
+  at 200%, the Month swipe between a 5-row and 6-row month by hand, a real iPhone. The Logs
   comparison with frame T was by code. A History chip opened on a month range now searches
-  only the last week of that month. The full suite was not run after F4; the home and logs
-  folders pass.
+  only the last week of that month.
 
 ## Open checks
 
