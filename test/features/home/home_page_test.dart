@@ -706,7 +706,20 @@ void main() {
     expect(find.text('Starts Wed, Oct 21 · then 7 more'), findsOneWidget);
     expect(find.text('Smoke-free from Dec 16'), findsOneWidget);
     expect(find.text('61 days to go'), findsOneWidget);
-    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Edit'), findsNothing);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('tapping your plan opens Plan details', (tester) async {
+    await startPlan(LogicalDay(2026, 10, 14));
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.scrollAndTap(find.text('Your plan'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('The whole plan'), findsOneWidget);
+    expect(find.text('Change habit'), findsNothing);
 
     await tester.disposeApp();
   });

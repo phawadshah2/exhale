@@ -10,7 +10,6 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
-import 'package:exhale/features/plan/presentation/widgets/edit_pill.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -108,29 +107,21 @@ class PlanCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: AppSpacing.md,
               children: [
-                Row(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 2,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 2,
-                        children: [
-                          Text('Your plan', style: text.titleMedium),
-                          Text(
-                            stage == null
-                                ? '$percent% of the way'
-                                : 'Stage ${stage.number} of '
-                                      '${plan.stageCount} '
-                                      '· $percent% of the way',
-                            style: text.bodySmall?.copyWith(
-                              color: colors.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
+                    Text('Your plan', style: text.titleMedium),
+                    Text(
+                      stage == null
+                          ? '$percent% of the way'
+                          : 'Stage ${stage.number} of '
+                                '${plan.stageCount} '
+                                '· $percent% of the way',
+                      style: text.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
                       ),
                     ),
-                    EditPill(habitId: habitId),
                   ],
                 ),
                 Column(

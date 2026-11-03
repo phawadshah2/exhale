@@ -92,17 +92,12 @@ void main() {
       await tester.disposeApp();
     });
 
-    testWidgets("the plan card's Edit pill still opens Edit plan", (
-      tester,
-    ) async {
+    testWidgets('the plan card has no Edit pill', (tester) async {
       await seedK();
       await tester.pumpAppPastSplash(height: 2400);
 
-      await tester.tap(find.text('Edit'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Edit plan'), findsOneWidget);
-      expect(find.text(title), findsNothing);
+      expect(find.text('Your plan'), findsOneWidget);
+      expect(find.text('Edit'), findsNothing);
       await tester.disposeApp();
     });
 
