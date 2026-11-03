@@ -28,8 +28,14 @@ rows still to do).
 
 ## Next action
 
-The UI fixes Fawad asked for on 2026-11-03. Sort out the open questions with him first,
-then add them to the plan as tasks.
+The UI fixes Fawad asked for on 2026-11-03, as a short fixes phase on
+`feat/plan-and-stages`, before Task 13. First add them to the plan as tasks, comparing each
+with its design frame in `design/6._home_details_logs/` and `design/8._plan_edit_logs/`.
+
+Decided (Fawad, 2026-11-03):
+- Logs: picking a date jumps to its week, with that day selected and its logs listed.
+  Swiping moves week by week.
+- Home Month: the greyed-out days from the previous and next months are display only.
 
 1. Ring card: make the trigger bars quieter so the eye goes to the ring (smaller, less
    spacing). Centre the icon in the last-entry tile and the tiles like it.
