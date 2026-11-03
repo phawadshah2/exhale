@@ -6,7 +6,9 @@ import 'package:exhale/features/plan/domain/entities/stage_check.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
+import 'package:exhale/features/tracking/domain/entities/trigger_breakdown.dart';
 import 'package:exhale/features/tracking/domain/services/daily_progress_builder.dart';
+import 'package:exhale/features/tracking/domain/services/progress_calculator.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -161,6 +163,44 @@ stageWindowLogsProvider = StreamProvider.family<List<HabitLog>, StageWindow>((
         to: boundary.endOf(key.windowEnd),
       );
 });
+
+/// The 14 days ending on a checked stage's last day, added up.
+@immutable
+class StageWindowStats {
+  const StageWindowStats({
+    required this.logged,
+    required this.allowed,
+    required this.topTriggers,
+  });
+
+  final int logged;
+  final int allowed;
+
+  /// The three most used triggers; empty when no log has one.
+  final List<TriggerShare> topTriggers;
+
+  /// Logs a day, rounded up.
+  int get average => (logged + 13) ~/ 14;
+}
+
+final ProviderFamily<StageWindowStats?, StageWindow> stageWindowStatsProvider =
+    Provider.family<StageWindowStats?, StageWindow>((ref, key) {
+      final history = ref.watch(planHistoryProvider(key.habitId)).value;
+      final logs = ref.watch(stageWindowLogsProvider(key)).value;
+      if (history == null || logs == null) return null;
+      final days = buildDailyProgress(
+        logs: logs,
+        boundary: ref.watch(dayBoundaryProvider),
+        history: history,
+        from: key.windowEnd.addDays(-13),
+        to: key.windowEnd,
+      );
+      return StageWindowStats(
+        logged: days.fold<int>(0, (sum, day) => sum + day.count),
+        allowed: days.fold<int>(0, (sum, day) => sum + day.limit),
+        topTriggers: ProgressCalculator.triggerBreakdown(logs).top(3),
+      );
+    });
 
 /// The unanswered hold, review or reassess card of the habit's **current**
 /// plan; null when there is none. A replanned plan starts with no cards.

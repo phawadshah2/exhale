@@ -7,7 +7,8 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/features/home/presentation/providers/stage_card_provider.dart';
-import 'package:exhale/features/home/presentation/widgets/stage_sheets.dart';
+import 'package:exhale/features/home/presentation/widgets/plan_reassess_sheet.dart';
+import 'package:exhale/features/home/presentation/widgets/plan_review_sheet.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:flutter/material.dart';
@@ -29,13 +30,17 @@ class StageCards extends ConsumerWidget {
       title: "This pace isn't fitting.",
       body: '${_overLine(card.limit)} The plan can bend, and you decide how.',
       button: 'Review my plan',
-      onPressed: () => unawaited(showReviewSheet(context, card)),
+      onPressed: () => unawaited(
+        showPlanReviewSheet(context, ref, habitId: habitId, card: card),
+      ),
     ),
     final ReassessCardData card => _NoticeCard(
       title: 'Back around where you started.',
       body: "About ${card.average} a day lately. Nothing's been wiped.",
       button: 'Have a look',
-      onPressed: () => unawaited(showReassessSheet(context, card)),
+      onPressed: () => unawaited(
+        showPlanReassessSheet(context, ref, habitId: habitId, card: card),
+      ),
     ),
     null => const SizedBox.shrink(),
   };
