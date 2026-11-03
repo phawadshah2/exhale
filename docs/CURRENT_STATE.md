@@ -12,7 +12,7 @@ Updated 2026-11-03. The full log of earlier sessions is in
 | M6 Plan details, Edit plan, Logs (Tasks 1 to 12) | Done on `feat/plan-and-stages`: reviewed, two simulator walks |
 | UI fixes from Fawad's review (Phase 4b, F1 to F4) | Done; seen in the simulator, light mode |
 | UI review round 2 (Logs, Plan, Home, transitions) | Done, committed (a947c2d) |
-| M7 Stage management (Tasks 13 to 20) | Tasks 13 to 15 done; Task 16 next |
+| M7 Stage management (Tasks 13 to 20) | Tasks 13 to 16 done; Task 17 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 Plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md`. Spec for M7:
@@ -44,6 +44,9 @@ rows still to do).
 
 - Task 15: `StageChecks.evaluate` in `lib/features/plan/domain/services/stage_checks.dart`
   (37 tests). A skipped result stores zeros and closes no waiting hold.
+- Task 16: `RunStageCheck` (one transaction from read to write) and `StageCheckListener` in the
+  shell; runs for the single habit at start and on a day change. Added
+  `HabitLogRepository.getLogs`, a one-shot `watchLogs`.
 
 ## UI review round 2 (a947c2d, 2026-11-03)
 
@@ -63,8 +66,8 @@ rows still to do).
 
 ## Next action
 
-Task 16, running the check (Sonnet 5.5 medium): read its block in the plan and Stages spec
-sections 2 and 6. Fawad may still ask for round 2 fixes after a full restart. The M7 review
+Task 17, `PlanChoices` and wording (Sonnet 5.5 medium): read its block in the plan and Stages
+spec sections 4 and 5. Fawad may still ask for round 2 fixes after a full restart. The M7 review
 (Task 20) runs on Opus 5.5 high.
 
 ## Open checks

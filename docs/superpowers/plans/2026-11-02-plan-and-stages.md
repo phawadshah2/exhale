@@ -772,17 +772,17 @@ abstract final class StageChecks { static StageCheckResult? evaluate({required P
 - Produces: `RunStageCheck` with `Future<Result<void>> call(({int habitId, LogicalDay today, DayBoundary boundary}))`;
   `StageCheckListener` wrapping the shell's child, running on first build and when `todayProvider` changes.
 
-- [ ] **Step 1: Write the failing tests.**
+- [x] **Step 1: Write the failing tests.**
   - a failed check stores `hold` and a `plan_holds` row together; a pass stores only the check
   - a read failure stores nothing and returns the failure, and the next run works
   - **two simultaneous calls store one check and one hold** (Review Focus)
   - no habit or no plan: nothing
   - the listener runs at start and when the logical day changes, not on every rebuild
-- [ ] **Step 2: Run, expect failure.**
-- [ ] **Step 3: Implement.** Everything from reading checks to writing runs inside `TransactionRunner.run`, so the second
+- [x] **Step 2: Run, expect failure.**
+- [x] **Step 3: Implement.** Everything from reading checks to writing runs inside `TransactionRunner.run`, so the second
   call sees the first's row. Failures are logged and shown to no one (Stages spec 7).
-- [ ] **Step 4: Run, expect pass.**
-- [ ] **Step 5: Commit** `feat(plan): run the stage check at start and each new day`.
+- [x] **Step 4: Run, expect pass.**
+- [x] **Step 5: Commit** `feat(plan): run the stage check at start and each new day`.
 
 ### Task 17: `PlanChoices` and wording
 
