@@ -3,6 +3,8 @@ import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/entities/stage_check.dart';
 import 'package:exhale/features/plan/domain/repositories/plan_repository.dart';
 import 'package:exhale/features/plan/domain/repositories/stage_check_repository.dart';
+import 'package:exhale/features/plan/domain/usecases/answer_stage_check.dart';
+import 'package:exhale/features/plan/domain/usecases/keep_original_date.dart';
 import 'package:exhale/features/plan/domain/usecases/run_stage_check.dart';
 import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +15,14 @@ final planRepositoryProvider = Provider<PlanRepository>(
 );
 
 final savePlanProvider = Provider<SavePlan>((ref) => sl<SavePlan>());
+
+final answerStageCheckProvider = Provider<AnswerStageCheck>(
+  (ref) => sl<AnswerStageCheck>(),
+);
+
+final keepOriginalDateProvider = Provider<KeepOriginalDate>(
+  (ref) => sl<KeepOriginalDate>(),
+);
 
 final runStageCheckProvider = Provider<RunStageCheck>(
   (ref) => sl<RunStageCheck>(),
