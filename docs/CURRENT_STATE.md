@@ -1,20 +1,25 @@
 # Current state
 
 Updated 2026-11-03. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
-(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 11 of 20 are done, and Task
-12's review and fixes; its simulator walk (Step 3) waits for Fawad's approval. The first
-release tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled
-compare link.
+(Plan details, Edit plan, Logs), then M7 (stage management). M6 is done: Tasks 1 to 12 of 20,
+including the independent review and two simulator walks. The first release tracks one habit (Fawad,
+2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled compare link.
 
 Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
 pass. CI on PR #28 was not read.
 
-Checks at the walk-fix commit: format clean, `analyze --fatal-infos` clean, full suite 1038 passed. Plan details and Edit plan were
-seen on a simulator in light mode; Logs only before its fixes. Nothing on this branch is pushed.
+State (handoff 2026-11-03): `feat/plan-and-stages` at 5715c87 matches `origin/feat/plan-and-stages`,
+so it is pushed; CI on it was not read, and no PR is open. Tree clean apart from the two design files
+left out on purpose. Checks at f1bc936, the last code commit: format clean, `analyze --fatal-infos`
+clean, full suite 1038 passed (the review session's run; not rerun at this handoff, docs only).
 
-**Next action:** Task 13 (Sonnet 5.5 medium). M6 is done apart from a long plan on a simulator, which
-needs an install with no habit (the seed skips itself otherwise). The M7 review (Task 20) is Opus 5.5
-high. The real iPhone pass stays pending and must include these screens.
+**Next action (Sonnet 5.5 medium, fresh session):** Task 13 (holds in `ReductionPlan`), the start of M7,
+with `superpowers:executing-plans` on `feat/plan-and-stages`. Read first: `CLAUDE.md`, the plan's header
+and Task 13, `docs/superpowers/specs/2026-11-02-stage-management-design.md`, and the ledger
+`.superpowers/sdd/2026-11-02-plan-and-stages/progress.md` (rulings; pre-flight rows for M7 are still to
+do). Still unseen on a simulator: a long plan (needs an install with no habit, as the seed skips itself
+otherwise), light mode after the fixes, Plan details at 200%. The M7 review (Task 20) is Opus 5.5 high.
+The real iPhone pass stays pending and must include these screens.
 
 **Task 12 walk, second pass (2026-11-03, same simulator, debug build of 5715c87, dark):** seen, all
 whole: Logs' trigger bar drawn in four colours and chips at their own width, month chips side by side,
