@@ -9,13 +9,27 @@ compare link.
 Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
 pass. CI on PR #28 was not read.
 
-Checks at 04b3e98, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 1036
-passed. None of Tasks 1 to 12 has been seen on a simulator. Nothing on this branch is pushed.
+Checks at the walk-fix commit: format clean, `analyze --fatal-infos` clean, full suite 1038 passed. Plan details and Edit plan were
+seen on a simulator in light mode; Logs only before its fixes. Nothing on this branch is pushed.
 
-**Next action:** Task 12 Step 3, the simulator walk, once Fawad approves the exact command: all three
-screens in light and dark, a replan's Behind you, a price change, and `lib/main_seed.dart` for a long
-plan. Record here what was seen. Then Task 13 (Sonnet 5.5 medium). The M7 review (Task 20) is Opus 5.5
-high. The real iPhone pass stays pending and must include these screens.
+**Next action:** finish Task 12 Step 3 on a fresh build: Logs in light and dark with triggers (the bar
+and chips fixed after the walk), Plan details and Edit plan in dark, and a long plan (the seed only
+runs on an install with no habit). Then Task 13 (Sonnet 5.5 medium). The M7 review (Task 20) is Opus
+5.5 high. The real iPhone pass stays pending and must include these screens.
+
+**Task 12 simulator walk (2026-11-03, `exhale` simulator, iOS 26.5, debug build of 04a00a6):** the
+seed skipped itself, as the install already had a habit (Vaping, 12 a day from Oct 31, no price).
+Seen, light mode, Ink accent: Home's plan card opens Plan details, with the totals agreeing with Home
+(15 used, 21 avoided, 3 of 3 kept) and the rings fading in. "Add a price ›" opens Edit plan. A vertical
+swipe on the dial away from the thumb scrolls and leaves the limit. A$12.50 for 30 shows A$0.42 a
+session and "Counts from Day 1.", and Save price keeps stage 1 with Money saved A$8.75 (21 × 41.7¢).
+Dragging the thumb sets 10, with "Shake on it again" and the caption, and saving gives Behind you
+"Earlier plan · until Nov 2" with Stage 1 at A$8.75, opening to 15 of 36, 0 of 3, 5.0 a day, Boredom,
+"The easy one." Found and fixed since, each seen red: the Logs trigger bar drew 0 pt tall, the trigger
+and month chips stretched full width, and the current stage read "A$8.75 of A$0.00". Not seen: any
+screen in dark (the app follows its own setting, switched to Dark at the end), Logs after the fixes,
+a filter from History, a long plan, 200% text. The walk stopped once someone else started using the
+simulator (three logs appeared at about 11:10).
 
 **Task 12 done in code (2026-11-03):** the independent M6 review of `51e0bc6..213b594`, read against the
 spec, not the ledger. Read: price history and its data path (same-day replace, clearing the only
