@@ -5,6 +5,7 @@ import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/period_stats.dart';
+import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger_breakdown.dart';
 import 'package:exhale/features/tracking/domain/services/progress_calculator.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
@@ -60,6 +61,12 @@ class LogsView {
     (entry) => entry.day == day,
     orElse: () => LogsDay(day: day, logs: const [], limit: null),
   );
+
+  /// The latest day with a [trigger] log, or null with none in the period.
+  LogicalDay? latestWith(Trigger trigger) => days
+      .where((entry) => entry.logs.any((log) => log.trigger == trigger))
+      .firstOrNull
+      ?.day;
 }
 
 final ProviderFamily<LogsView?, LogsScope> logsViewProvider = Provider

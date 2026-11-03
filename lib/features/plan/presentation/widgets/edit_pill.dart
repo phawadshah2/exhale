@@ -16,16 +16,19 @@ class EditPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    void open() {
+      unawaited(HapticFeedback.selectionClick());
+      unawaited(context.push(AppRoutes.editPlanFor(habitId)));
+    }
+
     return Semantics(
       button: true,
       label: 'Edit plan',
       excludeSemantics: true,
+      onTap: open,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () {
-          unawaited(HapticFeedback.selectionClick());
-          unawaited(context.push(AppRoutes.editPlanFor(habitId)));
-        },
+        onTap: open,
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
           child: Center(

@@ -41,13 +41,16 @@ class _LogsPageState extends ConsumerState<LogsPage> {
   /// and this stays up until it has, rather than a spinner for a frame.
   ({LogsSelection selection, LogsView view})? _shown;
 
+  /// A filter opened on a period, as from History's chips, moves to the
+  /// period's latest match once it loads, rather than an empty day.
+  late bool _seekMatch;
+
   @override
   void initState() {
     super.initState();
-    _selection = LogsSelection.fromQuery(
-      widget.query,
-      today: ref.read(todayProvider),
-    );
+    final query = widget.query;
+    _selection = LogsSelection.fromQuery(query, today: ref.read(todayProvider));
+    _seekMatch = query.trigger != null && query.from != query.to;
   }
 
   void _change(LogsSelection selection) =>
@@ -100,7 +103,14 @@ class _LogsPageState extends ConsumerState<LogsPage> {
       final view = ref.watch(
         logsViewProvider((habitId: habitId, range: range)),
       );
-      if (view != null) _shown = (selection: _selection, view: view);
+      if (view != null) {
+        if (_seekMatch) {
+          _seekMatch = false;
+          final match = view.latestWith(_selection.trigger!);
+          if (match != null) _selection = _selection.select(match);
+        }
+        _shown = (selection: _selection, view: view);
+      }
     }
     final shown = _shown;
     final earliest = habitId == null

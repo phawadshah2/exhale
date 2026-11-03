@@ -20,6 +20,7 @@ class PriceCard extends StatefulWidget {
     required this.form,
     required this.currencySymbol,
     required this.baseline,
+    required this.countsFromDayOne,
     required this.onPriceChanged,
     required this.onUnitsChanged,
     super.key,
@@ -28,6 +29,9 @@ class PriceCard extends StatefulWidget {
   final Habit habit;
   final EditPlanState form;
   final String currencySymbol;
+
+  /// True while a price saved today would be the habit's first.
+  final bool countsFromDayOne;
 
   /// The daily amount before the first plan.
   final int baseline;
@@ -89,7 +93,7 @@ class _PriceCardState extends State<PriceCard> {
         ? null
         : _unitPrice(stored, form.storedUnits);
     final fine = Text(
-      stored == null
+      widget.countsFromDayOne
           ? 'Counts from Day 1.'
           : "Counts from today. What you've saved so far stays as it is.",
       style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),

@@ -816,6 +816,48 @@ void main() {
     await tester.disposeApp();
   });
 
+  group('VoiceOver', () {
+    Future<void> expectTapAction(
+      WidgetTester tester,
+      Pattern label,
+      SemanticsHandle handle,
+    ) async {
+      try {
+        expect(
+          find.semantics.byLabel(label).evaluate().single,
+          isSemantics(hasTapAction: true),
+        );
+      } finally {
+        handle.dispose();
+        await tester.disposeApp();
+      }
+    }
+
+    testWidgets('can open a stage', (tester) async {
+      final handle = tester.ensureSemantics();
+      await seedK();
+      await openDetails(tester);
+
+      await expectTapAction(tester, RegExp('^Stage 1, '), handle);
+    });
+
+    testWidgets('can add a price from its tile', (tester) async {
+      final handle = tester.ensureSemantics();
+      await seedK(priceCents: null);
+      await openDetails(tester);
+
+      await expectTapAction(tester, RegExp('^Money saved, '), handle);
+    });
+
+    testWidgets('can press Edit', (tester) async {
+      final handle = tester.ensureSemantics();
+      await seedK();
+      await openDetails(tester);
+
+      await expectTapAction(tester, 'Edit plan', handle);
+    });
+  });
+
   group('at 3x text on an SE width', () {
     setUpAll(loadAppFonts);
     setUp(() {

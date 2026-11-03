@@ -145,7 +145,7 @@ void main() {
       await tester.pump();
       await drag.up();
 
-      expect(changes, [5, 10]);
+      expect(changes, [10]);
     });
 
     testWidgets('past the top stops at the scale and does not wrap', (
@@ -197,83 +197,92 @@ void main() {
       await drag.up();
       await tester.pump();
 
-      expect(changes, [10, 20]);
+      expect(changes, [20]);
     });
 
-    testWidgets('a vertical drag on the ring beats the page scrolling', (
-      tester,
-    ) async {
-      final controller = ScrollController();
-      addTearDown(controller.dispose);
-      final changes = <int>[];
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.light,
-          home: Scaffold(
-            body: SingleChildScrollView(
-              controller: controller,
-              child: Column(
-                children: [
-                  LimitDial(
-                    value: 9,
-                    planStartLimit: 12,
-                    unitsLabel: 'sessions a day',
-                    gapLabel: null,
-                    onChanged: changes.add,
-                  ),
-                  const SizedBox(height: 2000),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
+    testWidgets('a press on the ring changes nothing', (tester) async {
+      final changes = await pumpDial(tester);
 
-      final drag = await tester.startGesture(onRing(tester, 0.2));
+      await tester.tapAt(onRing(tester, 0.25));
       await tester.pump();
-      for (final fraction in [0.25, 0.3, 0.35]) {
-        await drag.moveTo(onRing(tester, fraction));
-        await tester.pump();
-      }
-      await drag.up();
+      await tester.tapAt(onRing(tester, 0.46));
       await tester.pump();
 
-      expect(controller.offset, 0);
-      expect(changes, isNotEmpty);
-    });
-
-    testWidgets('a drag from the middle scrolls the page', (tester) async {
-      final controller = ScrollController();
-      addTearDown(controller.dispose);
-      final changes = <int>[];
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.light,
-          home: Scaffold(
-            body: SingleChildScrollView(
-              controller: controller,
-              child: Column(
-                children: [
-                  LimitDial(
-                    value: 9,
-                    planStartLimit: 12,
-                    unitsLabel: 'sessions a day',
-                    gapLabel: null,
-                    onChanged: changes.add,
-                  ),
-                  const SizedBox(height: 2000),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.dragFrom(tester.getCenter(ring()), const Offset(0, -100));
-      await tester.pump();
-
-      expect(controller.offset, greaterThan(0));
       expect(changes, isEmpty);
+    });
+
+    group('in a page that scrolls', () {
+      Future<(ScrollController, List<int>)> pumpInPage(
+        WidgetTester tester,
+      ) async {
+        final controller = ScrollController();
+        addTearDown(controller.dispose);
+        final changes = <int>[];
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.light,
+            home: Scaffold(
+              body: SingleChildScrollView(
+                controller: controller,
+                child: Column(
+                  children: [
+                    LimitDial(
+                      value: 9,
+                      planStartLimit: 12,
+                      unitsLabel: 'sessions a day',
+                      gapLabel: null,
+                      onChanged: changes.add,
+                    ),
+                    const SizedBox(height: 2000),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+        return (controller, changes);
+      }
+
+      testWidgets('a vertical drag from the thumb moves the thumb', (
+        tester,
+      ) async {
+        final (controller, changes) = await pumpInPage(tester);
+
+        // 9 of 20 sits at 0.45 of a turn.
+        final drag = await tester.startGesture(onRing(tester, 0.45));
+        await tester.pump();
+        for (final fraction in [0.4, 0.35, 0.3]) {
+          await drag.moveTo(onRing(tester, fraction));
+          await tester.pump();
+        }
+        await drag.up();
+        await tester.pump();
+
+        expect(controller.offset, 0);
+        expect(changes, isNotEmpty);
+      });
+
+      testWidgets('a vertical drag on the ring away from the thumb scrolls', (
+        tester,
+      ) async {
+        final (controller, changes) = await pumpInPage(tester);
+
+        await tester.dragFrom(onRing(tester, 0.2), const Offset(0, -100));
+        await tester.pump();
+
+        expect(controller.offset, greaterThan(0));
+        expect(changes, isEmpty);
+      });
+
+      testWidgets('a drag from the middle scrolls the page', (tester) async {
+        final (controller, changes) = await pumpInPage(tester);
+
+        await tester.dragFrom(tester.getCenter(ring()), const Offset(0, -100));
+        await tester.pump();
+
+        expect(controller.offset, greaterThan(0));
+        expect(changes, isEmpty);
+      });
     });
   });
 
@@ -285,19 +294,20 @@ void main() {
     await tester.pump();
     expect(played, ['HapticFeedbackType.selectionClick']);
 
-    final drag = await tester.startGesture(onRing(tester, 0.25));
+    // On the thumb, as + made it 10 of 20: pressing it is no change.
+    final drag = await tester.startGesture(onRing(tester, 0.5));
     await tester.pump();
-    expect(played, hasLength(2));
+    expect(played, hasLength(1));
 
-    // Still rounds to 5 of 20: no change, no haptic.
-    await drag.moveTo(onRing(tester, 0.255));
+    // Still rounds to 10 of 20: no change, no haptic.
+    await drag.moveTo(onRing(tester, 0.505));
     await tester.pump();
-    expect(played, hasLength(2));
+    expect(played, hasLength(1));
 
-    await drag.moveTo(onRing(tester, 0.3));
+    await drag.moveTo(onRing(tester, 0.55));
     await tester.pump();
     await drag.up();
-    expect(played, hasLength(3));
+    expect(played, hasLength(2));
   });
 
   group('semantics', () {

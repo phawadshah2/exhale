@@ -41,6 +41,10 @@ class LimitDial extends StatefulWidget {
   /// page scrolls from the middle of the dial.
   static const double _ringReach = 30;
 
+  /// How far from the thumb a touch takes the ring before it moves. Elsewhere
+  /// on the ring a vertical drag scrolls the page instead.
+  static const double _thumbReach = 30;
+
   /// Space for the text inside the ring.
   static const double _centreWidth = 150;
 
@@ -89,12 +93,26 @@ class _LimitDialState extends State<LimitDial> {
     return fromLine.abs() <= LimitDial._ringReach;
   }
 
+  bool _isOnThumb(Offset position) {
+    const centre = Offset(LimitDial._size / 2, LimitDial._size / 2);
+    final angle = 2 * math.pi * widget.value / _scale;
+    final thumb =
+        centre +
+        Offset(
+          LimitDial._radius * math.sin(angle),
+          -LimitDial._radius * math.cos(angle),
+        );
+    return (position - thumb).distance <= LimitDial._thumbReach;
+  }
+
+  /// Changes nothing, as a tap can win the drag too; the value follows the
+  /// finger once it moves. From the thumb it moves from where it is.
   void _start(DragStartDetails details) {
     final scale = _scale;
-    final next = _valueAt(details.localPosition, scale);
     setState(() => _dragScale = scale);
-    _dragValue = next;
-    _emit(next);
+    _dragValue = _isOnThumb(details.localPosition)
+        ? widget.value
+        : _valueAt(details.localPosition, scale);
   }
 
   void _update(DragUpdateDetails details) {
@@ -137,7 +155,10 @@ class _LimitDialState extends State<LimitDial> {
             gestures: {
               _RingDragRecognizer:
                   GestureRecognizerFactoryWithHandlers<_RingDragRecognizer>(
-                    () => _RingDragRecognizer(isOnRing: _isOnRing),
+                    () => _RingDragRecognizer(
+                      isOnRing: _isOnRing,
+                      isOnThumb: _isOnThumb,
+                    ),
                     (recognizer) => recognizer
                       ..onStart = _start
                       ..onUpdate = _update
@@ -229,15 +250,16 @@ class _CentreLabel extends StatelessWidget {
   );
 }
 
-/// Takes a touch on the ring at once, so the page around it can't scroll it
-/// away. A plain pan loses vertical drags to the page, which needs less
-/// movement to win.
+/// Takes a touch on the thumb at once, so the page around it can't scroll it
+/// away. Elsewhere on the ring it is a plain pan, which loses vertical drags
+/// to the page: a scroll that starts on the ring stays a scroll.
 class _RingDragRecognizer extends PanGestureRecognizer {
-  _RingDragRecognizer({required this.isOnRing}) {
+  _RingDragRecognizer({required this.isOnRing, required this.isOnThumb}) {
     dragStartBehavior = DragStartBehavior.down;
   }
 
   final bool Function(Offset position) isOnRing;
+  final bool Function(Offset position) isOnThumb;
 
   @override
   bool isPointerAllowed(PointerEvent event) =>
@@ -246,7 +268,7 @@ class _RingDragRecognizer extends PanGestureRecognizer {
   @override
   void addAllowedPointer(PointerDownEvent event) {
     super.addAllowedPointer(event);
-    resolve(GestureDisposition.accepted);
+    if (isOnThumb(event.localPosition)) resolve(GestureDisposition.accepted);
   }
 }
 

@@ -153,8 +153,11 @@ class _Tile extends StatelessWidget {
     final text = context.textTheme;
     final of = this.of;
     final caption = this.caption;
+    // Its own node, so the card doesn't merge it and its tap away.
     return Semantics(
+      container: true,
       button: onTap != null,
+      onTap: onTap,
       label:
           '$label, $value'
           '${of == null ? '' : ' of $of'}'

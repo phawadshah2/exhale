@@ -8,6 +8,7 @@ import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/entities/price_history.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
+import 'package:exhale/features/habit/domain/usecases/set_habit_price.dart';
 import 'package:exhale/features/habit/domain/usecases/update_habit.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
@@ -433,11 +434,65 @@ void main() {
     });
   });
 
+  testWidgets('past the quit date a price alone reads Save price', (
+    tester,
+  ) async {
+    await openEditPlan(
+      tester,
+      plan: PlanDraft(
+        startDay: today.addDays(-40),
+        startLimit: 9,
+        quitDay: today.addDays(-5),
+      ),
+    );
+
+    expect(find.text('Shake on it again'), findsOneWidget);
+    expect(
+      find.text('Past days keep their limits. Stages start again at 1.'),
+      findsOneWidget,
+    );
+
+    await enterPrice(tester, '12');
+
+    expect(find.text('Save price'), findsOneWidget);
+    expect(
+      find.text('Past days keep their limits. Stages start again at 1.'),
+      findsNothing,
+    );
+
+    await press(tester, 'Save price');
+
+    expect((await history(tester)).plans, hasLength(1));
+    expect((await stored(tester)).priceCents, 1200);
+
+    await tester.disposeApp();
+  });
+
   group('price card', () {
     const fromToday =
         "Counts from today. What you've saved so far stays as it is.";
     const up = 'Up again? Almost like they want you to quit.';
     const down = "Cheaper? Don't celebrate with one.";
+
+    testWidgets('a price added after clearing one counts from today', (
+      tester,
+    ) async {
+      await seedHabit(running, priceCents: 1000);
+      await sl<SetHabitPrice>()((
+        habitId: 1,
+        day: yesterday,
+        priceCents: null,
+        unitsPerContainer: 20,
+      ));
+      await tester.pumpAppPastSplash(height: 2400);
+      await tester.tap(find.byTooltip('Edit plan'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(fromToday), findsOneWidget);
+      expect(find.text('Counts from Day 1.'), findsNothing);
+
+      await tester.disposeApp();
+    });
 
     testWidgets('is hidden for a habit with no cost', (tester) async {
       await openEditPlan(tester, habit: Habit.socialMedia);

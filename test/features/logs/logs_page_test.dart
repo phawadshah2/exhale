@@ -4,6 +4,7 @@ import 'package:exhale/app/bootstrap.dart';
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/theme/app_theme.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
@@ -12,6 +13,8 @@ import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
+import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
+import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
@@ -208,6 +211,85 @@ void main() {
       await tapAndSettle(tester, cell(oct(15)));
 
       expect(played, ['HapticFeedbackType.selectionClick']);
+    });
+
+    logsTest('the last period stays up until a new one loads', (tester) async {
+      await startPlan();
+      final lastWeek = StreamController<List<HabitLog>>.broadcast();
+      addTearDown(lastWeek.close);
+      final earlier = PeriodRange(oct(5), oct(11));
+      await tester.pumpAppPastSplash(
+        height: 2400,
+        overrides: [
+          logsInRangeProvider.overrideWith(
+            (ref, key) => key.range == earlier
+                ? lastWeek.stream
+                : Stream.value(const <HabitLog>[]),
+          ),
+        ],
+      );
+      final context = tester.element(find.byType(Scaffold).first);
+      unawaited(
+        GoRouter.of(context)
+            .push(const LogsQuery(habitId: 1).toUri().toString()),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Earlier'));
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text('Oct 12 – Oct 18'), findsOneWidget);
+      expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
+
+      lastWeek.add(const []);
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text('Oct 5 – Oct 11'), findsOneWidget);
+      expect(find.text('Sun, Oct 11'), findsOneWidget);
+    });
+
+    testWidgets('the slot bar paints used, over and unused', (tester) async {
+      Future<RenderObject> bar({required int limit, required int count}) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.light,
+            home: SizedBox(
+              width: 300,
+              child: LogsSlotBar(limit: limit, count: count),
+            ),
+          ),
+        );
+        return tester.renderObject(
+          find.descendant(
+            of: find.byType(LogsSlotBar),
+            matching: find.byType(CustomPaint),
+          ),
+        );
+      }
+
+      final first = await bar(limit: 3, count: 1);
+      final context = tester.element(find.byType(LogsSlotBar));
+      final used = context.colors.primaryContainer;
+      final over = context.exhale.danger.solid;
+      final unused = context.colors.surfaceContainerHigh;
+
+      expect(
+        first,
+        paints
+          ..rrect(color: used)
+          ..rrect(color: unused)
+          ..rrect(color: unused),
+      );
+      expect(
+        await bar(limit: 2, count: 3),
+        paints
+          ..rrect(color: used)
+          ..rrect(color: used)
+          ..rrect(color: over),
+      );
     });
   });
 
@@ -808,6 +890,52 @@ void main() {
       expect(find.text('Woke up'), findsNothing);
       expect(find.text('Then nothing. Well done, or asleep.'), findsNothing);
       expect(find.textContaining('Forgot one?'), findsNothing);
+    });
+
+    group('opened on a period', () {
+      LogsQuery week(Trigger trigger) =>
+          LogsQuery(habitId: 1, from: oct(12), to: oct(18), trigger: trigger);
+
+      logsTest('lands on the latest day with a match', (tester) async {
+        await startPlan();
+        await logAt(DateTime(2026, 10, 14, 9), trigger: Trigger.work);
+        await logAt(DateTime(2026, 10, 15, 9), trigger: Trigger.work);
+        await logAt(DateTime(2026, 10, 16, 9), trigger: Trigger.stress);
+        await openPage(tester, week(Trigger.work));
+
+        expect(find.text('Thu, Oct 15'), findsOneWidget);
+        expect(find.text('No Work logs this day.'), findsNothing);
+        expect(find.text('9:00 AM'), findsOneWidget);
+      });
+
+      logsTest('stays on today when today has a match', (tester) async {
+        await startPlan();
+        await logAt(DateTime(2026, 10, 15, 9), trigger: Trigger.work);
+        await logAt(DateTime(2026, 10, 16, 9), trigger: Trigger.work);
+        await openPage(tester, week(Trigger.work));
+
+        expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
+      });
+
+      logsTest('with no match stays on the last day', (tester) async {
+        await startPlan();
+        await logAt(DateTime(2026, 10, 15, 9), trigger: Trigger.stress);
+        await openPage(tester, week(Trigger.work));
+
+        expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
+        expect(find.text('No Work logs this day.'), findsOneWidget);
+      });
+
+      logsTest('a later selection is left alone', (tester) async {
+        await startPlan();
+        await logAt(DateTime(2026, 10, 15, 9), trigger: Trigger.work);
+        await openPage(tester, week(Trigger.work));
+
+        await tapAndSettle(tester, cell(oct(16)));
+
+        expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
+        expect(find.text('No Work logs this day.'), findsOneWidget);
+      });
     });
 
     logsTest('a filter with no match on the day says so', (tester) async {

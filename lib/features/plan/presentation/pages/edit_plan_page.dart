@@ -221,6 +221,12 @@ class _EditPlanForm extends ConsumerWidget {
             form: form,
             currencySymbol: settings.currencySymbol,
             baseline: history.plans.first.startLimit,
+            countsFromDayOne:
+                ref
+                    .watch(priceHistoryProvider(habitId))
+                    .value
+                    ?.isFirstPriceOn(form.today) ??
+                form.storedPriceCents == null,
             onPriceChanged: controller.setPriceText,
             onUnitsChanged: controller.setUnitsPerContainer,
           ),

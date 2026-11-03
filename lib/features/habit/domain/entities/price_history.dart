@@ -52,6 +52,11 @@ class PriceHistory {
     return _unitPrice(point);
   }
 
+  /// Whether a price set on [day] is the first, so it counts from Day 1. A
+  /// point already on [day] is replaced.
+  bool isFirstPriceOn(LogicalDay day) =>
+      _points.isEmpty || (_points.length == 1 && _points.single.fromDay == day);
+
   double? get currentUnitPriceCents =>
       _points.isEmpty ? null : _unitPrice(_points.last);
 

@@ -23,6 +23,19 @@ void main() {
     expect(twoPrices.unitPriceCentsOn(nov3), 45);
   });
 
+  test('a price is the first only with no point, or one on that day', () {
+    PriceHistory of(List<PricePoint> points) =>
+        PriceHistory.forHabit(Habit.smoking, points);
+
+    expect(of(const []).isFirstPriceOn(nov2), isTrue);
+    expect(of([point(nov2, 800)]).isFirstPriceOn(nov2), isTrue);
+    expect(of([point(nov1, 800)]).isFirstPriceOn(nov2), isFalse);
+    expect(
+      of([point(nov1, 800), point(nov2, null)]).isFirstPriceOn(nov2),
+      isFalse,
+    );
+  });
+
   test('days before the first point use the first point', () {
     expect(twoPrices.unitPriceCentsOn(nov1.addDays(-20)), 40);
   });

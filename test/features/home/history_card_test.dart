@@ -179,13 +179,10 @@ void main() {
     await tester.tap(find.textContaining('Work ·'));
     await tester.pumpAndSettle();
 
-    // Opens on today, which has no Work logs; Oct 14 has both.
+    // Today has no Work logs, so it opens on Oct 14, which has both.
     expect(find.text('The evidence.'), findsOneWidget);
-    expect(find.text('No Work logs this day.'), findsOneWidget);
-
-    await tester.tap(find.byKey(ValueKey(LogicalDay(2026, 10, 14))));
-    await tester.pumpAndSettle();
-
+    expect(find.text('Wed, Oct 14'), findsOneWidget);
+    expect(find.text('No Work logs this day.'), findsNothing);
     expect(find.byType(Dismissible), findsNWidgets(2));
 
     await tester.disposeApp();

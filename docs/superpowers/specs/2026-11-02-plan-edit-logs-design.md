@@ -245,6 +245,8 @@ The number in the middle with "{units} a day" ("{unit} a day" at 1) and "One eve
 the smallest multiple of 20 that is at least the larger of the plan's start limit and the value.
 
 - dragging the ring sets the value, from 1 to `R`, and stops at both ends instead of wrapping
+- only the thumb takes a touch at once; elsewhere on the ring a vertical drag scrolls the page, and a
+  press alone changes nothing (M6 review: a scroll past the dial otherwise changed the limit)
 - − and + step by one, up to 80, and `R` follows
 - each change is a selection haptic
 - VoiceOver treats it as one adjustable control: "Daily limit, 9 sessions a day"
@@ -288,8 +290,9 @@ no container.
   rounded to whole units of money as onboarding does
 - `ExhaleReply` when the unit price changes against a stored price. Up: "Up again? Almost like they
   want you to quit." Down: "Cheaper? Don't celebrate with one."
-- fine print: "Counts from today. What you've saved so far stays as it is." With no stored price:
-  "Counts from Day 1."
+- fine print: "Counts from today. What you've saved so far stays as it is." When the price would be
+  the first, with no point yet or only today's: "Counts from Day 1." A price added after clearing
+  one counts from today, so it gets the first line
 - "I'd rather not know" empties the field. Hidden when it is already empty
 
 ### 4.5 Your why and Change habit
@@ -308,6 +311,10 @@ The Your why card leaves the page, and `reason` leaves `EditPlanState`.
 | `planChanged` | "Shake on it again" | saves the price if changed, then starts a new plan today |
 | only `priceChanged` | "Save price" | saves the price; **no new plan**, stage numbers stay |
 | neither | "Shake on it again", disabled | none |
+
+Past the quit date the form opens on a new plan (limit 1, Suggested), so `planChanged` is true
+unless the price is the only change: then it is a price-only save, and a habit that reached its quit
+date can add a price without starting again.
 
 When `planChanged`, the footer caption is "Past days keep their limits. Stages start again at 1."
 Otherwise there is no caption.
@@ -336,7 +343,8 @@ The page holds a mode (Week or Month), the shown period, a selected day and an o
   - a range that is a whole week: Week
   - any other range, such as History's All: Month of the range's end
   - the selected day is the period's last day, or today if earlier
-  - `trigger` opens with that filter on
+  - `trigger` opens with that filter on. Opened on a range, as from History's chips, the selected
+    day moves to the period's latest day with a matching log, if it has one
 - **Stepping** with the arrows moves the period and selects its last available day.
 - **Switching** Week and Month keeps the selected day and shows the period holding it.
 - **Limits:** the earlier arrow stops at the period holding `earliestDayProvider`. The later arrow

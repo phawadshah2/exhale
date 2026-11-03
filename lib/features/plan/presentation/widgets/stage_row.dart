@@ -169,6 +169,7 @@ class _StageRowState extends ConsumerState<StageRow> {
               '${report.stage.limit} a day, $dates'
               '${money == null ? '' : ', ${money.value} ${money.label}'}',
           excludeSemantics: true,
+          onTap: _toggle,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: _toggle,

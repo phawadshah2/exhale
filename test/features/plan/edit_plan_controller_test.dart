@@ -243,6 +243,53 @@ void main() {
       expect(form.planChanged, isTrue);
       expect(form.canSave, isTrue);
     });
+
+    group('past the quit date', () {
+      final finished = PlanDraft(
+        startDay: today.addDays(-40),
+        startLimit: 9,
+        quitDay: today.addDays(-5),
+      );
+
+      test('a price alone saves without a new plan', () async {
+        await seedHabit(finished);
+        final container = await open();
+        final controller = container.read(editPlanProvider(1).notifier)
+          ..setPriceText('12');
+
+        expect(container.read(editPlanProvider(1)).planChanged, isFalse);
+        expect(await controller.save(), isTrue);
+
+        expect((await history()).plans, hasLength(1));
+        expect((await stored()).priceCents, 1200);
+      });
+
+      test('a price and a moved limit start a plan', () async {
+        await seedHabit(finished);
+        final container = await open();
+        final controller = container.read(editPlanProvider(1).notifier)
+          ..setPriceText('12')
+          ..setDailyLimit(5);
+
+        expect(container.read(editPlanProvider(1)).planChanged, isTrue);
+        expect(await controller.save(), isTrue);
+
+        expect((await history()).plans, hasLength(2));
+        expect((await stored()).priceCents, 1200);
+      });
+
+      test('a price put back leaves the form starting a plan', () async {
+        await seedHabit(finished);
+        final container = await open();
+        container.read(editPlanProvider(1).notifier)
+          ..setPriceText('12')
+          ..setPriceText('');
+
+        final form = container.read(editPlanProvider(1));
+        expect(form.planChanged, isTrue);
+        expect(form.canSave, isTrue);
+      });
+    });
   });
 
   group('failures', () {

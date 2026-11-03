@@ -48,6 +48,8 @@ class EditPlanState {
     required this.today,
     required this.currentLimit,
     required this.currentQuitDay,
+    required this.openingLimit,
+    required this.openingQuitDay,
     required this.startLimit,
     required this.quitDay,
     required this.unitsPerContainer,
@@ -67,6 +69,10 @@ class EditPlanState {
 
   /// The quit date of the plan in force, offered as "Keep current".
   final LogicalDay currentQuitDay;
+
+  /// The limit and date the form opened with.
+  final int openingLimit;
+  final LogicalDay openingQuitDay;
   final int startLimit;
   final LogicalDay quitDay;
 
@@ -88,8 +94,13 @@ class EditPlanState {
   PlanDraft get draft =>
       PlanDraft(startDay: today, startLimit: startLimit, quitDay: quitDay);
 
-  bool get planChanged =>
-      startLimit != currentLimit || quitDay != currentQuitDay;
+  /// Past the quit date the form opens on a new plan, which a press starts
+  /// unless the price is the only thing changed.
+  bool get planChanged => canKeepCurrent
+      ? startLimit != currentLimit || quitDay != currentQuitDay
+      : !priceChanged ||
+            startLimit != openingLimit ||
+            quitDay != openingQuitDay;
 
   /// True for an invalid price too, so pressing save can show its error.
   bool get priceChanged =>
@@ -130,6 +141,8 @@ class EditPlanState {
     today: today,
     currentLimit: currentLimit,
     currentQuitDay: currentQuitDay,
+    openingLimit: openingLimit,
+    openingQuitDay: openingQuitDay,
     startLimit: startLimit ?? this.startLimit,
     quitDay: quitDay ?? this.quitDay,
     quitPreset: quitPreset != null ? quitPreset() : this.quitPreset,
@@ -179,6 +192,8 @@ class EditPlanController extends Notifier<EditPlanState> {
       today: today,
       currentLimit: plan.limitOn(today),
       currentQuitDay: plan.quitDay,
+      openingLimit: startLimit,
+      openingQuitDay: quitDay,
       startLimit: startLimit,
       quitDay: quitDay,
       quitPreset: preset,
