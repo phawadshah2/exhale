@@ -105,7 +105,10 @@ class CurrentStageCard extends ConsumerWidget {
                 ? null
                 : StageMoney(
                     value: money(saved),
-                    label: PlanCopy.ofToSave(money(toSave)),
+                    // A stage at the baseline has nothing to save of.
+                    label: toSave > 0
+                        ? PlanCopy.ofToSave(money(toSave))
+                        : PlanCopy.saved,
                     color: context.exhale.success.foreground,
                   ),
           ),

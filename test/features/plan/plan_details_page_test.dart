@@ -288,6 +288,27 @@ void main() {
       expect(find.text('to save'), findsNWidgets(8));
       await tester.disposeApp();
     });
+
+    testWidgets('a current stage at the baseline has nothing to save of', (
+      tester,
+    ) async {
+      // Day 3 of stage 1, at 12 a day: the limit is still the baseline.
+      await seedHabit(
+        PlanDraft(startDay: today.addDays(-2), startLimit: 12, quitDay: quit),
+        habit: Habit.vaping,
+        priceCents: 800,
+      );
+      await logOn(today.addDays(-2), times: 4);
+      await openDetails(tester);
+
+      // (12 − 4 + 12) × 40 cents.
+      final shown = find.text(r'of $0.00').evaluate().length;
+      final saved = find.text('saved').evaluate().length;
+      expect(find.text(r'$8.00'), findsWidgets);
+      await tester.disposeApp();
+      expect(shown, 0);
+      expect(saved, 1);
+    });
   });
 
   group('rings', () {

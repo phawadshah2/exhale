@@ -239,7 +239,6 @@ class _MonthChip extends StatelessWidget {
         child: Container(
           constraints: const BoxConstraints(minHeight: 44),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-          alignment: Alignment.center,
           decoration: ShapeDecoration(
             color: selected ? exhale.emphasis : null,
             shape: StadiumBorder(
@@ -248,12 +247,15 @@ class _MonthChip extends StatelessWidget {
               ),
             ),
           ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: context.textTheme.labelMedium?.copyWith(
-              color: selected ? exhale.onEmphasis : colors.onSurface,
-              fontWeight: FontWeight.w600,
+          child: Center(
+            widthFactor: 1,
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: context.textTheme.labelMedium?.copyWith(
+                color: selected ? exhale.onEmphasis : colors.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),

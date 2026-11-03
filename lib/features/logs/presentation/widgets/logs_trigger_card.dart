@@ -166,6 +166,7 @@ class _Bar extends StatelessWidget {
         child: SizedBox(
           height: 10,
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 2,
             children: [
               for (final share in breakdown.shares)
@@ -301,16 +302,18 @@ class _ChipBody extends StatelessWidget {
         child: Container(
           constraints: const BoxConstraints(minHeight: 34),
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          alignment: Alignment.center,
           decoration: ShapeDecoration(
             color: fill,
             shape: StadiumBorder(side: BorderSide(color: border)),
           ),
-          child: Text(
-            label,
-            style: context.textTheme.labelMedium?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w600,
+          child: Center(
+            widthFactor: 1,
+            child: Text(
+              label,
+              style: context.textTheme.labelMedium?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),

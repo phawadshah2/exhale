@@ -373,6 +373,11 @@ void main() {
       await tapAndSettle(tester, find.text('Oct 12 – Oct 18'));
       expect(find.text('Sep 2026'), findsOneWidget);
       expect(find.text('Oct 2026'), findsOneWidget);
+      // Side by side, not a full-width row each.
+      expect(
+        tester.getTopLeft(find.text('Sep 2026')).dy,
+        tester.getTopLeft(find.text('Oct 2026')).dy,
+      );
 
       await tapAndSettle(tester, find.text('Sep 2026'));
 
@@ -578,6 +583,28 @@ void main() {
       expect(find.text('Work 1'), findsOneWidget);
       expect(find.text('None 1'), findsOneWidget);
       expect(segments(tester), hasLength(3));
+    });
+
+    logsTest('the bar has height and a chip only its own width', (
+      tester,
+    ) async {
+      await seedTriggers();
+      await openPage(tester);
+
+      final bar = find.byKey(const Key('logs-trigger-bar'));
+      for (final segment
+          in find
+              .descendant(of: bar, matching: find.byType(ColoredBox))
+              .evaluate()) {
+        expect((segment.renderObject! as RenderBox).size.height, 10);
+      }
+      final chip = find
+          .ancestor(of: find.text('Work 1'), matching: find.byType(Container))
+          .first;
+      expect(
+        tester.getSize(chip).width,
+        lessThan(tester.getSize(bar).width / 2),
+      );
     });
 
     logsTest('no logs in the period hides the bar and chips', (tester) async {
