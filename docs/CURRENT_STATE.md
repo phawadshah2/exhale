@@ -12,7 +12,7 @@ Updated 2026-11-03. The full log of earlier sessions is in
 | M6 Plan details, Edit plan, Logs (Tasks 1 to 12) | Done on `feat/plan-and-stages`: reviewed, two simulator walks |
 | UI fixes from Fawad's review (Phase 4b, F1 to F4) | Done; seen in the simulator, light mode |
 | UI review round 2 (Logs, Plan, Home, transitions) | Done, committed (a947c2d) |
-| M7 Stage management (Tasks 13 to 20) | Tasks 13 to 16 done; Task 17 next |
+| M7 Stage management (Tasks 13 to 20) | Tasks 13 to 17 done; Task 18 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 Plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md`. Spec for M7:
@@ -47,6 +47,8 @@ rows still to do).
 - Task 16: `RunStageCheck` (one transaction from read to write) and `StageCheckListener` in the
   shell; runs for the single habit at start and on a day change. Added
   `HabitLogRepository.getLogs`, a one-shot `watchLogs`.
+- Task 17: `PlanChoices.review` / `reassess` and `PlanChoice` (`plan_choices.dart`, integer
+  length maths), `HabitWording.supportLine` and `stopSuddenlyLine`.
 
 ## UI review round 2 (a947c2d, 2026-11-03)
 
@@ -66,8 +68,9 @@ rows still to do).
 
 ## Next action
 
-Task 17, `PlanChoices` and wording (Sonnet 5.5 medium): read its block in the plan and Stages
-spec sections 4 and 5. Fawad may still ask for round 2 fixes after a full restart. The M7 review
+Task 18, Home cards (Sonnet 5.5 medium): read its block in the plan and Stages spec section 5.
+Open point for Tasks 18 and 19: a choice's quit date can fall before the current one (a late
+plan, a small real number), and the spec has only "later" labels. Fawad may still ask for round 2 fixes after a full restart. The M7 review
 (Task 20) runs on Opus 5.5 high.
 
 ## Open checks

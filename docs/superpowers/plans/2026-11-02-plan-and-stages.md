@@ -798,17 +798,17 @@ abstract final class StageChecks { static StageCheckResult? evaluate({required P
   `PlanChoices.reassess({required ReductionPlan current, required LogicalDay today, required int average})`.
   `HabitWording.supportLine` and `HabitWording.stopSuddenlyLine` (null except alcohol).
 
-- [ ] **Step 1: Write the failing tests** with the mocks' numbers:
+- [x] **Step 1: Write the failing tests** with the mocks' numbers:
   - **AC:** 12 a day from 2026-10-12, quit Jan 4, a hold from Nov 9, today Nov 16, average 11, checked limit 9. Real number:
     11 a day, Feb 1, +21 days. Slow down: 9 a day, every 14 days, Mar 22, +70. Keep: 8 today, Jan 11, 0.
   - **AD:** no hold, today Nov 9, average 12. Start again: 12, Feb 1, +28. Keep: Jan 4, 0.
   - the 80 cap; the plan length rounded up; `pace` under 1.5; the later-of rule when `suggestedQuitDay` is earlier than the
     current quit date
   - wording: nicotine habits and others per Stages spec 5.4; `stopSuddenlyLine` for alcohol only
-- [ ] **Step 2: Run, expect failure.**
-- [ ] **Step 3: Implement** Stages spec 4.
-- [ ] **Step 4: Run, expect pass.**
-- [ ] **Step 5: Commit** `feat(plan): add the review and reassess choices`.
+- [x] **Step 2: Run, expect failure.**
+- [x] **Step 3: Implement** Stages spec 4.
+- [x] **Step 4: Run, expect pass.**
+- [x] **Step 5: Commit** `feat(plan): add the review and reassess choices`.
 
 ### Task 18: Home cards
 
