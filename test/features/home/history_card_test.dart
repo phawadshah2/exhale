@@ -1,6 +1,10 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/home/presentation/widgets/history/month_ring_calendar.dart';
+import 'package:exhale/features/home/presentation/widgets/history/week_line_chart.dart';
+import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
+import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:flutter/material.dart';
@@ -93,6 +97,82 @@ void main() {
     expect(find.text('Over'), findsOneWidget);
     expect(find.text('Before plan'), findsOneWidget);
     expect(find.text('31'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('month keeps one height and greys the neighbouring days', (
+    tester,
+  ) async {
+    await seedWeek();
+    await showHistory(tester);
+    await tester.tap(find.text('Month'));
+    await tester.pumpAndSettle();
+
+    expect(
+      MonthRingCalendar.heightOf(PeriodRange.monthOf(LogicalDay(2027, 2, 10))),
+      MonthRingCalendar.heightOf(PeriodRange.monthOf(LogicalDay(2026, 10, 1))),
+    );
+
+    final calendar = find.byType(MonthRingCalendar);
+    // Oct 2026 starts on a Thursday: Sep 28 to 30 lead and Nov 1 to 8 trail.
+    final september = find.descendant(of: calendar, matching: find.text('30'));
+    final november = find.descendant(of: calendar, matching: find.text('1'));
+    expect(september, findsNWidgets(2));
+    expect(november, findsNWidgets(2));
+
+    final before = find.byType(LogsPage);
+    await tester.tap(november.last);
+    await tester.pumpAndSettle();
+    expect(before, findsNothing);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('month rings are thin and the future ones are dotted', (
+    tester,
+  ) async {
+    await seedWeek();
+    await showHistory(tester);
+    await tester.tap(find.text('Month'));
+    await tester.pumpAndSettle();
+
+    final rings = find.descendant(
+      of: find.byType(MonthRingCalendar),
+      matching: find.byType(CustomPaint),
+    );
+    // Oct 1 is before the plan, Oct 17 is in the future.
+    expect(tester.renderObject(rings.at(0)), paints..arc(strokeWidth: 3));
+    expect(tester.renderObject(rings.at(16)), isNot(paints..arc()));
+    expect(tester.renderObject(rings.at(16)), paints..path());
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('week line and day dots are thin', (tester) async {
+    await seedWeek();
+    await showHistory(tester);
+
+    final chart = tester.renderObject(
+      find
+          .descendant(
+            of: find.byType(WeekLineChart),
+            matching: find.byType(CustomPaint),
+          )
+          .first,
+    );
+    bool stroked(Symbol call, List<dynamic> args, double width) =>
+        call == #drawPath && (args[1] as Paint).strokeWidth == width;
+    expect(chart, paints..something((c, args) => stroked(c, args, 3)));
+    expect(
+      chart,
+      paints..something(
+        (call, args) =>
+            call == #drawCircle &&
+            args[1] == 4 &&
+            (args[2] as Paint).strokeWidth == 2,
+      ),
+    );
 
     await tester.disposeApp();
   });

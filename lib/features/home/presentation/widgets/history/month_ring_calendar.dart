@@ -26,20 +26,24 @@ class MonthRingCalendar extends StatelessWidget {
   static const double _headerHeight = 24;
   static const double _rowHeight = 48;
 
-  static int _weeks(PeriodRange range) =>
-      ((range.from.weekday - 1 + range.length) / 7).ceil();
+  static const int _weeks = 6;
 
-  /// Height for the weeks that [range] spans.
+  /// Always six weeks tall, so swiping between months never changes the
+  /// height. The days around the month belong to its neighbours.
   static double heightOf(PeriodRange range) =>
-      _headerHeight + _weeks(range) * _rowHeight;
+      _headerHeight + _weeks * _rowHeight;
 
   @override
   Widget build(BuildContext context) {
     final slots = summary.slots;
     final leading = summary.range.from.weekday - 1;
-    final cells = <DaySlot?>[for (var i = 0; i < leading; i++) null, ...slots];
-    while (cells.length % 7 != 0) {
-      cells.add(null);
+    final first = summary.range.from;
+    final cells = <Object>[
+      for (var i = leading; i > 0; i--) first.addDays(-i),
+      ...slots,
+    ];
+    while (cells.length < _weeks * 7) {
+      cells.add(first.addDays(cells.length - leading));
     }
     final label = context.textTheme.labelMedium!.copyWith(
       color: context.colors.onSurfaceVariant,
@@ -54,11 +58,11 @@ class MonthRingCalendar extends StatelessWidget {
     );
   }
 
-  Widget _grid(List<DaySlot?> cells, TextStyle label, double reveal) {
+  Widget _grid(List<Object> cells, TextStyle label, double reveal) {
     // The wave ends on the last shown day (today in this month), so its ring
     // finishes with the ring on the day card.
     final last = math.max(
-      cells.lastIndexWhere((c) => c != null && c.kind != DaySlotKind.future),
+      cells.lastIndexWhere((c) => c is DaySlot && c.kind != DaySlotKind.future),
       1,
     );
     return Column(
@@ -81,15 +85,16 @@ class MonthRingCalendar extends StatelessWidget {
               children: [
                 for (var col = 0; col < 7; col++)
                   Expanded(
-                    child: cells[row * 7 + col] == null
-                        ? const SizedBox.shrink()
-                        : _DayCell(
-                            slot: cells[row * 7 + col]!,
-                            onTap: onDayTap,
-                            reveal:
-                                (reveal * 1.6 - (row * 7 + col) / last * 0.6)
-                                    .clamp(0.0, 1.0),
-                          ),
+                    child: switch (cells[row * 7 + col]) {
+                      final LogicalDay day => _OutsideDay(day: day),
+                      final DaySlot slot => _DayCell(
+                        slot: slot,
+                        onTap: onDayTap,
+                        reveal: (reveal * 1.6 - (row * 7 + col) / last * 0.6)
+                            .clamp(0.0, 1.0),
+                      ),
+                      _ => const SizedBox.shrink(),
+                    },
                   ),
               ],
             ),
@@ -97,6 +102,26 @@ class MonthRingCalendar extends StatelessWidget {
       ],
     );
   }
+}
+
+/// A day of the previous or next month: shown for context, never tapped.
+class _OutsideDay extends StatelessWidget {
+  const _OutsideDay({required this.day});
+
+  final LogicalDay day;
+
+  @override
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: Center(
+      child: Text(
+        '${day.day}',
+        style: context.textTheme.labelSmall?.copyWith(
+          color: context.colors.onSurfaceVariant.withValues(alpha: 0.35),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ),
+  );
 }
 
 class _DayCell extends StatelessWidget {
@@ -155,8 +180,8 @@ class _DayCell extends StatelessWidget {
                         color: progress.status.barColor(context),
                       ),
                 dashed: future,
-                track: colors.surfaceContainerHigh,
-                dash: colors.outlineVariant,
+                track: colors.outlineVariant.withValues(alpha: 0.5),
+                dash: colors.onSurfaceVariant.withValues(alpha: 0.6),
               ),
               child: Center(
                 child: Text(
@@ -196,11 +221,12 @@ class _RingPainter extends CustomPainter {
     final rect = Rect.fromCircle(center: center, radius: 14);
     if (dashed) {
       canvas.drawPath(
-        dashedPath(Path()..addOval(rect), dash: 3, gap: 3),
+        dashedPath(Path()..addOval(rect), dash: 0.1, gap: 4.4),
         Paint()
           ..color = dash
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.5,
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = 2,
       );
       return;
     }
@@ -212,7 +238,7 @@ class _RingPainter extends CustomPainter {
       Paint()
         ..color = track
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 4,
+        ..strokeWidth = 3,
     );
     final arc = progress;
     if (arc == null || arc.fraction <= 0) return;
@@ -224,7 +250,7 @@ class _RingPainter extends CustomPainter {
       Paint()
         ..color = arc.color
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 4
+        ..strokeWidth = 3
         ..strokeCap = StrokeCap.round,
     );
   }
