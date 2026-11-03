@@ -12,7 +12,7 @@ Updated 2026-11-03. The full log of earlier sessions is in
 | M6 Plan details, Edit plan, Logs (Tasks 1 to 12) | Done on `feat/plan-and-stages`: reviewed, two simulator walks |
 | UI fixes from Fawad's review (Phase 4b, F1 to F4) | Done; seen in the simulator, light mode |
 | UI review round 2 (Logs, Plan, Home, transitions) | Done, committed (a947c2d) |
-| M7 Stage management (Tasks 13 to 20) | Tasks 13 to 17 done; Task 18 next |
+| M7 Stage management (Tasks 13 to 20) | Tasks 13 to 18 done; Task 19 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 Plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md`. Spec for M7:
@@ -33,22 +33,19 @@ rows still to do).
 
 - F1 to F4 (543ecc0, 203877e, 381598e, 389f483): ring card, History, Plan card (Edit pill
   removed), Logs (weeks only, calendar sheet, week swipe, current-stage highlight).
-- Task 13 (cdbb703): `PlanHold`; `ReductionPlan` takes `holds`; `quitDay` includes held
-  days, `agreedQuitDay` is stored; `daysPerDrop` ignores holds.
-- Task 14 (0c513c3): schema v11, `plan_holds` and `stage_checks`, `exhale_v10.sqlite`
-  fixture, plans read their holds, `replaceFrom` drops their holds and checks,
-  `StageCheck`, `StageCheckRepository`, `stageCheckRepositoryProvider`,
-  `stageChecksProvider`. `record(closesHoldWindow:)` stamps the old hold card with
-  midnight of the new check's day (no clock in the data layer).
-- Simulator walk of F1 to F4 seen working (iOS 26.5, seeded, light mode).
-
-- Task 15: `StageChecks.evaluate` in `lib/features/plan/domain/services/stage_checks.dart`
-  (37 tests). A skipped result stores zeros and closes no waiting hold.
-- Task 16: `RunStageCheck` (one transaction from read to write) and `StageCheckListener` in the
-  shell; runs for the single habit at start and on a day change. Added
-  `HabitLogRepository.getLogs`, a one-shot `watchLogs`.
+- Tasks 13 and 14 (cdbb703, 0c513c3): `PlanHold` and `ReductionPlan.holds` (`quitDay` includes
+  held days, `agreedQuitDay` is stored); schema v11 (`plan_holds`, `stage_checks`,
+  `exhale_v10.sqlite` fixture), `StageCheck`, `StageCheckRepository`, `stageChecksProvider`.
+  `record(closesHoldWindow:)` stamps the old hold card with midnight of the new check's day.
+- F1 to F4 seen working in the simulator (iOS 26.5, seeded, light mode).
+- Task 15: `StageChecks.evaluate` (`stage_checks.dart`); a skipped result closes no hold.
+- Task 16: `RunStageCheck` (one transaction) and `StageCheckListener` in the shell; runs at
+  start and on a day change. Added `HabitLogRepository.getLogs`.
 - Task 17: `PlanChoices.review` / `reassess` and `PlanChoice` (`plan_choices.dart`, integer
   length maths), `HabitWording.supportLine` and `stopSuddenlyLine`.
+- Task 18: `stageCardProvider` (current plan's unanswered row only), `StageCards` in the
+  ring card's slot like `QuitReachedCard` (the mock draws separate cards; the spec says the
+  slot), `AnswerStageCheck`, `KeepOriginalDate`. Not seen in the simulator or dark mode.
 
 ## UI review round 2 (a947c2d, 2026-11-03)
 
@@ -68,10 +65,11 @@ rows still to do).
 
 ## Next action
 
-Task 18, Home cards (Sonnet 5.5 medium): read its block in the plan and Stages spec section 5.
-Open point for Tasks 18 and 19: a choice's quit date can fall before the current one (a late
-plan, a small real number), and the spec has only "later" labels. Fawad may still ask for round 2 fixes after a full restart. The M7 review
-(Task 20) runs on Opus 5.5 high.
+Task 19, review and reassess sheets (Sonnet 5.5 medium): read its block in the plan and Stages
+spec sections 4 and 5.3 to 5.5. The cards call `showReviewSheet` / `showReassessSheet` in
+`stage_sheets.dart`, which are empty stubs to replace. Open point: a choice's quit date can
+fall before the current one, and the spec has only "later" labels. Fawad may still ask for
+round 2 fixes after a full restart. The M7 review (Task 20) runs on Opus 5.5 high.
 
 ## Open checks
 

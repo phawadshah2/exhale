@@ -825,7 +825,7 @@ abstract final class StageChecks { static StageCheckResult? evaluate({required P
   `stageCardProvider`: `ProviderFamily<StageCard?, int>`, reading only the **current plan's** unanswered row;
   `AnswerStageCheck` and `KeepOriginalDate` use cases.
 
-- [ ] **Step 1: Write the failing tests** (iOS where they pop):
+- [x] **Step 1: Write the failing tests** (iOS where they pop):
   - hold card copy from Stages spec 5.1, including "Zero can wait." on the last stage and the late-open wording
   - Keep is offered only on the check's day; it restores today's limit and removes the card; the next day only Got it shows
   - Got it answers; a failed save keeps the card with a snackbar; two presses save once
@@ -833,11 +833,11 @@ abstract final class StageChecks { static StageCheckResult? evaluate({required P
   - reassess card copy
   - cards show on today only; a review card hides `QuitReachedCard`
   - **saving Edit plan while a review card waits: the card goes and doesn't return** (Review Focus)
-- [ ] **Step 2: Run, expect failure.**
-- [ ] **Step 3: Implement** against frames AA and AB, in the `_Reveal` slot beside `QuitReachedCard`. Buttons open the sheets
+- [x] **Step 2: Run, expect failure.**
+- [x] **Step 3: Implement** against frames AA and AB, in the `_Reveal` slot beside `QuitReachedCard`. Buttons open the sheets
   through a stub until Task 19.
-- [ ] **Step 4: Run, expect pass.**
-- [ ] **Step 5: Commit** `feat(home): show the hold, review and reassess cards`.
+- [x] **Step 4: Run, expect pass.**
+- [x] **Step 5: Commit** `feat(home): show the hold, review and reassess cards`.
 
 ### Task 19: Review and reassess sheets
 
