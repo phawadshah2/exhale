@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:exhale/core/domain/time/logical_day.dart';
-import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/status_badge.dart';
@@ -29,9 +28,7 @@ class LogsTriggerCard extends StatelessWidget {
   final LogicalDay today;
   final ValueChanged<Trigger> onTrigger;
 
-  String get _label => selection.mode == LogsMode.week
-      ? LogsCalendarCard.ago(selection, today)
-      : AppFormat.month(selection.period.from);
+  String get _label => LogsCalendarCard.ago(selection, today);
 
   @override
   Widget build(BuildContext context) {

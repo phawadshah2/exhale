@@ -6,12 +6,14 @@ import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/theme/app_theme.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
 import 'package:exhale/features/logs/presentation/widgets/logs_rail_card.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
+import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
@@ -329,61 +331,78 @@ void main() {
       expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
     });
 
-    logsTest('Month shows the month, and its arrows step', (tester) async {
-      await startPlan(from: LogicalDay(2026, 9, 1));
-      await openPage(tester);
-
-      await tapAndSettle(tester, find.text('Month'));
-      expect(find.text('October 2026'), findsOneWidget);
-      expect(find.text('This month'), findsOneWidget);
-      expect(find.text('October'), findsOneWidget);
-
-      await tapAndSettle(tester, find.byTooltip('Earlier'));
-      expect(find.text('September 2026'), findsOneWidget);
-      expect(find.text('Last month'), findsOneWidget);
-      expect(find.text('September'), findsOneWidget);
-      expect(find.text('Wed, Sep 30'), findsOneWidget);
-
-      await tapAndSettle(tester, find.byTooltip('Earlier'));
-      expect(find.text('2 months ago'), findsOneWidget);
-    });
-
-    logsTest('switching keeps the selected day', (tester) async {
+    logsTest('there is no Week or Month switch', (tester) async {
       await startPlan();
       await openPage(tester);
 
-      await tapAndSettle(tester, cell(oct(14)));
-      await tapAndSettle(tester, find.text('Month'));
-      expect(find.text('Wed, Oct 14'), findsOneWidget);
-      expect(find.text('October 2026'), findsOneWidget);
-
-      await tapAndSettle(tester, cell(oct(5)));
-      await tapAndSettle(tester, find.text('Week'));
-      expect(find.text('Mon, Oct 5'), findsOneWidget);
-      expect(find.text('Oct 5 – Oct 11'), findsOneWidget);
+      expect(find.text('Week'), findsNothing);
+      expect(find.text('Month'), findsNothing);
     });
 
-    logsTest('the title opens month chips, and a pick closes them', (
+    logsTest('the title opens a calendar, and a pick jumps to its week', (
       tester,
     ) async {
       await startPlan();
       await openPage(tester);
-      expect(find.text('Sep 2026'), findsNothing);
+      expect(find.text('Pick a day'), findsNothing);
 
       await tapAndSettle(tester, find.text('Oct 12 – Oct 18'));
-      expect(find.text('Sep 2026'), findsOneWidget);
-      expect(find.text('Oct 2026'), findsOneWidget);
-      // Side by side, not a full-width row each.
-      expect(
-        tester.getTopLeft(find.text('Sep 2026')).dy,
-        tester.getTopLeft(find.text('Oct 2026')).dy,
+      expect(find.text('Pick a day'), findsOneWidget);
+      expect(find.text('October 2026'), findsOneWidget);
+
+      await tapAndSettle(tester, find.byTooltip('Previous month'));
+      expect(find.text('September 2026'), findsOneWidget);
+      await tapAndSettle(
+        tester,
+        find.descendant(
+          of: find.byType(AppSheetFrame),
+          matching: find.text('30'),
+        ),
       );
 
-      await tapAndSettle(tester, find.text('Sep 2026'));
-
-      expect(find.text('September 2026'), findsOneWidget);
+      expect(find.text('Pick a day'), findsNothing);
+      expect(find.text('Sep 28 – Oct 4'), findsOneWidget);
       expect(find.text('Wed, Sep 30'), findsOneWidget);
-      expect(find.text('Sep 2026'), findsNothing);
+      expect(find.text('2 weeks ago'), findsNWidgets(2));
+    });
+
+    logsTest('the calendar stops at the plan window', (tester) async {
+      await startPlan();
+      await openPage(tester);
+      await tapAndSettle(tester, find.text('Oct 12 – Oct 18'));
+
+      expect(arrow(tester, 'Next month').onPressed, isNull);
+      // Today is Oct 16: the 17th can't be picked.
+      await tapAndSettle(
+        tester,
+        find.descendant(
+          of: find.byType(AppSheetFrame),
+          matching: find.text('17'),
+        ),
+      );
+      expect(find.text('Pick a day'), findsOneWidget);
+
+      // The earliest day is Mon Sep 14.
+      await tapAndSettle(tester, find.byTooltip('Previous month'));
+      expect(arrow(tester, 'Previous month').onPressed, isNull);
+    });
+
+    logsTest('swiping moves a week at a time', (tester) async {
+      await startPlan();
+      await openPage(tester);
+
+      await tester.fling(cell(oct(14)), const Offset(300, 0), 1000);
+      await tester.pumpAndSettle();
+      expect(find.text('Oct 5 – Oct 11'), findsOneWidget);
+
+      await tester.fling(cell(oct(7)), const Offset(-300, 0), 1000);
+      await tester.pumpAndSettle();
+      expect(find.text('Oct 12 – Oct 18'), findsOneWidget);
+
+      // This week is the latest.
+      await tester.fling(cell(oct(14)), const Offset(-300, 0), 1000);
+      await tester.pumpAndSettle();
+      expect(find.text('Oct 12 – Oct 18'), findsOneWidget);
     });
 
     logsTest('a plan day fills by use, coloured by status', (tester) async {
@@ -428,16 +447,30 @@ void main() {
       expect(zero.color, context.exhale.success.solid);
     });
 
-    logsTest('the selected day uses the on-accent ring and date', (
+    logsTest('the selected day is highlighted like the current stage', (
       tester,
     ) async {
       await startPlan();
       await openPage(tester, onDay(oct(15)));
       final context = tester.element(find.byType(LogsPage));
 
-      expect(ringOf(tester, oct(15)).color, context.exhale.onEmphasis);
-      expect(dateOf(tester, oct(15)).style?.color, context.exhale.onEmphasis);
-      expect(ringOf(tester, oct(14)).color, isNot(context.exhale.onEmphasis));
+      BoxDecoration? backing(LogicalDay day) =>
+          tester
+                  .widget<Container>(
+                    find
+                        .descendant(
+                          of: cell(day),
+                          matching: find.byType(Container),
+                        )
+                        .first,
+                  )
+                  .decoration
+              as BoxDecoration?;
+
+      expect(backing(oct(15))?.color, context.exhale.inset);
+      expect(backing(oct(14)), isNull);
+      expect(ringOf(tester, oct(15)).color, isNot(context.exhale.onEmphasis));
+      expect(dateOf(tester, oct(15)).style?.fontWeight, FontWeight.w800);
     });
 
     logsTest('today has a heavier date', (tester) async {
@@ -777,6 +810,28 @@ void main() {
   });
 
   group('the rail', () {
+    logsTest('a log row sits on the card colour in light mode', (tester) async {
+      final repository = sl<SettingsRepository>();
+      final current = await repository.get() as Success<AppSettings>;
+      await repository.save(
+        current.value.copyWith(themePreference: ThemePreference.light),
+      );
+      await startPlan();
+      await logAt(DateTime(2026, 10, 15, 9));
+      await openPage(tester, onDay(oct(15)));
+      final context = tester.element(find.byType(LogsPage));
+
+      final row = tester.widget<ColoredBox>(
+        find
+            .descendant(
+              of: find.byType(Dismissible),
+              matching: find.byType(ColoredBox),
+            )
+            .first,
+      );
+      expect(row.color, Theme.of(context).cardTheme.color);
+    });
+
     logsTest('a past day shows its marks, logs and gaps', (tester) async {
       await setDayWindow();
       await startPlan();
@@ -1109,10 +1164,12 @@ void main() {
     });
     tearDown(binding.platformDispatcher.clearTextScaleFactorTestValue);
 
-    Future<void> expectWhole(WidgetTester tester) async {
+    Future<void> expectWhole(WidgetTester tester, {Finder? within}) async {
       tester.view.physicalSize = const Size(375 * 3, 812 * 3);
       await tester.pumpAndSettle();
-      final clipped = tester.clippedTexts(within: find.byType(LogsPage));
+      final clipped = tester.clippedTexts(
+        within: within ?? find.byType(LogsPage),
+      );
       expect(clipped, isEmpty);
     }
 
@@ -1128,17 +1185,23 @@ void main() {
       await logAt(DateTime(2026, 10, 16, 12), trigger: Trigger.watchingTv);
       await logAt(DateTime(2026, 10, 16, 15, 40));
       await openPage(tester);
-      await tapAndSettle(tester, find.text('Oct 12 – Oct 18'));
 
       await expectWhole(tester);
     });
 
-    logsTest('a Month and an extreme limit stay whole', (tester) async {
+    logsTest('the calendar sheet stays whole', (tester) async {
+      await startPlan();
+      await openPage(tester);
+      await tapAndSettle(tester, find.text('Oct 12 – Oct 18'));
+
+      await expectWhole(tester, within: find.byType(AppSheetFrame));
+    });
+
+    logsTest('an extreme limit stays whole', (tester) async {
       await setDayWindow();
       await startPlan(from: LogicalDay(2026, 9, 1), limit: 80, days: 560);
       await logAt(DateTime(2026, 10, 16, 8), times: 90);
       await openPage(tester);
-      await tapAndSettle(tester, find.text('Month'));
 
       await expectWhole(tester);
     });

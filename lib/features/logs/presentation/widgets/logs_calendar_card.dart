@@ -5,17 +5,17 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/core/widgets/pill_segmented_control.dart';
 import 'package:exhale/features/home/presentation/widgets/history/month_ring_calendar.dart';
 import 'package:exhale/features/logs/domain/logs_selection.dart';
 import 'package:exhale/features/logs/presentation/providers/logs_providers.dart';
+import 'package:exhale/features/logs/presentation/widgets/logs_date_picker.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Week and Month, the arrows, the month chips and a ring for each day.
+/// The week's arrows, a title that opens a calendar, and a ring for each day.
 class LogsCalendarCard extends StatefulWidget {
   const LogsCalendarCard({
     required this.selection,
@@ -32,15 +32,13 @@ class LogsCalendarCard extends StatefulWidget {
   final LogicalDay earliest;
   final ValueChanged<LogsSelection> onChanged;
 
-  /// This week, Last week, 3 weeks ago, or the same in months.
+  /// This week, Last week, or 3 weeks ago.
   static String ago(LogsSelection selection, LogicalDay today) {
-    final mode = selection.mode;
-    final name = mode == LogsMode.week ? 'week' : 'month';
-    final back = mode.unit.periodsBetween(selection.period.from, today);
+    final back = ChartPeriod.week.periodsBetween(selection.period.from, today);
     return switch (back) {
-      0 => 'This $name',
-      1 => 'Last $name',
-      _ => '$back ${name}s ago',
+      0 => 'This week',
+      1 => 'Last week',
+      _ => '$back weeks ago',
     };
   }
 
@@ -49,8 +47,6 @@ class LogsCalendarCard extends StatefulWidget {
 }
 
 class _LogsCalendarCardState extends State<LogsCalendarCard> {
-  bool _picking = false;
-
   void _change(LogsSelection selection) {
     unawaited(HapticFeedback.selectionClick());
     widget.onChanged(selection);
@@ -58,19 +54,29 @@ class _LogsCalendarCardState extends State<LogsCalendarCard> {
 
   String get _title {
     final PeriodRange(:from, :to) = widget.selection.period;
-    return widget.selection.mode == LogsMode.week
-        ? '${AppFormat.monthDay(from)} – ${AppFormat.monthDay(to)}'
-        : AppFormat.monthYear(from);
+    return '${AppFormat.monthDay(from)} – ${AppFormat.monthDay(to)}';
   }
 
-  List<LogicalDay> get _months => [
-    for (
-      var month = widget.earliest.startOfMonth;
-      !month.isAfter(widget.today);
-      month = LogicalDay(month.year, month.month + 1, 1)
-    )
-      month,
-  ];
+  Future<void> _pickDay() async {
+    final day = await showLogsDatePicker(
+      context,
+      selected: widget.selection.selected,
+      earliest: widget.earliest,
+      today: widget.today,
+    );
+    if (day != null && mounted) _change(widget.selection.select(day));
+  }
+
+  /// Swiping right goes to the week before, as in History.
+  void _swipe(DragEndDetails details) {
+    final velocity = details.primaryVelocity ?? 0;
+    final selection = widget.selection;
+    if (velocity > 200 && selection.canGoEarlier(widget.earliest)) {
+      _change(selection.step(-1, today: widget.today));
+    } else if (velocity < -200 && selection.canGoLater(widget.today)) {
+      _change(selection.step(1, today: widget.today));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,14 +91,6 @@ class _LogsCalendarCardState extends State<LogsCalendarCard> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: AppSpacing.sm,
           children: [
-            PillSegmentedControl<LogsMode>(
-              selected: selection.mode,
-              onChanged: (mode) => widget.onChanged(selection.withMode(mode)),
-              segments: const [
-                PillSegment(value: LogsMode.week, label: 'Week'),
-                PillSegment(value: LogsMode.month, label: 'Month'),
-              ],
-            ),
             Row(
               children: [
                 IconButton(
@@ -106,8 +104,7 @@ class _LogsCalendarCardState extends State<LogsCalendarCard> {
                   child: _Title(
                     title: _title,
                     subtitle: LogsCalendarCard.ago(selection, today),
-                    open: _picking,
-                    onTap: () => setState(() => _picking = !_picking),
+                    onTap: () => unawaited(_pickDay()),
                   ),
                 ),
                 IconButton(
@@ -119,31 +116,16 @@ class _LogsCalendarCardState extends State<LogsCalendarCard> {
                 ),
               ],
             ),
-            if (_picking)
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: AppSpacing.sm,
-                runSpacing: AppSpacing.sm,
-                children: [
-                  for (final month in _months)
-                    _MonthChip(
-                      label: '${AppFormat.shortMonth(month)} ${month.year}',
-                      selected:
-                          selection.mode == LogsMode.month &&
-                          selection.period.from == month,
-                      onTap: () {
-                        setState(() => _picking = false);
-                        _change(selection.pickMonth(month, today: today));
-                      },
-                    ),
-                ],
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onHorizontalDragEnd: _swipe,
+              child: _Grid(
+                selection: selection,
+                view: widget.view,
+                today: today,
+                earliest: widget.earliest,
+                onSelect: (day) => _change(selection.select(day)),
               ),
-            _Grid(
-              selection: selection,
-              view: widget.view,
-              today: today,
-              earliest: widget.earliest,
-              onSelect: (day) => _change(selection.select(day)),
             ),
             const Center(child: MonthRingKey(showBeforePlan: false)),
           ],
@@ -157,13 +139,11 @@ class _Title extends StatelessWidget {
   const _Title({
     required this.title,
     required this.subtitle,
-    required this.open,
     required this.onTap,
   });
 
   final String title;
   final String subtitle;
-  final bool open;
   final VoidCallback onTap;
 
   @override
@@ -171,8 +151,7 @@ class _Title extends StatelessWidget {
     final text = context.textTheme;
     return Semantics(
       button: true,
-      expanded: open,
-      label: 'Choose a month',
+      label: 'Pick a day',
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -194,10 +173,7 @@ class _Title extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Icon(
-                    open ? AppIcons.chevronUp : AppIcons.chevronDown,
-                    size: 14,
-                  ),
+                  const Icon(AppIcons.chevronDown, size: 14),
                 ],
               ),
               Text(
@@ -208,55 +184,6 @@ class _Title extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MonthChip extends StatelessWidget {
-  const _MonthChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final exhale = context.exhale;
-    return Semantics(
-      button: true,
-      selected: selected,
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 44),
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-          decoration: ShapeDecoration(
-            color: selected ? exhale.emphasis : null,
-            shape: StadiumBorder(
-              side: BorderSide(
-                color: selected ? exhale.emphasis : colors.outlineVariant,
-              ),
-            ),
-          ),
-          child: Center(
-            widthFactor: 1,
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: context.textTheme.labelMedium?.copyWith(
-                color: selected ? exhale.onEmphasis : colors.onSurface,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
           ),
         ),
       ),
@@ -377,14 +304,10 @@ class _DayCell extends StatelessWidget {
     final progress = entry.progress;
     final atZero = progress?.limit == 0 && progress?.count == 0;
 
-    final ringColor = selected
-        ? exhale.onEmphasis
-        : atZero
+    final ringColor = atZero
         ? exhale.success.solid
         : progress?.status.barColor(context) ?? colors.outlineVariant;
-    final dateColor = selected
-        ? exhale.onEmphasis
-        : enabled
+    final dateColor = enabled
         ? colors.onSurface
         : colors.onSurfaceVariant.withValues(alpha: 0.6);
 
@@ -401,9 +324,10 @@ class _DayCell extends StatelessWidget {
         child: Container(
           height: height,
           alignment: Alignment.center,
+          // The current-stage highlight on Plan details.
           decoration: selected
               ? BoxDecoration(
-                  color: exhale.emphasis,
+                  color: exhale.inset,
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 )
               : null,
@@ -414,10 +338,10 @@ class _DayCell extends StatelessWidget {
                 fill: atZero ? 1 : progress?.usedFraction ?? 0,
                 strokeWidth: _stroke,
                 color: ringColor,
-                track: selected
-                    ? exhale.onEmphasis.withValues(alpha: 0.35)
-                    : progress == null
+                track: progress == null
                     ? colors.outlineVariant
+                    : selected
+                    ? colors.surfaceContainerHighest
                     : colors.surfaceContainerHigh,
                 dashed: progress == null,
               ),

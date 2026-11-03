@@ -540,13 +540,13 @@ class _LogRow extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           onTap: () => onEdit(log),
           child: ColoredBox(
-            color: colors.surfaceContainerLow,
+            color: Theme.of(context).cardTheme.color ?? colors.surface,
             child: _RailRow(
               lead: Container(
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: over ? danger.soft : colors.surfaceContainerHighest,
+                  color: over ? danger.soft : colors.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
