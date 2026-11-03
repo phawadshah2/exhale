@@ -335,29 +335,30 @@ day."
 
 ### 5.1 State
 
-The page holds a mode (Week or Month), the shown period, a selected day and an optional trigger.
+The page holds the shown week, a selected day and an optional trigger. There is no Month (Fawad, 2026-11-03).
 
 - **Opening:** from `LogsQuery`
   - no range: Week of today, today selected
   - one day: its Week, that day selected
   - a range that is a whole week: Week
-  - any other range, such as History's All: Month of the range's end
+  - any other range, such as a month or History's All: the week of the range's end
   - the selected day is the period's last day, or today if earlier
   - `trigger` opens with that filter on. Opened on a range, as from History's chips, the selected
     day moves to the period's latest day with a matching log, if it has one
 - **Stepping** with the arrows moves the period and selects its last available day.
-- **Switching** Week and Month keeps the selected day and shows the period holding it.
+- **Picking a date** from the calendar shows that date's week with the day selected.
+- **Swiping** the week moves one week, like the arrows.
 - **Limits:** the earlier arrow stops at the period holding `earliestDayProvider`. The later arrow
   stops at the period holding today and is disabled there.
 
 ### 5.2 Calendar card
 
-Week and Month switch; earlier arrow; title with chevron; later arrow.
+Earlier arrow; title with chevron; later arrow.
 
-- Title: "{Oct 27} – {Nov 2}" with "This week", "Last week" or "{n} weeks ago". Month: "November
-  2026" with "This month", "Last month" or "{n} months ago".
-- The title opens a row of month chips, from `earliestDayProvider`'s month to this month. It wraps.
-  Picking one switches to Month, shows that month and closes the row.
+- Title: "{Oct 27} – {Nov 2}" with "This week", "Last week" or "{n} weeks ago".
+- The title opens a month calendar in a sheet, from `earliestDayProvider`'s month to this month.
+  Days before the earliest or after today can't be picked.
+- The selected day takes the current-stage highlight of Plan details.
 - Weeks start on Monday, matching `PeriodRange.weekOf`.
 
 **Cells:** a 38 pt ring with the date inside, not scaled with text, in a 48 pt target.
@@ -491,7 +492,7 @@ text, because the row beside them says the same thing.
   them.
 - Stepping a period selects its last available day. T kept the old selection, which could leave the
   day card outside the period shown.
-- History's All opens Logs on the current month, since T has no All.
+- History's All opens Logs on the current week, since T has no All.
 - A trigger filter narrows the rail only, and rings keep the whole day's counts.
 
 **Copy written here, not in a frame**
@@ -557,8 +558,7 @@ The existing `edit_plan_page_test.dart` is rewritten for the new page.
 
 - each `LogsQuery` shape opens the right mode, period, selected day and filter
 - arrows stop at both ends
-- Week and Month keep the selected day
-- month chips
+- calendar sheet picks a day and jumps to its week
 - each cell state, including limit 0 and before the plan
 - the period card's text, pill and no-plan-days case
 - the filter, its count-0 chip, and clearing

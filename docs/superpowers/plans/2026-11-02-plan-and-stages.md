@@ -569,13 +569,13 @@ display only.
 - Modify: `lib/features/home/presentation/widgets/ring_card.dart`, `day_triggers.dart`
 - Test: the existing ring card and day triggers tests, extended
 
-- [ ] **Step 1: Compare with `Main.dc.html`** and list the differences.
-- [ ] **Step 2: Write the failing tests:** the trigger bars are smaller with less spacing than today's
+- [x] **Step 1: Compare with `Main.dc.html`** and list the differences.
+- [x] **Step 2: Write the failing tests:** the trigger bars are smaller with less spacing than today's
   constants (assert the new sizes); the icon in the last-entry tile and in the tiles like it is centred
   (compare the icon's centre with the tile's centre).
-- [ ] **Step 3: Implement.** Quieter trigger bars so the ring leads; centre the icons.
-- [ ] **Step 4: Run, expect pass.**
-- [ ] **Step 5: Commit** `fix(home): quieten the trigger bars and centre tile icons`.
+- [x] **Step 3: Implement.** Quieter trigger bars so the ring leads; centre the icons.
+- [x] **Step 4: Run, expect pass.**
+- [x] **Step 5: Commit** `fix(home): quieten the trigger bars and centre tile icons`.
 
 ### Task F2: History card
 
@@ -584,17 +584,17 @@ display only.
   `history/month_ring_calendar.dart`, `history_card.dart`
 - Test: the existing history tests, extended
 
-- [ ] **Step 1: Compare with `ChartB.dc.html` (Week) and `ChartC.dc.html` (Month)** and list the differences.
-- [ ] **Step 2: Write the failing tests:**
+- [x] **Step 1: Compare with `ChartB.dc.html` (Week) and `ChartC.dc.html` (Month)** and list the differences.
+- [x] **Step 2: Write the failing tests:**
   - Week: line and day dots use the thinner widths
   - Month: ring stroke is thinner; a dotted future ring and a past ring are drawn differently (assert the
     two paint styles differ in more than stroke width, so they read apart at a glance)
   - Month swipe: the grid keeps one fixed height for 4, 5 and 6-row months, with no overflow, and the
     leading and trailing cells show the neighbouring months' days greyed out and not tappable
     (a tap on one does nothing)
-- [ ] **Step 3: Implement.** Always lay out 6 rows, or the tallest month's height, so the swipe never resizes.
-- [ ] **Step 4: Run, expect pass.**
-- [ ] **Step 5: Commit** `fix(home): thinner history strokes and a fixed-height month`.
+- [x] **Step 3: Implement.** Always lay out 6 rows, or the tallest month's height, so the swipe never resizes.
+- [x] **Step 4: Run, expect pass.**
+- [x] **Step 5: Commit** `fix(home): thinner history strokes and a fixed-height month`.
 
 ### Task F3: Plan card opens Plan details
 
@@ -607,10 +607,10 @@ The card body already opens Plan details (`openDetails`); only its `EditPill` op
 (Fawad, 2026-11-03): remove the pill from the card.** Edit plan stays reachable from Plan details, the
 dashboard header and the stats grid. Keep `EditPill` if Plan details or others use it.
 
-- [ ] **Step 1: Write the failing test** (the card has no Edit pill; every tap on it lands on Plan details,
+- [x] **Step 1: Write the failing test** (the card has no Edit pill; every tap on it lands on Plan details,
   none on Edit plan).
-- [ ] **Step 2: Implement. Step 3: Run, expect pass.**
-- [ ] **Step 4: Commit** `fix(home): open plan details from the plan card`.
+- [x] **Step 2: Implement. Step 3: Run, expect pass.**
+- [x] **Step 4: Commit** `fix(home): open plan details from the plan card`.
 
 ### Task F4: Logs page
 
@@ -619,9 +619,9 @@ dashboard header and the stats grid. Keep `EditPill` if Plan details or others u
   `widgets/logs_calendar_card.dart`, `widgets/logs_rail_card.dart`
 - Test: `logs_selection_test.dart`, `logs_page_test.dart`
 
-- [ ] **Step 1: Compare with `LogsCombined.dc.html` (frame T)**, and the selected-day style with the current
+- [x] **Step 1: Compare with `LogsCombined.dc.html` (frame T)**, and the selected-day style with the current
   stage on Plan details; list the differences.
-- [ ] **Step 2: Write the failing tests.**
+- [x] **Step 2: Write the failing tests.**
   - the selected day uses the same highlight as the current stage on Plan details (share the style, don't
     copy it)
   - the arrow next to the period opens a calendar; picking a date jumps to that date's week with the day
@@ -630,16 +630,16 @@ dashboard header and the stats grid. Keep `EditPill` if Plan details or others u
     Month (History's All) open the week of the range's end
   - swiping the week row moves one week; the arrows do the same and keep their limits
   - the log list (stepper) and the log card background match the frame
-- [ ] **Step 3: Run, expect failure.**
-- [ ] **Step 4: Implement.** Remove the mode from `LogsSelection`; add `pickDay(LogicalDay, {today})`
-  (replacing `pickMonth`); the calendar is a `showAppSheet`. Update Screens spec 5.1 to 5.2 to match.
-- [ ] **Step 5: Run, expect pass.**
-- [ ] **Step 6: Commit** `fix(logs): weeks only, with a calendar to pick a day`.
+- [x] **Step 3: Run, expect failure.**
+- [x] **Step 4: Implement.** Remove the mode from `LogsSelection`; `select(day)` now jumps to the day's week
+  (`pickMonth` and `withMode` go); the calendar is a `showAppSheet`. Screens spec 5.1 to 5.2 updated.
+- [x] **Step 5: Run, expect pass.**
+- [x] **Step 6: Commit** `fix(logs): weeks only, with a calendar to pick a day`.
 
 ### Task F5: Review the fixes
 
-- [ ] **Step 1:** Run `fvm dart format .`, `fvm flutter analyze --fatal-infos` and the tests of F1 to F4.
-- [ ] **Step 2:** Update `docs/CURRENT_STATE.md` (what was and wasn't seen; M7 is next). Commit
+- [x] **Step 1:** Run `fvm dart format .`, `fvm flutter analyze --fatal-infos` and the tests of F1 to F4.
+- [x] **Step 2:** Update `docs/CURRENT_STATE.md` (what was and wasn't seen; M7 is next). Commit
   `docs: record the UI fixes`.
 
 # Phase 5: Stage management (Stages spec)

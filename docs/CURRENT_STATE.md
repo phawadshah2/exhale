@@ -10,7 +10,7 @@ Updated 2026-11-03. The full log of earlier sessions is in
 | M1 Habits foundation, M2 Dashboard and Logs, M3 Logging and editing, onboarding redesign | Done, merged |
 | M5 Release candidate | Done, merged to `main` (51e0bc6). Real iPhone pass still open |
 | M6 Plan details, Edit plan, Logs (Tasks 1 to 12) | Done on `feat/plan-and-stages`: reviewed, two simulator walks |
-| UI fixes from Fawad's review (below) | Next, before M7 |
+| UI fixes from Fawad's review (Phase 4b, F1 to F4) | Done on `feat/plan-and-stages`; not seen in the simulator |
 | M7 Stage management (Tasks 13 to 20) | Not started |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
@@ -20,8 +20,8 @@ rows still to do).
 
 ## Repo
 
-- `feat/plan-and-stages` is pushed up to 5715c87. Five docs commits after it are local
-  (3850418 to 77b2e03). No PR is open, and CI on the branch was not read.
+- `feat/plan-and-stages` is pushed up to 5715c87. Docs and F1 to F4 commits after it are
+  local. No PR is open, and CI on the branch was not read.
 - Checks at f1bc936, the last code commit: format clean, `analyze --fatal-infos` clean,
   full suite 1038 passed. Not run since, as only docs changed.
 - 2026-11-03 setup changes: the new check flow is in `CLAUDE.md` "Workflow". The global
@@ -32,37 +32,20 @@ rows still to do).
 
 ## Next action
 
-The UI fixes Fawad asked for on 2026-11-03, as a short fixes phase on
-`feat/plan-and-stages`, before Task 13. They are now in the plan as Phase 4b, Tasks F1 to
-F5 (ring card, History card, Plan card, Logs page, review). Start with F1; compare each
-with its design frame in `design/6._home_details_logs/` and `design/8._plan_edit_logs/`.
+Task 13 (holds in `ReductionPlan`), the start of M7, on Sonnet 5.5 medium. The M7 review
+(Task 20) runs on Opus 5.5 high.
 
-Decided for F3 (Fawad, 2026-11-03): remove the Edit pill from the Plan card; the card
-body already opens Plan details.
-
-Decided (Fawad, 2026-11-03):
-- Logs: picking a date jumps to its week, with that day selected and its logs listed.
-  Swiping moves week by week.
-- Home Month: the greyed-out days from the previous and next months are display only.
-
-1. Ring card: make the trigger bars quieter so the eye goes to the ring (smaller, less
-   spacing). Centre the icon in the last-entry tile and the tiles like it.
-2. Home History card:
-   - Week: thinner line and day dots.
-   - Month: thinner rings. Make the dotted future rings and the past rings clearer, so
-     the two are easy to tell apart.
-   - Month swipe overflows. Keep one fixed height, with greyed-out days from the
-     previous and next months.
-3. Plan card: open Plan details, not Edit plan.
-4. Logs page:
-   - Highlight the selected day the same way as the current stage on Plan details.
-   - The arrow next to the period opens a calendar.
-   - Drop the Week/Month switch: weeks only, with a specific day picked from the
-     calendar.
-   - The log list (stepper) and the log card background must match the design.
-
-After that comes Task 13 (holds in `ReductionPlan`), the start of M7, on Sonnet 5.5
-medium. The M7 review (Task 20) runs on Opus 5.5 high.
+UI fixes done 2026-11-03 (commits 543ecc0, 203877e, 381598e, 389f483, plus the docs):
+- F1 Ring card: trigger bars 5 pt, tighter panel, icons centred in the info tiles.
+- F2 History: thinner week line and dots, thinner month rings, dotted future rings, month
+  fixed at six weeks with greyed, untappable neighbour days.
+- F3 Plan card: Edit pill removed; the card opens Plan details.
+- F4 Logs: weeks only, a calendar sheet from the title, swipe by week, the selected day
+  uses the current-stage inset highlight, the log row sits on the card colour in light mode.
+- Not seen: the simulator, light mode, 200% text on the new calendar sheet. The Logs
+  comparison with frame T was by code. A History chip opened on a month range now searches
+  only the last week of that month. The full suite was not run after F4; the home and logs
+  folders pass.
 
 ## Open checks
 
