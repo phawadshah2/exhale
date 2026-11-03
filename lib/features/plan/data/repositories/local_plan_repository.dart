@@ -1,4 +1,3 @@
-import 'package:exhale/core/data/local/database/app_database.dart';
 import 'package:exhale/core/data/storage_guard.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/features/plan/data/datasources/plan_local_data_source.dart';
@@ -30,6 +29,6 @@ class LocalPlanRepository implements PlanRepository {
         () => _localDataSource.replaceFrom(plan.toCompanion(habitId)),
       );
 
-  PlanHistory? _toHistory(List<PlanRow> rows) =>
+  PlanHistory? _toHistory(List<PlanRecord> rows) =>
       rows.isEmpty ? null : PlanHistory(rows.map((row) => row.toEntity()));
 }

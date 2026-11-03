@@ -1,6 +1,8 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
+import 'package:exhale/features/plan/domain/entities/stage_check.dart';
 import 'package:exhale/features/plan/domain/repositories/plan_repository.dart';
+import 'package:exhale/features/plan/domain/repositories/stage_check_repository.dart';
 import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -15,4 +17,15 @@ final savePlanProvider = Provider<SavePlan>((ref) => sl<SavePlan>());
 final StreamProviderFamily<PlanHistory?, int> planHistoryProvider =
     StreamProvider.family<PlanHistory?, int>(
       (ref, habitId) => ref.watch(planRepositoryProvider).watchHistory(habitId),
+    );
+
+final stageCheckRepositoryProvider = Provider<StageCheckRepository>(
+  (ref) => sl<StageCheckRepository>(),
+);
+
+/// A habit's stage checks, newest first.
+final StreamProviderFamily<List<StageCheck>, int> stageChecksProvider =
+    StreamProvider.family<List<StageCheck>, int>(
+      (ref, habitId) =>
+          ref.watch(stageCheckRepositoryProvider).watchChecks(habitId),
     );

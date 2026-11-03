@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:exhale/core/data/local/database/app_database.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
@@ -5,6 +6,7 @@ import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/data/datasources/plan_local_data_source.dart';
 import 'package:exhale/features/plan/data/repositories/local_plan_repository.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
+import 'package:exhale/features/plan/domain/entities/plan_hold.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -98,6 +100,82 @@ void main() {
 
     expect(emissions.first, isNull);
     expect(emissions.last!.current, first);
+  });
+
+  Future<int> planId(LogicalDay start) async => (await (database.select(
+    database.plans,
+  )..where((row) => row.startDay.equals(start.toString()))).getSingle()).id;
+
+  Future<void> addHold(int plan, LogicalDay start, {int days = 7}) => database
+      .into(database.planHolds)
+      .insert(
+        PlanHoldsCompanion.insert(
+          planId: plan,
+          startDay: start.toString(),
+          days: Value(days),
+        ),
+      );
+
+  test('a plan reads back its holds, earliest first', () async {
+    await repository.savePlan(habit, first);
+    final id = await planId(oct15);
+    await addHold(id, oct15.addDays(28));
+    await addHold(id, oct15.addDays(14), days: 3);
+
+    final [plan] = historyOf(await repository.getHistory(habit))!.plans;
+
+    expect(plan.holds, [
+      PlanHold(startDay: oct15.addDays(14), days: 3),
+      PlanHold(startDay: oct15.addDays(28)),
+    ]);
+    expect(plan.agreedQuitDay, oct15.addDays(63));
+    expect(plan.quitDay, oct15.addDays(73));
+  });
+
+  test('watchHistory emits when a hold is added', () async {
+    await repository.savePlan(habit, first);
+    final emissions = <PlanHistory?>[];
+    final sub = repository.watchHistory(habit).listen(emissions.add);
+    await pumpEventQueue();
+
+    await addHold(await planId(oct15), oct15.addDays(14));
+    await pumpEventQueue();
+    await sub.cancel();
+
+    expect(emissions.first!.current.holds, isEmpty);
+    expect(emissions.last!.current.holds, [
+      PlanHold(startDay: oct15.addDays(14)),
+    ]);
+  });
+
+  test('a replan removes the holds and checks of the plans it drops', () async {
+    final later = planFrom(oct15.addDays(14), 5);
+    await repository.savePlan(habit, first);
+    await repository.savePlan(habit, later);
+    final laterId = await planId(later.startDay);
+    final firstId = await planId(oct15);
+    await addHold(firstId, oct15.addDays(7));
+    await addHold(laterId, later.startDay.addDays(7));
+    for (final plan in [firstId, laterId]) {
+      await database
+          .into(database.stageChecks)
+          .insert(
+            StageChecksCompanion.insert(
+              planId: plan,
+              windowEndDay: '2026-11-01',
+              checkDay: '2026-11-02',
+              outcome: 'hold',
+            ),
+          );
+    }
+
+    final earlier = planFrom(oct15.addDays(7), 6);
+    expect(await repository.savePlan(habit, earlier), isA<Success<void>>());
+
+    final holds = await database.select(database.planHolds).get();
+    final checks = await database.select(database.stageChecks).get();
+    expect(holds.map((hold) => hold.planId), [firstId]);
+    expect(checks.map((check) => check.planId), [firstId]);
   });
 
   test('plans of two habits do not replace each other', () async {

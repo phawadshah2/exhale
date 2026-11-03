@@ -731,6 +731,39 @@ void main() {
     });
   });
 
+  group('upgrade from v10', () {
+    AppDatabase openV10() {
+      final dir = Directory.systemTemp.createTempSync('exhale_v10');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final file = File('test/fixtures/exhale_v10.sqlite')
+          .copySync('${dir.path}/exhale.sqlite');
+      driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+      final database = AppDatabase(NativeDatabase(file));
+      addTearDown(database.close);
+      return database;
+    }
+
+    test('ends on the latest version', () => _expectLatest(openV10()));
+
+    test('adds both tables, empty', () async {
+      final database = openV10();
+
+      expect(await _rows(database, 'SELECT * FROM plan_holds'), isEmpty);
+      expect(await _rows(database, 'SELECT * FROM stage_checks'), isEmpty);
+    });
+
+    test('keeps the habit, its plan and its price', () async {
+      final database = openV10();
+
+      final [habit] = await _activeHabits(database);
+      expect(habit.priceCents, 1500);
+      final [plan] = (await _history(database, 1)).plans;
+      expect(plan.startDay, LogicalDay(2026, 10, 20));
+      expect(plan.holds, isEmpty);
+      expect(await _rows(database, 'SELECT * FROM habit_prices'), hasLength(1));
+    });
+  });
+
   test('a plan without a settings row becomes a smoking habit 1', () async {
     final database = _open(_createV7Schema);
     addTearDown(database.close);

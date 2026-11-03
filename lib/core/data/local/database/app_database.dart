@@ -3,19 +3,31 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:exhale/core/data/local/database/tables/habit_logs_table.dart';
 import 'package:exhale/core/data/local/database/tables/habit_prices_table.dart';
 import 'package:exhale/core/data/local/database/tables/habits_table.dart';
+import 'package:exhale/core/data/local/database/tables/plan_holds_table.dart';
 import 'package:exhale/core/data/local/database/tables/plans_table.dart';
 import 'package:exhale/core/data/local/database/tables/settings_table.dart';
+import 'package:exhale/core/data/local/database/tables/stage_checks_table.dart';
 import 'package:path_provider/path_provider.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Habits, Plans, HabitLogs, Settings, HabitPrices])
+@DriftDatabase(
+  tables: [
+    Habits,
+    Plans,
+    HabitLogs,
+    Settings,
+    HabitPrices,
+    PlanHolds,
+    StageChecks,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
     : super(executor ?? _createConnection());
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -44,6 +56,10 @@ class AppDatabase extends _$AppDatabase {
             h.price_cents, h.units_per_container
           FROM habits h WHERE h.price_cents IS NOT NULL
         ''');
+      }
+      if (from < 11) {
+        await migrator.createTable(planHolds);
+        await migrator.createTable(stageChecks);
       }
       // drift writes the version only after the migration returns; writing it
       // here too keeps a kill in between from rerunning a finished step.

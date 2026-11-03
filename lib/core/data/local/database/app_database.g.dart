@@ -2553,6 +2553,726 @@ class HabitPricesCompanion extends UpdateCompanion<HabitPriceRow> {
   }
 }
 
+class $PlanHoldsTable extends PlanHolds
+    with TableInfo<$PlanHoldsTable, PlanHoldRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlanHoldsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _planIdMeta = const VerificationMeta('planId');
+  @override
+  late final GeneratedColumn<int> planId = GeneratedColumn<int>(
+    'plan_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES plans (id)',
+    ),
+  );
+  static const VerificationMeta _startDayMeta = const VerificationMeta(
+    'startDay',
+  );
+  @override
+  late final GeneratedColumn<String> startDay = GeneratedColumn<String>(
+    'start_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _daysMeta = const VerificationMeta('days');
+  @override
+  late final GeneratedColumn<int> days = GeneratedColumn<int>(
+    'days',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(7),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, planId, startDay, days];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'plan_holds';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PlanHoldRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('plan_id')) {
+      context.handle(
+        _planIdMeta,
+        planId.isAcceptableOrUnknown(data['plan_id']!, _planIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_planIdMeta);
+    }
+    if (data.containsKey('start_day')) {
+      context.handle(
+        _startDayMeta,
+        startDay.isAcceptableOrUnknown(data['start_day']!, _startDayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startDayMeta);
+    }
+    if (data.containsKey('days')) {
+      context.handle(
+        _daysMeta,
+        days.isAcceptableOrUnknown(data['days']!, _daysMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {planId, startDay},
+  ];
+  @override
+  PlanHoldRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PlanHoldRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      planId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}plan_id'],
+      )!,
+      startDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}start_day'],
+      )!,
+      days: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}days'],
+      )!,
+    );
+  }
+
+  @override
+  $PlanHoldsTable createAlias(String alias) {
+    return $PlanHoldsTable(attachedDatabase, alias);
+  }
+}
+
+class PlanHoldRow extends DataClass implements Insertable<PlanHoldRow> {
+  final int id;
+  final int planId;
+
+  /// LogicalDay in yyyy-mm-dd form; the limit stays put from this day.
+  final String startDay;
+  final int days;
+  const PlanHoldRow({
+    required this.id,
+    required this.planId,
+    required this.startDay,
+    required this.days,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['plan_id'] = Variable<int>(planId);
+    map['start_day'] = Variable<String>(startDay);
+    map['days'] = Variable<int>(days);
+    return map;
+  }
+
+  PlanHoldsCompanion toCompanion(bool nullToAbsent) {
+    return PlanHoldsCompanion(
+      id: Value(id),
+      planId: Value(planId),
+      startDay: Value(startDay),
+      days: Value(days),
+    );
+  }
+
+  factory PlanHoldRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PlanHoldRow(
+      id: serializer.fromJson<int>(json['id']),
+      planId: serializer.fromJson<int>(json['planId']),
+      startDay: serializer.fromJson<String>(json['startDay']),
+      days: serializer.fromJson<int>(json['days']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'planId': serializer.toJson<int>(planId),
+      'startDay': serializer.toJson<String>(startDay),
+      'days': serializer.toJson<int>(days),
+    };
+  }
+
+  PlanHoldRow copyWith({int? id, int? planId, String? startDay, int? days}) =>
+      PlanHoldRow(
+        id: id ?? this.id,
+        planId: planId ?? this.planId,
+        startDay: startDay ?? this.startDay,
+        days: days ?? this.days,
+      );
+  PlanHoldRow copyWithCompanion(PlanHoldsCompanion data) {
+    return PlanHoldRow(
+      id: data.id.present ? data.id.value : this.id,
+      planId: data.planId.present ? data.planId.value : this.planId,
+      startDay: data.startDay.present ? data.startDay.value : this.startDay,
+      days: data.days.present ? data.days.value : this.days,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlanHoldRow(')
+          ..write('id: $id, ')
+          ..write('planId: $planId, ')
+          ..write('startDay: $startDay, ')
+          ..write('days: $days')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, planId, startDay, days);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PlanHoldRow &&
+          other.id == this.id &&
+          other.planId == this.planId &&
+          other.startDay == this.startDay &&
+          other.days == this.days);
+}
+
+class PlanHoldsCompanion extends UpdateCompanion<PlanHoldRow> {
+  final Value<int> id;
+  final Value<int> planId;
+  final Value<String> startDay;
+  final Value<int> days;
+  const PlanHoldsCompanion({
+    this.id = const Value.absent(),
+    this.planId = const Value.absent(),
+    this.startDay = const Value.absent(),
+    this.days = const Value.absent(),
+  });
+  PlanHoldsCompanion.insert({
+    this.id = const Value.absent(),
+    required int planId,
+    required String startDay,
+    this.days = const Value.absent(),
+  }) : planId = Value(planId),
+       startDay = Value(startDay);
+  static Insertable<PlanHoldRow> custom({
+    Expression<int>? id,
+    Expression<int>? planId,
+    Expression<String>? startDay,
+    Expression<int>? days,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (planId != null) 'plan_id': planId,
+      if (startDay != null) 'start_day': startDay,
+      if (days != null) 'days': days,
+    });
+  }
+
+  PlanHoldsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? planId,
+    Value<String>? startDay,
+    Value<int>? days,
+  }) {
+    return PlanHoldsCompanion(
+      id: id ?? this.id,
+      planId: planId ?? this.planId,
+      startDay: startDay ?? this.startDay,
+      days: days ?? this.days,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (planId.present) {
+      map['plan_id'] = Variable<int>(planId.value);
+    }
+    if (startDay.present) {
+      map['start_day'] = Variable<String>(startDay.value);
+    }
+    if (days.present) {
+      map['days'] = Variable<int>(days.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlanHoldsCompanion(')
+          ..write('id: $id, ')
+          ..write('planId: $planId, ')
+          ..write('startDay: $startDay, ')
+          ..write('days: $days')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StageChecksTable extends StageChecks
+    with TableInfo<$StageChecksTable, StageCheckRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StageChecksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _planIdMeta = const VerificationMeta('planId');
+  @override
+  late final GeneratedColumn<int> planId = GeneratedColumn<int>(
+    'plan_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES plans (id)',
+    ),
+  );
+  static const VerificationMeta _windowEndDayMeta = const VerificationMeta(
+    'windowEndDay',
+  );
+  @override
+  late final GeneratedColumn<String> windowEndDay = GeneratedColumn<String>(
+    'window_end_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _checkDayMeta = const VerificationMeta(
+    'checkDay',
+  );
+  @override
+  late final GeneratedColumn<String> checkDay = GeneratedColumn<String>(
+    'check_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _outcomeMeta = const VerificationMeta(
+    'outcome',
+  );
+  @override
+  late final GeneratedColumn<String> outcome = GeneratedColumn<String>(
+    'outcome',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _answeredAtMeta = const VerificationMeta(
+    'answeredAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> answeredAt = GeneratedColumn<DateTime>(
+    'answered_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    planId,
+    windowEndDay,
+    checkDay,
+    outcome,
+    answeredAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'stage_checks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StageCheckRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('plan_id')) {
+      context.handle(
+        _planIdMeta,
+        planId.isAcceptableOrUnknown(data['plan_id']!, _planIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_planIdMeta);
+    }
+    if (data.containsKey('window_end_day')) {
+      context.handle(
+        _windowEndDayMeta,
+        windowEndDay.isAcceptableOrUnknown(
+          data['window_end_day']!,
+          _windowEndDayMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_windowEndDayMeta);
+    }
+    if (data.containsKey('check_day')) {
+      context.handle(
+        _checkDayMeta,
+        checkDay.isAcceptableOrUnknown(data['check_day']!, _checkDayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_checkDayMeta);
+    }
+    if (data.containsKey('outcome')) {
+      context.handle(
+        _outcomeMeta,
+        outcome.isAcceptableOrUnknown(data['outcome']!, _outcomeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_outcomeMeta);
+    }
+    if (data.containsKey('answered_at')) {
+      context.handle(
+        _answeredAtMeta,
+        answeredAt.isAcceptableOrUnknown(data['answered_at']!, _answeredAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {planId, windowEndDay},
+  ];
+  @override
+  StageCheckRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StageCheckRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      planId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}plan_id'],
+      )!,
+      windowEndDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}window_end_day'],
+      )!,
+      checkDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}check_day'],
+      )!,
+      outcome: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}outcome'],
+      )!,
+      answeredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}answered_at'],
+      ),
+    );
+  }
+
+  @override
+  $StageChecksTable createAlias(String alias) {
+    return $StageChecksTable(attachedDatabase, alias);
+  }
+}
+
+class StageCheckRow extends DataClass implements Insertable<StageCheckRow> {
+  final int id;
+  final int planId;
+
+  /// LogicalDay in yyyy-mm-dd form: the last day of the window checked.
+  final String windowEndDay;
+
+  /// LogicalDay in yyyy-mm-dd form: the day the check ran.
+  final String checkDay;
+
+  /// passed, skipped, hold, review or reassess.
+  final String outcome;
+
+  /// Null while a hold, review or reassess card still waits.
+  final DateTime? answeredAt;
+  const StageCheckRow({
+    required this.id,
+    required this.planId,
+    required this.windowEndDay,
+    required this.checkDay,
+    required this.outcome,
+    this.answeredAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['plan_id'] = Variable<int>(planId);
+    map['window_end_day'] = Variable<String>(windowEndDay);
+    map['check_day'] = Variable<String>(checkDay);
+    map['outcome'] = Variable<String>(outcome);
+    if (!nullToAbsent || answeredAt != null) {
+      map['answered_at'] = Variable<DateTime>(answeredAt);
+    }
+    return map;
+  }
+
+  StageChecksCompanion toCompanion(bool nullToAbsent) {
+    return StageChecksCompanion(
+      id: Value(id),
+      planId: Value(planId),
+      windowEndDay: Value(windowEndDay),
+      checkDay: Value(checkDay),
+      outcome: Value(outcome),
+      answeredAt: answeredAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(answeredAt),
+    );
+  }
+
+  factory StageCheckRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StageCheckRow(
+      id: serializer.fromJson<int>(json['id']),
+      planId: serializer.fromJson<int>(json['planId']),
+      windowEndDay: serializer.fromJson<String>(json['windowEndDay']),
+      checkDay: serializer.fromJson<String>(json['checkDay']),
+      outcome: serializer.fromJson<String>(json['outcome']),
+      answeredAt: serializer.fromJson<DateTime?>(json['answeredAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'planId': serializer.toJson<int>(planId),
+      'windowEndDay': serializer.toJson<String>(windowEndDay),
+      'checkDay': serializer.toJson<String>(checkDay),
+      'outcome': serializer.toJson<String>(outcome),
+      'answeredAt': serializer.toJson<DateTime?>(answeredAt),
+    };
+  }
+
+  StageCheckRow copyWith({
+    int? id,
+    int? planId,
+    String? windowEndDay,
+    String? checkDay,
+    String? outcome,
+    Value<DateTime?> answeredAt = const Value.absent(),
+  }) => StageCheckRow(
+    id: id ?? this.id,
+    planId: planId ?? this.planId,
+    windowEndDay: windowEndDay ?? this.windowEndDay,
+    checkDay: checkDay ?? this.checkDay,
+    outcome: outcome ?? this.outcome,
+    answeredAt: answeredAt.present ? answeredAt.value : this.answeredAt,
+  );
+  StageCheckRow copyWithCompanion(StageChecksCompanion data) {
+    return StageCheckRow(
+      id: data.id.present ? data.id.value : this.id,
+      planId: data.planId.present ? data.planId.value : this.planId,
+      windowEndDay: data.windowEndDay.present
+          ? data.windowEndDay.value
+          : this.windowEndDay,
+      checkDay: data.checkDay.present ? data.checkDay.value : this.checkDay,
+      outcome: data.outcome.present ? data.outcome.value : this.outcome,
+      answeredAt: data.answeredAt.present
+          ? data.answeredAt.value
+          : this.answeredAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StageCheckRow(')
+          ..write('id: $id, ')
+          ..write('planId: $planId, ')
+          ..write('windowEndDay: $windowEndDay, ')
+          ..write('checkDay: $checkDay, ')
+          ..write('outcome: $outcome, ')
+          ..write('answeredAt: $answeredAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, planId, windowEndDay, checkDay, outcome, answeredAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StageCheckRow &&
+          other.id == this.id &&
+          other.planId == this.planId &&
+          other.windowEndDay == this.windowEndDay &&
+          other.checkDay == this.checkDay &&
+          other.outcome == this.outcome &&
+          other.answeredAt == this.answeredAt);
+}
+
+class StageChecksCompanion extends UpdateCompanion<StageCheckRow> {
+  final Value<int> id;
+  final Value<int> planId;
+  final Value<String> windowEndDay;
+  final Value<String> checkDay;
+  final Value<String> outcome;
+  final Value<DateTime?> answeredAt;
+  const StageChecksCompanion({
+    this.id = const Value.absent(),
+    this.planId = const Value.absent(),
+    this.windowEndDay = const Value.absent(),
+    this.checkDay = const Value.absent(),
+    this.outcome = const Value.absent(),
+    this.answeredAt = const Value.absent(),
+  });
+  StageChecksCompanion.insert({
+    this.id = const Value.absent(),
+    required int planId,
+    required String windowEndDay,
+    required String checkDay,
+    required String outcome,
+    this.answeredAt = const Value.absent(),
+  }) : planId = Value(planId),
+       windowEndDay = Value(windowEndDay),
+       checkDay = Value(checkDay),
+       outcome = Value(outcome);
+  static Insertable<StageCheckRow> custom({
+    Expression<int>? id,
+    Expression<int>? planId,
+    Expression<String>? windowEndDay,
+    Expression<String>? checkDay,
+    Expression<String>? outcome,
+    Expression<DateTime>? answeredAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (planId != null) 'plan_id': planId,
+      if (windowEndDay != null) 'window_end_day': windowEndDay,
+      if (checkDay != null) 'check_day': checkDay,
+      if (outcome != null) 'outcome': outcome,
+      if (answeredAt != null) 'answered_at': answeredAt,
+    });
+  }
+
+  StageChecksCompanion copyWith({
+    Value<int>? id,
+    Value<int>? planId,
+    Value<String>? windowEndDay,
+    Value<String>? checkDay,
+    Value<String>? outcome,
+    Value<DateTime?>? answeredAt,
+  }) {
+    return StageChecksCompanion(
+      id: id ?? this.id,
+      planId: planId ?? this.planId,
+      windowEndDay: windowEndDay ?? this.windowEndDay,
+      checkDay: checkDay ?? this.checkDay,
+      outcome: outcome ?? this.outcome,
+      answeredAt: answeredAt ?? this.answeredAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (planId.present) {
+      map['plan_id'] = Variable<int>(planId.value);
+    }
+    if (windowEndDay.present) {
+      map['window_end_day'] = Variable<String>(windowEndDay.value);
+    }
+    if (checkDay.present) {
+      map['check_day'] = Variable<String>(checkDay.value);
+    }
+    if (outcome.present) {
+      map['outcome'] = Variable<String>(outcome.value);
+    }
+    if (answeredAt.present) {
+      map['answered_at'] = Variable<DateTime>(answeredAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StageChecksCompanion(')
+          ..write('id: $id, ')
+          ..write('planId: $planId, ')
+          ..write('windowEndDay: $windowEndDay, ')
+          ..write('checkDay: $checkDay, ')
+          ..write('outcome: $outcome, ')
+          ..write('answeredAt: $answeredAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2561,6 +3281,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $HabitLogsTable habitLogs = $HabitLogsTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
   late final $HabitPricesTable habitPrices = $HabitPricesTable(this);
+  late final $PlanHoldsTable planHolds = $PlanHoldsTable(this);
+  late final $StageChecksTable stageChecks = $StageChecksTable(this);
   late final Index idxHabitLogsLoggedAt = Index(
     'idx_habit_logs_logged_at',
     'CREATE INDEX idx_habit_logs_logged_at ON habit_logs (logged_at)',
@@ -2579,6 +3301,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     habitLogs,
     settings,
     habitPrices,
+    planHolds,
+    stageChecks,
     idxHabitLogsLoggedAt,
     idxHabitLogsHabitIdLoggedAt,
   ];
@@ -3215,6 +3939,42 @@ final class $$PlansTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$PlanHoldsTable, List<PlanHoldRow>>
+  _planHoldsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.planHolds,
+    aliasName: 'plans__id__plan_holds__plan_id',
+  );
+
+  $$PlanHoldsTableProcessedTableManager get planHoldsRefs {
+    final manager = $$PlanHoldsTableTableManager(
+      $_db,
+      $_db.planHolds,
+    ).filter((f) => f.planId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_planHoldsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$StageChecksTable, List<StageCheckRow>>
+  _stageChecksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.stageChecks,
+    aliasName: 'plans__id__stage_checks__plan_id',
+  );
+
+  $$StageChecksTableProcessedTableManager get stageChecksRefs {
+    final manager = $$StageChecksTableTableManager(
+      $_db,
+      $_db.stageChecks,
+    ).filter((f) => f.planId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_stageChecksRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$PlansTableFilterComposer extends Composer<_$AppDatabase, $PlansTable> {
@@ -3271,6 +4031,56 @@ class $$PlansTableFilterComposer extends Composer<_$AppDatabase, $PlansTable> {
           ),
     );
     return composer;
+  }
+
+  Expression<bool> planHoldsRefs(
+    Expression<bool> Function($$PlanHoldsTableFilterComposer f) f,
+  ) {
+    final $$PlanHoldsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.planHolds,
+      getReferencedColumn: (t) => t.planId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlanHoldsTableFilterComposer(
+            $db: $db,
+            $table: $db.planHolds,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> stageChecksRefs(
+    Expression<bool> Function($$StageChecksTableFilterComposer f) f,
+  ) {
+    final $$StageChecksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.stageChecks,
+      getReferencedColumn: (t) => t.planId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StageChecksTableFilterComposer(
+            $db: $db,
+            $table: $db.stageChecks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -3380,6 +4190,56 @@ class $$PlansTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> planHoldsRefs<T extends Object>(
+    Expression<T> Function($$PlanHoldsTableAnnotationComposer a) f,
+  ) {
+    final $$PlanHoldsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.planHolds,
+      getReferencedColumn: (t) => t.planId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlanHoldsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.planHolds,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> stageChecksRefs<T extends Object>(
+    Expression<T> Function($$StageChecksTableAnnotationComposer a) f,
+  ) {
+    final $$StageChecksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.stageChecks,
+      getReferencedColumn: (t) => t.planId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StageChecksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stageChecks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$PlansTableTableManager
@@ -3395,7 +4255,11 @@ class $$PlansTableTableManager
           $$PlansTableUpdateCompanionBuilder,
           (PlanRow, $$PlansTableReferences),
           PlanRow,
-          PrefetchHooks Function({bool habitId})
+          PrefetchHooks Function({
+            bool habitId,
+            bool planHoldsRefs,
+            bool stageChecksRefs,
+          })
         > {
   $$PlansTableTableManager(_$AppDatabase db, $PlansTable table)
     : super(
@@ -3448,46 +4312,96 @@ class $$PlansTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({habitId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (habitId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.habitId,
-                        referencedTable: $$PlansTableReferences._habitIdTable(
-                          db,
-                        ),
-                        referencedColumn: $$PlansTableReferences
-                            ._habitIdTable(db)
-                            .id,
-                      ) as T;
-                    }
+          prefetchHooksCallback:
+              ({
+                habitId = false,
+                planHoldsRefs = false,
+                stageChecksRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (planHoldsRefs) db.planHolds,
+                    if (stageChecksRefs) db.stageChecks,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (habitId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.habitId,
+                            referencedTable: $$PlansTableReferences
+                                ._habitIdTable(db),
+                            referencedColumn: $$PlansTableReferences
+                                ._habitIdTable(db)
+                                .id,
+                          ) as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (planHoldsRefs)
+                        await $_getPrefetchedData<
+                          PlanRow,
+                          $PlansTable,
+                          PlanHoldRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlansTableReferences
+                              ._planHoldsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlansTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).planHoldsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.planId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (stageChecksRefs)
+                        await $_getPrefetchedData<
+                          PlanRow,
+                          $PlansTable,
+                          StageCheckRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PlansTableReferences
+                              ._stageChecksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PlansTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).stageChecksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.planId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -3504,7 +4418,11 @@ typedef $$PlansTableProcessedTableManager =
       $$PlansTableUpdateCompanionBuilder,
       (PlanRow, $$PlansTableReferences),
       PlanRow,
-      PrefetchHooks Function({bool habitId})
+      PrefetchHooks Function({
+        bool habitId,
+        bool planHoldsRefs,
+        bool stageChecksRefs,
+      })
     >;
 typedef $$HabitLogsTableCreateCompanionBuilder = HabitLogsCompanion Function({
   Value<int> id,
@@ -4492,6 +5410,626 @@ typedef $$HabitPricesTableProcessedTableManager =
       HabitPriceRow,
       PrefetchHooks Function({bool habitId})
     >;
+typedef $$PlanHoldsTableCreateCompanionBuilder = PlanHoldsCompanion Function({
+  Value<int> id,
+  required int planId,
+  required String startDay,
+  Value<int> days,
+});
+typedef $$PlanHoldsTableUpdateCompanionBuilder = PlanHoldsCompanion Function({
+  Value<int> id,
+  Value<int> planId,
+  Value<String> startDay,
+  Value<int> days,
+});
+
+final class $$PlanHoldsTableReferences
+    extends BaseReferences<_$AppDatabase, $PlanHoldsTable, PlanHoldRow> {
+  $$PlanHoldsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $PlansTable _planIdTable(_$AppDatabase db) =>
+      db.plans.createAlias('plan_holds__plan_id__plans__id');
+
+  $$PlansTableProcessedTableManager get planId {
+    final $_column = $_itemColumn<int>('plan_id')!;
+
+    final manager = $$PlansTableTableManager(
+      $_db,
+      $_db.plans,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_planIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PlanHoldsTableFilterComposer
+    extends Composer<_$AppDatabase, $PlanHoldsTable> {
+  $$PlanHoldsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get startDay => $composableBuilder(
+    column: $table.startDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get days => $composableBuilder(
+    column: $table.days,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PlansTableFilterComposer get planId {
+    final $$PlansTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.planId,
+      referencedTable: $db.plans,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlansTableFilterComposer(
+            $db: $db,
+            $table: $db.plans,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlanHoldsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlanHoldsTable> {
+  $$PlanHoldsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get startDay => $composableBuilder(
+    column: $table.startDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get days => $composableBuilder(
+    column: $table.days,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PlansTableOrderingComposer get planId {
+    final $$PlansTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.planId,
+      referencedTable: $db.plans,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlansTableOrderingComposer(
+            $db: $db,
+            $table: $db.plans,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlanHoldsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlanHoldsTable> {
+  $$PlanHoldsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get startDay =>
+      $composableBuilder(column: $table.startDay, builder: (column) => column);
+
+  GeneratedColumn<int> get days =>
+      $composableBuilder(column: $table.days, builder: (column) => column);
+
+  $$PlansTableAnnotationComposer get planId {
+    final $$PlansTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.planId,
+      referencedTable: $db.plans,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlansTableAnnotationComposer(
+            $db: $db,
+            $table: $db.plans,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PlanHoldsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PlanHoldsTable,
+          PlanHoldRow,
+          $$PlanHoldsTableFilterComposer,
+          $$PlanHoldsTableOrderingComposer,
+          $$PlanHoldsTableAnnotationComposer,
+          $$PlanHoldsTableCreateCompanionBuilder,
+          $$PlanHoldsTableUpdateCompanionBuilder,
+          (PlanHoldRow, $$PlanHoldsTableReferences),
+          PlanHoldRow,
+          PrefetchHooks Function({bool planId})
+        > {
+  $$PlanHoldsTableTableManager(_$AppDatabase db, $PlanHoldsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlanHoldsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlanHoldsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlanHoldsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> planId = const Value.absent(),
+                Value<String> startDay = const Value.absent(),
+                Value<int> days = const Value.absent(),
+              }) => PlanHoldsCompanion(
+                id: id,
+                planId: planId,
+                startDay: startDay,
+                days: days,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int planId,
+                required String startDay,
+                Value<int> days = const Value.absent(),
+              }) => PlanHoldsCompanion.insert(
+                id: id,
+                planId: planId,
+                startDay: startDay,
+                days: days,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PlanHoldsTable, PlanHoldRow>(table),
+                  $$PlanHoldsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({planId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (planId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.planId,
+                        referencedTable: $$PlanHoldsTableReferences
+                            ._planIdTable(db),
+                        referencedColumn: $$PlanHoldsTableReferences
+                            ._planIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PlanHoldsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PlanHoldsTable,
+      PlanHoldRow,
+      $$PlanHoldsTableFilterComposer,
+      $$PlanHoldsTableOrderingComposer,
+      $$PlanHoldsTableAnnotationComposer,
+      $$PlanHoldsTableCreateCompanionBuilder,
+      $$PlanHoldsTableUpdateCompanionBuilder,
+      (PlanHoldRow, $$PlanHoldsTableReferences),
+      PlanHoldRow,
+      PrefetchHooks Function({bool planId})
+    >;
+typedef $$StageChecksTableCreateCompanionBuilder =
+    StageChecksCompanion Function({
+      Value<int> id,
+      required int planId,
+      required String windowEndDay,
+      required String checkDay,
+      required String outcome,
+      Value<DateTime?> answeredAt,
+    });
+typedef $$StageChecksTableUpdateCompanionBuilder =
+    StageChecksCompanion Function({
+      Value<int> id,
+      Value<int> planId,
+      Value<String> windowEndDay,
+      Value<String> checkDay,
+      Value<String> outcome,
+      Value<DateTime?> answeredAt,
+    });
+
+final class $$StageChecksTableReferences
+    extends BaseReferences<_$AppDatabase, $StageChecksTable, StageCheckRow> {
+  $$StageChecksTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $PlansTable _planIdTable(_$AppDatabase db) =>
+      db.plans.createAlias('stage_checks__plan_id__plans__id');
+
+  $$PlansTableProcessedTableManager get planId {
+    final $_column = $_itemColumn<int>('plan_id')!;
+
+    final manager = $$PlansTableTableManager(
+      $_db,
+      $_db.plans,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_planIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$StageChecksTableFilterComposer
+    extends Composer<_$AppDatabase, $StageChecksTable> {
+  $$StageChecksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get windowEndDay => $composableBuilder(
+    column: $table.windowEndDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get checkDay => $composableBuilder(
+    column: $table.checkDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get outcome => $composableBuilder(
+    column: $table.outcome,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get answeredAt => $composableBuilder(
+    column: $table.answeredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PlansTableFilterComposer get planId {
+    final $$PlansTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.planId,
+      referencedTable: $db.plans,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlansTableFilterComposer(
+            $db: $db,
+            $table: $db.plans,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StageChecksTableOrderingComposer
+    extends Composer<_$AppDatabase, $StageChecksTable> {
+  $$StageChecksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get windowEndDay => $composableBuilder(
+    column: $table.windowEndDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get checkDay => $composableBuilder(
+    column: $table.checkDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get outcome => $composableBuilder(
+    column: $table.outcome,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get answeredAt => $composableBuilder(
+    column: $table.answeredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PlansTableOrderingComposer get planId {
+    final $$PlansTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.planId,
+      referencedTable: $db.plans,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlansTableOrderingComposer(
+            $db: $db,
+            $table: $db.plans,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StageChecksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $StageChecksTable> {
+  $$StageChecksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get windowEndDay => $composableBuilder(
+    column: $table.windowEndDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get checkDay =>
+      $composableBuilder(column: $table.checkDay, builder: (column) => column);
+
+  GeneratedColumn<String> get outcome =>
+      $composableBuilder(column: $table.outcome, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get answeredAt => $composableBuilder(
+    column: $table.answeredAt,
+    builder: (column) => column,
+  );
+
+  $$PlansTableAnnotationComposer get planId {
+    final $$PlansTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.planId,
+      referencedTable: $db.plans,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PlansTableAnnotationComposer(
+            $db: $db,
+            $table: $db.plans,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StageChecksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $StageChecksTable,
+          StageCheckRow,
+          $$StageChecksTableFilterComposer,
+          $$StageChecksTableOrderingComposer,
+          $$StageChecksTableAnnotationComposer,
+          $$StageChecksTableCreateCompanionBuilder,
+          $$StageChecksTableUpdateCompanionBuilder,
+          (StageCheckRow, $$StageChecksTableReferences),
+          StageCheckRow,
+          PrefetchHooks Function({bool planId})
+        > {
+  $$StageChecksTableTableManager(_$AppDatabase db, $StageChecksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StageChecksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StageChecksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StageChecksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> planId = const Value.absent(),
+                Value<String> windowEndDay = const Value.absent(),
+                Value<String> checkDay = const Value.absent(),
+                Value<String> outcome = const Value.absent(),
+                Value<DateTime?> answeredAt = const Value.absent(),
+              }) => StageChecksCompanion(
+                id: id,
+                planId: planId,
+                windowEndDay: windowEndDay,
+                checkDay: checkDay,
+                outcome: outcome,
+                answeredAt: answeredAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int planId,
+                required String windowEndDay,
+                required String checkDay,
+                required String outcome,
+                Value<DateTime?> answeredAt = const Value.absent(),
+              }) => StageChecksCompanion.insert(
+                id: id,
+                planId: planId,
+                windowEndDay: windowEndDay,
+                checkDay: checkDay,
+                outcome: outcome,
+                answeredAt: answeredAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$StageChecksTable, StageCheckRow>(table),
+                  $$StageChecksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({planId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (planId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.planId,
+                        referencedTable: $$StageChecksTableReferences
+                            ._planIdTable(db),
+                        referencedColumn: $$StageChecksTableReferences
+                            ._planIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$StageChecksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $StageChecksTable,
+      StageCheckRow,
+      $$StageChecksTableFilterComposer,
+      $$StageChecksTableOrderingComposer,
+      $$StageChecksTableAnnotationComposer,
+      $$StageChecksTableCreateCompanionBuilder,
+      $$StageChecksTableUpdateCompanionBuilder,
+      (StageCheckRow, $$StageChecksTableReferences),
+      StageCheckRow,
+      PrefetchHooks Function({bool planId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4506,4 +6044,8 @@ class $AppDatabaseManager {
       $$SettingsTableTableManager(_db, _db.settings);
   $$HabitPricesTableTableManager get habitPrices =>
       $$HabitPricesTableTableManager(_db, _db.habitPrices);
+  $$PlanHoldsTableTableManager get planHolds =>
+      $$PlanHoldsTableTableManager(_db, _db.planHolds);
+  $$StageChecksTableTableManager get stageChecks =>
+      $$StageChecksTableTableManager(_db, _db.stageChecks);
 }
