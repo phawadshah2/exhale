@@ -33,8 +33,12 @@ rows still to do).
 ## Next action
 
 The UI fixes Fawad asked for on 2026-11-03, as a short fixes phase on
-`feat/plan-and-stages`, before Task 13. First add them to the plan as tasks, comparing each
+`feat/plan-and-stages`, before Task 13. They are now in the plan as Phase 4b, Tasks F1 to
+F5 (ring card, History card, Plan card, Logs page, review). Start with F1; compare each
 with its design frame in `design/6._home_details_logs/` and `design/8._plan_edit_logs/`.
+
+Open question for Fawad before F3: the Plan card body already opens Plan details; only its
+Edit pill opens Edit plan. Should the pill go, or become a Plan details affordance?
 
 Decided (Fawad, 2026-11-03):
 - Logs: picking a date jumps to its week, with that day selected and its logs listed.

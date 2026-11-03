@@ -551,6 +551,98 @@ abstract final class DayRail { static List<RailEntry> build({required List<Habit
   change, and `lib/main_seed.dart` for a long plan. Record in `docs/CURRENT_STATE.md` what was seen and what wasn't.
 - [x] **Step 4: Commit** `docs: record the M6 review`, and give Fawad the push command.
 
+# Phase 4b: UI fixes from Fawad's review (2026-11-03)
+
+Fixes on the M6 screens, before M7. Tasks are labelled F1 to F4 so Tasks 13 to 20 keep their numbers.
+Each starts by opening its design frame next to the current widget and listing the differences it will
+close. Frames: `design/6._home_details_logs/` (`Main`, `ChartB`, `ChartC`, `StateLight`) and
+`design/8._plan_edit_logs/` (`LogsCombined` is frame T, `HomeToday`, `StageToday` for the current-stage
+highlight). Sonnet 5.5 medium. Same per-task check flow as Phase 1 to 4.
+
+Decided (Fawad, 2026-11-03): in Logs, picking a date jumps to its week with that day selected and its logs
+listed, and swiping moves week by week. In Home Month, the greyed-out days of the neighbouring months are
+display only.
+
+### Task F1: Ring card
+
+**Files:**
+- Modify: `lib/features/home/presentation/widgets/ring_card.dart`, `day_triggers.dart`
+- Test: the existing ring card and day triggers tests, extended
+
+- [ ] **Step 1: Compare with `Main.dc.html`** and list the differences.
+- [ ] **Step 2: Write the failing tests:** the trigger bars are smaller with less spacing than today's
+  constants (assert the new sizes); the icon in the last-entry tile and in the tiles like it is centred
+  (compare the icon's centre with the tile's centre).
+- [ ] **Step 3: Implement.** Quieter trigger bars so the ring leads; centre the icons.
+- [ ] **Step 4: Run, expect pass.**
+- [ ] **Step 5: Commit** `fix(home): quieten the trigger bars and centre tile icons`.
+
+### Task F2: History card
+
+**Files:**
+- Modify: `lib/features/home/presentation/widgets/history/week_line_chart.dart`,
+  `history/month_ring_calendar.dart`, `history_card.dart`
+- Test: the existing history tests, extended
+
+- [ ] **Step 1: Compare with `ChartB.dc.html` (Week) and `ChartC.dc.html` (Month)** and list the differences.
+- [ ] **Step 2: Write the failing tests:**
+  - Week: line and day dots use the thinner widths
+  - Month: ring stroke is thinner; a dotted future ring and a past ring are drawn differently (assert the
+    two paint styles differ in more than stroke width, so they read apart at a glance)
+  - Month swipe: the grid keeps one fixed height for 4, 5 and 6-row months, with no overflow, and the
+    leading and trailing cells show the neighbouring months' days greyed out and not tappable
+    (a tap on one does nothing)
+- [ ] **Step 3: Implement.** Always lay out 6 rows, or the tallest month's height, so the swipe never resizes.
+- [ ] **Step 4: Run, expect pass.**
+- [ ] **Step 5: Commit** `fix(home): thinner history strokes and a fixed-height month`.
+
+### Task F3: Plan card opens Plan details
+
+**Files:**
+- Modify: `lib/features/home/presentation/widgets/plan_card.dart` (and `plan/presentation/widgets/edit_pill.dart`
+  only if the pill stays)
+- Test: the existing plan card test
+
+The card body already opens Plan details (`openDetails`); only its `EditPill` opens Edit plan. **Open
+question for Fawad before this task:** should the pill go, or become a Plan details affordance? Edit plan
+stays reachable from Plan details, the dashboard header and the stats grid.
+
+- [ ] **Step 1: Ask Fawad** which one he meant.
+- [ ] **Step 2: Write the failing test** for the answer (every tap on the card, pill included, lands on Plan
+  details; none lands on Edit plan).
+- [ ] **Step 3: Implement. Step 4: Run, expect pass.**
+- [ ] **Step 5: Commit** `fix(home): open plan details from the plan card`.
+
+### Task F4: Logs page
+
+**Files:**
+- Modify: `lib/features/logs/domain/logs_selection.dart`, `presentation/pages/logs_page.dart`,
+  `widgets/logs_calendar_card.dart`, `widgets/logs_rail_card.dart`
+- Test: `logs_selection_test.dart`, `logs_page_test.dart`
+
+- [ ] **Step 1: Compare with `LogsCombined.dc.html` (frame T)**, and the selected-day style with the current
+  stage on Plan details; list the differences.
+- [ ] **Step 2: Write the failing tests.**
+  - the selected day uses the same highlight as the current stage on Plan details (share the style, don't
+    copy it)
+  - the arrow next to the period opens a calendar; picking a date jumps to that date's week with the day
+    selected and its logs listed; dates before `earliestDayProvider` or in the future can't be picked
+  - no Week/Month switch and no month chips; `LogsMode` and `withMode` go, and `LogsQuery` ranges that were
+    Month (History's All) open the week of the range's end
+  - swiping the week row moves one week; the arrows do the same and keep their limits
+  - the log list (stepper) and the log card background match the frame
+- [ ] **Step 3: Run, expect failure.**
+- [ ] **Step 4: Implement.** Remove the mode from `LogsSelection`; add `pickDay(LogicalDay, {today})`
+  (replacing `pickMonth`); the calendar is a `showAppSheet`. Update Screens spec 5.1 to 5.2 to match.
+- [ ] **Step 5: Run, expect pass.**
+- [ ] **Step 6: Commit** `fix(logs): weeks only, with a calendar to pick a day`.
+
+### Task F5: Review the fixes
+
+- [ ] **Step 1:** Run `fvm dart format .`, `fvm flutter analyze --fatal-infos` and the tests of F1 to F4.
+- [ ] **Step 2:** Update `docs/CURRENT_STATE.md` (what was and wasn't seen; M7 is next). Commit
+  `docs: record the UI fixes`.
+
 # Phase 5: Stage management (Stages spec)
 
 ### Task 13: Holds in `ReductionPlan`
