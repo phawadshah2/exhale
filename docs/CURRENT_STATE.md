@@ -11,7 +11,7 @@ Updated 2026-11-03. The full log of earlier sessions is in
 | M5 Release candidate | Done, merged to `main` (51e0bc6). Real iPhone pass still open |
 | M6 Plan details, Edit plan, Logs (Tasks 1 to 12) | Done on `feat/plan-and-stages`: reviewed, two simulator walks |
 | UI fixes from Fawad's review (Phase 4b, F1 to F4) | Done; seen in the simulator, light mode |
-| UI review round 2 (Logs, Plan, Home, transitions) | Built, uncommitted; Fawad reviewing in the app |
+| UI review round 2 (Logs, Plan, Home, transitions) | Done, committed (a947c2d) |
 | M7 Stage management (Tasks 13 to 20) | Tasks 13 and 14 done; Task 15 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
@@ -22,7 +22,7 @@ rows still to do).
 
 ## Repo
 
-- Branch `feat/plan-and-stages`. Round 2 below is uncommitted (24 files). Pushed up to 5715c87; every commit after it is
+- Branch `feat/plan-and-stages`. Round 2 is committed (a947c2d). Pushed up to 5715c87; every commit after it is
   local (UI fixes, Tasks 13 and 14, docs). No PR is open, and CI was not read.
 - Checks at 0c513c3: full suite 1073 passed. Round 2, last run: format and `analyze
   --fatal-infos` clean; `test/features/{logs,home,settings,plan}` and `test/app` pass. Full
@@ -42,7 +42,7 @@ rows still to do).
   midnight of the new check's day (no clock in the data layer).
 - Simulator walk of F1 to F4 seen working (iOS 26.5, seeded, light mode).
 
-## UI review round 2 (uncommitted, 2026-11-03)
+## UI review round 2 (a947c2d, 2026-11-03)
 
 - Logs: weekday above ring, highlight wraps both; iOS date wheel replaces the sheet
   (`logs_date_picker.dart` deleted); count ring on the right of the day header
@@ -60,8 +60,8 @@ rows still to do).
 
 ## Next action
 
-Fawad reviews round 2 after a full restart (not hot reload), then asks for fixes or says
-commit. Then Task 15 below.
+Round 2 is committed. Start Task 15 below (Fawad may still ask for round 2 fixes after
+a full restart).
 
 ### After that: Task 15
 
