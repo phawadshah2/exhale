@@ -37,8 +37,8 @@ The UI fixes Fawad asked for on 2026-11-03, as a short fixes phase on
 F5 (ring card, History card, Plan card, Logs page, review). Start with F1; compare each
 with its design frame in `design/6._home_details_logs/` and `design/8._plan_edit_logs/`.
 
-Open question for Fawad before F3: the Plan card body already opens Plan details; only its
-Edit pill opens Edit plan. Should the pill go, or become a Plan details affordance?
+Decided for F3 (Fawad, 2026-11-03): remove the Edit pill from the Plan card; the card
+body already opens Plan details.
 
 Decided (Fawad, 2026-11-03):
 - Logs: picking a date jumps to its week, with that day selected and its logs listed.

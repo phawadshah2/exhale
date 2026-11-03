@@ -603,15 +603,14 @@ display only.
   only if the pill stays)
 - Test: the existing plan card test
 
-The card body already opens Plan details (`openDetails`); only its `EditPill` opens Edit plan. **Open
-question for Fawad before this task:** should the pill go, or become a Plan details affordance? Edit plan
-stays reachable from Plan details, the dashboard header and the stats grid.
+The card body already opens Plan details (`openDetails`); only its `EditPill` opens Edit plan. **Decided
+(Fawad, 2026-11-03): remove the pill from the card.** Edit plan stays reachable from Plan details, the
+dashboard header and the stats grid. Keep `EditPill` if Plan details or others use it.
 
-- [ ] **Step 1: Ask Fawad** which one he meant.
-- [ ] **Step 2: Write the failing test** for the answer (every tap on the card, pill included, lands on Plan
-  details; none lands on Edit plan).
-- [ ] **Step 3: Implement. Step 4: Run, expect pass.**
-- [ ] **Step 5: Commit** `fix(home): open plan details from the plan card`.
+- [ ] **Step 1: Write the failing test** (the card has no Edit pill; every tap on it lands on Plan details,
+  none on Edit plan).
+- [ ] **Step 2: Implement. Step 3: Run, expect pass.**
+- [ ] **Step 4: Commit** `fix(home): open plan details from the plan card`.
 
 ### Task F4: Logs page
 
