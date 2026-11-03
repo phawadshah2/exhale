@@ -15,6 +15,6 @@ extension ReductionPlanMapper on ReductionPlan {
     habitId: habitId,
     startDay: startDay.toString(),
     startLimit: startLimit,
-    quitDay: quitDay.toString(),
+    quitDay: agreedQuitDay.toString(),
   );
 }
