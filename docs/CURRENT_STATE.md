@@ -1,23 +1,42 @@
 # Current state
 
-Updated 2026-11-02. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
-(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 11 of 20 are done. The first
+Updated 2026-11-03. Goal: milestone M6 of `docs/superpowers/plans/2026-11-02-plan-and-stages.md`
+(Plan details, Edit plan, Logs), then M7 (stage management). Tasks 1 to 11 of 20 are done, and Task
+12's review and fixes; its simulator walk (Step 3) waits for Fawad's approval. The first
 release tracks one habit (Fawad, 2026-10-31). `gh` is not installed: Fawad opens PRs from a prefilled
 compare link.
 
 Before this: M5 (release candidate) is done and merged to `main` (51e0bc6) except the real iPhone
 pass. CI on PR #28 was not read.
 
-Checks at 33bdb78, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 1013
-passed. None of Tasks 1 to 11 has been seen on a simulator. Nothing on this branch is pushed.
+Checks at 04b3e98, the last code commit: format clean, `analyze --fatal-infos` clean, full suite 1036
+passed. None of Tasks 1 to 12 has been seen on a simulator. Nothing on this branch is pushed.
 
-**Next action (Opus 5.5 high, fresh session):** Task 12, the independent M6 review, in
-`docs/superpowers/plans/2026-11-02-plan-and-stages.md`. Read `docs/superpowers/specs/2026-11-02-plan-edit-logs-design.md`
-and the diff from `51e0bc6`, plus the `Ruling:` lines in
-`.superpowers/sdd/2026-11-02-plan-and-stages/progress.md`. Focus: the price rules, `PlanReport` against
-Home, the price-only save, and Logs' query mapping. Fix findings, each seen red first where a test can
-show it. Then ask Fawad for the simulator walk in the plan's Step 3. The M7 review (Task 20) is also Opus
-5.5 high. The real iPhone pass stays pending and must include these screens.
+**Next action:** Task 12 Step 3, the simulator walk, once Fawad approves the exact command: all three
+screens in light and dark, a replan's Behind you, a price change, and `lib/main_seed.dart` for a long
+plan. Record here what was seen. Then Task 13 (Sonnet 5.5 medium). The M7 review (Task 20) is Opus 5.5
+high. The real iPhone pass stays pending and must include these screens.
+
+**Task 12 done in code (2026-11-03):** the independent M6 review of `51e0bc6..213b594`, read against the
+spec, not the ledger. Read: price history and its data path (same-day replace, clearing the only
+point, the v10 migration inside the upgrade transaction), `PlanReport` against Home (both use
+`ProgressCalculator.homeStats`), the price-only save, `LogsSelection.fromQuery`, `DayRail`, and the five
+widgets of the three screens. Findings, all fixed and seen red first:
+
+- Past the quit date, Edit plan could not save a price without starting a new plan, and Home's
+  "Add a price ›" leads there. Now a price alone is a price-only save.
+- The dial took any touch on its ring and set the value on the press, so scrolling past it to the
+  price changed the limit. Now only the thumb takes a touch at once, and a press changes nothing.
+- VoiceOver could not reach "Add a price ›" on Plan details (the card merged its tiles into one
+  node). Stage rows and the Edit pill had no tap action.
+- Logs opened from a History trigger chip landed on a day with no match. It now lands on the
+  period's latest match.
+- "Counts from Day 1." showed after a cleared price, when a new one counts from today.
+
+Spec 4.1, 4.4, 4.6 and 5.1 record the changes. New coverage with no fix: the old period staying up
+while a new one loads, the slot bar's colours, a selected chip's contrast, and Logs with a filter in
+`accessibility_test`. Deferred minors and rulings are in the ledger as `Task 12:` lines. Not seen: a
+simulator, VoiceOver itself, rail line painting, how the thumb-only dial feels.
 
 **Task 11 done (33bdb78, 2026-11-02):** Logs is frame T: `LogsCalendarCard`, `LogsTriggerCard` and
 `LogsRailCard`, read from `LogsSelection` and `DayRail`. `LogsPeriodCard`, `LogsDayCard` and `DayGroup` are

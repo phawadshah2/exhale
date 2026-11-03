@@ -544,9 +544,9 @@ abstract final class DayRail { static List<RailEntry> build({required List<Habit
 
 ### Task 12: Milestone M6 review
 
-- [ ] **Step 1: Ask Fawad** for the review on Opus 5.5 high, in a fresh session, reading the Screens spec and the
+- [x] **Step 1: Ask Fawad** for the review on Opus 5.5 high, in a fresh session, reading the Screens spec and the
   diff from `51e0bc6`. Focus: the price rules, `PlanReport` against Home, the price-only save, and Logs' query mapping.
-- [ ] **Step 2: Fix findings**, each seen red first where a test can show it.
+- [x] **Step 2: Fix findings**, each seen red first where a test can show it.
 - [ ] **Step 3: Ask Fawad** for a simulator walk: all three screens, light and dark, a replan's Behind you, a price
   change, and `lib/main_seed.dart` for a long plan. Record in `docs/CURRENT_STATE.md` what was seen and what wasn't.
 - [ ] **Step 4: Commit** `docs: record the M6 review`, and give Fawad the push command.
