@@ -3,6 +3,7 @@ import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/entities/stage_check.dart';
 import 'package:exhale/features/plan/domain/repositories/plan_repository.dart';
 import 'package:exhale/features/plan/domain/repositories/stage_check_repository.dart';
+import 'package:exhale/features/plan/domain/usecases/run_stage_check.dart';
 import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -12,6 +13,10 @@ final planRepositoryProvider = Provider<PlanRepository>(
 );
 
 final savePlanProvider = Provider<SavePlan>((ref) => sl<SavePlan>());
+
+final runStageCheckProvider = Provider<RunStageCheck>(
+  (ref) => sl<RunStageCheck>(),
+);
 
 /// A habit's plans; null until its first plan is saved.
 final StreamProviderFamily<PlanHistory?, int> planHistoryProvider =
