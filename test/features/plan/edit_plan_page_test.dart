@@ -323,8 +323,8 @@ void main() {
       expect(find.text('Dec 16'), findsOneWidget);
       expect(find.text('Keep current'), findsOneWidget);
       expect(find.text('Suggested'), findsOneWidget);
-      expect(find.text('8 wks'), findsOneWidget);
-      expect(find.text('16 wks'), findsOneWidget);
+      expect(find.text('8 weeks'), findsOneWidget);
+      expect(find.text('16 weeks'), findsOneWidget);
 
       await tester.disposeApp();
     });
@@ -338,10 +338,44 @@ void main() {
       await tester.disposeApp();
     });
 
+    testWidgets('a lower limit keeps the date and shows the new pace', (
+      tester,
+    ) async {
+      await openEditPlan(tester);
+      expect(find.textContaining('(was '), findsNothing);
+      expect(find.textContaining('Use suggested date'), findsNothing);
+
+      await stepDial(tester, AppIcons.remove);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Dec 16'), findsOneWidget);
+      expect(find.textContaining('Pace: '), findsOneWidget);
+      expect(find.textContaining('(was '), findsOneWidget);
+      expect(find.textContaining('Use suggested date ('), findsOneWidget);
+
+      await tester.disposeApp();
+    });
+
+    testWidgets('the suggested date follows the limit on one tap', (
+      tester,
+    ) async {
+      await openEditPlan(tester);
+      await stepDial(tester, AppIcons.remove);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.textContaining('Use suggested date ('));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Use suggested date'), findsNothing);
+      expect(find.text('Dec 16'), findsNothing);
+
+      await tester.disposeApp();
+    });
+
     testWidgets('a chip sets the date', (tester) async {
       await openEditPlan(tester);
 
-      await tester.tap(find.text('8 wks'));
+      await tester.tap(find.text('8 weeks'));
       await tester.pump();
 
       expect(find.text('Dec 11'), findsOneWidget);

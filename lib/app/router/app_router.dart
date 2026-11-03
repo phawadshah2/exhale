@@ -1,5 +1,6 @@
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/app/shell/app_shell.dart';
+import 'package:exhale/app/shell/branch_fade.dart';
 import 'package:exhale/app/shell/page_visits.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/home/presentation/pages/habit_details_page.dart';
@@ -77,7 +78,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) =>
             LogsPage(query: LogsQuery.fromUri(state.uri)),
       ),
-      StatefulShellRoute.indexedStack(
+      StatefulShellRoute(
+        navigatorContainerBuilder: (context, navigationShell, children) =>
+            BranchFade(
+              currentIndex: navigationShell.currentIndex,
+              children: children,
+            ),
         builder: (context, state, navigationShell) =>
             AppShell(navigationShell: navigationShell),
         branches: [

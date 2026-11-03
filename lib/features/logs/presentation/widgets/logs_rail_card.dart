@@ -1,24 +1,29 @@
-import 'dart:math' as math;
-
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/home/presentation/providers/next_log_timer_provider.dart';
 import 'package:exhale/features/home/presentation/widgets/history/chart_paint.dart';
 import 'package:exhale/features/logs/domain/day_rail.dart';
 import 'package:exhale/features/logs/domain/logs_selection.dart';
 import 'package:exhale/features/logs/presentation/providers/logs_providers.dart';
+import 'package:exhale/features/logs/presentation/widgets/logs_calendar_card.dart';
+import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
+import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
+import 'package:exhale/features/tracking/domain/entities/trigger.dart';
+import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// The selected day: its count, its slots and its rail, placed by time.
+/// The selected day: its count ring and its rail, placed by time.
 class LogsRailCard extends ConsumerWidget {
   const LogsRailCard({
     required this.habitId,
@@ -27,6 +32,7 @@ class LogsRailCard extends ConsumerWidget {
     required this.today,
     required this.onEdit,
     required this.onDelete,
+    required this.onSelect,
     super.key,
   });
 
@@ -36,6 +42,9 @@ class LogsRailCard extends ConsumerWidget {
   final LogicalDay today;
   final ValueChanged<HabitLog> onEdit;
   final Future<void> Function(HabitLog log) onDelete;
+
+  /// A day picked from a range's list, which opens its week.
+  final ValueChanged<LogicalDay> onSelect;
 
   /// 28 pt, and 1 pt more for every 5 minutes, up to 120.
   static double gapHeight(Duration gap) =>
@@ -58,6 +67,33 @@ class LogsRailCard extends ConsumerWidget {
           )
         : null;
 
+    if (trigger != null || selection.isRange) {
+      return Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: AppSpacing.card,
+          child: SmoothSwitcher(
+            resize: true,
+            child: trigger == null
+                ? _RangeDays(
+                    key: ValueKey('days-${selection.period}'),
+                    view: view,
+                    onSelect: onSelect,
+                  )
+                : _RangeLogs(
+                    key: ValueKey('${selection.period}-${trigger.name}'),
+                    selection: selection,
+                    view: view,
+                    trigger: trigger,
+                    today: today,
+                    onEdit: onEdit,
+                    onDelete: onDelete,
+                  ),
+          ),
+        ),
+      );
+    }
+
     final rail = DayRail.build(
       logs: entry.logs.reversed.toList(),
       limit: entry.limit,
@@ -65,39 +101,27 @@ class LogsRailCard extends ConsumerWidget {
       day: day,
       isToday: isToday,
       next: next,
-      filter: trigger,
     );
 
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
         padding: AppSpacing.card,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: AppSpacing.gutterSm,
-          children: [
-            _DayHeader(entry: entry, isToday: isToday),
-            if (trigger != null && rail.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                child: Text(
-                  'No ${trigger.label} logs this day.',
-                  textAlign: TextAlign.center,
-                  style: text.bodyMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
-                ),
-              )
-            else
+        child: SmoothSwitcher(
+          resize: true,
+          child: Column(
+            key: ValueKey('rail-$day'),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: AppSpacing.gutterSm,
+            children: [
+              _DayHeader(entry: entry, isToday: isToday),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: trigger == null ? 0 : AppSpacing.sm,
                 children: [
                   for (final (i, row) in rail.indexed)
                     _entry(row, isLast: i == rail.length - 1, isToday: isToday),
                 ],
               ),
-            if (trigger == null) ...[
               Divider(height: 1, color: colors.outlineVariant),
               Text(
                 'Forgot one? Tap + at the top to add it to this day. '
@@ -108,7 +132,7 @@ class LogsRailCard extends ConsumerWidget {
                 ),
               ),
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -209,104 +233,286 @@ class _DayHeader extends StatelessWidget {
     final date = AppFormat.shortWeekdayDate(entry.day);
     final (count, color) = _count(context);
     final progress = entry.progress;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: AppSpacing.sm,
+    return Row(
+      spacing: AppSpacing.gutterSm,
       children: [
-        // Wraps at large text sizes instead of overflowing.
-        Wrap(
-          alignment: WrapAlignment.spaceBetween,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: AppSpacing.sm,
-          children: [
-            Text(isToday ? 'Today · $date' : date, style: text.titleMedium),
-            Text(
-              count,
-              style: text.labelMedium?.copyWith(
-                color: color,
-                fontWeight: FontWeight.w600,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(isToday ? 'Today · $date' : date, style: text.titleMedium),
+              Text(
+                count,
+                style: text.labelMedium?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        if (progress != null && (progress.limit > 0 || progress.count > 0))
-          LogsSlotBar(limit: progress.limit, count: progress.count),
+        if (progress != null)
+          LogsCountRing(limit: progress.limit, count: progress.count),
       ],
     );
   }
 }
 
-/// One slot for each of the limit or the count, whichever is more.
-class LogsSlotBar extends StatelessWidget {
-  const LogsSlotBar({required this.limit, required this.count, super.key});
-
-  final int limit;
-  final int count;
-
-  @override
-  Widget build(BuildContext context) => ExcludeSemantics(
-    child: SizedBox(
-      height: _SlotPainter.height,
-      child: CustomPaint(
-        painter: _SlotPainter(
-          limit: limit,
-          count: count,
-          used: context.colors.primaryContainer,
-          over: context.exhale.danger.solid,
-          unused: context.colors.surfaceContainerHigh,
-        ),
-      ),
-    ),
-  );
-}
-
-class _SlotPainter extends CustomPainter {
-  const _SlotPainter({
+/// The day's count against its limit as a ring, filling on arrival and
+/// whenever the count changes.
+class LogsCountRing extends StatelessWidget {
+  const LogsCountRing({
     required this.limit,
     required this.count,
-    required this.used,
-    required this.over,
-    required this.unused,
+    this.size = 52,
+    super.key,
   });
 
-  static const double height = 6;
-  static const double _gap = 4;
-
+  final double size;
   final int limit;
   final int count;
-  final Color used;
-  final Color over;
-  final Color unused;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final slots = math.max(limit, count);
-    // At 80 slots a 4 pt gap would leave no slot to draw.
-    final gap = math.min(_gap, size.width / slots / 4);
-    final width = (size.width - gap * (slots - 1)) / slots;
-    for (var i = 0; i < slots; i++) {
-      final color = i >= limit
-          ? over
-          : i < count
-          ? used
-          : unused;
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(i * (width + gap), 0, width, height),
-          const Radius.circular(height / 2),
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final progress = DailyProgress(
+      day: LogicalDay(2000, 1, 1),
+      count: count,
+      limit: limit,
+    );
+    final atZero = limit == 0 && count == 0;
+    final color = atZero
+        ? context.exhale.success.solid
+        : progress.status.barColor(context);
+    return ExcludeSemantics(
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(end: atZero ? 1 : progress.usedFraction),
+        duration: AppMotion.fill,
+        curve: AppMotion.fillCurve,
+        builder: (context, fill, _) => SizedBox.square(
+          dimension: size,
+          child: CustomPaint(
+            painter: StageRingPainter(
+              fill: fill,
+              strokeWidth: size / 10.4,
+              color: color,
+              track: colors.surfaceContainerHigh,
+              dashed: false,
+            ),
+            child: Center(
+              child: MediaQuery.withNoTextScaling(
+                child: Text(
+                  '$count',
+                  style:
+                      (size >= 40
+                              ? context.textTheme.titleSmall
+                              : context.textTheme.labelSmall)
+                          ?.copyWith(fontWeight: FontWeight.w800),
+                ),
+              ),
+            ),
+          ),
         ),
-        Paint()..color = color,
-      );
-    }
+      ),
+    );
   }
+}
+
+/// One row for each day of a range: its count against its limit. A row opens
+/// that day's week.
+class _RangeDays extends StatelessWidget {
+  const _RangeDays({required this.view, required this.onSelect, super.key});
+
+  final LogsView view;
+  final ValueChanged<LogicalDay> onSelect;
 
   @override
-  bool shouldRepaint(_SlotPainter old) =>
-      old.limit != limit ||
-      old.count != count ||
-      old.used != used ||
-      old.over != over ||
-      old.unused != unused;
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final text = context.textTheme;
+    final muted = text.bodySmall?.copyWith(color: colors.onSurfaceVariant);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.sm,
+            children: [
+              Text('Days in this range', style: text.titleMedium),
+              Text('${view.days.length} days', style: muted),
+            ],
+          ),
+        ),
+        for (final entry in view.days)
+          _DayRow(entry: entry, onTap: () => onSelect(entry.day)),
+      ],
+    );
+  }
+}
+
+class _DayRow extends StatelessWidget {
+  const _DayRow({required this.entry, required this.onTap});
+
+  final LogsDay entry;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final text = context.textTheme;
+    final date = AppFormat.shortWeekdayDate(entry.day);
+    final limit = entry.limit;
+    final count = limit == null
+        ? '${entry.count} logged'
+        : '${entry.count} of $limit';
+    return Semantics(
+      button: true,
+      label: '$date, $count. Opens its week.',
+      excludeSemantics: true,
+      onTap: onTap,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 44),
+          decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: colors.outlineVariant)),
+          ),
+          child: Row(
+            spacing: AppSpacing.sm,
+            children: [
+              Expanded(child: Text(date, style: text.bodyMedium)),
+              Text(
+                count,
+                style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+              ),
+              if (limit != null)
+                LogsCountRing(limit: limit, count: entry.count, size: 30)
+              else
+                const SizedBox.square(dimension: 30),
+              Icon(
+                AppIcons.chevronRight,
+                size: 14,
+                color: colors.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Every log with the filter's trigger in the week or range, a heading for
+/// each day. A very long range lists its latest [_cap] logs.
+class _RangeLogs extends StatelessWidget {
+  const _RangeLogs({
+    required this.selection,
+    required this.view,
+    required this.trigger,
+    required this.today,
+    required this.onEdit,
+    required this.onDelete,
+    super.key,
+  });
+
+  final LogsSelection selection;
+  final LogsView view;
+  final Trigger trigger;
+  final LogicalDay today;
+  final ValueChanged<HabitLog> onEdit;
+  final Future<void> Function(HabitLog log) onDelete;
+
+  static const int _cap = 200;
+
+  bool _matches(HabitLog log) => log.trigger == trigger;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final text = context.textTheme;
+    final days = [
+      for (final entry in view.days)
+        if (entry.logs.any(_matches)) entry,
+    ];
+    final total = days.fold<int>(
+      0,
+      (sum, entry) => sum + entry.logs.where(_matches).length,
+    );
+    final heading = selection.isRange
+        ? 'in this range'
+        : LogsCalendarCard.ago(selection, today).toLowerCase();
+    final label = trigger.label;
+    var left = _cap;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: AppSpacing.gutterSm,
+      children: [
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: AppSpacing.sm,
+          children: [
+            Text(label, style: text.titleMedium),
+            Text(
+              '$total ${total == 1 ? 'log' : 'logs'} $heading',
+              style: text.labelMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        if (days.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+            child: Text(
+              'No $label logs $heading.',
+              textAlign: TextAlign.center,
+              style: text.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+            ),
+          )
+        else
+          for (final entry in days)
+            if (left > 0)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: AppSpacing.sm,
+                children: [
+                  Text(
+                    AppFormat.shortWeekdayDate(entry.day),
+                    style: text.labelMedium?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  for (final (i, log) in entry.logs.indexed)
+                    if (_matches(log) && left-- > 0)
+                      _LogRow(
+                        log: log,
+                        // Newest first, so the oldest log has the highest
+                        // index.
+                        over:
+                            entry.limit != null &&
+                            entry.logs.length - 1 - i >= entry.limit!,
+                        onEdit: onEdit,
+                        onDelete: onDelete,
+                      ),
+                ],
+              ),
+        if (total > _cap)
+          Text(
+            'Showing the latest $_cap.',
+            textAlign: TextAlign.center,
+            style: text.labelMedium?.copyWith(color: colors.onSurfaceVariant),
+          ),
+      ],
+    );
+  }
 }
 
 enum _LineStyle { solid, dashed }

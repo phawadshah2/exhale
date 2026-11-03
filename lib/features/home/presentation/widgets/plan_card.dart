@@ -107,20 +107,47 @@ class PlanCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: AppSpacing.md,
               children: [
-                Column(
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 2,
+                  spacing: AppSpacing.sm,
                   children: [
-                    Text('Your plan', style: text.titleMedium),
-                    Text(
-                      stage == null
-                          ? '$percent% of the way'
-                          : 'Stage ${stage.number} of '
-                                '${plan.stageCount} '
-                                '· $percent% of the way',
-                      style: text.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 2,
+                        children: [
+                          Text('Your plan', style: text.titleMedium),
+                          Text(
+                            stage == null
+                                ? '$percent% of the way'
+                                : 'Stage ${stage.number} of '
+                                      '${plan.stageCount} '
+                                      '· $percent% of the way',
+                            style: text.bodySmall?.copyWith(
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                    // Says the whole card opens Plan details.
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 2,
+                      children: [
+                        Text(
+                          'Details',
+                          style: text.labelMedium?.copyWith(
+                            color: colors.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Icon(
+                          AppIcons.chevronRight,
+                          size: 14,
+                          color: colors.primary,
+                        ),
+                      ],
                     ),
                   ],
                 ),

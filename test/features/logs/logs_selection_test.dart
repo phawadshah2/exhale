@@ -63,20 +63,50 @@ void main() {
       );
     });
 
-    test('a month range opens the week of its end', () {
+    test('a month range opens as that range, on its last day', () {
+      final selection = _open(_oct(1), _oct(31));
+
       _expectShows(
-        _open(_oct(1), _oct(31)),
-        period: PeriodRange(_oct(26), _nov(1)),
+        selection,
+        period: PeriodRange(_oct(1), _oct(31)),
         selected: _oct(31),
       );
+      expect(selection.isRange, isTrue);
     });
 
-    test("History's All range opens the week of its end", () {
+    test("History's All range opens as that range, ending today", () {
+      final selection = _open(LogicalDay(2026, 8, 14), _today);
+
       _expectShows(
-        _open(LogicalDay(2026, 8, 14), _today),
-        period: _thisWeek,
+        selection,
+        period: PeriodRange(LogicalDay(2026, 8, 14), _today),
         selected: _today,
       );
+      expect(selection.isRange, isTrue);
+    });
+
+    test('a month that has only just begun is still a range', () {
+      // Nov 1 is a Sunday, the day before this week starts.
+      final selection = _open(_nov(1), LogicalDay(2026, 11, 30));
+
+      _expectShows(
+        selection,
+        period: PeriodRange(_nov(1), _today),
+        selected: _today,
+      );
+      expect(selection.isRange, isTrue);
+    });
+
+    test('a week or a day is not a range', () {
+      expect(_open(_oct(26), _nov(1)).isRange, isFalse);
+      expect(_open(_oct(28), _oct(28)).isRange, isFalse);
+    });
+
+    test('picking a day leaves a range for its week', () {
+      final picked = _open(_oct(1), _oct(31)).select(_oct(14));
+
+      expect(picked.isRange, isFalse);
+      expect(picked.period, PeriodRange(_oct(12), _oct(18)));
     });
 
     test('a range ending after today never opens on a future day', () {
@@ -155,10 +185,10 @@ void main() {
       );
     });
 
-    test('keeps the trigger', () {
+    test('clears the trigger', () {
       expect(
         _open(_today, _today, trigger: Trigger.stress).select(_nov(3)).trigger,
-        Trigger.stress,
+        isNull,
       );
     });
   });

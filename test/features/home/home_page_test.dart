@@ -724,6 +724,15 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('your plan shows that it opens Plan details', (tester) async {
+    await startPlan(LogicalDay(2026, 10, 14));
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.text('Details'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('your plan marks the stage before as done', (tester) async {
     await startPlan(LogicalDay(2026, 10, 1));
     await tester.pumpAppPastSplash(height: 2400);

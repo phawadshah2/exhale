@@ -3,10 +3,12 @@ import 'dart:math' as math;
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/circle_icon_button.dart';
 import 'package:exhale/core/widgets/load_failure.dart';
+import 'package:exhale/core/widgets/scroll_reveal.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
@@ -114,40 +116,49 @@ class _PlanDetails extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: AppSpacing.md,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const _BackButton(),
-                EditPill(habitId: habitId),
-              ],
+            ScrollReveal(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const _BackButton(),
+                  EditPill(habitId: habitId),
+                ],
+              ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: AppSpacing.xs,
-              children: [
-                // "Regrettably." has to fit one line on the smallest phone.
-                MediaQuery.withClampedTextScaling(
-                  maxScaleFactor: 1.5,
-                  child: Text(
-                    report.quitReached ? PlanCopy.quitTitle : PlanCopy.title,
-                    style: text.headlineLarge,
+            ScrollReveal(
+              index: 1,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: AppSpacing.xs,
+                children: [
+                  // "Regrettably." has to fit one line on the smallest phone.
+                  MediaQuery.withClampedTextScaling(
+                    maxScaleFactor: 1.5,
+                    child: Text(
+                      report.quitReached ? PlanCopy.quitTitle : PlanCopy.title,
+                      style: text.headlineLarge,
+                    ),
                   ),
-                ),
-                Text(
-                  PlanCopy.lead,
-                  style: text.bodyMedium?.copyWith(
-                    color: context.colors.onSurfaceVariant,
+                  Text(
+                    PlanCopy.lead,
+                    style: text.bodyMedium?.copyWith(
+                      color: context.colors.onSurfaceVariant,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            PlanTotalsCard(
-              habitId: habitId,
-              totals: report.totals,
-              habit: habit,
+            ScrollReveal(
+              index: 2,
+              child: PlanTotalsCard(
+                habitId: habitId,
+                totals: report.totals,
+                habit: habit,
+              ),
             ),
             if (report.behind.isNotEmpty)
               _Section(
+                index: 3,
                 title: PlanCopy.behindTitle,
                 side: behindSaved == null
                     ? null
@@ -170,6 +181,7 @@ class _PlanDetails extends ConsumerWidget {
               ),
             if (current != null)
               _Section(
+                index: 4,
                 title: PlanCopy.youTitle,
                 side: PlanCopy.stageOf(current.stage.number, report.stageCount),
                 highlighted: true,
@@ -183,6 +195,7 @@ class _PlanDetails extends ConsumerWidget {
               ),
             if (report.ahead.isNotEmpty)
               _Section(
+                index: 5,
                 title: PlanCopy.aheadTitle,
                 side: aheadToSave == null
                     ? null
@@ -197,7 +210,10 @@ class _PlanDetails extends ConsumerWidget {
                     ),
                 ],
               ),
-            _FinishRow(report: report, habit: habit, today: today),
+            ScrollReveal(
+              index: 6,
+              child: _FinishRow(report: report, habit: habit, today: today),
+            ),
           ],
         ),
       ),
@@ -207,12 +223,14 @@ class _PlanDetails extends ConsumerWidget {
 
 class _Section extends StatelessWidget {
   const _Section({
+    required this.index,
     required this.title,
     required this.side,
     required this.children,
     this.highlighted = false,
   });
 
+  final int index;
   final String title;
   final String? side;
   final List<Widget> children;
@@ -234,47 +252,55 @@ class _Section extends StatelessWidget {
     final sideText = side == null
         ? null
         : Text(side, style: text.bodySmall?.copyWith(color: muted));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: AppSpacing.sm,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-          child: context.hasLargeText
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [titleText, ?sideText],
-                )
-              : Row(
-                  spacing: AppSpacing.sm,
-                  children: [
-                    Expanded(child: titleText),
-                    ?sideText,
-                  ],
-                ),
-        ),
-        Card(
-          shape: highlighted
-              ? RoundedRectangleBorder(
-                  borderRadius: AppRadius.card,
-                  side: BorderSide(
-                    color: context.colors.primaryContainer,
-                    width: 2,
+    return ScrollReveal(
+      index: index,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: AppSpacing.sm,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+            child: context.hasLargeText
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [titleText, ?sideText],
+                  )
+                : Row(
+                    spacing: AppSpacing.sm,
+                    children: [
+                      Expanded(child: titleText),
+                      ?sideText,
+                    ],
                   ),
-                )
-              : null,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.gutterSm,
-              vertical: AppSpacing.sm,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: children,
+          ),
+          AnimatedSize(
+            duration: AppMotion.swap,
+            curve: AppMotion.swapCurve,
+            alignment: Alignment.topCenter,
+            child: Card(
+              shape: highlighted
+                  ? RoundedRectangleBorder(
+                      borderRadius: AppRadius.card,
+                      side: BorderSide(
+                        color: context.colors.primaryContainer,
+                        width: 2,
+                      ),
+                    )
+                  : null,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.gutterSm,
+                  vertical: AppSpacing.sm,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: children,
+                ),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

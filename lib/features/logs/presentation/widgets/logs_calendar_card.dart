@@ -3,15 +3,18 @@ import 'dart:async';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/app_dialogs.dart';
+import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/home/presentation/widgets/history/month_ring_calendar.dart';
 import 'package:exhale/features/logs/domain/logs_selection.dart';
 import 'package:exhale/features/logs/presentation/providers/logs_providers.dart';
-import 'package:exhale/features/logs/presentation/widgets/logs_date_picker.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
+import 'package:flutter/cupertino.dart' show CupertinoDatePickerMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -34,6 +37,7 @@ class LogsCalendarCard extends StatefulWidget {
 
   /// This week, Last week, or 3 weeks ago.
   static String ago(LogsSelection selection, LogicalDay today) {
+    if (selection.isRange) return range(selection.period);
     final back = ChartPeriod.week.periodsBetween(selection.period.from, today);
     return switch (back) {
       0 => 'This week',
@@ -41,6 +45,10 @@ class LogsCalendarCard extends StatefulWidget {
       _ => '$back weeks ago',
     };
   }
+
+  /// Oct 1 – Oct 31
+  static String range(PeriodRange period) =>
+      '${AppFormat.monthDay(period.from)} – ${AppFormat.monthDay(period.to)}';
 
   @override
   State<LogsCalendarCard> createState() => _LogsCalendarCardState();
@@ -52,19 +60,20 @@ class _LogsCalendarCardState extends State<LogsCalendarCard> {
     widget.onChanged(selection);
   }
 
-  String get _title {
-    final PeriodRange(:from, :to) = widget.selection.period;
-    return '${AppFormat.monthDay(from)} – ${AppFormat.monthDay(to)}';
-  }
+  String get _title => LogsCalendarCard.range(widget.selection.period);
 
   Future<void> _pickDay() async {
-    final day = await showLogsDatePicker(
+    final picked = await showWheelPicker(
       context,
-      selected: widget.selection.selected,
-      earliest: widget.earliest,
-      today: widget.today,
+      title: 'Pick a day',
+      mode: CupertinoDatePickerMode.date,
+      initial: widget.selection.selected.toLocalDate(),
+      minimum: widget.earliest.toLocalDate(),
+      maximum: widget.today.toLocalDate(),
     );
-    if (day != null && mounted) _change(widget.selection.select(day));
+    if (picked != null && mounted) {
+      _change(widget.selection.select(LogicalDay.fromDate(picked)));
+    }
   }
 
   /// Swiping right goes to the week before, as in History.
@@ -82,6 +91,19 @@ class _LogsCalendarCardState extends State<LogsCalendarCard> {
   Widget build(BuildContext context) {
     final selection = widget.selection;
     final today = widget.today;
+
+    if (selection.isRange) {
+      return Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.gutterSm),
+          child: _RangeHeader(
+            title: _title,
+            onBack: () => _change(selection.select(selection.period.to)),
+          ),
+        ),
+      );
+    }
 
     return Card(
       margin: EdgeInsets.zero,
@@ -119,18 +141,78 @@ class _LogsCalendarCardState extends State<LogsCalendarCard> {
             GestureDetector(
               behavior: HitTestBehavior.translucent,
               onHorizontalDragEnd: _swipe,
-              child: _Grid(
-                selection: selection,
-                view: widget.view,
-                today: today,
-                earliest: widget.earliest,
-                onSelect: (day) => _change(selection.select(day)),
+              child: SmoothSwitcher(
+                resize: true,
+                child: _Grid(
+                  key: ValueKey('grid-${selection.period.from}'),
+                  selection: selection,
+                  view: widget.view,
+                  today: today,
+                  earliest: widget.earliest,
+                  onSelect: (day) => _change(selection.select(day)),
+                ),
               ),
             ),
             const Center(child: MonthRingKey(showBeforePlan: false)),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The range opened from History, with a way back to the weeks.
+class _RangeHeader extends StatelessWidget {
+  const _RangeHeader({required this.title, required this.onBack});
+
+  final String title;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = context.textTheme;
+    final colors = context.colors;
+    return Column(
+      children: [
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        Semantics(
+          button: true,
+          label: 'Back to weeks',
+          excludeSemantics: true,
+          onTap: onBack,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onBack,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 44),
+              child: Center(
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Whole range · ',
+                        style: TextStyle(color: colors.onSurfaceVariant),
+                      ),
+                      TextSpan(
+                        text: 'Back to weeks',
+                        style: TextStyle(
+                          color: colors.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  style: text.labelMedium,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -198,6 +280,7 @@ class _Grid extends StatelessWidget {
     required this.today,
     required this.earliest,
     required this.onSelect,
+    super.key,
   });
 
   final LogsSelection selection;
@@ -205,8 +288,6 @@ class _Grid extends StatelessWidget {
   final LogicalDay today;
   final LogicalDay earliest;
   final ValueChanged<LogicalDay> onSelect;
-
-  static const _weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   @override
   Widget build(BuildContext context) {
@@ -221,28 +302,6 @@ class _Grid extends StatelessWidget {
 
     return Column(
       children: [
-        // Seven of these share a phone's width; past this scale "Wed" doesn't
-        // fit its column.
-        MediaQuery.withClampedTextScaling(
-          maxScaleFactor: 1.5,
-          child: ExcludeSemantics(
-            child: Row(
-              children: [
-                for (final weekday in _weekdays)
-                  Expanded(
-                    child: Text(
-                      weekday,
-                      textAlign: TextAlign.center,
-                      style: context.textTheme.labelSmall?.copyWith(
-                        color: context.colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
         for (var row = 0; row < cells.length ~/ 7; row++)
           Row(
             children: [
@@ -279,7 +338,7 @@ class _DayCell extends StatelessWidget {
     super.key,
   });
 
-  static const double height = 48;
+  static const double height = 68;
   static const double _ring = 38;
   static const double _stroke = 3.5;
 
@@ -321,44 +380,75 @@ class _DayCell extends StatelessWidget {
       child: GestureDetector(
         onTap: enabled ? onTap : null,
         behavior: HitTestBehavior.opaque,
-        child: Container(
+        child: AnimatedContainer(
+          duration: AppMotion.swap,
+          curve: AppMotion.swapCurve,
           height: height,
           alignment: Alignment.center,
           // The current-stage highlight on Plan details.
-          decoration: selected
-              ? BoxDecoration(
-                  color: exhale.inset,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                )
-              : null,
-          child: SizedBox.square(
-            dimension: _ring,
-            child: CustomPaint(
-              painter: StageRingPainter(
-                fill: atZero ? 1 : progress?.usedFraction ?? 0,
-                strokeWidth: _stroke,
-                color: ringColor,
-                track: progress == null
-                    ? colors.outlineVariant
-                    : selected
-                    ? colors.surfaceContainerHighest
-                    : colors.surfaceContainerHigh,
-                dashed: progress == null,
+          decoration: BoxDecoration(
+            color: selected ? exhale.inset : exhale.inset.withValues(alpha: 0),
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 3,
+            children: [
+              // Seven of these share a phone's width; past this scale "Wed"
+              // doesn't fit its column.
+              MediaQuery.withClampedTextScaling(
+                maxScaleFactor: 1.5,
+                child: Text(
+                  AppFormat.shortWeekday(day),
+                  style: context.textTheme.labelSmall?.copyWith(
+                    color: selected || isToday
+                        ? colors.onSurface
+                        : colors.onSurfaceVariant,
+                    fontWeight: selected || isToday
+                        ? FontWeight.w800
+                        : FontWeight.w600,
+                  ),
+                ),
               ),
-              child: Center(
-                child: MediaQuery.withNoTextScaling(
-                  child: Text(
-                    '${day.day}',
-                    style: context.textTheme.labelSmall?.copyWith(
-                      color: dateColor,
-                      fontWeight: selected || isToday
-                          ? FontWeight.w800
-                          : FontWeight.w600,
+              SizedBox.square(
+                dimension: _ring,
+                // The track eases between its two colours with the highlight.
+                child: TweenAnimationBuilder<Color?>(
+                  tween: ColorTween(
+                    end: progress == null
+                        ? colors.outlineVariant
+                        : selected
+                        ? colors.surfaceContainerHighest
+                        : colors.surfaceContainerHigh,
+                  ),
+                  duration: AppMotion.swap,
+                  curve: AppMotion.swapCurve,
+                  builder: (context, track, child) => CustomPaint(
+                    painter: StageRingPainter(
+                      fill: atZero ? 1 : progress?.usedFraction ?? 0,
+                      strokeWidth: _stroke,
+                      color: ringColor,
+                      track: track ?? colors.surfaceContainerHigh,
+                      dashed: progress == null,
+                    ),
+                    child: child,
+                  ),
+                  child: Center(
+                    child: MediaQuery.withNoTextScaling(
+                      child: Text(
+                        '${day.day}',
+                        style: context.textTheme.labelSmall?.copyWith(
+                          color: dateColor,
+                          fontWeight: selected || isToday
+                              ? FontWeight.w800
+                              : FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),

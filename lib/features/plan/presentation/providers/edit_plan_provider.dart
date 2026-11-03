@@ -20,8 +20,8 @@ import 'package:flutter_riverpod/misc.dart';
 enum EditQuitPreset {
   keepCurrent('Keep current'),
   suggested('Suggested'),
-  weeks8('8 wks'),
-  weeks16('16 wks');
+  weeks8('8 weeks'),
+  weeks16('16 weeks');
 
   EditQuitPreset(this.label);
 

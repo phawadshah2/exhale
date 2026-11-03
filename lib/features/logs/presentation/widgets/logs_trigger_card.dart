@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
+import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/core/widgets/status_badge.dart';
 import 'package:exhale/features/logs/domain/logs_selection.dart';
 import 'package:exhale/features/logs/presentation/providers/logs_providers.dart';
@@ -36,52 +38,74 @@ class LogsTriggerCard extends StatelessWidget {
     final text = context.textTheme;
     final breakdown = view.breakdown;
     final selected = selection.trigger;
+    final span = selection.isRange ? 'this range' : 'the week';
 
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
         padding: AppSpacing.card,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: AppSpacing.gutterSm,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              spacing: AppSpacing.sm,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _label,
-                        style: text.labelMedium?.copyWith(
-                          color: colors.onSurfaceVariant,
+        child: SmoothSwitcher(
+          resize: true,
+          child: Column(
+            key: ValueKey('card-${selection.period}'),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: AppSpacing.gutterSm,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                spacing: AppSpacing.sm,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _label,
+                          style: text.labelMedium?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
                         ),
+                        if (view.hasPlanDays)
+                          _Allowed(view: view)
+                        else
+                          Text('Before your plan', style: text.titleMedium),
+                      ],
+                    ),
+                  ),
+                  if (view.hasPlanDays) _Pill(under: view.stats.underBy),
+                ],
+              ),
+              if (breakdown.total > 0)
+                _Bar(
+                  breakdown: breakdown,
+                  selected: selected,
+                  label: 'Triggers for $_label',
+                ),
+              if (breakdown.total > 0 || selected != null)
+                _Chips(
+                  breakdown: breakdown,
+                  selected: selected,
+                  onTrigger: onTrigger,
+                ),
+              if (breakdown.total > 0)
+                SmoothSwitcher(
+                  resize: true,
+                  child: SizedBox(
+                    key: ValueKey(selected),
+                    width: double.infinity,
+                    child: Text(
+                      selected == null
+                          ? 'Tap a trigger to see its logs across $span.'
+                          : 'Tap ${selected.label} again to clear the filter.',
+                      textAlign: TextAlign.start,
+                      style: text.labelSmall?.copyWith(
+                        color: colors.onSurfaceVariant,
                       ),
-                      if (view.hasPlanDays)
-                        _Allowed(view: view)
-                      else
-                        Text('Before your plan', style: text.titleMedium),
-                    ],
+                    ),
                   ),
                 ),
-                if (view.hasPlanDays) _Pill(under: view.stats.underBy),
-              ],
-            ),
-            if (breakdown.total > 0)
-              _Bar(
-                breakdown: breakdown,
-                selected: selected,
-                label: 'Triggers for $_label',
-              ),
-            if (breakdown.total > 0 || selected != null)
-              _Chips(
-                breakdown: breakdown,
-                selected: selected,
-                onTrigger: onTrigger,
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -169,12 +193,18 @@ class _Bar extends StatelessWidget {
               for (final share in breakdown.shares)
                 Expanded(
                   flex: share.count,
-                  child: ColoredBox(color: tint(share.trigger)),
+                  child: AnimatedContainer(
+                    duration: AppMotion.swap,
+                    curve: AppMotion.swapCurve,
+                    color: tint(share.trigger),
+                  ),
                 ),
               if (breakdown.noTrigger > 0)
                 Expanded(
                   flex: breakdown.noTrigger,
-                  child: ColoredBox(
+                  child: AnimatedContainer(
+                    duration: AppMotion.swap,
+                    curve: AppMotion.swapCurve,
                     color: selected == null
                         ? none
                         : none.withValues(alpha: _dimmed),
@@ -204,7 +234,7 @@ class _Chips extends StatelessWidget {
     final picked = selected;
     final shares = breakdown.shares;
     return Wrap(
-      spacing: AppSpacing.sm,
+      spacing: AppSpacing.xs,
       children: [
         for (final share in shares)
           _TriggerChip(
@@ -296,9 +326,11 @@ class _ChipBody extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 44),
       child: Center(
         widthFactor: 1,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 34),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: AnimatedContainer(
+          duration: AppMotion.swap,
+          curve: AppMotion.swapCurve,
+          constraints: const BoxConstraints(minHeight: 26),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           decoration: ShapeDecoration(
             color: fill,
             shape: StadiumBorder(side: BorderSide(color: border)),
@@ -307,7 +339,7 @@ class _ChipBody extends StatelessWidget {
             widthFactor: 1,
             child: Text(
               label,
-              style: context.textTheme.labelMedium?.copyWith(
+              style: context.textTheme.labelSmall?.copyWith(
                 color: color,
                 fontWeight: FontWeight.w600,
               ),

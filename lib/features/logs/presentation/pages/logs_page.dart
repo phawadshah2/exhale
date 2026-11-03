@@ -8,6 +8,7 @@ import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/circle_icon_button.dart';
 import 'package:exhale/core/widgets/load_failure.dart';
+import 'package:exhale/core/widgets/scroll_reveal.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/logs/domain/logs_selection.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
@@ -41,16 +42,11 @@ class _LogsPageState extends ConsumerState<LogsPage> {
   /// and this stays up until it has, rather than a spinner for a frame.
   ({LogsSelection selection, LogsView view})? _shown;
 
-  /// A filter opened on a period, as from History's chips, moves to the
-  /// period's latest match once it loads, rather than an empty day.
-  late bool _seekMatch;
-
   @override
   void initState() {
     super.initState();
     final query = widget.query;
     _selection = LogsSelection.fromQuery(query, today: ref.read(todayProvider));
-    _seekMatch = query.trigger != null && query.from != query.to;
   }
 
   void _change(LogsSelection selection) =>
@@ -98,17 +94,13 @@ class _LogsPageState extends ConsumerState<LogsPage> {
   Widget build(BuildContext context) {
     final habitId = widget.query.habitId ?? ref.watch(primaryHabitProvider)?.id;
     final today = ref.watch(todayProvider);
+    final insets = MediaQuery.paddingOf(context);
     final range = _selection.period;
     if (habitId != null) {
       final view = ref.watch(
         logsViewProvider((habitId: habitId, range: range)),
       );
       if (view != null) {
-        if (_seekMatch) {
-          _seekMatch = false;
-          final match = view.latestWith(_selection.trigger!);
-          if (match != null) _selection = _selection.select(match);
-        }
         _shown = (selection: _selection, view: view);
       }
     }
@@ -127,83 +119,90 @@ class _LogsPageState extends ConsumerState<LogsPage> {
                 ref.watch(planHistoryProvider(habitId)).failedToLoad));
 
     return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: AppSpacing.page.copyWith(top: AppSpacing.sm),
-              sliver: SliverToBoxAdapter(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CircleIconButton(
-                      tooltip: 'Back',
-                      icon: AppIcons.back,
-                      onPressed: () => context.pop(),
-                    ),
-                    CircleIconButton(
-                      tooltip: 'Add a missed log',
-                      icon: AppIcons.add,
-                      onPressed: habitId == null
-                          ? null
-                          : () => showLogEditorSheet(
-                              context,
-                              habitId: habitId,
-                              day: _selection.selected,
-                            ),
-                    ),
-                  ],
-                ),
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: AppSpacing.page.copyWith(top: insets.top + AppSpacing.sm),
+            sliver: SliverToBoxAdapter(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CircleIconButton(
+                    tooltip: 'Back',
+                    icon: AppIcons.back,
+                    onPressed: () => context.pop(),
+                  ),
+                  CircleIconButton(
+                    tooltip: 'Add a missed log',
+                    icon: AppIcons.add,
+                    onPressed: habitId == null
+                        ? null
+                        : () => showLogEditorSheet(
+                            context,
+                            habitId: habitId,
+                            day: _selection.selected,
+                          ),
+                  ),
+                ],
               ),
             ),
-            if (failed)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: LoadFailure(
-                  message: "Couldn't load your logs.",
-                  onRetry: () {
-                    ref.invalidate(activeHabitsProvider);
-                    if (habitId == null) return;
-                    ref
-                      ..invalidate(
-                        logsInRangeProvider((habitId: habitId, range: range)),
-                      )
-                      ..invalidate(planHistoryProvider(habitId));
-                  },
-                ),
-              )
-            else if (shown == null || habitId == null)
-              const SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(child: CircularProgressIndicator.adaptive()),
-              )
-            else
-              SliverPadding(
-                padding: AppSpacing.page.copyWith(
-                  top: AppSpacing.md,
-                  bottom: AppSpacing.xl,
-                ),
-                sliver: SliverList.list(
-                  children: [
-                    const _Header(),
-                    const SizedBox(height: AppSpacing.md),
-                    LogsCalendarCard(
+          ),
+          if (failed)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: LoadFailure(
+                message: "Couldn't load your logs.",
+                onRetry: () {
+                  ref.invalidate(activeHabitsProvider);
+                  if (habitId == null) return;
+                  ref
+                    ..invalidate(
+                      logsInRangeProvider((habitId: habitId, range: range)),
+                    )
+                    ..invalidate(planHistoryProvider(habitId));
+                },
+              ),
+            )
+          else if (shown == null || habitId == null)
+            const SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(child: CircularProgressIndicator.adaptive()),
+            )
+          else
+            SliverPadding(
+              padding: AppSpacing.page.copyWith(
+                top: AppSpacing.md,
+                bottom: insets.bottom + AppSpacing.xl,
+              ),
+              sliver: SliverList.list(
+                children: [
+                  const ScrollReveal(child: _Header()),
+                  const SizedBox(height: AppSpacing.md),
+                  ScrollReveal(
+                    index: 1,
+                    child: LogsCalendarCard(
                       selection: shown.selection,
                       view: shown.view,
                       today: today,
                       earliest: earliest,
                       onChanged: _change,
                     ),
-                    const SizedBox(height: AppSpacing.md),
-                    LogsTriggerCard(
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  ScrollReveal(
+                    index: 2,
+                    child: LogsTriggerCard(
                       selection: shown.selection,
                       view: shown.view,
                       today: today,
                       onTrigger: (trigger) =>
                           _change(shown.selection.toggleTrigger(trigger)),
                     ),
-                    const SizedBox(height: AppSpacing.md),
-                    LogsRailCard(
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  ScrollReveal(
+                    index: 3,
+                    child: LogsRailCard(
                       habitId: habitId,
                       selection: shown.selection,
                       view: shown.view,
@@ -215,12 +214,13 @@ class _LogsPageState extends ConsumerState<LogsPage> {
                         log: log,
                       ),
                       onDelete: (log) => _delete(habitId, log),
+                      onSelect: (day) => _change(shown.selection.select(day)),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:exhale/core/presentation/providers/clock_providers.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/widgets/load_failure.dart';
+import 'package:exhale/core/widgets/scroll_reveal.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
 import 'package:exhale/features/home/presentation/widgets/dashboard_header.dart';
@@ -9,7 +10,6 @@ import 'package:exhale/features/home/presentation/widgets/history_card.dart';
 import 'package:exhale/features/home/presentation/widgets/plan_card.dart';
 import 'package:exhale/features/home/presentation/widgets/quote_card.dart';
 import 'package:exhale/features/home/presentation/widgets/ring_card.dart';
-import 'package:exhale/features/home/presentation/widgets/scroll_reveal.dart';
 import 'package:exhale/features/home/presentation/widgets/stage_pill.dart';
 import 'package:exhale/features/home/presentation/widgets/stats_grid.dart';
 import 'package:exhale/features/home/presentation/widgets/today_logs_card.dart';

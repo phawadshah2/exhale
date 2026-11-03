@@ -63,7 +63,6 @@ class DayTriggers extends ConsumerWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 2,
         children: [
           Text(
             "${isToday ? "TODAY'S" : "THAT DAY'S"} TRIGGERS"
@@ -146,7 +145,7 @@ class _TriggerRow extends StatelessWidget {
       child: InkWell(
         onTap: tap,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 44),
+          constraints: const BoxConstraints(minHeight: 28),
           child: large
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

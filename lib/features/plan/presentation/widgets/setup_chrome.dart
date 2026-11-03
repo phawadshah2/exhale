@@ -4,6 +4,7 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/primary_button.dart';
+import 'package:exhale/core/widgets/scroll_reveal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -50,7 +51,10 @@ class _SetupScaffoldState extends State<SetupScaffold> {
                 top: insets.top + AppSpacing.md,
                 bottom: math.max(keyboard + AppSpacing.lg, _footerHeight),
               ),
-              children: widget.children,
+              children: [
+                for (final (i, child) in widget.children.indexed)
+                  ScrollReveal(index: i, child: child),
+              ],
             ),
           ),
           Positioned(

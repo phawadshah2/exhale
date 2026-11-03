@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
@@ -133,33 +134,56 @@ class _PriceCardState extends State<PriceCard> {
               _stepper(habit),
             ],
           ),
-        if (form.hasInvalidPrice)
-          Text(
-            'Enter a valid price',
-            style: text.bodySmall?.copyWith(
-              color: context.exhale.danger.foreground,
-            ),
-          ),
-        if (unit != null) _tiles(habit, unit, large: large),
-        if (unit != null && storedUnit != null && unit != storedUnit)
-          ExhaleReply(
-            text: unit > storedUnit
-                ? 'Up again? Almost like they want you to quit.'
-                : "Cheaper? Don't celebrate with one.",
-          ),
-        if (large)
-          Column(
+        // What the price adds eases in and out together, so the card grows
+        // and shrinks as you type instead of jumping.
+        AnimatedSize(
+          duration: AppMotion.swap,
+          curve: AppMotion.swapCurve,
+          alignment: Alignment.topCenter,
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [fine, ?rather],
-          )
-        else
-          Row(
             spacing: AppSpacing.gutterSm,
             children: [
-              Expanded(child: fine),
-              ?rather,
+              if (form.hasInvalidPrice)
+                _Appear(
+                  key: const ValueKey('invalid'),
+                  child: Text(
+                    'Enter a valid price',
+                    style: text.bodySmall?.copyWith(
+                      color: context.exhale.danger.foreground,
+                    ),
+                  ),
+                ),
+              if (unit != null)
+                _Appear(
+                  key: const ValueKey('tiles'),
+                  child: _tiles(habit, unit, large: large),
+                ),
+              if (unit != null && storedUnit != null && unit != storedUnit)
+                _Appear(
+                  key: ValueKey(unit > storedUnit),
+                  child: ExhaleReply(
+                    text: unit > storedUnit
+                        ? 'Up again? Almost like they want you to quit.'
+                        : "Cheaper? Don't celebrate with one.",
+                  ),
+                ),
+              if (large)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [fine, ?rather],
+                )
+              else
+                Row(
+                  spacing: AppSpacing.gutterSm,
+                  children: [
+                    Expanded(child: fine),
+                    ?rather,
+                  ],
+                ),
             ],
           ),
+        ),
       ],
     );
   }
@@ -286,6 +310,23 @@ class _PriceCardState extends State<PriceCard> {
       ),
     );
   }
+}
+
+/// Fades [child] in when it first appears.
+class _Appear extends StatelessWidget {
+  const _Appear({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
+    tween: Tween(begin: 0, end: 1),
+    duration: AppMotion.swap,
+    curve: AppMotion.swapCurve,
+    builder: (context, opacity, child) =>
+        Opacity(opacity: opacity, child: child),
+    child: child,
+  );
 }
 
 class _Tile extends StatelessWidget {

@@ -6,7 +6,6 @@ import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/theme/app_theme.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
-import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
 import 'package:exhale/features/logs/presentation/widgets/logs_rail_card.dart';
@@ -20,6 +19,7 @@ import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -115,16 +115,13 @@ void main() {
 
   Finder cell(LogicalDay day) => find.byKey(ValueKey(day));
 
-  StageRingPainter ringOf(WidgetTester tester, LogicalDay day) =>
-      tester
-              .widget<CustomPaint>(
-                find.descendant(
-                  of: cell(day),
-                  matching: find.byType(CustomPaint),
-                ),
-              )
-              .painter!
-          as StageRingPainter;
+  StageRingPainter ringOf(WidgetTester tester, LogicalDay day) => tester
+      .widgetList<CustomPaint>(
+        find.descendant(of: cell(day), matching: find.byType(CustomPaint)),
+      )
+      .map((paint) => paint.painter)
+      .whereType<StageRingPainter>()
+      .first;
 
   Text dateOf(WidgetTester tester, LogicalDay day) => tester.widget<Text>(
     find.descendant(of: cell(day), matching: find.text('${day.day}')),
@@ -253,44 +250,45 @@ void main() {
       expect(find.text('Sun, Oct 11'), findsOneWidget);
     });
 
-    testWidgets('the slot bar paints used, over and unused', (tester) async {
-      Future<RenderObject> bar({required int limit, required int count}) async {
+    testWidgets('the count ring fills in the status colour', (tester) async {
+      Future<BuildContext> ring({
+        required int limit,
+        required int count,
+      }) async {
         await tester.pumpWidget(
           MaterialApp(
             theme: AppTheme.light,
-            home: SizedBox(
-              width: 300,
-              child: LogsSlotBar(limit: limit, count: count),
+            home: Center(
+              child: LogsCountRing(limit: limit, count: count),
             ),
           ),
         );
-        return tester.renderObject(
-          find.descendant(
-            of: find.byType(LogsSlotBar),
-            matching: find.byType(CustomPaint),
-          ),
-        );
+        await tester.pumpAndSettle();
+        return tester.element(find.byType(LogsCountRing));
       }
 
-      final first = await bar(limit: 3, count: 1);
-      final context = tester.element(find.byType(LogsSlotBar));
-      final used = context.colors.primaryContainer;
-      final over = context.exhale.danger.solid;
-      final unused = context.colors.surfaceContainerHigh;
-
+      final under = await ring(limit: 3, count: 1);
+      expect(find.text('1'), findsOneWidget);
       expect(
-        first,
-        paints
-          ..rrect(color: used)
-          ..rrect(color: unused)
-          ..rrect(color: unused),
+        tester.renderObject(
+          find.descendant(
+            of: find.byType(LogsCountRing),
+            matching: find.byType(CustomPaint),
+          ),
+        ),
+        paints..arc(color: under.colors.primaryContainer),
       );
+
+      final over = await ring(limit: 2, count: 3);
+      expect(find.text('3'), findsOneWidget);
       expect(
-        await bar(limit: 2, count: 3),
-        paints
-          ..rrect(color: used)
-          ..rrect(color: used)
-          ..rrect(color: over),
+        tester.renderObject(
+          find.descendant(
+            of: find.byType(LogsCountRing),
+            matching: find.byType(CustomPaint),
+          ),
+        ),
+        paints..arc(color: over.exhale.danger.solid),
       );
     });
   });
@@ -339,7 +337,7 @@ void main() {
       expect(find.text('Month'), findsNothing);
     });
 
-    logsTest('the title opens a calendar, and a pick jumps to its week', (
+    logsTest('the title opens a day wheel, and a pick jumps to its week', (
       tester,
     ) async {
       await startPlan();
@@ -348,17 +346,13 @@ void main() {
 
       await tapAndSettle(tester, find.text('Oct 12 – Oct 18'));
       expect(find.text('Pick a day'), findsOneWidget);
-      expect(find.text('October 2026'), findsOneWidget);
-
-      await tapAndSettle(tester, find.byTooltip('Previous month'));
-      expect(find.text('September 2026'), findsOneWidget);
-      await tapAndSettle(
-        tester,
-        find.descendant(
-          of: find.byType(AppSheetFrame),
-          matching: find.text('30'),
-        ),
+      final wheel = tester.widget<CupertinoDatePicker>(
+        find.byType(CupertinoDatePicker),
       );
+      expect(wheel.mode, CupertinoDatePickerMode.date);
+
+      wheel.onDateTimeChanged(DateTime(2026, 9, 30));
+      await tapAndSettle(tester, find.byTooltip('Done'));
 
       expect(find.text('Pick a day'), findsNothing);
       expect(find.text('Sep 28 – Oct 4'), findsOneWidget);
@@ -366,25 +360,17 @@ void main() {
       expect(find.text('2 weeks ago'), findsNWidgets(2));
     });
 
-    logsTest('the calendar stops at the plan window', (tester) async {
+    logsTest('the wheel runs from the first day to today', (tester) async {
       await startPlan();
       await openPage(tester);
       await tapAndSettle(tester, find.text('Oct 12 – Oct 18'));
 
-      expect(arrow(tester, 'Next month').onPressed, isNull);
-      // Today is Oct 16: the 17th can't be picked.
-      await tapAndSettle(
-        tester,
-        find.descendant(
-          of: find.byType(AppSheetFrame),
-          matching: find.text('17'),
-        ),
+      final wheel = tester.widget<CupertinoDatePicker>(
+        find.byType(CupertinoDatePicker),
       );
-      expect(find.text('Pick a day'), findsOneWidget);
-
-      // The earliest day is Mon Sep 14.
-      await tapAndSettle(tester, find.byTooltip('Previous month'));
-      expect(arrow(tester, 'Previous month').onPressed, isNull);
+      // Today is Oct 16; the earliest day is Mon Sep 14.
+      expect(wheel.maximumDate, DateTime(2026, 10, 16));
+      expect(wheel.minimumDate, DateTime(2026, 9, 14));
     });
 
     logsTest('swiping moves a week at a time', (tester) async {
@@ -468,7 +454,7 @@ void main() {
               as BoxDecoration?;
 
       expect(backing(oct(15))?.color, context.exhale.inset);
-      expect(backing(oct(14)), isNull);
+      expect(backing(oct(14))?.color?.a, 0);
       expect(ringOf(tester, oct(15)).color, isNot(context.exhale.onEmphasis));
       expect(dateOf(tester, oct(15)).style?.fontWeight, FontWeight.w800);
     });
@@ -597,13 +583,14 @@ void main() {
       await logAt(DateTime(2026, 10, 16, 12));
     }
 
-    List<ColoredBox> segments(WidgetTester tester) => tester
-        .widgetList<ColoredBox>(
+    List<Color> segments(WidgetTester tester) => tester
+        .widgetList<DecoratedBox>(
           find.descendant(
             of: find.byKey(const Key('logs-trigger-bar')),
-            matching: find.byType(ColoredBox),
+            matching: find.byType(DecoratedBox),
           ),
         )
+        .map((box) => (box.decoration as BoxDecoration).color!)
         .toList();
 
     logsTest('the bar and chips show the counts, most used first', (
@@ -627,7 +614,7 @@ void main() {
       final bar = find.byKey(const Key('logs-trigger-bar'));
       for (final segment
           in find
-              .descendant(of: bar, matching: find.byType(ColoredBox))
+              .descendant(of: bar, matching: find.byType(DecoratedBox))
               .evaluate()) {
         expect((segment.renderObject! as RenderBox).size.height, 10);
       }
@@ -652,13 +639,13 @@ void main() {
       await seedTriggers();
       await openPage(tester);
       expect(find.byType(Dismissible), findsNWidgets(4));
-      expect(segments(tester).map((s) => s.color.a), [1, 1, 1]);
+      expect(segments(tester).map((color) => color.a), [1, 1, 1]);
 
       await tapAndSettle(tester, find.text('Stress 2'));
       expect(find.byType(Dismissible), findsNWidgets(2));
-      expect(segments(tester).first.color.a, 1);
-      expect(segments(tester)[1].color.a, lessThan(1));
-      expect(segments(tester)[2].color.a, lessThan(1));
+      expect(segments(tester).first.a, 1);
+      expect(segments(tester)[1].a, lessThan(1));
+      expect(segments(tester)[2].a, lessThan(1));
 
       await tapAndSettle(tester, find.text('Stress 2'));
       expect(find.byType(Dismissible), findsNWidgets(4));
@@ -688,12 +675,12 @@ void main() {
       await openPage(tester, onDay(today, trigger: Trigger.stress));
 
       expect(find.text('Stress 0'), findsOneWidget);
-      expect(find.text('No Stress logs this day.'), findsOneWidget);
+      expect(find.text('No Stress logs this week.'), findsOneWidget);
 
       await tapAndSettle(tester, find.text('Stress 0'));
 
       expect(find.text('Stress 0'), findsNothing);
-      expect(find.text('No Stress logs this day.'), findsNothing);
+      expect(find.text('No Stress logs this week.'), findsNothing);
       expect(find.byType(Dismissible), findsOneWidget);
     });
 
@@ -781,31 +768,31 @@ void main() {
       );
     });
 
-    logsTest('the slot bar has one slot for each of limit or count', (
+    logsTest('the count ring shows the count against the limit', (
       tester,
     ) async {
       await startPlan();
       await logAt(DateTime(2026, 10, 15, 9), times: 12);
       await openPage(tester, onDay(oct(15)));
 
-      final bar = tester.widget<LogsSlotBar>(find.byType(LogsSlotBar));
-      expect(bar.limit, 9);
-      expect(bar.count, 12);
+      final ring = tester.widget<LogsCountRing>(find.byType(LogsCountRing));
+      expect(ring.limit, 9);
+      expect(ring.count, 12);
     });
 
-    logsTest('the slot bar hides before the plan', (tester) async {
+    logsTest('the count ring hides before the plan', (tester) async {
       await startPlan();
       await logAt(DateTime(2026, 10, 13, 9));
       await openPage(tester, onDay(oct(13)));
 
-      expect(find.byType(LogsSlotBar), findsNothing);
+      expect(find.byType(LogsCountRing), findsNothing);
     });
 
-    logsTest('the slot bar hides at limit 0 with no logs', (tester) async {
+    logsTest('the count ring fills at limit 0 with no logs', (tester) async {
       await startPlan(from: LogicalDay(2026, 10, 1), limit: 2, days: 14);
       await openPage(tester);
 
-      expect(find.byType(LogsSlotBar), findsNothing);
+      expect(find.byType(LogsCountRing), findsOneWidget);
     });
   });
 
@@ -978,56 +965,137 @@ void main() {
       LogsQuery week(Trigger trigger) =>
           LogsQuery(habitId: 1, from: oct(12), to: oct(18), trigger: trigger);
 
-      logsTest('lands on the latest day with a match', (tester) async {
+      logsTest('lists every match in the week, a heading for each day', (
+        tester,
+      ) async {
         await startPlan();
         await logAt(DateTime(2026, 10, 14, 9), trigger: Trigger.work);
         await logAt(DateTime(2026, 10, 15, 9), trigger: Trigger.work);
         await logAt(DateTime(2026, 10, 16, 9), trigger: Trigger.stress);
         await openPage(tester, week(Trigger.work));
 
+        expect(find.text('2 logs this week'), findsOneWidget);
+        expect(find.text('Wed, Oct 14'), findsOneWidget);
         expect(find.text('Thu, Oct 15'), findsOneWidget);
-        expect(find.text('No Work logs this day.'), findsNothing);
-        expect(find.text('9:00 AM'), findsOneWidget);
+        expect(find.text('Fri, Oct 16'), findsNothing);
+        expect(find.byType(Dismissible), findsNWidgets(2));
       });
 
-      logsTest('stays on today when today has a match', (tester) async {
-        await startPlan();
-        await logAt(DateTime(2026, 10, 15, 9), trigger: Trigger.work);
-        await logAt(DateTime(2026, 10, 16, 9), trigger: Trigger.work);
-        await openPage(tester, week(Trigger.work));
-
-        expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
-      });
-
-      logsTest('with no match stays on the last day', (tester) async {
+      logsTest('with no match says so for the week', (tester) async {
         await startPlan();
         await logAt(DateTime(2026, 10, 15, 9), trigger: Trigger.stress);
         await openPage(tester, week(Trigger.work));
 
-        expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
-        expect(find.text('No Work logs this day.'), findsOneWidget);
+        expect(find.text('No Work logs this week.'), findsOneWidget);
+        expect(find.byType(Dismissible), findsNothing);
       });
 
-      logsTest('a later selection is left alone', (tester) async {
+      logsTest('selecting a day clears the filter', (tester) async {
         await startPlan();
+        await logAt(DateTime(2026, 10, 14, 9), trigger: Trigger.work);
         await logAt(DateTime(2026, 10, 15, 9), trigger: Trigger.work);
         await openPage(tester, week(Trigger.work));
 
-        await tapAndSettle(tester, cell(oct(16)));
+        await tapAndSettle(tester, cell(oct(13)));
 
-        expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
-        expect(find.text('No Work logs this day.'), findsOneWidget);
+        // Picking a day drops the filter and shows that day's rail.
+        expect(find.text('2 logs this week'), findsNothing);
+        expect(find.text('Tue, Oct 13'), findsOneWidget);
       });
     });
 
-    logsTest('a filter with no match on the day says so', (tester) async {
+    logsTest('a month range lists every match across it', (tester) async {
+      await startPlan();
+      await logAt(DateTime(2026, 10, 3, 9), trigger: Trigger.stress);
+      await logAt(DateTime(2026, 10, 14, 9), trigger: Trigger.stress);
+      await logAt(DateTime(2026, 10, 14, 11), trigger: Trigger.work);
+      await openPage(
+        tester,
+        LogsQuery(
+          habitId: 1,
+          from: oct(1),
+          to: LogicalDay(2026, 10, 31),
+          trigger: Trigger.stress,
+        ),
+      );
+
+      expect(find.text('Oct 1 – Oct 16'), findsNWidgets(2));
+      expect(find.text('2 logs in this range'), findsOneWidget);
+      expect(find.text('Sat, Oct 3'), findsOneWidget);
+      expect(find.byType(Dismissible), findsNWidgets(2));
+    });
+
+    logsTest(
+      'a range without a filter lists its days, and a day opens its week',
+      (tester) async {
+        await startPlan();
+        await logAt(DateTime(2026, 10, 14, 9), times: 2);
+        await openPage(
+          tester,
+          LogsQuery(habitId: 1, from: oct(1), to: LogicalDay(2026, 10, 31)),
+        );
+
+        expect(find.text('Days in this range'), findsOneWidget);
+        expect(
+          find.textContaining('Back to weeks', findRichText: true),
+          findsOneWidget,
+        );
+        expect(find.byType(Dismissible), findsNothing);
+        expect(cell(oct(14)), findsNothing);
+
+        await tapAndSettle(tester, find.textContaining('Wed, Oct 14'));
+
+        expect(find.text('Oct 12 – Oct 18'), findsOneWidget);
+        expect(find.text('Wed, Oct 14'), findsOneWidget);
+        expect(find.text('Days in this range'), findsNothing);
+      },
+    );
+
+    logsTest('Back to weeks opens the week of the range end', (tester) async {
+      await startPlan();
+      await openPage(
+        tester,
+        LogsQuery(habitId: 1, from: oct(1), to: LogicalDay(2026, 10, 31)),
+      );
+
+      await tapAndSettle(
+        tester,
+        find.textContaining('Back to weeks', findRichText: true),
+      );
+
+      expect(find.text('Oct 12 – Oct 18'), findsOneWidget);
+      expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
+    });
+
+    logsTest('the triggers card says triggers can filter', (tester) async {
+      await startPlan();
+      await logAt(DateTime(2026, 10, 16, 8), trigger: Trigger.stress);
+      await openPage(tester);
+
+      expect(
+        find.text('Tap a trigger to see its logs across the week.'),
+        findsOneWidget,
+      );
+
+      await tapAndSettle(tester, find.text('Stress 1'));
+
+      expect(
+        find.text('Tap Stress again to clear the filter.'),
+        findsOneWidget,
+      );
+    });
+
+    logsTest('a filter lists the week, not only the selected day', (
+      tester,
+    ) async {
       await startPlan();
       await logAt(DateTime(2026, 10, 14, 9), trigger: Trigger.stress);
       await logAt(DateTime(2026, 10, 15, 9), trigger: Trigger.work);
       await openPage(tester, onDay(oct(15), trigger: Trigger.stress));
 
-      expect(find.text('No Stress logs this day.'), findsOneWidget);
-      expect(find.byType(Dismissible), findsNothing);
+      expect(find.text('Wed, Oct 14'), findsOneWidget);
+      expect(find.text('Thu, Oct 15'), findsNothing);
+      expect(find.byType(Dismissible), findsOneWidget);
     });
 
     logsTest('tapping a log opens the editor', (tester) async {
@@ -1189,12 +1257,18 @@ void main() {
       await expectWhole(tester);
     });
 
-    logsTest('the calendar sheet stays whole', (tester) async {
+    logsTest('a filtered week stays whole', (tester) async {
       await startPlan();
-      await openPage(tester);
-      await tapAndSettle(tester, find.text('Oct 12 – Oct 18'));
+      await logAt(
+        DateTime(2026, 10, 14, 9),
+        times: 3,
+        trigger: Trigger.avoidingTasks,
+        note: 'Between meetings, again',
+      );
+      await logAt(DateTime(2026, 10, 16, 8), trigger: Trigger.avoidingTasks);
+      await openPage(tester, onDay(today, trigger: Trigger.avoidingTasks));
 
-      await expectWhole(tester, within: find.byType(AppSheetFrame));
+      await expectWhole(tester);
     });
 
     logsTest('an extreme limit stays whole', (tester) async {
