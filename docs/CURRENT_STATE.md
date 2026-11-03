@@ -20,10 +20,14 @@ rows still to do).
 
 ## Repo
 
-- `feat/plan-and-stages` is pushed up to 5715c87. Docs commits after it are local. No PR
-  is open, and CI on the branch was not read.
+- `feat/plan-and-stages` is pushed up to 5715c87. Five docs commits after it are local
+  (3850418 to 77b2e03). No PR is open, and CI on the branch was not read.
 - Checks at f1bc936, the last code commit: format clean, `analyze --fatal-infos` clean,
-  full suite 1038 passed.
+  full suite 1038 passed. Not run since, as only docs changed.
+- 2026-11-03 setup changes: the new check flow is in `CLAUDE.md` "Workflow". The global
+  hook no longer prompts for codegen, builds or simulator runs in this repo. Plans run
+  with the `execute-plan` skill (Superpowers is being turned off). This repo's auto
+  memory now holds `project_exhale.md`.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
 ## Next action
