@@ -12,7 +12,7 @@ Updated 2026-11-03. The full log of earlier sessions is in
 | M6 Plan details, Edit plan, Logs (Tasks 1 to 12) | Done on `feat/plan-and-stages`: reviewed, two simulator walks |
 | UI fixes from Fawad's review (Phase 4b, F1 to F4) | Done; seen in the simulator, light mode |
 | UI review round 2 (Logs, Plan, Home, transitions) | Done, committed (a947c2d) |
-| M7 Stage management (Tasks 13 to 20) | Tasks 13 and 14 done; Task 15 next |
+| M7 Stage management (Tasks 13 to 20) | Tasks 13 to 15 done; Task 16 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 Plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md`. Spec for M7:
@@ -42,6 +42,9 @@ rows still to do).
   midnight of the new check's day (no clock in the data layer).
 - Simulator walk of F1 to F4 seen working (iOS 26.5, seeded, light mode).
 
+- Task 15: `StageChecks.evaluate` in `lib/features/plan/domain/services/stage_checks.dart`
+  (37 tests). A skipped result stores zeros and closes no waiting hold.
+
 ## UI review round 2 (a947c2d, 2026-11-03)
 
 - Logs: weekday above ring, highlight wraps both; iOS date wheel replaces the sheet
@@ -60,14 +63,9 @@ rows still to do).
 
 ## Next action
 
-Round 2 is committed. Start Task 15 below (Fawad may still ask for round 2 fixes after
-a full restart).
-
-### After that: Task 15
-
-Task 15, `StageChecks`: the pure check over logs and history (Sonnet 5.5 medium). Read the
-Task 15 block of the plan and Stages spec sections 2 and 9. The M7 review (Task 20) runs
-on Opus 5.5 high.
+Task 16, running the check (Sonnet 5.5 medium): read its block in the plan and Stages spec
+sections 2 and 6. Fawad may still ask for round 2 fixes after a full restart. The M7 review
+(Task 20) runs on Opus 5.5 high.
 
 ## Open checks
 

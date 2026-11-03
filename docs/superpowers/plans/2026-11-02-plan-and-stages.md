@@ -745,7 +745,7 @@ abstract final class StageChecks { static StageCheckResult? evaluate({required P
   required LogicalDay today}); }
 ```
 
-- [ ] **Step 1: Write the failing tests**, the Stages spec 9 "The check" list:
+- [x] **Step 1: Write the failing tests**, the Stages spec 9 "The check" list:
   - one day over and the rest at the limit passes; two over with the total over fails; two over with the total under
     passes; `logged == allowed` passes
   - a window across short stages uses each day's limit
@@ -755,10 +755,10 @@ abstract final class StageChecks { static StageCheckResult? evaluate({required P
   - streak: hold then review; passed in between; after a kept review; across a new plan
   - no check while a review card waits; a waiting hold is closed by the next check
   - the hold's `startDay` is the stage's last day + 1, also on a late open
-- [ ] **Step 2: Run, expect failure.**
-- [ ] **Step 3: Implement** Stages spec 2, with only the current plan's checks counted.
-- [ ] **Step 4: Run, expect pass.**
-- [ ] **Step 5: Commit** `feat(plan): add the stage check rules`.
+- [x] **Step 2: Run, expect failure.**
+- [x] **Step 3: Implement** Stages spec 2, with only the current plan's checks counted.
+- [x] **Step 4: Run, expect pass.**
+- [x] **Step 5: Commit** `feat(plan): add the stage check rules`.
 
 ### Task 16: Running the check
 
