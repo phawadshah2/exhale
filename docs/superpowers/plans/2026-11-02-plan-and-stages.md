@@ -657,7 +657,7 @@ dashboard header and the stats grid. Keep `EditPill` if Plan details or others u
   `quitDay`; `daysPerDrop` uses `agreedQuitDay`. Equality includes `holds`. `ReductionPlanMapper.toCompanion` writes
   `agreedQuitDay`.
 
-- [ ] **Step 1: Write the failing tests** from Stages spec 3 and 9. 12 a day from Oct 12, quit Jan 4, hold from Nov 9:
+- [x] **Step 1: Write the failing tests** from Stages spec 3 and 9. 12 a day from Oct 12, quit Jan 4, hold from Nov 9:
   - stage 4 runs Nov 2 to 15, 14 days, and stage count stays 12
   - `limitOn`: Nov 8 is 9, Nov 15 is 9, Nov 16 is 8
   - `quitDay` is Jan 11, `agreedQuitDay` Jan 4, `daysPerDrop` still 7
@@ -665,8 +665,8 @@ dashboard header and the stats grid. Keep `EditPill` if Plan details or others u
   - stages under and over 7 days
   - `nextDropOn`, `plannedReduction`
   - a plan with no holds matches today's results, day by day, for several plans
-- [ ] **Step 2: Run, expect failure.**
-- [ ] **Step 3: Implement** the limit rule:
+- [x] **Step 2: Run, expect failure.**
+- [x] **Step 3: Implement** the limit rule:
 
 ```dart
 int _limitAt(int real) {
@@ -682,8 +682,8 @@ int _limitAt(int real) {
 ```
 
   `_taperAt` is today's `_limitAt` over `agreedQuitDay − startDay`.
-- [ ] **Step 4: Run, expect pass**, then the full suite: every existing `quitDay` reader must be unchanged with no holds.
-- [ ] **Step 5: Commit** `feat(plan): let a plan hold a stage`.
+- [x] **Step 4: Run, expect pass**, then the full suite: every existing `quitDay` reader must be unchanged with no holds.
+- [x] **Step 5: Commit** `feat(plan): let a plan hold a stage`.
 
 ### Task 14: `plan_holds` and `stage_checks`, v11
 

@@ -11,7 +11,7 @@ Updated 2026-11-03. The full log of earlier sessions is in
 | M5 Release candidate | Done, merged to `main` (51e0bc6). Real iPhone pass still open |
 | M6 Plan details, Edit plan, Logs (Tasks 1 to 12) | Done on `feat/plan-and-stages`: reviewed, two simulator walks |
 | UI fixes from Fawad's review (Phase 4b, F1 to F4) | Done on `feat/plan-and-stages`; not seen in the simulator |
-| M7 Stage management (Tasks 13 to 20) | Not started |
+| M7 Stage management (Tasks 13 to 20) | Task 13 done; Task 14 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 Plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md`. Ledger with rulings:
@@ -32,8 +32,9 @@ rows still to do).
 
 ## Next action
 
-Task 13 (holds in `ReductionPlan`), the start of M7, on Sonnet 5.5 medium. The M7 review
-(Task 20) runs on Opus 5.5 high.
+Task 14 (`plan_holds` and `stage_checks` tables, schema v11), on Sonnet 5.5 medium; run
+codegen after the drift tables change. Task 13 (holds in `ReductionPlan`) is done and
+committed; full suite 1055 passed. The M7 review (Task 20) runs on Opus 5.5 high.
 
 UI fixes done 2026-11-03 (commits 543ecc0, 203877e, 381598e, 389f483, plus the docs):
 - F1 Ring card: trigger bars 5 pt, tighter panel, icons centred in the info tiles.
