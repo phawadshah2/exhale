@@ -1,6 +1,6 @@
 # Plan details, Edit plan, Logs and stage management Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans (the project's stated
+> **For agentic workers:** REQUIRED SKILL: Use execute-plan (the project's stated
 > method, see `CLAUDE.md`) to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax
 > for tracking.
 

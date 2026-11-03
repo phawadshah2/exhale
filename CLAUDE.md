@@ -30,7 +30,7 @@ it when a task or milestone finishes. Older session logs are in `docs/history/`.
 This section overrides the global approval rules for this project only.
 
 1. Every feature gets a spec and a task plan in `docs/superpowers/` before code.
-2. Run plans with `superpowers:executing-plans`, one task at a time: failing test, code,
+2. Run plans with the `execute-plan` skill, one task at a time: failing test, code,
    passing test, commit.
 3. After each task, run `fvm dart format .`, `fvm flutter analyze --fatal-infos`, and only
    that task's tests: `fvm flutter test <the task's test files>`.
