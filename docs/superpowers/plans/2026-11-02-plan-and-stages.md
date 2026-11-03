@@ -713,19 +713,19 @@ abstract interface class StageCheckRepository {
 
   `stageCheckRepositoryProvider`, `stageChecksProvider` (`StreamProviderFamily<List<StageCheck>, int>`).
 
-- [ ] **Step 1: Make the v10 fixture** the way Task 1 did, from `exhale_v9.sqlite`, before bumping.
-- [ ] **Step 2: Write the failing tests.**
+- [x] **Step 1: Make the v10 fixture** the way Task 1 did, from `exhale_v9.sqlite`, before bumping.
+- [x] **Step 2: Write the failing tests.**
   - `upgrade from v10`: `_expectLatest`, and both tables are empty with existing rows kept
   - `watchHistory` and `getHistory` return a plan's holds, and `watchHistory` emits when a hold is added
   - `record` writes the check and hold together; a duplicate `(plan, window_end)` writes neither and returns success
   - `keepOriginalDate` deletes the hold and answers, together
   - `replaceFrom` removes holds and checks of the plans it drops, with foreign keys on
-- [ ] **Step 3: Run, expect failure.**
-- [ ] **Step 4: Implement.** Tables per Stages spec 6. Add `if (from < 11)` creating both. Plans read through a join on
+- [x] **Step 3: Run, expect failure.**
+- [x] **Step 4: Implement.** Tables per Stages spec 6. Add `if (from < 11)` creating both. Plans read through a join on
   `plan_holds`, grouped by plan, so the stream sees both tables. Resolve `plan_id` from `(habit_id, start_day)`. Ask Fawad,
   then run codegen.
-- [ ] **Step 5: Run, expect pass.**
-- [ ] **Step 6: Commit** `feat(data): add stage checks and holds at schema v11`.
+- [x] **Step 5: Run, expect pass.**
+- [x] **Step 6: Commit** `feat(data): add stage checks and holds at schema v11`.
 
 ### Task 15: `StageChecks`
 
