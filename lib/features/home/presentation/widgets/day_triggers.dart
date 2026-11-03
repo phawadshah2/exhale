@@ -56,14 +56,14 @@ class DayTriggers extends ConsumerWidget {
     return Container(
       key: ValueKey('panel-$day'),
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: colors.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 9,
+        spacing: 2,
         children: [
           Text(
             "${isToday ? "TODAY'S" : "THAT DAY'S"} TRIGGERS"
@@ -106,7 +106,7 @@ class _TriggerRow extends StatelessWidget {
     final percent = (share.fraction * 100).round();
     final tap = onTap == null ? null : () => onTap!(share.trigger);
     final logs = share.count == 1 ? '1 log' : '${share.count} logs';
-    final labelStyle = text.bodyMedium?.copyWith(fontWeight: FontWeight.w600);
+    final labelStyle = text.bodySmall?.copyWith(fontWeight: FontWeight.w600);
     final large = context.hasLargeText;
     final bar = Expanded(
       child: ClipRRect(
@@ -118,7 +118,7 @@ class _TriggerRow extends StatelessWidget {
           curve: AppMotion.fillCurve,
           builder: (context, value, _) => LinearProgressIndicator(
             value: value,
-            minHeight: 8,
+            minHeight: 5,
             color: color,
             backgroundColor: colors.outlineVariant,
           ),
@@ -132,7 +132,7 @@ class _TriggerRow extends StatelessWidget {
     );
     final chevron = Icon(
       AppIcons.chevronRight,
-      size: 14,
+      size: 12,
       color: colors.onSurfaceVariant,
     );
     return Semantics(

@@ -786,7 +786,6 @@ class _InfoCell extends StatelessWidget {
     final text = context.textTheme;
     final (icon, label, value) = cell;
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: AppSpacing.sm,
       children: [
         Icon(icon, size: 20, color: colors.primary),
