@@ -442,7 +442,7 @@ void main() {
       expect(result.closesWaitingHold, isFalse);
     });
 
-    test('a skipped check closes nothing', () {
+    test('a skipped check closes it too', () {
       final result = _evaluate(
         today: _nov(11),
         logs: failing,
@@ -450,7 +450,7 @@ void main() {
       )!;
 
       expect(result.outcome, StageOutcome.skipped);
-      expect(result.closesWaitingHold, isFalse);
+      expect(result.closesWaitingHold, isTrue);
     });
 
     test('a stage lengthened by a hold ends later', () {

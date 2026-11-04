@@ -83,6 +83,10 @@ abstract final class StageChecks {
       return null;
     }
 
+    final waitingHold = own.any(
+      (c) => c.outcome == StageOutcome.hold && c.answeredAt == null,
+    );
+
     if (today.daysSince(end) > maxLateDays) {
       return StageCheckResult(
         outcome: StageOutcome.skipped,
@@ -90,6 +94,7 @@ abstract final class StageChecks {
         logged: 0,
         allowed: 0,
         overDays: 0,
+        closesWaitingHold: waitingHold,
       );
     }
 
@@ -104,10 +109,6 @@ abstract final class StageChecks {
     final allowed = _sum(window, (d) => d.limit);
     final overDays = window.where((d) => d.count > d.limit).length;
     final failed = logged > allowed && overDays >= 2;
-
-    final waitingHold = own.any(
-      (c) => c.outcome == StageOutcome.hold && c.answeredAt == null,
-    );
 
     StageCheckResult result(StageOutcome outcome, {PlanHold? hold}) =>
         StageCheckResult(
