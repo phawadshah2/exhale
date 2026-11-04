@@ -47,14 +47,14 @@ Files: `lib/features/tracking/presentation/limit_status_ui.dart`,
 Files: `lib/features/tracking/presentation/trigger_ui.dart`,
 `test/features/tracking/presentation/trigger_ui_test.dart`. Spec: "Trigger colours (G2)".
 
-- [ ] Tests (fail first): replace "every trigger has its own colour" with "a habit's
+- [x] Tests (fail first): replace "every trigger has its own colour" with "a habit's
   triggers each have their own colour" (for each `HabitKind`, the 8 tints are a set of 8);
   add "no trigger looks like a status colour" (each tint's hue is at least 25° on the
   wheel from 160, 38 and 0). Keep the readability and hue tests.
-- [ ] `trigger_ui.dart`: `_hue` becomes `195 + 17 * _slot`, with `int get _slot` per the
+- [x] `trigger_ui.dart`: `_hue` becomes `195 + 17 * _slot`, with `int get _slot` per the
   spec's table. Update the doc comment on `tint`.
-- [ ] Move `test/features/tracking/limit_status_ui_test.dart` into `presentation/`.
-- [ ] Commit `fix(tracking): keep trigger colours clear of the status colours`.
+- [x] Move `test/features/tracking/limit_status_ui_test.dart` into `presentation/`.
+- [x] Commit `fix(tracking): keep trigger colours clear of the status colours`.
 
 ### Then
 
