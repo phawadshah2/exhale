@@ -13,6 +13,7 @@ Updated 2026-11-04. The full log of earlier sessions (including Tasks 13 to 19 a
 | UI fixes from Fawad's review (Phase 4b, F1 to F4) | Done; seen in the simulator, light mode |
 | UI review round 2 (Logs, Plan, Home, transitions) | Done, committed (a947c2d) |
 | M7 Stage management (Tasks 13 to 20) | Done: reviewed, fixed, simulator walk 2026-11-04 |
+| Stage polish P1 to P4 (`docs/superpowers/plans/2026-11-04-stage-polish.md`) | Done, committed; seen in the simulator, waiting for Fawad's review |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 Plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md` (all tasks ticked). Spec for
@@ -20,10 +21,11 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 
 ## Repo
 
-- Branch `feat/plan-and-stages`, code at 679dc88. Pushed up to 5715c87; every later commit
-  is local. No PR is open, and CI was not read.
-- Checks at 679dc88: full suite 1192 passed (`build/test-report.json`), format and
-  `analyze --fatal-infos` clean.
+- Branch `feat/plan-and-stages`, code at the P4 commit. Pushed up to 5715c87; every later
+  commit is local. No PR is open, and CI was not read.
+- Checks at 679dc88: full suite 1192 passed (`build/test-report.json`). Stage polish: the
+  four tasks' files plus `accessibility_test.dart` passed (163), format and
+  `analyze --fatal-infos` clean; the full suite was not rerun.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
 ## M7 simulator walk (2026-11-04, `exhale` iOS 26.5)
@@ -50,9 +52,18 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 3. Hold card date tiles barely stand out from the card in light mode.
 4. Before M7: "Vs baseline" shows "↓ 0%" with an arrow at 0%.
 
+## Stage polish (2026-11-04)
+
+Sheets fit their content; stage rings red when over, amber at the limit; a past stage
+shows its days; a day ring or dot opens that day's Logs. Walked on `exhale` (review seed,
+already answered): Stage 3 red, its rings and red figures, Fri opened Logs on Oct 30,
+light and dark. The sheet fix was not seen there (no card showed).
+
 ## Next action
 
-Fawad rules on the questions above, then push `feat/plan-and-stages` and open the PR to
+Fawad reviews the stage polish. Then, on a new branch off `feat/plan-and-stages`: green
+for "under limit" everywhere (his call, kept separate so it can be reverted). Then he
+rules on the questions above, then push `feat/plan-and-stages` and open the PR to
 `main` from the compare link. After merge: the real iPhone pass, including the M6 and M7
 screens (hold, review, reassess via `SEED_STAGE`).
 
