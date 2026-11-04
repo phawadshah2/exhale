@@ -153,8 +153,11 @@ class _StageChoiceSheetState extends ConsumerState<StageChoiceSheet> {
     final muted = text.bodyMedium?.copyWith(
       color: context.colors.onSurfaceVariant,
     );
-    // Follows the day for a sheet left open past midnight.
-    ref.watch(todayProvider);
+    // The choices start on the day the sheet opened; once that day is over,
+    // close so a new plan never starts yesterday. The card reopens it.
+    ref.listen<LogicalDay>(todayProvider, (_, today) {
+      if (today != widget.today && !_saving) Navigator.of(context).pop();
+    });
     return ListView(
       controller: widget.controller,
       padding: const EdgeInsets.fromLTRB(20, 28, 20, 24),

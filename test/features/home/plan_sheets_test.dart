@@ -423,6 +423,24 @@ void main() {
       await tester.disposeApp();
     });
 
+    testWidgets('closes at the reset hour, so no plan starts yesterday', (
+      tester,
+    ) async {
+      await seedReview(tester);
+      await openSheet(tester, 'Review my plan');
+
+      (sl<Clock>() as FixedClock).current = DateTime(2026, 11, 10, 4, 1);
+      await tester.pump(const Duration(minutes: 1));
+      await tester.pumpAndSettle();
+
+      expect(find.text("Let's look at the plan"), findsNothing);
+      expect(find.text('Review my plan'), findsOneWidget);
+      expect((await history(tester)).plans, hasLength(1));
+      expect((await onlyCheck(tester)).answeredAt, isNull);
+
+      await tester.disposeApp();
+    });
+
     testWidgets('a failed save keeps the sheet and changes nothing', (
       tester,
     ) async {
