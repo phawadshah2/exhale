@@ -21,7 +21,7 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 
 ## Repo
 
-- Branch `feat/plan-and-stages`, code at the P4 commit. Pushed up to 5715c87; every later
+- Branch `feat/plan-and-stages` at 4c27f78, tree clean. Pushed up to 5715c87; every later
   commit is local. No PR is open, and CI was not read.
 - Checks at 679dc88: full suite 1192 passed (`build/test-report.json`). Stage polish: the
   four tasks' files plus `accessibility_test.dart` passed (163), format and
@@ -62,7 +62,11 @@ light and dark. The sheet fix was not seen there (no card showed).
 ## Next action
 
 Fawad reviews the stage polish. Then, on a new branch off `feat/plan-and-stages`: green
-for "under limit" everywhere (his call, kept separate so it can be reverted). Then he
+for "under limit" everywhere (his call, kept separate so it can be reverted). It needs a
+spec and plan first. Today under is `colors.primaryContainer` (the accent), set in
+`stage_days.dart` (`_statusColor`, the dot painter's `under`) and `stage_ring.dart`;
+grep the other screens for it before writing the spec. Read the stage polish spec and plan
+(`docs/superpowers/*/2026-11-04-stage-polish*.md`) first. Then he
 rules on the questions above, then push `feat/plan-and-stages` and open the PR to
 `main` from the compare link. After merge: the real iPhone pass, including the M6 and M7
 screens (hold, review, reassess via `SEED_STAGE`).
