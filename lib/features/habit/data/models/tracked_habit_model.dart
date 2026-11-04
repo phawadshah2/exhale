@@ -1,7 +1,9 @@
 import 'package:drift/drift.dart';
 import 'package:exhale/core/data/local/database/app_database.dart';
+import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
+import 'package:exhale/features/habit/domain/entities/price_history.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 
 extension HabitRowMapper on HabitRow {
@@ -41,6 +43,14 @@ extension HabitDraftMapper on HabitDraft {
         unitsPerContainer: Value(unitsPerContainer),
         createdAt: Value(createdAt),
       );
+}
+
+extension HabitPriceRowMapper on HabitPriceRow {
+  PricePoint toEntity() => PricePoint(
+    fromDay: LogicalDay.parse(fromDay),
+    priceCents: priceCents,
+    unitsPerContainer: unitsPerContainer,
+  );
 }
 
 extension TrackedHabitMapper on TrackedHabit {

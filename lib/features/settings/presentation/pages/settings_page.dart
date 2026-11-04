@@ -1,4 +1,6 @@
+import 'package:exhale/app/shell/page_visits.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
+import 'package:exhale/core/widgets/scroll_reveal.dart';
 import 'package:exhale/core/widgets/section_card.dart';
 import 'package:exhale/features/settings/presentation/widgets/accent_picker.dart';
 import 'package:exhale/features/settings/presentation/widgets/theme_preference_control.dart';
@@ -12,27 +14,47 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final insets = MediaQuery.paddingOf(context);
-    return ListView(
-      padding: AppSpacing.page.copyWith(
-        top: insets.top + AppSpacing.sm,
-        bottom: insets.bottom + AppSpacing.lg,
-      ),
-      children: [
-        Text('Settings', style: Theme.of(context).textTheme.headlineLarge),
-        const SizedBox(height: AppSpacing.md),
-        const SectionCard(
-          title: 'Appearance',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: AppSpacing.lg,
-            children: [ThemePreferenceControl(), AccentPicker()],
-          ),
+    return ReplayOnVisit(
+      tab: 1,
+      child: ListView(
+        padding: AppSpacing.page.copyWith(
+          top: insets.top + AppSpacing.sm,
+          bottom: insets.bottom + AppSpacing.lg,
         ),
-        const SizedBox(height: AppSpacing.md),
-        const Card(clipBehavior: Clip.antiAlias, child: TriggerPromptTile()),
-        const SizedBox(height: AppSpacing.md),
-        const Card(clipBehavior: Clip.antiAlias, child: YourDayTile()),
-      ],
+        children: [
+          ScrollReveal(
+            child: Text(
+              'Settings',
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          const ScrollReveal(
+            index: 1,
+            child: SectionCard(
+              title: 'Appearance',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: AppSpacing.lg,
+                children: [ThemePreferenceControl(), AccentPicker()],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          const ScrollReveal(
+            index: 2,
+            child: Card(
+              clipBehavior: Clip.antiAlias,
+              child: TriggerPromptTile(),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          const ScrollReveal(
+            index: 3,
+            child: Card(clipBehavior: Clip.antiAlias, child: YourDayTile()),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -67,6 +67,14 @@ void main() {
           greaterThanOrEqualTo(4.5),
           reason: trigger.name,
         );
+        expect(
+          contrast(
+            Theme.of(context).colorScheme.surface,
+            trigger.textTint(context),
+          ),
+          greaterThanOrEqualTo(4.5),
+          reason: 'selected ${trigger.name}',
+        );
       }
     });
   }

@@ -1,5 +1,6 @@
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/app/shell/app_shell.dart';
+import 'package:exhale/app/shell/branch_fade.dart';
 import 'package:exhale/app/shell/page_visits.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/home/presentation/pages/habit_details_page.dart';
@@ -10,6 +11,7 @@ import 'package:exhale/features/onboarding/presentation/pages/change_habit_page.
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
 import 'package:exhale/features/plan/presentation/pages/edit_plan_page.dart';
+import 'package:exhale/features/plan/presentation/pages/plan_details_page.dart';
 import 'package:exhale/features/settings/presentation/pages/settings_page.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,6 +56,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             EditPlanPage(habitId: int.parse(state.pathParameters['habitId']!)),
       ),
       GoRoute(
+        path: AppRoutes.planDetails,
+        builder: (context, state) => PlanDetailsPage(
+          habitId: int.parse(state.pathParameters['habitId']!),
+        ),
+      ),
+      GoRoute(
         path: AppRoutes.changeHabit,
         redirect: (context, state) {
           final habitId = int.parse(state.pathParameters['habitId']!);
@@ -70,7 +78,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) =>
             LogsPage(query: LogsQuery.fromUri(state.uri)),
       ),
-      StatefulShellRoute.indexedStack(
+      StatefulShellRoute(
+        navigatorContainerBuilder: (context, navigationShell, children) =>
+            BranchFade(
+              currentIndex: navigationShell.currentIndex,
+              children: children,
+            ),
         builder: (context, state, navigationShell) =>
             AppShell(navigationShell: navigationShell),
         branches: [

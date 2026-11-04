@@ -22,6 +22,13 @@ abstract interface class HabitLogRepository {
     int? habitId,
   });
 
+  /// [watchLogs] read once.
+  Future<Result<List<HabitLog>>> getLogs({
+    required DateTime from,
+    required DateTime to,
+    int? habitId,
+  });
+
   Stream<HabitLog?> watchLatest({int? habitId});
 
   /// The newest [limit] logs of every active habit, newest first.

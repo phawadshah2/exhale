@@ -10,6 +10,7 @@ import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/archive_habit.dart';
+import 'package:exhale/features/habit/domain/usecases/set_habit_price.dart';
 import 'package:exhale/features/habit/domain/usecases/start_tracking.dart';
 import 'package:exhale/features/habit/domain/usecases/update_habit.dart';
 import 'package:exhale/features/plan/data/datasources/plan_local_data_source.dart';
@@ -111,6 +112,7 @@ void main() {
         StartTracking(
           addHabit,
           SavePlan(planRepository ?? plans),
+          SetHabitPrice(repository),
           DriftTransactionRunner(database),
         );
 
@@ -159,6 +161,42 @@ void main() {
         isA<StorageFailure>(),
       );
       expect(await database.select(database.habits).get(), isEmpty);
+    });
+
+    test('a habit with a price gets a point on the plan start day', () async {
+      final result = await startTracking()((
+        habit: const HabitDraft(
+          habit: Habit.vaping,
+          priceCents: 1200,
+          unitsPerContainer: 30,
+        ),
+        plan: plan,
+      ));
+
+      final habit = (result as Success<TrackedHabit>).value;
+      final [point] = await repository.watchPrices(habit.id).first;
+      expect(point.fromDay, today);
+      expect(point.priceCents, 1200);
+      expect(point.unitsPerContainer, 30);
+    });
+
+    test('a habit with no price gets no point', () async {
+      final result = await startTracking()((
+        habit: const HabitDraft(habit: Habit.vaping),
+        plan: plan,
+      ));
+
+      final habit = (result as Success<TrackedHabit>).value;
+      expect(await repository.watchPrices(habit.id).first, isEmpty);
+    });
+
+    test('a failed plan save leaves no point', () async {
+      await startTracking(planRepository: _FailingPlans())((
+        habit: const HabitDraft(habit: Habit.vaping, priceCents: 1200),
+        plan: plan,
+      ));
+
+      expect(await database.select(database.habitPrices).get(), isEmpty);
     });
   });
 }

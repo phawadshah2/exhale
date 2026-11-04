@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Edit plan, list and glass sheets</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--good:#00704A;--glass:rgba(255,255,255,0.72);--scrim:rgba(14,20,29,0.28);--glass-line:rgba(255,255,255,0.7);}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--good:#4EDEA3;--glass:rgba(36,42,52,0.72);--scrim:rgba(0,0,0,0.45);--glass-line:rgba(255,255,255,0.08);}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 844px; box-sizing: border-box; position: relative; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 28px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+
+  <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+  </button>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.64px">The terms.</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">Tap one. I'll pretend not to notice.</p>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 2px 16px; display: flex; flex-direction: column">
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+      <button style="min-height: 56px; border: 0; border-bottom: {{r.line}}; background: transparent; color: inherit; font-family: inherit; display: flex; align-items: center; justify-content: space-between; padding: 0; font-size: 14px">
+        <span style="font-weight: 600">{{r.label}}</span>
+        <span style="color: var(--muted)">{{r.value}} ›</span>
+      </button>
+    </sc-for>
+  </div>
+
+  <div style="position: absolute; inset: 0; background: var(--scrim)"></div>
+
+  <div style="position: absolute; left: 8px; right: 8px; bottom: 8px; border-radius: 32px; background: var(--glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--glass-line); box-shadow: 0 12px 32px rgba(0,0,0,0.18); padding: 12px 18px 18px; display: flex; flex-direction: column; gap: 14px">
+    <span style="align-self: center; width: 36px; height: 5px; border-radius: 99px; background: var(--muted); opacity: 0.4"></span>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-family: Manrope, sans-serif; font-size: 20px; line-height: 28px; font-weight: 600">Daily limit from today</span>
+      <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Now 9. Past days keep theirs.</span>
+    </div>
+
+    <div style="position: relative; height: 176px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: Manrope, sans-serif; font-variant-numeric: tabular-nums; overflow: hidden" role="img" aria-label="Wheel set to 8 sessions a day">
+      <div style="position: absolute; left: 0; right: 0; top: 66px; height: 44px; border-radius: 12px; background: var(--high)"></div>
+      <span style="position: relative; height: 32px; line-height: 32px; font-size: 18px; color: var(--muted); opacity: 0.5">6</span>
+      <span style="position: relative; height: 34px; line-height: 34px; font-size: 20px; color: var(--muted)">7</span>
+      <span style="position: relative; height: 44px; line-height: 44px; font-size: 26px; font-weight: 700">8 a day</span>
+      <span style="position: relative; height: 34px; line-height: 34px; font-size: 20px; color: var(--muted)">9</span>
+      <span style="position: relative; height: 32px; line-height: 32px; font-size: 18px; color: var(--muted); opacity: 0.5">10</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: 16px; padding: 10px 12px">
+      <svg width="120" height="44" viewBox="0 0 120 44" role="img" aria-label="Limit falling from 8 to zero" style="flex-shrink: 0">
+        <path d="M2 4 H17 V9 H32 V14 H47 V20 H62 V25 H77 V30 H92 V35 H107 V41 H118" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"></path>
+      </svg>
+      <div style="display: flex; flex-direction: column">
+        <span style="font-size: 13px; line-height: 18px; font-weight: 600">Same date, Dec 31</span>
+        <span style="font-size: 12px; line-height: 16px; color: var(--muted)">One fewer every 8 days. Brave.</span>
+      </div>
+    </div>
+
+    <button style="min-height: 56px; border-radius: 99px; border: 0; background: var(--accent); color: var(--on-accent); font-family: inherit; font-size: 16px; font-weight: 600">Shake on it again</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const line = '1px solid var(--line)';
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      rows: [
+        { label: 'Daily limit', value: '9 a day', line },
+        { label: 'Quit date', value: 'Dec 31, 60 days', line },
+        { label: 'Price', value: '$8.00 a pack', line },
+        { label: 'Your why', value: 'Morning runs', line },
+        { label: 'Change habit', value: 'Vaping', line: '0' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

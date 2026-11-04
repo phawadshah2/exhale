@@ -10,6 +10,7 @@ import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/archive_habit.dart';
+import 'package:exhale/features/habit/domain/usecases/set_habit_price.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/home/presentation/widgets/stage_pill.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
@@ -224,7 +225,7 @@ void main() {
       LogsQuery(habitId: 1, from: today, to: today),
     );
     await tester.pumpAndSettle();
-    GoRouter.of(tester.element(find.text('Logs'))).pop();
+    GoRouter.of(tester.element(find.text('The evidence.'))).pop();
     await tester.pumpAndSettle();
 
     expect(
@@ -353,15 +354,15 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Logs'), findsOneWidget);
-    expect(find.text('2 logged'), findsOneWidget);
+    expect(find.text('The evidence.'), findsOneWidget);
+    expect(find.text('2 of 9'), findsOneWidget);
 
     await tester.drag(find.byType(Dismissible).first, const Offset(-500, 0));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Delete').last);
     await tester.pumpAndSettle();
 
-    expect(find.text('1 logged'), findsOneWidget);
+    expect(find.text('1 of 9'), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -388,7 +389,28 @@ void main() {
     await tester.scrollAndTap(find.text('Add log'));
     await tester.pumpAndSettle();
 
-    expect(find.text('2 logged'), findsOneWidget);
+    expect(find.text('2 of 9'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('a price change leaves earlier days at their price', (
+    tester,
+  ) async {
+    final id = await startPlan(LogicalDay(2026, 10, 14), priceCents: 1600);
+    await logOn(DateTime(2026, 10, 14, 9), times: 6);
+    await logOn(DateTime(2026, 10, 15, 9), times: 6);
+    await sl<SetHabitPrice>()((
+      habitId: id,
+      day: LogicalDay(2026, 10, 15),
+      priceCents: 2000,
+      unitsPerContainer: 20,
+    ));
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.ensureVisible(find.text('Money saved'));
+    await tester.pumpAndSettle();
+    expect(find.text(r'$5.40'), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -684,7 +706,29 @@ void main() {
     expect(find.text('Starts Wed, Oct 21 · then 7 more'), findsOneWidget);
     expect(find.text('Smoke-free from Dec 16'), findsOneWidget);
     expect(find.text('61 days to go'), findsOneWidget);
-    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Edit'), findsNothing);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('tapping your plan opens Plan details', (tester) async {
+    await startPlan(LogicalDay(2026, 10, 14));
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.scrollAndTap(find.text('Your plan'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('The whole plan'), findsOneWidget);
+    expect(find.text('Change habit'), findsNothing);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('your plan shows that it opens Plan details', (tester) async {
+    await startPlan(LogicalDay(2026, 10, 14));
+    await tester.pumpAppPastSplash(height: 2400);
+
+    expect(find.text('Details'), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -718,7 +762,7 @@ void main() {
     await tester.scrollAndTap(find.text('+1 more today'));
     await tester.pumpAndSettle();
     expect(find.text('9:00 AM'), findsOneWidget);
-    expect(find.text('Logs'), findsNothing);
+    expect(find.text('The evidence.'), findsNothing);
 
     await tester.scrollAndTap(find.text('Show less'));
     await tester.pumpAndSettle();
@@ -728,10 +772,9 @@ void main() {
     await tester.scrollAndTap(find.text('See all logs'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Logs'), findsOneWidget);
+    expect(find.text('The evidence.'), findsOneWidget);
     expect(find.text('Today · Fri, Oct 16'), findsOneWidget);
-    expect(find.byType(Dismissible), findsNWidgets(3));
-    expect(find.text('Show 1 more'), findsOneWidget);
+    expect(find.byType(Dismissible), findsNWidgets(4));
 
     await tester.disposeApp();
   });

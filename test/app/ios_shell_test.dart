@@ -48,6 +48,21 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('switching tabs fades one into the other', (tester) async {
+    await tester.pumpAppPastSplash();
+
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pump(const Duration(milliseconds: 150));
+    expect(find.byType(HomePage), findsOneWidget);
+    expect(find.byType(SettingsPage), findsOneWidget);
+
+    await tester.pumpAndSettle();
+    expect(find.byType(HomePage), findsNothing);
+    expect(find.byType(SettingsPage), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('glass is on unless Reduce Transparency is', (tester) async {
     await tester.pumpAppPastSplash();
     expect(glassOn(tester), isTrue);

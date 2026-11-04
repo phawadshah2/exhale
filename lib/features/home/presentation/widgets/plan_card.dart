@@ -85,106 +85,88 @@ class PlanCard extends StatelessWidget {
       ),
     ];
 
-    return Card(
-      child: Padding(
-        padding: AppSpacing.card,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: AppSpacing.md,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 2,
-                    children: [
-                      Text('Your plan', style: text.titleMedium),
-                      Text(
-                        stage == null
-                            ? '$percent% of the way'
-                            : 'Stage ${stage.number} of ${plan.stageCount} '
-                                  '· $percent% of the way',
-                        style: text.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                _EditPill(
-                  onTap: () {
-                    unawaited(HapticFeedback.selectionClick());
-                    unawaited(context.push(AppRoutes.editPlanFor(habitId)));
-                  },
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                for (var i = 0; i < steps.length; i++)
-                  _StepRow(
-                    step: steps[i],
-                    connector: i == steps.length - 1
-                        ? _Connector.none
-                        : steps[i].marker == _Marker.done
-                        ? _Connector.done
-                        : steps[i].dashedAfter
-                        ? _Connector.dashed
-                        : _Connector.plain,
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+    void openDetails() {
+      unawaited(HapticFeedback.selectionClick());
+      unawaited(context.push(AppRoutes.planDetailsFor(habitId)));
+    }
 
-class _EditPill extends StatelessWidget {
-  const _EditPill({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
     return Semantics(
+      container: true,
+      explicitChildNodes: true,
       button: true,
-      label: 'Edit plan',
-      excludeSemantics: true,
+      label: 'Plan details',
+      onTap: openDetails,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
-          child: Center(
-            widthFactor: 1,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
-              decoration: ShapeDecoration(
-                shape: StadiumBorder(
-                  side: BorderSide(
-                    color: colors.primary.withValues(alpha: 0.4),
-                  ),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 5,
-                children: [
-                  Icon(AppIcons.edit, size: 14, color: colors.primary),
-                  Text(
-                    'Edit',
-                    style: context.textTheme.labelMedium?.copyWith(
-                      color: colors.primary,
-                      fontWeight: FontWeight.w600,
+        excludeFromSemantics: true,
+        onTap: openDetails,
+        child: Card(
+          child: Padding(
+            padding: AppSpacing.card,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: AppSpacing.md,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: AppSpacing.sm,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 2,
+                        children: [
+                          Text('Your plan', style: text.titleMedium),
+                          Text(
+                            stage == null
+                                ? '$percent% of the way'
+                                : 'Stage ${stage.number} of '
+                                      '${plan.stageCount} '
+                                      '· $percent% of the way',
+                            style: text.bodySmall?.copyWith(
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                    // Says the whole card opens Plan details.
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 2,
+                      children: [
+                        Text(
+                          'Details',
+                          style: text.labelMedium?.copyWith(
+                            color: colors.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Icon(
+                          AppIcons.chevronRight,
+                          size: 14,
+                          color: colors.primary,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    for (var i = 0; i < steps.length; i++)
+                      _StepRow(
+                        step: steps[i],
+                        connector: i == steps.length - 1
+                            ? _Connector.none
+                            : steps[i].marker == _Marker.done
+                            ? _Connector.done
+                            : steps[i].dashedAfter
+                            ? _Connector.dashed
+                            : _Connector.plain,
+                      ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

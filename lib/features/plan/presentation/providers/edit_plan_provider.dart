@@ -1,8 +1,9 @@
+import 'dart:math';
+
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/failure_message.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
-import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
@@ -45,34 +46,72 @@ enum EditQuitPreset {
 class EditPlanState {
   const EditPlanState({
     required this.today,
+    required this.currentLimit,
     required this.currentQuitDay,
+    required this.openingLimit,
+    required this.openingQuitDay,
     required this.startLimit,
     required this.quitDay,
     required this.unitsPerContainer,
+    required this.storedPriceCents,
+    required this.storedUnits,
+    required this.rulerSpanDays,
     this.quitPreset = EditQuitPreset.keepCurrent,
     this.priceText = '',
-    this.reason = '',
     this.isSubmitting = false,
     this.errorMessage,
   });
 
   final LogicalDay today;
 
+  /// Today's limit under the plan in force.
+  final int currentLimit;
+
   /// The quit date of the plan in force, offered as "Keep current".
   final LogicalDay currentQuitDay;
+
+  /// The limit and date the form opened with.
+  final int openingLimit;
+  final LogicalDay openingQuitDay;
   final int startLimit;
   final LogicalDay quitDay;
 
-  /// Null once the user picks a date on the wheel.
+  /// Null once the user picks a date on the wheel or the ruler.
   final EditQuitPreset? quitPreset;
   final String priceText;
   final int unitsPerContainer;
-  final String reason;
+
+  /// What is stored now, moved on as soon as a save writes the price.
+  final int? storedPriceCents;
+  final int storedUnits;
+
+  /// Days the ruler spans from today. Only a chip or the wheel changes it, so
+  /// it never moves under a finger.
+  final int rulerSpanDays;
   final bool isSubmitting;
   final String? errorMessage;
 
   PlanDraft get draft =>
       PlanDraft(startDay: today, startLimit: startLimit, quitDay: quitDay);
+
+  /// Past the quit date the form opens on a new plan, which a press starts
+  /// unless the price is the only thing changed.
+  bool get planChanged => canKeepCurrent
+      ? startLimit != currentLimit || quitDay != currentQuitDay
+      : !priceChanged ||
+            startLimit != openingLimit ||
+            quitDay != openingQuitDay;
+
+  /// True for an invalid price too, so pressing save can show its error.
+  bool get priceChanged =>
+      hasInvalidPrice ||
+      priceCents != storedPriceCents ||
+      unitsPerContainer != storedUnits;
+
+  bool get canSave => planChanged ? preview != null : priceChanged;
+
+  /// A plan that reached its quit date cannot be kept as it is.
+  bool get canKeepCurrent => currentQuitDay.isAfter(today);
 
   bool get isSteep => PlanValidation.isSteep(draft);
 
@@ -93,18 +132,27 @@ class EditPlanState {
     EditQuitPreset? Function()? quitPreset,
     String? priceText,
     int? unitsPerContainer,
-    String? reason,
+    int? Function()? storedPriceCents,
+    int? storedUnits,
+    int? rulerSpanDays,
     bool? isSubmitting,
     String? Function()? errorMessage,
   }) => EditPlanState(
     today: today,
+    currentLimit: currentLimit,
     currentQuitDay: currentQuitDay,
+    openingLimit: openingLimit,
+    openingQuitDay: openingQuitDay,
     startLimit: startLimit ?? this.startLimit,
     quitDay: quitDay ?? this.quitDay,
     quitPreset: quitPreset != null ? quitPreset() : this.quitPreset,
     priceText: priceText ?? this.priceText,
     unitsPerContainer: unitsPerContainer ?? this.unitsPerContainer,
-    reason: reason ?? this.reason,
+    storedPriceCents: storedPriceCents != null
+        ? storedPriceCents()
+        : this.storedPriceCents,
+    storedUnits: storedUnits ?? this.storedUnits,
+    rulerSpanDays: rulerSpanDays ?? this.rulerSpanDays,
     isSubmitting: isSubmitting ?? this.isSubmitting,
     errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
   );
@@ -135,19 +183,25 @@ class EditPlanController extends Notifier<EditPlanState> {
     final preset = canKeep
         ? EditQuitPreset.keepCurrent
         : EditQuitPreset.suggested;
+    final quitDay = preset.quitDayFor(
+      today: today,
+      startLimit: startLimit,
+      currentQuitDay: plan.quitDay,
+    );
     return EditPlanState(
       today: today,
+      currentLimit: plan.limitOn(today),
       currentQuitDay: plan.quitDay,
+      openingLimit: startLimit,
+      openingQuitDay: quitDay,
       startLimit: startLimit,
-      quitDay: preset.quitDayFor(
-        today: today,
-        startLimit: startLimit,
-        currentQuitDay: plan.quitDay,
-      ),
+      quitDay: quitDay,
       quitPreset: preset,
       unitsPerContainer: habit.unitsPerContainer,
       priceText: cents == null ? '' : (cents / 100).toStringAsFixed(2),
-      reason: habit.reason ?? '',
+      storedPriceCents: cents,
+      storedUnits: habit.unitsPerContainer,
+      rulerSpanDays: _rulerSpan(today, quitDay),
     );
   }
 
@@ -165,21 +219,33 @@ class EditPlanController extends Notifier<EditPlanState> {
     );
   }
 
-  void selectQuitPreset(EditQuitPreset preset) => state = state.copyWith(
-    quitPreset: () => preset,
-    quitDay: _quitDayFor(preset, state.startLimit),
-    errorMessage: () => null,
-  );
-
-  /// A date picked on the wheel; any day after today is allowed.
-  void setQuitDay(LogicalDay day) {
-    final earliest = earliestQuitDay;
+  void selectQuitPreset(EditQuitPreset preset) {
+    final quitDay = _quitDayFor(preset, state.startLimit);
     state = state.copyWith(
-      quitDay: day.isBefore(earliest) ? earliest : day,
-      quitPreset: () => null,
+      quitPreset: () => preset,
+      quitDay: quitDay,
+      rulerSpanDays: _rulerSpan(state.today, quitDay),
       errorMessage: () => null,
     );
   }
+
+  /// A date picked on the wheel; any day after today is allowed.
+  void setQuitDay(LogicalDay day) {
+    final quitDay = _notBeforeEarliest(day);
+    state = state.copyWith(
+      quitDay: quitDay,
+      quitPreset: () => null,
+      rulerSpanDays: _rulerSpan(state.today, quitDay),
+      errorMessage: () => null,
+    );
+  }
+
+  /// A date dragged on the ruler; the ruler's span stays as it is.
+  void setQuitDayFromRuler(LogicalDay day) => state = state.copyWith(
+    quitDay: _notBeforeEarliest(day),
+    quitPreset: () => null,
+    errorMessage: () => null,
+  );
 
   void setPriceText(String text) =>
       state = state.copyWith(priceText: text, errorMessage: () => null);
@@ -188,10 +254,8 @@ class EditPlanController extends Notifier<EditPlanState> {
     unitsPerContainer: value.clamp(1, HabitValidation.maxUnitsPerContainer),
   );
 
-  void setReason(String text) => state = state.copyWith(reason: text);
-
-  /// Saves the habit's price and reason, then starts the new plan today.
-  /// Returns true when both are stored.
+  /// Saves the price if it changed, then starts a new plan today if the plan
+  /// changed. Returns true when everything that changed is stored.
   Future<bool> save() async {
     if (state.isSubmitting) return false;
     final habit = ref.read(habitProvider(habitId));
@@ -202,38 +266,56 @@ class EditPlanController extends Notifier<EditPlanState> {
       );
       return false;
     }
+    if (!state.canSave) return false;
     final form = state;
     state = form.copyWith(isSubmitting: true, errorMessage: () => null);
 
-    final updated = await ref.read(updateHabitProvider)(_updatedHabit(habit));
-    if (!ref.mounted) return false;
-    if (updated case FailureResult(:final failure)) {
-      return _fail(failureMessage(failure));
+    if (form.priceChanged) {
+      final priceCents = habit.habit.tracksCost ? form.priceCents : null;
+      final priced = await ref.read(setHabitPriceProvider)((
+        habitId: habitId,
+        day: form.today,
+        priceCents: priceCents,
+        unitsPerContainer: form.unitsPerContainer,
+      ));
+      if (!ref.mounted) return false;
+      if (priced case FailureResult(:final failure)) {
+        return _fail(failureMessage(failure));
+      }
+      state = state.copyWith(
+        storedPriceCents: () => priceCents,
+        storedUnits: form.unitsPerContainer,
+      );
     }
 
-    final saved = await ref.read(savePlanProvider)((
-      habitId: habitId,
-      draft: form.draft,
-    ));
-    if (!ref.mounted) return false;
-    if (saved case FailureResult(:final failure)) {
-      return _fail(failureMessage(failure));
+    if (form.planChanged) {
+      final saved = await ref.read(savePlanProvider)((
+        habitId: habitId,
+        draft: form.draft,
+      ));
+      if (!ref.mounted) return false;
+      if (saved case FailureResult(:final failure)) {
+        return _fail(failureMessage(failure));
+      }
     }
 
     state = state.copyWith(isSubmitting: false);
     return true;
   }
 
-  TrackedHabit _updatedHabit(TrackedHabit habit) => habit.copyWith(
-    priceCents: () => habit.habit.tracksCost ? state.priceCents : null,
-    unitsPerContainer: state.unitsPerContainer,
-    reason: () => state.reason,
-  );
-
   bool _fail(String message) {
     state = state.copyWith(isSubmitting: false, errorMessage: () => message);
     return false;
   }
+
+  LogicalDay _notBeforeEarliest(LogicalDay day) {
+    final earliest = earliestQuitDay;
+    return day.isBefore(earliest) ? earliest : day;
+  }
+
+  /// 17 weeks, or 4 weeks past [quitDay] if that is later.
+  int _rulerSpan(LogicalDay today, LogicalDay quitDay) =>
+      max(119, quitDay.daysSince(today) + 28);
 
   LogicalDay _quitDayFor(EditQuitPreset preset, int startLimit) =>
       preset.quitDayFor(

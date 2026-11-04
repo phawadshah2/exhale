@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan details, the stash</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--warn:#B26B00;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--warn:#FFB95F;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1040px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 32px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </button>
+    <button style="min-height: 44px; display: flex; align-items: center; background: transparent; border: 0; padding: 0; font-family: inherit">
+      <span style="display: flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 99px; border: 1px solid var(--accent-text); color: var(--accent-text); font-size: 12px; font-weight: 600">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg>Edit
+      </span>
+    </button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 48px; line-height: 56px; font-weight: 700; letter-spacing: -1.44px">283 left.</h1>
+    <span style="font-family: Manrope, sans-serif; font-size: 24px; line-height: 32px; font-weight: 600; color: var(--muted)">Ever.</span>
+    <p style="margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--muted)">Every session between you and zero. I counted, so you can't round down.</p>
+  </div>
+
+  <div style="height: 48px; box-sizing: border-box; border-radius: 99px; background: var(--pill); padding: 0 8px 0 12px; display: flex; align-items: center; gap: 10px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-text)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.1 9.6 4.2 4.2 0 0 0 7 18z"></path></svg>
+    <span style="flex-grow: 1; font-size: 14px; font-weight: 600">Vaping · Drops to 8 in 4d</span>
+    <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--accent-text); border: 1px solid var(--accent-text); border-radius: 99px; padding: 3px 10px">STAGE 4 / 12</span>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <span style="font-size: 16px; line-height: 24px; font-weight: 600">The whole plan</span>
+      <span style="font-size: 12px; color: var(--muted)">Each dot is 1 session</span>
+    </div>
+    <svg width="316" height="222" viewBox="0 0 316 222" role="img" aria-label="546 dots, one per session the plan allows. 263 are gone, 283 are left, and 4 of those are today's." style="align-self: center">
+      <sc-for list="{{dots}}" as="d" hint-placeholder-count="28">
+        <circle cx="{{d.x}}" cy="{{d.y}}" r="{{d.r}}" fill="{{d.fill}}" opacity="{{d.opacity}}"></circle>
+      </sc-for>
+    </svg>
+    <div style="display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; line-height: 16px; color: var(--muted)">
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--high)"></span>Gone, 263</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--warn)"></span>Today's, 4</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent)"></span>Still to come, 279</span>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+    <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; color: var(--muted)">If you burn them all</span>
+      <span style="font-family: Manrope, sans-serif; font-size: 24px; line-height: 32px; font-weight: 700">$113</span>
+      <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Cheapest goodbye you'll ever buy.</span>
+    </div>
+    <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; color: var(--muted)">The very last one</span>
+      <span style="font-family: Manrope, sans-serif; font-size: 24px; line-height: 32px; font-weight: 700">Dec 30</span>
+      <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Make it a good one. Or don't.</span>
+    </div>
+  </div>
+
+  <p style="margin: 0; padding: 0 4px; font-size: 12px; line-height: 18px; color: var(--muted)">Going over doesn't borrow from tomorrow. Nice try.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dots = [];
+    const gone = 263;
+    const todayEnd = gone + 4;
+    let i = 0;
+    for (let stage = 1; stage <= 12; stage++) {
+      const count = (13 - stage) * 7;
+      for (let n = 0; n < count; n++) {
+        const col = i % 28;
+        const row = Math.floor(i / 28);
+        let fill = 'var(--accent)';
+        if (i < gone) fill = 'var(--high)';
+        else if (i < todayEnd) fill = 'var(--warn)';
+        dots.push({
+          x: 6 + col * 11.2,
+          y: 6 + row * 11,
+          r: 4,
+          fill,
+          // Alternating stages read as bands, so the stages stay visible.
+          opacity: i >= todayEnd && stage % 2 === 1 ? 0.55 : 1,
+        });
+        i++;
+      }
+    }
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      dots,
+    };
+  }
+}
+</script>
+</body>
+</html>

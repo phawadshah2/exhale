@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home with the next-log timer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#57F1DB}a:hover{color:#2DD4BF}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0E141D; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 62px 20px 0; display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden">
+
+<div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0">
+<div style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid #2DD4BF; box-sizing: border-box; background: #1A2029; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="#DDE2F0" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 20a8 8 0 0 1 16 0z"></path></svg>
+<span style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: #2DD4BF; color: #003731; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 99px">D12</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1; min-width: 0">
+<span style="font-size: 13px; color: #93A0AE">Wednesday, Oct 21</span>
+<span style="font-family: Manrope, sans-serif; font-size: 23px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap">Good afternoon</span>
+</div>
+<sc-if value="{{isD}}" hint-placeholder-val="{{ false }}">
+<div style="height: 36px; box-sizing: border-box; flex-shrink: 0; border-radius: 99px; background: rgba(45,212,191,0.12); border: 1px solid rgba(45,212,191,0.4); padding: 0 12px 0 9px; display: flex; align-items: center; gap: 6px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#57F1DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10M7 21h10M8 3v3c0 3 8 4 8 6s-8 3-8 6v3M16 3v3c0 3-8 4-8 6s8 3 8 6v3"></path></svg>
+<span style="font-size: 14px; font-weight: 700; color: #57F1DB; font-variant-numeric: tabular-nums; white-space: nowrap">47 min</span>
+</div>
+</sc-if>
+</div>
+
+<div style="height: 48px; flex-shrink: 0; box-sizing: border-box; border-radius: 99px; background: #242A34; border: 1px solid rgba(60,74,70,0.6); padding: 0 8px 0 12px; display: flex; align-items: center; gap: 10px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#57F1DB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.1 9.6 4.2 4.2 0 0 0 7 18z"></path></svg>
+<span style="flex-grow: 1; font-size: 14px; font-weight: 600">Vaping · Drops to 10 in 4d</span>
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #57F1DB; background: rgba(45,212,191,0.12); border: 1px solid rgba(45,212,191,0.4); border-radius: 99px; padding: 3px 10px; white-space: nowrap">STAGE 2 / 9</span>
+</div>
+
+<div style="flex-shrink: 0; background: #161C25; border: 1px solid #2C333D; border-radius: 28px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="flex-grow: 1; font-family: Manrope, sans-serif; font-size: 20px; font-weight: 700">Today's Consumption</span>
+<span style="font-size: 12px; font-weight: 600; color: #4EDEA3; background: rgba(78,222,163,0.12); border: 1px solid rgba(78,222,163,0.45); border-radius: 99px; padding: 4px 10px; display: flex; align-items: center; gap: 6px"><span style="width: 6px; height: 6px; border-radius: 50%; background: #4EDEA3"></span>On track</span>
+</div>
+
+<div style="display: flex; justify-content: center">
+<div style="position: relative; width: 220px; height: 220px">
+<svg width="220" height="220" viewBox="0 0 220 220" role="img" aria-label="4 of 11 sessions today">
+<defs><linearGradient id="ringM" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00A572"></stop><stop offset="1" stop-color="#2DD4BF"></stop></linearGradient></defs>
+<circle cx="110" cy="110" r="96" fill="none" stroke="#242A34" stroke-width="14"></circle>
+<circle cx="110" cy="110" r="96" fill="none" stroke="url(#ringM)" stroke-width="14" stroke-linecap="round" stroke-dasharray="219 603" transform="rotate(-90 110 110)"></circle>
+</svg>
+<sc-if value="{{isB}}" hint-placeholder-val="{{ false }}">
+<svg width="220" height="220" viewBox="0 0 220 220" aria-hidden="true" style="position: absolute; inset: 0">
+<circle cx="110" cy="110" r="80" fill="none" stroke="#242A34" stroke-width="4"></circle>
+<circle cx="110" cy="110" r="80" fill="none" stroke="#DDE2F0" stroke-width="4" stroke-linecap="round" stroke-dasharray="272 503" transform="rotate(-90 110 110)"></circle>
+</svg>
+</sc-if>
+<div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
+<sc-if value="{{ringPlain}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; align-items: baseline; gap: 4px"><span style="font-family: Manrope, sans-serif; font-size: 56px; font-weight: 700; letter-spacing: -0.03em">4</span><span style="font-family: Manrope, sans-serif; font-size: 24px; font-weight: 600; color: #93A0AE">/ 11</span></div>
+<span style="font-family: Manrope, sans-serif; font-size: 18px; font-weight: 600; color: #57F1DB">7 left today</span>
+<span style="font-size: 12px; color: #93A0AE">36% of daily limit</span>
+</sc-if>
+<sc-if value="{{isA}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; align-items: baseline; gap: 4px"><span style="font-family: Manrope, sans-serif; font-size: 50px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1">4</span><span style="font-family: Manrope, sans-serif; font-size: 22px; font-weight: 600; color: #93A0AE">/ 11</span></div>
+<span style="font-family: Manrope, sans-serif; font-size: 24px; font-weight: 700; color: #57F1DB; font-variant-numeric: tabular-nums">47:12</span>
+<span style="font-size: 12px; color: #93A0AE">until next · 7 left</span>
+</sc-if>
+<sc-if value="{{isB}}" hint-placeholder-val="{{ false }}">
+<span style="font-family: Manrope, sans-serif; font-size: 46px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1">47:12</span>
+<span style="font-size: 13px; font-weight: 600; color: #57F1DB">until your next</span>
+<span style="font-size: 12px; color: #93A0AE">4 of 11 · 7 left</span>
+</sc-if>
+</div>
+</div>
+</div>
+
+<div style="height: 1px; background: rgba(60,74,70,0.5)"></div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div style="display: flex; gap: 8px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#57F1DB" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #93A0AE">Last entry</span><span style="font-size: 16px; font-weight: 600">39m ago</span><span style="font-size: 12px; color: #93A0AE">3:42 PM</span></div>
+</div>
+<sc-if value="{{isG}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; gap: 8px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#57F1DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10M7 21h10M8 3v3c0 3 8 4 8 6s-8 3-8 6v3M16 3v3c0 3-8 4-8 6s8 3 8 6v3"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #93A0AE">Next on schedule</span><span style="font-size: 16px; font-weight: 700; color: #57F1DB; font-variant-numeric: tabular-nums">in 47:12</span><span style="font-size: 12px; color: #93A0AE">5:09 PM</span></div>
+</div>
+</sc-if>
+<sc-if value="{{notG}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; gap: 8px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFB4AB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #93A0AE">Last trigger</span><span style="font-size: 16px; font-weight: 600">Stress</span><span style="font-size: 12px; color: #93A0AE">Deadline call</span></div>
+</div>
+</sc-if>
+</div>
+</div>
+
+<sc-if value="{{isToday}}" hint-placeholder-val="{{ true }}">
+<div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; align-items: center; text-align: center">
+<span style="font-size: 14px; font-weight: 700">Next one on schedule in 47 min</span>
+<span style="font-size: 12px; color: #93A0AE">About one every 87 min until bed</span>
+</div>
+</sc-if>
+
+<sc-if value="{{paceOnly}}" hint-placeholder-val="{{ false }}">
+<div style="flex-shrink: 0; text-align: center; font-size: 12px; color: #93A0AE">About one every 87 min until bed</div>
+</sc-if>
+
+<sc-if value="{{isC}}" hint-placeholder-val="{{ false }}">
+<div style="flex-shrink: 0; background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 12px; font-weight: 600; color: #93A0AE">Next one on schedule in</span>
+<span style="font-family: Manrope, sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1">47:12</span>
+</div>
+<span style="font-size: 13px; font-weight: 600; color: #57F1DB; padding-bottom: 6px; white-space: nowrap">at 5:09 PM</span>
+</div>
+<div style="height: 6px; border-radius: 99px; background: #2F353F"><div style="width: 54%; height: 6px; border-radius: 99px; background: #2DD4BF"></div></div>
+</div>
+</sc-if>
+
+<sc-if value="{{isF}}" hint-placeholder-val="{{ false }}">
+<div style="flex-shrink: 0; background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 14px 18px 12px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<span style="font-family: Manrope, sans-serif; font-size: 20px; font-weight: 700">Next at 5:09 PM</span>
+<span style="font-size: 13px; font-weight: 600; color: #57F1DB; font-variant-numeric: tabular-nums">in 47 min</span>
+</div>
+<div style="position: relative; height: 16px" role="img" aria-label="Your day from 7:30 AM to 11:30 PM: four logs so far, the next at 5:09 PM">
+<div style="position: absolute; left: 0; right: 0; top: 5px; height: 6px; border-radius: 99px; background: #2F353F"></div>
+<div style="position: absolute; left: 0; width: 55.4%; top: 5px; height: 6px; border-radius: 99px; background: rgba(45,212,191,0.35)"></div>
+<div style="position: absolute; left: 5.2%; top: 3px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: #2DD4BF"></div>
+<div style="position: absolute; left: 19.8%; top: 3px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: #2DD4BF"></div>
+<div style="position: absolute; left: 34.9%; top: 3px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: #2DD4BF"></div>
+<div style="position: absolute; left: 51.3%; top: 3px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: #2DD4BF"></div>
+<div style="position: absolute; left: 60.3%; top: 0; width: 16px; height: 16px; box-sizing: border-box; margin-left: -8px; border-radius: 50%; background: #161C25; border: 3px solid #DDE2F0"></div>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: #93A0AE"><span>7:30 AM</span><span>11:30 PM</span></div>
+</div>
+</sc-if>
+
+<div style="flex-shrink: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: 12px; color: #93A0AE">Streak</span><span style="font-family: Manrope, sans-serif; font-size: 26px; font-weight: 700">6 Days</span></div>
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: 12px; color: #93A0AE">Vs baseline</span><span style="font-family: Manrope, sans-serif; font-size: 26px; font-weight: 700; color: #4EDEA3">↓ 28%</span></div>
+</div>
+
+<div style="position: absolute; left: 20px; right: 20px; bottom: 34px; display: flex; align-items: center; justify-content: space-between">
+<div style="height: 56px; box-sizing: border-box; border-radius: 99px; background: rgba(36,42,52,0.92); border: 1px solid rgba(255,255,255,0.1); padding: 4px; display: flex; align-items: center; gap: 4px">
+<button type="button" aria-label="Home" style="border: 0; width: 76px; height: 48px; border-radius: 99px; background: rgba(45,212,191,0.18); display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#57F1DB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg></button>
+<button type="button" aria-label="Settings" style="border: 0; width: 76px; height: 48px; border-radius: 99px; background: transparent; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#DDE2F0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg></button>
+</div>
+<div style="position: relative; width: 64px; height: 64px; flex-shrink: 0">
+<sc-if value="{{isE}}" hint-placeholder-val="{{ false }}">
+<svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true" style="position: absolute; left: -8px; top: -8px">
+<circle cx="40" cy="40" r="37" fill="none" stroke="#2F353F" stroke-width="4"></circle>
+<circle cx="40" cy="40" r="37" fill="none" stroke="#2DD4BF" stroke-width="4" stroke-linecap="round" stroke-dasharray="126 232.5" transform="rotate(-90 40 40)"></circle>
+</svg>
+<div style="position: absolute; bottom: 82px; right: -6px; height: 32px; box-sizing: border-box; padding: 0 12px; border-radius: 99px; background: rgba(36,42,52,0.96); border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; white-space: nowrap"><span style="font-size: 13px; font-weight: 700; color: #57F1DB; font-variant-numeric: tabular-nums">47 min</span></div>
+</sc-if>
+<a href="#" aria-label="Log; hold for more options" style="position: absolute; inset: 0; box-sizing: border-box; text-decoration: none; border: 1px solid rgba(255,255,255,0.12); border-radius: 50%; background: #2DD4BF; display: flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#003731" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"variant":{"editor":"enum","options":["today","a","b","c","d","e","f","g"],"default":"today"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const v = this.props.variant ?? 'today';
+    return {
+      isToday: v === 'today',
+      isA: v === 'a',
+      isB: v === 'b',
+      isC: v === 'c',
+      isD: v === 'd',
+      isE: v === 'e',
+      isF: v === 'f',
+      isG: v === 'g',
+      notG: v !== 'g',
+      ringPlain: v !== 'a' && v !== 'b',
+      paceOnly: ['a', 'b', 'd', 'e', 'g'].includes(v),
+    };
+  }
+}
+</script>
+</body>
+</html>

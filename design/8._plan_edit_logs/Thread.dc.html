@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan details, the thread</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--you:#E9EEF3;--dash:#AEB6C1;--good:#00704A;--warn:#855300;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--you:#242A34;--dash:#4A525E;--good:#4EDEA3;--warn:#FFB95F;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--on-accent-soft:#C9D0D9;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--on-accent-soft:#3E4651;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--on-accent-soft:#00574C;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--on-accent-soft:#00574C;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--on-accent-soft:#DCE8FF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--on-accent-soft:#DCE8FF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1240px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 0; display: flex; flex-direction: column; gap: 8px; overflow: hidden; position: relative">
+
+  <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 8px">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </button>
+    <div style="flex-grow: 1; display: flex; flex-direction: column">
+      <span style="font-family: Manrope, sans-serif; font-size: 18px; line-height: 24px; font-weight: 600">Your plan</span>
+      <span style="font-size: 12px; line-height: 16px; color: var(--muted)">Exhale · online, unfortunately</span>
+    </div>
+    <button style="min-height: 44px; display: flex; align-items: center; background: transparent; border: 0; padding: 0; font-family: inherit">
+      <span style="padding: 5px 11px; border-radius: 99px; border: 1px solid var(--accent-text); color: var(--accent-text); font-size: 12px; font-weight: 600">Edit</span>
+    </button>
+  </div>
+
+  <span style="text-align: center; font-size: 11px; line-height: 16px; font-weight: 600; color: var(--muted)">Thu, Oct 8 · Stage 1</span>
+  <div style="display: flex; align-items: flex-end; gap: 9px">
+    <span style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"></path></svg></span>
+    <span style="max-width: 280px; background: var(--accent); color: var(--on-accent); border-radius: 20px 20px 20px 6px; padding: 10px 14px; font-size: 15px; line-height: 21px">12 a day. Zero by Dec 31. You shook on it.</span>
+  </div>
+
+  <span style="text-align: center; font-size: 11px; line-height: 16px; font-weight: 600; color: var(--muted); padding-top: 4px">Thu, Oct 15 · Stage 2</span>
+  <div style="display: flex; align-items: flex-end; gap: 9px">
+    <span style="width: 32px; flex-shrink: 0"></span>
+    <span style="max-width: 280px; background: var(--accent); color: var(--on-accent); border-radius: 20px 20px 20px 6px; padding: 10px 14px; font-size: 15px; line-height: 21px">11. You barely noticed. I did. Twice.</span>
+  </div>
+
+  <span style="text-align: center; font-size: 11px; line-height: 16px; font-weight: 600; color: var(--muted); padding-top: 4px">Thu, Oct 22 · Stage 3</span>
+  <div style="display: flex; align-items: flex-end; gap: 9px">
+    <span style="width: 32px; flex-shrink: 0"></span>
+    <span style="max-width: 280px; background: var(--accent); color: var(--on-accent); border-radius: 20px 20px 20px 6px; padding: 10px 14px; font-size: 15px; line-height: 21px">10. Last week of double digits.</span>
+  </div>
+
+  <span style="text-align: center; font-size: 11px; line-height: 16px; font-weight: 700; color: var(--accent-text); padding-top: 4px">Thu, Oct 29 · Stage 4 · now</span>
+  <div style="display: flex; align-items: flex-end; gap: 9px">
+    <span style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"></path></svg></span>
+    <div style="width: 280px; box-sizing: border-box; background: var(--accent); color: var(--on-accent); border-radius: 20px 20px 20px 6px; padding: 10px 14px 14px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 15px; line-height: 21px">9. Single digits. Don't get cocky.</span>
+      <div style="display: flex; align-items: center; gap: 12px; background: var(--card); color: var(--ink); border-radius: 14px; padding: 10px">
+        <svg width="44" height="44" viewBox="0 0 44 44" role="img" aria-label="5 of 9 today">
+          <circle cx="22" cy="22" r="18" fill="none" stroke="var(--high)" stroke-width="5"></circle>
+          <circle cx="22" cy="22" r="18" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="56 100" transform="rotate(-90 22 22)"></circle>
+        </svg>
+        <div style="display: flex; flex-direction: column; gap: 1px">
+          <span style="font-size: 14px; line-height: 20px; font-weight: 600">5 of 9 today</span>
+          <span style="font-size: 12px; line-height: 16px; color: var(--muted)">Day 4 of 7 · drops in 4d</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding-top: 2px">
+    <span style="max-width: 280px; background: var(--you); border-radius: 20px 20px 6px 20px; padding: 10px 14px; font-size: 15px; line-height: 21px">it's basically flavoured air</span>
+    <span style="font-size: 11px; line-height: 16px; color: var(--muted)">Read 11:49 PM</span>
+  </div>
+  <div style="display: flex; align-items: flex-end; gap: 9px">
+    <span style="width: 32px; flex-shrink: 0"></span>
+    <span style="max-width: 280px; background: var(--accent); color: var(--on-accent); border-radius: 20px 20px 20px 6px; padding: 10px 14px; font-size: 15px; line-height: 21px">It still counts.</span>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 10px; padding: 12px 0 4px">
+    <div style="flex-grow: 1; height: 1px; background: var(--line)"></div>
+    <span style="font-size: 11px; line-height: 16px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted)">SCHEDULED. ALREADY WRITTEN.</span>
+    <div style="flex-grow: 1; height: 1px; background: var(--line)"></div>
+  </div>
+
+  <sc-for list="{{scheduled}}" as="m" hint-placeholder-count="3">
+    <div style="display: flex; align-items: flex-end; gap: 9px">
+      <span style="width: 32px; flex-shrink: 0"></span>
+      <div style="max-width: 280px; display: flex; flex-direction: column; gap: 2px; border: 1.5px dashed var(--dash); border-radius: 20px 20px 20px 6px; padding: 9px 14px">
+        <span style="font-size: 15px; line-height: 21px">{{m.text}}</span>
+        <span style="font-size: 11px; line-height: 16px; color: var(--muted)">Sends {{m.when}}</span>
+      </div>
+    </div>
+  </sc-for>
+
+  <button style="align-self: center; min-height: 44px; border: 0; background: transparent; color: var(--accent-text); font-family: inherit; font-size: 13px; font-weight: 600">Spoil 6 more</button>
+
+  <div style="display: flex; align-items: flex-end; gap: 9px">
+    <span style="width: 32px; height: 32px; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed var(--dash); color: var(--good); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4M6 4h11l-2 4 2 4H6"></path></svg></span>
+    <div style="max-width: 280px; display: flex; flex-direction: column; gap: 2px; border: 1.5px dashed var(--good); border-radius: 20px 20px 20px 6px; padding: 9px 14px">
+      <span style="font-size: 15px; line-height: 21px; font-weight: 600">Zero. That's the whole plan. I've got nothing else to say.</span>
+      <span style="font-size: 11px; line-height: 16px; color: var(--muted)">Sends Thu, Dec 31 · last message</span>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 20px; right: 20px; bottom: 28px; min-height: 48px; box-sizing: border-box; border-radius: 99px; background: var(--pill); padding: 0 18px; display: flex; align-items: center; font-size: 14px; color: var(--muted)">Replies are off. So are excuses.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      scheduled: [
+        { text: "8. You'll live.", when: 'Thu, Nov 5' },
+        { text: '7. Your thumbs are bored already.', when: 'Thu, Nov 12' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

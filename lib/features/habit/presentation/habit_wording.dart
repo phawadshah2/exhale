@@ -25,4 +25,19 @@ extension HabitWording on Habit {
               ? 'Drops to $next tomorrow'
               : 'Drops to $next in ${days}d');
   }
+
+  /// The closing line of the reassess sheet.
+  String get supportLine => switch (kind) {
+    HabitKind.vaping || HabitKind.smoking || HabitKind.nicotinePouches =>
+      'If this keeps being hard, a doctor, pharmacist or local quit service '
+          'can help.',
+    _ =>
+      'If this keeps being hard, a doctor or local support service can help.',
+  };
+
+  /// A safety line for alcohol; null for every other habit.
+  String? get stopSuddenlyLine => kind == HabitKind.alcohol
+      ? "If you drink heavily, don't stop suddenly without medical advice. "
+            'It can be dangerous.'
+      : null;
 }

@@ -70,6 +70,25 @@ void main() {
     expect(logs, [atStart, morning, late]);
   });
 
+  test('getLogs returns the same half-open range once', () async {
+    final from = DateTime(2026, 10, 16, 4);
+    final to = DateTime(2026, 10, 17, 4);
+
+    await add(DateTime(2026, 10, 16, 3, 59));
+    final atStart = await add(from);
+    final late = await add(DateTime(2026, 10, 17, 1, 30));
+    await add(to);
+    await add(DateTime(2026, 10, 16, 9), habitId: smoking);
+
+    final result = await repository.getLogs(
+      habitId: vaping,
+      from: from,
+      to: to,
+    );
+
+    expect((result as Success<List<HabitLog>>).value, [atStart, late]);
+  });
+
   test('watching one habit leaves out logs of another', () async {
     final vapingLog = await add(DateTime(2026, 10, 16, 9));
     await add(DateTime(2026, 10, 16, 10), habitId: smoking);

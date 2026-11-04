@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan details, spoilers</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--good:#00704A;--warn:#855300;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--good:#4EDEA3;--warn:#FFB95F;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1040px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 32px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </button>
+    <button style="min-height: 44px; display: flex; align-items: center; background: transparent; border: 0; padding: 0; font-family: inherit">
+      <span style="display: flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 99px; border: 1px solid var(--accent-text); color: var(--accent-text); font-size: 12px; font-weight: 600">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg>Edit
+      </span>
+    </button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.64px">Spoilers.</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">Drag to any day and see what future you has to put up with.</p>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px; align-items: center">
+    <div style="width: 100%; display: flex; align-items: center; justify-content: space-between">
+      <span style="font-size: 16px; line-height: 24px; font-weight: 600">{{date}}</span>
+      <span style="font-size: 12px; font-weight: 600; color: var(--accent-text); border: 1px solid var(--accent-text); border-radius: 99px; padding: 3px 10px">{{relative}}</span>
+    </div>
+
+    <div style="position: relative; width: 220px; height: 220px">
+      <svg width="220" height="220" viewBox="0 0 220 220" role="img" aria-label="{{ringLabel}}">
+        <circle cx="110" cy="110" r="96" fill="none" stroke="var(--high)" stroke-width="14"></circle>
+        <circle cx="110" cy="110" r="96" fill="none" stroke="{{ringColor}}" stroke-width="14" stroke-linecap="round" pathLength="100" stroke-dasharray="{{ringDash}}" transform="rotate(-90 110 110)"></circle>
+      </svg>
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
+        <span style="font-family: Manrope, sans-serif; font-size: 48px; line-height: 56px; font-weight: 700; letter-spacing: -1.44px; font-variant-numeric: tabular-nums">{{limit}}</span>
+        <span style="font-size: 13px; color: var(--muted)">{{limitCaption}}</span>
+        <span style="font-size: 12px; color: var(--muted)">{{gapLine}}</span>
+      </div>
+    </div>
+
+    <span style="font-size: 14px; line-height: 20px; font-weight: 700; color: var(--accent-text)">{{stageLine}}</span>
+
+    <span style="align-self: flex-end; max-width: 280px; background: var(--accent); color: var(--on-accent); border-radius: 20px 20px 6px 20px; padding: 10px 14px; font-size: 14px; line-height: 20px">{{reply}}</span>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+    <svg width="316" height="110" viewBox="0 0 316 110" role="img" aria-label="The plan as a falling line, from 12 a day on Oct 8 to zero on Dec 31" style="align-self: center">
+      <path d="{{futurePath}}" fill="none" stroke="var(--line)" stroke-width="3" stroke-linejoin="round"></path>
+      <path d="{{pastPath}}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"></path>
+      <line x1="{{todayX}}" y1="4" x2="{{todayX}}" y2="106" stroke="var(--muted)" stroke-width="1" stroke-dasharray="2 4"></line>
+      <line x1="{{thumbX}}" y1="4" x2="{{thumbX}}" y2="106" stroke="var(--accent)" stroke-width="1.5"></line>
+      <circle cx="{{thumbX}}" cy="{{thumbY}}" r="7" fill="var(--accent)" stroke="var(--card)" stroke-width="3"></circle>
+    </svg>
+    <input type="range" min="0" max="84" step="1" value="{{day}}" onChange="{{onDay}}" aria-label="Day of the plan" style="width: 100%; height: 44px; margin: 0; accent-color: var(--accent)">
+    <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--muted)">
+      <span>Oct 8</span>
+      <span>Dec 31</span>
+    </div>
+    <div style="display: flex; gap: 8px; padding-top: 4px">
+      <sc-for list="{{jumps}}" as="j" hint-placeholder-count="3">
+        <button onClick="{{j.pick}}" style="flex: 1 1 0; min-height: 44px; border-radius: 99px; border: 1px solid var(--line); background: {{j.bg}}; color: {{j.fg}}; font-family: inherit; font-size: 13px; font-weight: 600; padding: 0">{{j.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const total = 84;
+    const today = 24;
+    const start = new Date(2026, 9, 8);
+    const day = (this.state && this.state.day) ?? 49;
+    const limitOn = (d) => (d >= total ? 0 : Math.ceil((total - d) / 7));
+    const limit = limitOn(day);
+    const date = new Date(start.getTime());
+    date.setDate(date.getDate() + day);
+    const offset = day - today;
+
+    const xOf = (d) => 8 + (d / total) * 300;
+    const yOf = (l) => 98 - (l / 12) * 88;
+    const pathTo = (from, to) => {
+      let d = 'M' + xOf(from) + ' ' + yOf(limitOn(from));
+      for (let i = from + 1; i <= to; i++) {
+        d += ' L' + xOf(i) + ' ' + yOf(limitOn(i - 1));
+        d += ' L' + xOf(i) + ' ' + yOf(limitOn(i));
+      }
+      return d;
+    };
+
+    let reply;
+    if (day === total) reply = 'Zero. Nothing to see here. Literally.';
+    else if (day === today) reply = 'Today. The only one you can do anything about.';
+    else if (day < today) reply = 'Already happened. No refunds.';
+    else if (limit >= 8) reply = "One fewer than last week. You'll cope.";
+    else if (limit === 7) reply = 'Seven. Still plenty to complain about.';
+    else if (limit === 6) reply = "Halfway down. Don't tell your thumbs.";
+    else if (limit >= 4) reply = 'By now this feels normal. Annoyingly.';
+    else if (limit === 3) reply = "Three. You'll start planning your day around them.";
+    else if (limit === 2) reply = 'Two. Morning and night, like brushing your teeth. Worse.';
+    else reply = 'One. Choose wisely.';
+
+    const minutes = limit > 0 ? Math.round(960 / limit) : 0;
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    const gap = m === 0 ? h + ' h' : h > 0 ? h + ' h ' + m + ' min' : m + ' min';
+
+    const jump = (label, target) => ({
+      label,
+      pick: () => this.setState({ day: target }),
+      bg: day === target ? 'var(--accent)' : 'transparent',
+      fg: day === target ? 'var(--on-accent)' : 'var(--ink)',
+    });
+
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      day,
+      limit,
+      date: date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+      relative: offset === 0 ? 'Today' : offset > 0 ? 'In ' + offset + (offset === 1 ? ' day' : ' days') : -offset + (offset === -1 ? ' day ago' : ' days ago'),
+      ringDash: (limit / 12) * 100 + ' 100',
+      ringColor: day === total ? 'var(--good)' : 'var(--accent)',
+      ringLabel: limit + ' a day on this date',
+      limitCaption: day === total ? 'Vape-free' : 'a day',
+      gapLine: limit > 0 ? 'One every ' + gap : 'All day',
+      stageLine: day === total ? 'Quit date' : 'Stage ' + (Math.floor(day / 7) + 1) + ' of 12 · day ' + ((day % 7) + 1) + ' of 7',
+      reply,
+      onDay: (e) => this.setState({ day: Number(e.target.value) }),
+      futurePath: pathTo(0, total),
+      pastPath: pathTo(0, day),
+      todayX: xOf(today),
+      thumbX: xOf(day),
+      thumbY: yOf(limit),
+      jumps: [jump('Today', today), jump('Halfway', 42), jump('The end', total)],
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -37,10 +37,10 @@ class PaceGuide {
   }) {
     if (limit <= 0 || countToday >= limit) return null;
 
-    final wake = _latest(_onDay(day, window.wakeMinute), boundary.startOf(day));
+    final wake = _latest(onDay(day, window.wakeMinute), boundary.startOf(day));
     final end = boundary.endOf(day);
     final bed = _earliest(
-      _onDay(day, window.wakeMinute + window.awakeMinutes),
+      onDay(day, window.wakeMinute + window.awakeMinutes),
       end,
     );
     if (now.isBefore(wake) || !now.isBefore(end)) return null;
@@ -76,7 +76,7 @@ class PaceGuide {
   }
 
   /// [minute] may run past midnight into the next calendar date.
-  static DateTime _onDay(LogicalDay day, int minute) =>
+  static DateTime onDay(LogicalDay day, int minute) =>
       DateTime(day.year, day.month, day.day, 0, minute);
 
   static DateTime _latest(DateTime a, DateTime b) => a.isAfter(b) ? a : b;

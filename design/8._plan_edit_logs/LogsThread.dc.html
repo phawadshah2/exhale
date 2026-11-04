@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logs, the confession</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--you:#E9EEF3;--good:#00704A;--warn:#855300;--danger:#BA1A1A;--stress:#BA1A1A;--work:#855300;--meal:#00796B;--social:#1D5FD1;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--you:#242A34;--good:#4EDEA3;--warn:#FFB95F;--danger:#FFB4AB;--stress:#FFB4AB;--work:#FFB95F;--meal:#57F1DB;--social:#A9C7FF;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1200px; box-sizing: border-box; position: relative; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 96px; display: flex; flex-direction: column; gap: 8px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 6px">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+    <div style="flex-grow: 1; display: flex; flex-direction: column">
+      <span style="font-family: Manrope, sans-serif; font-size: 18px; line-height: 24px; font-weight: 600">The confession</span>
+      <span style="font-size: 12px; line-height: 16px; color: var(--muted)">Exhale · remembers everything</span>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 8px; padding-bottom: 6px; overflow: hidden">
+    <button style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 0; background: var(--accent); color: var(--on-accent); font-family: inherit; font-size: 13px; font-weight: 600; white-space: nowrap">This week · 60</button>
+    <button style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--stress); font-family: inherit; font-size: 13px; font-weight: 600; white-space: nowrap">Stress 22</button>
+    <button style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--work); font-family: inherit; font-size: 13px; font-weight: 600; white-space: nowrap">Work 14</button>
+    <button style="min-height: 44px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--meal); font-family: inherit; font-size: 13px; font-weight: 600; white-space: nowrap">After meal 11</button>
+  </div>
+
+  <sc-for list="{{items}}" as="m" hint-placeholder-count="14">
+    <div style="display: flex; flex-direction: column">
+      <sc-if value="{{m.isDay}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 8px 0 2px">
+          <span style="font-size: 12px; line-height: 16px; font-weight: 700">{{m.title}}</span>
+          <span style="font-size: 12px; line-height: 16px; font-weight: 600; color: {{m.color}}">{{m.count}}</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{m.isYou}}" hint-placeholder-val="{{true}}">
+        <button aria-label="{{m.aria}}" style="align-self: flex-end; max-width: 280px; min-height: 44px; border: 0; background: var(--you); color: var(--ink); font-family: inherit; text-align: left; border-radius: 20px 20px 6px 20px; padding: 8px 14px; display: flex; flex-direction: column; gap: 1px">
+          <span style="display: flex; align-items: center; gap: 8px">
+            <span style="font-size: 15px; line-height: 21px; font-weight: 700">{{m.time}}</span>
+            <span style="font-size: 12px; line-height: 21px; font-weight: 600; color: {{m.color}}">{{m.trigger}}</span>
+          </span>
+          <sc-if value="{{m.hasNote}}" hint-placeholder-val="{{false}}">
+            <span style="font-size: 14px; line-height: 20px">{{m.note}}</span>
+          </sc-if>
+        </button>
+      </sc-if>
+      <sc-if value="{{m.isExhale}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; align-items: flex-end; gap: 9px">
+          <span style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"></path></svg></span>
+          <span style="max-width: 280px; background: var(--accent); color: var(--on-accent); border-radius: 20px 20px 20px 6px; padding: 10px 14px; font-size: 15px; line-height: 21px">{{m.text}}</span>
+        </div>
+      </sc-if>
+    </div>
+  </sc-for>
+
+  <button style="position: absolute; left: 20px; right: 20px; bottom: 28px; min-height: 48px; border-radius: 99px; border: 0; background: var(--pill); color: var(--muted); font-family: inherit; font-size: 14px; text-align: left; padding: 0 18px; display: flex; align-items: center; justify-content: space-between">
+    <span>Forgot one? Add a missed log</span>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+  </button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const colors = { Stress: 'var(--stress)', Work: 'var(--work)', 'After meal': 'var(--meal)', Social: 'var(--social)', 'No trigger': 'var(--muted)' };
+    const base = { isDay: false, isYou: false, isExhale: false };
+    const you = (time, trigger, note) => ({ ...base, isYou: true, time, trigger, note: note || '', hasNote: Boolean(note), color: colors[trigger], aria: time + ', ' + trigger + '. Tap to edit, swipe to delete.' });
+    const day = (title, count, color) => ({ ...base, isDay: true, title, count, color });
+    const exhale = (text) => ({ ...base, isExhale: true, text });
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      items: [
+        day('Today · Sun, Nov 1', '5 of 9 · 4 left', 'var(--good)'),
+        you('3:42 PM', 'Stress', 'Deadline call ran late'),
+        exhale('Deadlines do end. Mostly.'),
+        you('1:15 PM', 'After meal'),
+        you('11:30 AM', 'Work'),
+        you('9:41 AM', 'Work', 'Stand-up ran long'),
+        you('8:02 AM', 'No trigger'),
+        exhale('No reason at all. At least you’re honest.'),
+        day('Sat, Oct 31', '9 of 9 · at limit', 'var(--warn)'),
+        you('10:48 PM', 'Social'),
+        exhale('Right on the line. Show-off.'),
+        day('Fri, Oct 30', '11 of 9 · 2 over', 'var(--danger)'),
+        you('11:05 PM', 'Stress'),
+        exhale('Two over. Tomorrow starts fresh at 9.'),
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

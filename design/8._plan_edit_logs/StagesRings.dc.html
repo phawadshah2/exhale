@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan stages, ring ladder</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--inner:#F1F4F7;--good:#00704A;--warn:#855300;--warn-bar:#B26B00;--danger:#BA1A1A;--dash:#AEB6C1;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--inner:#1E252F;--good:#4EDEA3;--warn:#FFB95F;--warn-bar:#FFB95F;--danger:#FFB4AB;--dash:#4A525E;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1900px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 32px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </button>
+    <button style="min-height: 44px; display: flex; align-items: center; background: transparent; border: 0; padding: 0; font-family: inherit">
+      <span style="padding: 5px 11px; border-radius: 99px; border: 1px solid var(--accent-text); color: var(--accent-text); font-size: 12px; font-weight: 600">Edit</span>
+    </button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.64px">You are here. Regrettably.</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">Each ring is a stage, filled by what you used. Tap one for the damage.</p>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <span style="font-size: 16px; line-height: 24px; font-weight: 600">The whole plan</span>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <sc-for list="{{totals}}" as="t" hint-placeholder-count="4">
+        <div style="background: var(--inner); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 12px; line-height: 16px; color: var(--muted)">{{t.label}}</span>
+          <span style="white-space: nowrap"><span style="font-family: Manrope, sans-serif; font-size: 20px; line-height: 28px; font-weight: 700; font-variant-numeric: tabular-nums">{{t.value}}</span><span style="font-family: Manrope, sans-serif; font-size: 13px; font-weight: 600; color: var(--muted)"> / {{t.of}}</span></span>
+          <div style="height: 4px; border-radius: 99px; background: var(--high); margin-top: 2px"><div style="height: 4px; width: {{t.pct}}%; border-radius: 99px; background: var(--accent)"></div></div>
+        </div>
+      </sc-for>
+    </div>
+    <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Without a plan: 1,008 sessions and $403.20. Nobody said it was cheap.</span>
+  </div>
+
+  <sc-for list="{{sections}}" as="sec" hint-placeholder-count="3">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; justify-content: space-between; padding: 0 4px">
+        <span style="font-size: 11px; line-height: 16px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted)">{{sec.title}}</span>
+        <span style="font-size: 12px; line-height: 16px; color: var(--muted)">{{sec.side}}</span>
+      </div>
+      <div style="background: var(--card); border-radius: 24px; border: {{sec.border}}; padding: 8px 12px; display: flex; flex-direction: column">
+        <sc-for list="{{sec.stages}}" as="s" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column">
+            <button onClick="{{s.toggle}}" aria-expanded="{{s.open}}" aria-label="{{s.aria}}" style="width: 100%; min-height: 60px; border: 0; background: transparent; color: inherit; font-family: inherit; text-align: left; padding: 6px 0; display: flex; align-items: center; gap: 12px">
+              <span style="position: relative; width: {{s.size}}px; height: {{s.size}}px; flex-shrink: 0">
+                <svg width="{{s.size}}" height="{{s.size}}" viewBox="0 0 44 44" aria-hidden="true">
+                  <circle cx="22" cy="22" r="18" fill="none" stroke="{{s.track}}" stroke-width="4" stroke-dasharray="{{s.trackDash}}"></circle>
+                  <circle cx="22" cy="22" r="18" fill="none" stroke="{{s.ring}}" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="{{s.dash}}" transform="rotate(-90 22 22)"></circle>
+                </svg>
+                <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: Manrope, sans-serif; font-size: {{s.numSize}}px; font-weight: 700; font-variant-numeric: tabular-nums">{{s.limit}}</span>
+              </span>
+              <span style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column">
+                <span style="display: flex; align-items: center; gap: 6px">
+                  <span style="font-size: 14px; line-height: 20px; font-weight: 600">Stage {{s.n}}</span>
+                  <sc-if value="{{s.isNow}}" hint-placeholder-val="{{false}}">
+                    <span style="font-size: 10px; line-height: 14px; font-weight: 700; letter-spacing: 0.08em; background: var(--accent); color: var(--on-accent); border-radius: 99px; padding: 2px 7px">NOW</span>
+                  </sc-if>
+                </span>
+                <span style="font-size: 12px; line-height: 16px; color: var(--muted)">{{s.dates}}</span>
+              </span>
+              <span style="display: flex; flex-direction: column; align-items: flex-end">
+                <span style="font-size: 14px; line-height: 20px; font-weight: 700; color: {{s.moneyColor}}; font-variant-numeric: tabular-nums">{{s.money}}</span>
+                <span style="font-size: 11px; line-height: 16px; color: var(--muted)">{{s.moneyLabel}}</span>
+              </span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; transform: rotate({{s.chevron}}deg); transition: transform 200ms"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+            <sc-if value="{{s.open}}" hint-placeholder-val="{{false}}">
+              <div style="background: var(--inner); border-radius: 16px; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 10px">
+                <sc-if value="{{s.isNow}}" hint-placeholder-val="{{false}}">
+                  <div style="display: flex; flex-direction: column; gap: 3px" role="img" aria-label="Day by day: Thursday 8 of 9, Friday 11 of 9, Saturday 9 of 9, Sunday 5 of 9 so far, then three days to come">
+                    <sc-for list="{{dotDays}}" as="d" hint-placeholder-count="7">
+                      <div style="display: flex; align-items: center; gap: 8px; height: 12px">
+                        <span style="width: 26px; font-size: 11px; line-height: 12px; font-weight: {{d.weight}}; color: {{d.labelColor}}">{{d.name}}</span>
+                        <span style="flex: 1 1 0; display: flex; gap: 4px">
+                          <sc-for list="{{d.dots}}" as="o" hint-placeholder-count="9">
+                            <span style="width: 8px; height: 8px; box-sizing: border-box; border-radius: 50%; background: {{o.fill}}; border: {{o.border}}"></span>
+                          </sc-for>
+                        </span>
+                        <span style="font-size: 11px; line-height: 12px; font-weight: 600; color: {{d.countColor}}; font-variant-numeric: tabular-nums">{{d.count}}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11px; line-height: 14px; color: var(--muted)">
+                    <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent)"></span>Used</span>
+                    <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--good)"></span>Skipped</span>
+                    <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--danger)"></span>Over</span>
+                    <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--dash)"></span>To come</span>
+                  </div>
+                </sc-if>
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px">
+                  <sc-for list="{{s.stats}}" as="st" hint-placeholder-count="4">
+                    <div style="display: flex; flex-direction: column; gap: 1px">
+                      <span style="font-size: 11px; line-height: 14px; color: var(--muted)">{{st.label}}</span>
+                      <span style="font-size: 14px; line-height: 20px; font-weight: 600; color: {{st.color}}">{{st.value}}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <span style="font-size: 12px; line-height: 18px; color: var(--muted)">{{s.note}}</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+
+  <div style="display: flex; align-items: center; gap: 12px; padding: 0 16px">
+    <span style="width: 44px; height: 44px; box-sizing: border-box; border-radius: 50%; border: 4px solid var(--good); color: var(--good); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4M6 4h11l-2 4 2 4H6"></path></svg></span>
+    <div style="display: flex; flex-direction: column">
+      <span style="font-size: 14px; line-height: 20px; font-weight: 600">Vape-free from Dec 31</span>
+      <span style="font-size: 12px; line-height: 18px; color: var(--muted)">60 days to go. Then this ring stays full.</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const opened = (this.state && this.state.opened) ?? [4];
+    const price = 0.4;
+    const baseline = 12;
+    const money = (units) => '$' + (units * price).toFixed(2);
+    const gapOf = (l) => {
+      const minutes = Math.round(960 / l);
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      return m === 0 ? h + ' h' : h + ' h ' + m + ' min';
+    };
+    const dates = ['Oct 8 – 14', 'Oct 15 – 21', 'Oct 22 – 28', 'Oct 29 – Nov 4', 'Nov 5 – 11', 'Nov 12 – 18', 'Nov 19 – 25', 'Nov 26 – Dec 2', 'Dec 3 – 9', 'Dec 10 – 16', 'Dec 17 – 23', 'Dec 24 – 30'];
+    const past = {
+      1: { used: 79, over: 1, avg: '11.3', trigger: 'Stress', note: 'The easy one. It was meant to be.' },
+      2: { used: 78, over: 2, avg: '11.1', trigger: 'Work', note: 'One over for the whole stage. Bold.' },
+      3: { used: 66, over: 1, avg: '9.4', trigger: 'After meal', note: 'Your best so far. Try not to let it go to your head.' },
+    };
+    const futureNotes = { 5: 'One fewer. You have survived worse Mondays.', 7: 'Halfway down. Don’t tell your thumbs.', 12: 'The last one. Literally.' };
+
+    const build = (n) => {
+      const l = 13 - n;
+      const allowed = l * 7;
+      const isDone = n < 4;
+      const isNow = n === 4;
+      const open = opened.includes(n);
+      const p = past[n];
+      const used = isNow ? 33 : p ? p.used : 0;
+      const fill = Math.min(100, Math.round((used / allowed) * 100));
+      let stats;
+      let note;
+      if (isNow) {
+        stats = [
+          { label: 'Sessions', value: '33 of 63 used', color: 'inherit' },
+          { label: 'Days over', value: '1 so far', color: 'var(--warn)' },
+        ];
+        note = 'Drops to 8 in 4 days. Try to look surprised.';
+      } else if (isDone) {
+        stats = [
+          { label: 'Sessions', value: p.used + ' of ' + allowed + ' used', color: p.used > allowed ? 'var(--warn)' : 'inherit' },
+          { label: 'Days over', value: p.over + ' of 7', color: 'var(--warn)' },
+          { label: 'Average', value: p.avg + ' a day', color: 'inherit' },
+          { label: 'Mostly', value: p.trigger, color: 'inherit' },
+        ];
+        note = p.note;
+      } else {
+        stats = [
+          { label: 'Sessions', value: allowed + ' allowed', color: 'inherit' },
+          { label: 'Pace', value: 'One every ' + gapOf(l), color: 'inherit' },
+          { label: 'To avoid', value: ((baseline - l) * 7) + ' sessions', color: 'inherit' },
+          { label: 'Starts', value: 'In ' + (4 + (n - 5) * 7) + ' days', color: 'inherit' },
+        ];
+        note = futureNotes[n] || 'Already written. Nothing to do yet.';
+      }
+      return {
+        n,
+        limit: l,
+        dates: isNow ? d4 : dates[n - 1],
+        isNow,
+        open,
+        stats,
+        note,
+        size: isNow ? 56 : 44,
+        numSize: isNow ? 18 : 14,
+        track: isDone || isNow ? 'var(--high)' : 'var(--dash)',
+        trackDash: isDone || isNow ? 'none' : '3 3',
+        ring: used === 0 ? 'transparent' : used > allowed ? 'var(--warn-bar)' : 'var(--accent)',
+        dash: fill + ' 100',
+        money: isNow ? '$6.00' : p ? money(baseline * 7 - p.used) : money((baseline - l) * 7),
+        moneyLabel: isNow ? 'of $8.40' : isDone ? 'saved' : 'to save',
+        moneyColor: isDone || isNow ? 'var(--good)' : 'var(--muted)',
+        chevron: open ? 180 : 0,
+        aria: 'Stage ' + n + ', ' + l + ' a day',
+        toggle: () => this.setState({ opened: open ? opened.filter((x) => x !== n) : [...opened, n] }),
+      };
+    };
+    const d4 = dates[3] + ' · day 4 of 7';
+    const range = (a, b) => {
+      const out = [];
+      for (let n = a; n <= b; n++) out.push(build(n));
+      return out;
+    };
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      // One row per day of the current stage, against its limit of 9.
+      dotDays: [['Thu', 8], ['Fri', 11], ['Sat', 9], ['Sun', 5, true], ['Mon'], ['Tue'], ['Wed']].map(([name, used, isToday]) => {
+        const dots = [];
+        const past = used !== undefined && !isToday;
+        const count = Math.max(9, used || 0);
+        for (let i = 0; i < count; i++) {
+          let fill = 'transparent';
+          let border = '1.5px solid var(--dash)';
+          if (used !== undefined && i >= 9) { fill = 'var(--danger)'; border = '0'; }
+          else if (used !== undefined && i < used) { fill = 'var(--accent)'; border = '0'; }
+          else if (past) { fill = 'var(--good)'; border = '0'; }
+          dots.push({ fill, border });
+        }
+        return {
+          name,
+          dots,
+          weight: isToday ? 800 : 600,
+          labelColor: isToday ? 'var(--ink)' : 'var(--muted)',
+          count: used === undefined ? '' : used + '/9',
+          countColor: used > 9 ? 'var(--danger)' : 'var(--muted)',
+        };
+      }),
+      totals: [
+        { label: 'Sessions used', value: '256', of: '546', pct: 47 },
+        { label: 'Sessions avoided', value: '44', of: '462', pct: 10 },
+        { label: 'Money saved', value: '$17.60', of: '$184.80', pct: 10 },
+        { label: 'Days kept', value: '19', of: '24', pct: 79 },
+      ],
+      sections: [
+        { title: 'BEHIND YOU', side: '$11.60 saved', border: '1px solid var(--card-line)', stages: range(1, 3) },
+        { title: 'YOU, REGRETTABLY', side: 'Stage 4 of 12', border: '2px solid var(--accent)', stages: range(4, 4) },
+        { title: 'AHEAD OF YOU', side: '$168.00 to save', border: '1px solid var(--card-line)', stages: range(5, 12) },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

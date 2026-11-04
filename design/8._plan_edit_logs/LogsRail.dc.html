@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logs, the day's rail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--inner:#F1F4F7;--good:#00704A;--warn:#855300;--danger:#BA1A1A;--stress:#BA1A1A;--work:#855300;--meal:#00796B;--dash:#AEB6C1;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--inner:#1E252F;--good:#4EDEA3;--warn:#FFB95F;--danger:#FFB4AB;--stress:#FFB4AB;--work:#FFB95F;--meal:#57F1DB;--dash:#5A6370;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1200px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 28px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+    <button aria-label="Add a missed log" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.64px">Your day, on the record.</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">The gaps are the good part. Mind them.</p>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 8px 8px 12px; display: flex; flex-direction: column; gap: 6px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <button aria-label="Previous day" style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink); padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <span style="font-size: 14px; line-height: 20px; font-weight: 600">Today · Sun, Nov 1</span>
+        <span style="font-size: 12px; line-height: 16px; color: var(--muted)">5 of 9 · 4 left · longest gap 2 h 27</span>
+      </div>
+      <button aria-label="Next day" disabled style="width: 44px; height: 44px; border: 0; background: transparent; color: var(--line); padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+    </div>
+    <div style="display: flex; gap: 4px; padding: 0 8px" role="img" aria-label="5 of 9 used">
+      <sc-for list="{{slots}}" as="s" hint-placeholder-count="9">
+        <span style="flex: 1 1 0; height: 6px; border-radius: 99px; background: {{s.c}}"></span>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column">
+    <sc-for list="{{rail}}" as="n" hint-placeholder-count="12">
+      <div style="display: flex; gap: 12px; align-items: stretch">
+        <div style="width: 40px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center">
+          <sc-if value="{{n.isLog}}" hint-placeholder-val="{{true}}">
+            <span style="width: 40px; height: 40px; border-radius: 14px; background: var(--pill); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{n.color}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.icon}}"></path></svg></span>
+          </sc-if>
+          <sc-if value="{{n.isMark}}" hint-placeholder-val="{{false}}">
+            <span style="width: 12px; height: 12px; box-sizing: border-box; border-radius: 50%; border: 2px solid {{n.markColor}}; margin: 4px 0; flex-shrink: 0"></span>
+          </sc-if>
+          <sc-if value="{{n.hasLine}}" hint-placeholder-val="{{true}}">
+            <span style="flex-grow: 1; min-height: 8px; width: 0; border-left: 2px {{n.lineStyle}} {{n.lineColor}}"></span>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{n.isLog}}" hint-placeholder-val="{{true}}">
+          <button style="flex: 1 1 0; min-width: 0; min-height: 44px; border: 0; background: transparent; color: inherit; font-family: inherit; text-align: left; padding: 0 0 2px; display: flex; flex-direction: column; justify-content: center">
+            <span style="display: flex; justify-content: space-between; gap: 8px">
+              <span style="font-size: 15px; line-height: 20px; font-weight: 700">{{n.time}}</span>
+              <span style="font-size: 12px; line-height: 20px; font-weight: 600; color: {{n.color}}">{{n.trigger}}</span>
+            </span>
+            <span style="font-size: 12px; line-height: 16px; color: var(--muted)">{{n.note}}</span>
+          </button>
+        </sc-if>
+
+        <sc-if value="{{n.isMark}}" hint-placeholder-val="{{false}}">
+          <div style="flex: 1 1 0; display: flex; justify-content: space-between; gap: 8px; padding-bottom: 6px; font-size: 12px; line-height: 20px; color: var(--muted)">
+            <span style="font-weight: 600">{{n.label}}</span>
+            <span>{{n.time}}</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{n.isGap}}" hint-placeholder-val="{{false}}">
+          <div style="flex: 1 1 0; display: flex; align-items: center; gap: 8px; min-height: {{n.h}}px; font-size: 12px; line-height: 16px; color: {{n.gapColor}}; font-weight: {{n.gapWeight}}">{{n.label}}</div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <button style="min-height: 44px; border-radius: 99px; border: 1.5px dashed var(--dash); background: transparent; color: var(--muted); font-family: inherit; font-size: 13px; font-weight: 600">Forgot one? Add a missed log</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const kinds = {
+      Stress: { color: 'var(--stress)', icon: 'M13 2L4 14h7l-1 8 9-12h-7z' },
+      Work: { color: 'var(--work)', icon: 'M3 7h18v13H3zM9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2' },
+      'After meal': { color: 'var(--meal)', icon: 'M7 3v7a2 2 0 0 0 4 0V3M9 10v11M17 3c-2 2-2 6 0 8v10' },
+      None: { color: 'var(--muted)', icon: 'M5 12h14' },
+    };
+    const solid = { hasLine: true, lineStyle: 'solid', lineColor: 'var(--line)' };
+    const dashed = { hasLine: true, lineStyle: 'dashed', lineColor: 'var(--dash)' };
+    const log = (time, trigger, note) => ({ isLog: true, isMark: false, isGap: false, time, trigger: trigger === 'None' ? 'No trigger' : trigger, note: note || 'No note', ...solid, hasLine: false, ...kinds[trigger] });
+    const gap = (label, h, best) => ({ isLog: false, isMark: false, isGap: true, label, h, gapColor: best ? 'var(--good)' : 'var(--muted)', gapWeight: best ? 700 : 500, ...solid });
+    const mark = (label, time, line, color) => ({ isLog: false, isMark: true, isGap: false, label, time, markColor: color, ...line });
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      slots: [0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => ({ c: i < 5 ? 'var(--accent)' : 'var(--high)' })),
+      rail: [
+        mark('Woke up', '7:30 AM', solid, 'var(--muted)'),
+        gap('32 min. Before coffee, was it?', 28),
+        log('8:02 AM', 'None'),
+        gap('1 h 39', 40),
+        log('9:41 AM', 'Work', 'Stand-up ran long'),
+        gap('1 h 49', 44),
+        log('11:30 AM', 'Work'),
+        gap('1 h 45', 42),
+        log('1:15 PM', 'After meal'),
+        gap('2 h 27. Longest today. Frame it.', 58, true),
+        log('3:42 PM', 'Stress', 'Deadline call ran late'),
+        { ...mark('Next on schedule', '4:54 PM', dashed, 'var(--accent)') },
+        gap('Nothing here yet. Keep it that way.', 44),
+        { ...mark('Bed', '11:30 PM', { hasLine: false }, 'var(--muted)') },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

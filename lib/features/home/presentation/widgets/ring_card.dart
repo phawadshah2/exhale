@@ -16,12 +16,14 @@ import 'package:exhale/features/habit/presentation/providers/habit_providers.dar
 import 'package:exhale/features/home/domain/pace_guide.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
 import 'package:exhale/features/home/presentation/providers/next_log_timer_provider.dart';
+import 'package:exhale/features/home/presentation/providers/stage_card_provider.dart';
 import 'package:exhale/features/home/presentation/widgets/backward_pager.dart';
 import 'package:exhale/features/home/presentation/widgets/day_triggers.dart';
 import 'package:exhale/features/home/presentation/widgets/draining_ring.dart';
 import 'package:exhale/features/home/presentation/widgets/pace_text.dart';
 import 'package:exhale/features/home/presentation/widgets/progress_ring.dart';
 import 'package:exhale/features/home/presentation/widgets/quit_reached_card.dart';
+import 'package:exhale/features/home/presentation/widgets/stage_cards.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
@@ -68,6 +70,7 @@ class RingCard extends ConsumerWidget {
     final pageCount = today.daysSince(earliest) + 1;
     final picker = ref.read(ringDayProvider(habitId).notifier);
     final logs = ref.watch(logsForDayProvider((habitId: habitId, day: day)));
+    final stageCard = ref.watch(stageCardProvider(habitId));
 
     void step(int days) {
       unawaited(HapticFeedback.selectionClick());
@@ -196,7 +199,17 @@ class RingCard extends ConsumerWidget {
                       child: PaceText(habitId: habitId),
                     ),
                     _Reveal(
-                      show: isToday && ref.watch(quitCardDueProvider(habitId)),
+                      show: isToday && stageCard != null,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.md),
+                        child: StageCards(habitId: habitId),
+                      ),
+                    ),
+                    _Reveal(
+                      show:
+                          isToday &&
+                          stageCard == null &&
+                          ref.watch(quitCardDueProvider(habitId)),
                       child: Padding(
                         padding: const EdgeInsets.only(top: AppSpacing.md),
                         child: QuitReachedCard(habitId: habitId),
@@ -786,7 +799,6 @@ class _InfoCell extends StatelessWidget {
     final text = context.textTheme;
     final (icon, label, value) = cell;
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: AppSpacing.sm,
       children: [
         Icon(icon, size: 20, color: colors.primary),

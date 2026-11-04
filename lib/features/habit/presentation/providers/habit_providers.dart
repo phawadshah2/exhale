@@ -1,9 +1,11 @@
 import 'package:exhale/core/di/injection_container.dart';
+import 'package:exhale/features/habit/domain/entities/price_history.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
 import 'package:exhale/features/habit/domain/usecases/add_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/archive_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/change_habit.dart';
+import 'package:exhale/features/habit/domain/usecases/set_habit_price.dart';
 import 'package:exhale/features/habit/domain/usecases/start_tracking.dart';
 import 'package:exhale/features/habit/domain/usecases/update_habit.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +18,10 @@ final habitRepositoryProvider = Provider<HabitRepository>(
 final addHabitProvider = Provider<AddHabit>((ref) => sl<AddHabit>());
 
 final updateHabitProvider = Provider<UpdateHabit>((ref) => sl<UpdateHabit>());
+
+final setHabitPriceProvider = Provider<SetHabitPrice>(
+  (ref) => sl<SetHabitPrice>(),
+);
 
 final archiveHabitProvider = Provider<ArchiveHabit>(
   (ref) => sl<ArchiveHabit>(),
@@ -41,6 +47,19 @@ final ProviderFamily<TrackedHabit?, int> habitProvider =
           ?.where((habit) => habit.id == id)
           .firstOrNull,
     );
+
+/// An active habit's prices over time; null until the habit is loaded.
+final StreamProviderFamily<PriceHistory?, int> priceHistoryProvider =
+    StreamProvider.family<PriceHistory?, int>((ref, habitId) {
+      final habit = ref.watch(
+        habitProvider(habitId).select((tracked) => tracked?.habit),
+      );
+      if (habit == null) return Stream.value(null);
+      return ref
+          .watch(habitRepositoryProvider)
+          .watchPrices(habitId)
+          .map((points) => PriceHistory.forHabit(habit, points));
+    });
 
 /// The habit Home shows until it lists several: the oldest active one.
 final primaryHabitProvider = Provider<TrackedHabit?>(

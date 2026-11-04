@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logs, ring strip</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--inner:#F1F4F7;--good:#00704A;--warn:#B26B00;--danger:#BA1A1A;--stress:#BA1A1A;--work:#855300;--meal:#00796B;--social:#1D5FD1;--dash:#AEB6C1;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--inner:#1E252F;--good:#4EDEA3;--warn:#FFB95F;--danger:#FFB4AB;--stress:#FFB4AB;--work:#FFB95F;--meal:#57F1DB;--social:#A9C7FF;--dash:#5A6370;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1100px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 28px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+    <button aria-label="Add a missed log" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.64px">Pick a day. Any day.</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">They're all on the record.</p>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 12px 10px; display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <button aria-label="Previous week" style="width: 44px; height: 36px; border: 0; background: transparent; color: var(--ink); padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+      <span style="font-size: 14px; font-weight: 600">60 of 66 this week</span>
+      <button aria-label="Open the month" style="min-height: 36px; padding: 0 8px; border: 0; background: transparent; color: var(--accent-text); font-family: inherit; font-size: 12px; font-weight: 700">Month</button>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr))">
+      <sc-for list="{{week}}" as="d" hint-placeholder-count="7">
+        <button aria-label="{{d.aria}}" style="min-height: 72px; border: 0; border-radius: 14px; background: {{d.bg}}; color: var(--ink); font-family: inherit; padding: 6px 0; display: flex; flex-direction: column; align-items: center; gap: 4px">
+          <span style="font-size: 11px; line-height: 14px; font-weight: 600; color: var(--muted)">{{d.name}}</span>
+          <span style="position: relative; width: 36px; height: 36px">
+            <svg width="36" height="36" viewBox="0 0 44 44" aria-hidden="true">
+              <circle cx="22" cy="22" r="18" fill="none" stroke="var(--high)" stroke-width="5"></circle>
+              <circle cx="22" cy="22" r="18" fill="none" stroke="{{d.ring}}" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="{{d.dash}}" transform="rotate(-90 22 22)"></circle>
+            </svg>
+            <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700">{{d.date}}</span>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between">
+      <div style="display: flex; flex-direction: column">
+        <span style="font-size: 13px; line-height: 18px; color: var(--muted)">Today · Sun, Nov 1</span>
+        <span><span style="font-family: Manrope, sans-serif; font-size: 36px; line-height: 44px; font-weight: 700; letter-spacing: -0.72px">5</span><span style="font-family: Manrope, sans-serif; font-size: 18px; font-weight: 600; color: var(--muted)"> / 9 allowed</span></span>
+      </div>
+      <span style="font-size: 12px; font-weight: 700; color: var(--good); background: color-mix(in srgb, var(--good) 12%, transparent); border: 1px solid color-mix(in srgb, var(--good) 40%, transparent); border-radius: 99px; padding: 4px 10px">4 left</span>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <sc-for list="{{chips}}" as="c" hint-placeholder-count="4">
+        <button style="min-height: 36px; font-family: inherit; font-size: 12px; font-weight: 600; color: {{c.color}}; background: color-mix(in srgb, {{c.color}} 10%, transparent); border: 1px solid color-mix(in srgb, {{c.color}} 35%, transparent); border-radius: 99px; padding: 0 10px">{{c.label}} · {{c.count}}</button>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-direction: column">
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+        <button style="min-height: 60px; border: 0; border-top: 1px solid var(--line); background: transparent; color: inherit; font-family: inherit; text-align: left; padding: 8px 0; display: flex; align-items: center; gap: 12px">
+          <span style="width: 40px; height: 40px; border-radius: 14px; background: var(--pill); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{r.color}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{r.icon}}"></path></svg></span>
+          <span style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column">
+            <span style="font-size: 15px; line-height: 20px; font-weight: 700">{{r.time}}</span>
+            <span style="font-size: 12px; line-height: 16px; color: var(--muted)">{{r.note}}</span>
+          </span>
+          <span style="font-size: 12px; font-weight: 600; color: {{r.color}}">{{r.trigger}}</span>
+        </button>
+      </sc-for>
+      <button style="min-height: 44px; margin-top: 4px; border-radius: 14px; border: 1.5px dashed var(--dash); background: transparent; color: var(--muted); font-family: inherit; font-size: 13px; font-weight: 600">Forgot one? Add a missed log</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const kinds = {
+      Stress: { color: 'var(--stress)', icon: 'M13 2L4 14h7l-1 8 9-12h-7z' },
+      Work: { color: 'var(--work)', icon: 'M3 7h18v13H3zM9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2' },
+      'After meal': { color: 'var(--meal)', icon: 'M7 3v7a2 2 0 0 0 4 0V3M9 10v11M17 3c-2 2-2 6 0 8v10' },
+      None: { color: 'var(--muted)', icon: 'M5 12h14' },
+    };
+    const row = (time, trigger, note) => ({ time, trigger, note: note || 'No note', ...kinds[trigger] });
+    const days = [['M', 26, 9, 10], ['T', 27, 8, 10], ['W', 28, 10, 10], ['T', 29, 8, 9], ['F', 30, 11, 9], ['S', 31, 9, 9], ['S', 1, 5, 9]];
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      week: days.map(([name, date, used, limit], i) => ({
+        name,
+        date,
+        bg: i === 6 ? 'var(--pill)' : 'transparent',
+        dash: Math.min(100, (used / limit) * 100) + ' 100',
+        ring: used > limit ? 'var(--danger)' : used === limit ? 'var(--warn)' : 'var(--accent)',
+        aria: date + ', ' + used + ' of ' + limit,
+      })),
+      chips: [
+        { label: 'Work', count: 2, color: 'var(--work)' },
+        { label: 'Stress', count: 1, color: 'var(--stress)' },
+        { label: 'After meal', count: 1, color: 'var(--meal)' },
+        { label: 'None', count: 1, color: 'var(--muted)' },
+      ],
+      rows: [row('3:42 PM', 'Stress', 'Deadline call ran late'), row('1:15 PM', 'After meal'), row('11:30 AM', 'Work'), row('9:41 AM', 'Work'), row('8:02 AM', 'None')],
+    };
+  }
+}
+</script>
+</body>
+</html>

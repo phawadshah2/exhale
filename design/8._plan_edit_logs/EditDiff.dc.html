@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Edit plan, before and after</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--inner:#F1F4F7;--good:#00704A;--warn:#855300;--dash:#AEB6C1;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--inner:#1E252F;--good:#4EDEA3;--warn:#FFB95F;--dash:#5A6370;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 1140px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 28px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; gap: 12px">
+    <button aria-label="Back" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+    </button>
+    <span style="font-family: Manrope, sans-serif; font-size: 18px; line-height: 26px; font-weight: 600">Edit plan</span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: Manrope, sans-serif; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -0.64px">Renegotiating, are we?</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--muted)">Changes start today. The past stays on the record.</p>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; gap: 14px; font-size: 12px; line-height: 16px; color: var(--muted)">
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 0; border-top: 2px dashed var(--dash)"></span>The old deal</span>
+      <span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 3px; border-radius: 2px; background: var(--accent)"></span>The new one</span>
+    </div>
+    <svg width="316" height="130" viewBox="0 0 316 130" role="img" aria-label="{{chartLabel}}" style="align-self: center">
+      <path d="{{oldPath}}" fill="none" stroke="var(--dash)" stroke-width="2" stroke-dasharray="4 4" stroke-linejoin="round"></path>
+      <path d="{{newPath}}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"></path>
+    </svg>
+    <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--muted)">
+      <span>Today</span>
+      <span>{{endLabel}}</span>
+    </div>
+
+    <div style="height: 1px; background: var(--line)"></div>
+
+    <sc-for list="{{diffs}}" as="d" hint-placeholder-count="3">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px">
+        <span style="font-size: 13px; line-height: 20px; color: var(--muted)">{{d.label}}</span>
+        <span style="font-size: 14px; line-height: 20px; white-space: nowrap"><span style="color: var(--muted)">{{d.from}}</span><span style="color: var(--muted)"> → </span><span style="font-weight: 700">{{d.to}}</span></span>
+      </div>
+    </sc-for>
+
+    <span style="align-self: flex-end; max-width: 280px; background: var(--accent); color: var(--on-accent); border-radius: 20px 20px 6px 20px; padding: 10px 14px; font-size: 14px; line-height: 20px; margin-top: 4px">{{reply}}</span>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <div style="display: flex; flex-direction: column">
+        <span style="font-size: 16px; line-height: 24px; font-weight: 600">Daily limit from today</span>
+        <span style="font-size: 12px; line-height: 18px; color: var(--muted)">sessions on a normal day</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px">
+        <button onClick="{{dec}}" aria-label="Fewer" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); font-size: 22px; line-height: 1; padding: 0">−</button>
+        <span style="width: 34px; text-align: center; font-family: Manrope, sans-serif; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums">{{limit}}</span>
+        <button onClick="{{inc}}" aria-label="More" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pill); color: var(--ink); font-size: 22px; line-height: 1; padding: 0">+</button>
+      </div>
+    </div>
+    <div style="height: 1px; background: var(--line)"></div>
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <span style="font-size: 16px; line-height: 24px; font-weight: 600">Quit date</span>
+        <button style="min-height: 44px; margin: -10px 0; border: 0; background: transparent; color: var(--accent-text); font-family: inherit; font-size: 14px; font-weight: 700; padding: 0">{{quitLabel}} ›</button>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{presets}}" as="p" hint-placeholder-count="4">
+          <button onClick="{{p.pick}}" style="min-height: 44px; border-radius: 99px; border: 1px solid {{p.border}}; background: {{p.bg}}; color: {{p.fg}}; font-family: inherit; font-size: 13px; font-weight: 600; padding: 0">{{p.label}}</button>
+        </sc-for>
+      </div>
+      <sc-if value="{{steep}}" hint-placeholder-val="{{false}}">
+        <span style="font-size: 12px; line-height: 18px; font-weight: 600; color: var(--warn)">That's more than one fewer a day. A later date may feel easier.</span>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 2px 16px; display: flex; flex-direction: column">
+    <button style="min-height: 48px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: inherit; font-family: inherit; display: flex; align-items: center; justify-content: space-between; padding: 0; font-size: 14px"><span style="font-weight: 600">Price</span><span style="color: var(--muted)">$8.00 a pack · 20 sessions ›</span></button>
+    <button style="min-height: 48px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: inherit; font-family: inherit; display: flex; align-items: center; justify-content: space-between; padding: 0; font-size: 14px"><span style="font-weight: 600">Your why</span><span style="color: var(--muted)">Morning runs ›</span></button>
+    <button style="min-height: 48px; border: 0; background: transparent; color: inherit; font-family: inherit; display: flex; align-items: center; justify-content: space-between; padding: 0; font-size: 14px"><span style="font-weight: 600">Change habit</span><span style="color: var(--muted)">Vaping ›</span></button>
+  </div>
+
+  <button style="min-height: 56px; border-radius: 99px; border: 0; background: var(--accent); color: var(--on-accent); font-family: inherit; font-size: 16px; font-weight: 600">Shake on it again</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":1140}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const limit = s.limit ?? 9;
+    const preset = s.preset ?? '16 weeks';
+    const today = new Date(2026, 10, 1);
+    const oldDays = 60;
+    const days = { 'Keep current': oldDays, Suggested: Math.min(90, Math.max(14, limit * 7)), '8 weeks': 56, '16 weeks': 112 }[preset];
+    const fmt = (n) => {
+      const d = new Date(today.getTime());
+      d.setDate(d.getDate() + n);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+    const newAt = (d) => (d >= days ? 0 : Math.ceil((limit * (days - d)) / days));
+    const oldAt = (d) => (d >= oldDays ? 0 : Math.ceil((oldDays - d) / 7));
+    const span = Math.max(days, oldDays);
+    const top = Math.max(limit, 9);
+    const x = (d) => 4 + (d / span) * 308;
+    const y = (l) => 124 - (l / top) * 116;
+    const path = (at, end) => {
+      let p = 'M' + x(0) + ' ' + y(at(0));
+      for (let d = 1; d <= end; d++) p += ' L' + x(d) + ' ' + y(at(d - 1)) + ' L' + x(d) + ' ' + y(at(d));
+      return p;
+    };
+    let left = 0;
+    for (let d = 0; d < days; d++) left += newAt(d);
+    const oldLeft = 288;
+    const rate = days / limit;
+    const money = (n) => '$' + (n * 0.4).toFixed(2);
+    const move = (n) => () => this.setState({ limit: Math.min(80, Math.max(1, limit + n)) });
+
+    let reply;
+    if (days > oldDays) reply = "Later. Sure. It's not like it's going anywhere.";
+    else if (days < oldDays) reply = 'Sooner? Look at you. I will hold you to it.';
+    else if (limit < 9) reply = 'Fewer, same date. Brave. I will remember this.';
+    else if (limit > 9) reply = 'More, same date. The maths gets steeper, not kinder.';
+    else reply = "That's the same deal. Just visiting?";
+
+    return {
+      themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink'),
+      limit,
+      reply,
+      steep: rate < 1,
+      dec: move(-1),
+      inc: move(1),
+      quitLabel: fmt(days),
+      endLabel: fmt(span),
+      oldPath: path(oldAt, oldDays),
+      newPath: path(newAt, days),
+      chartLabel: 'New plan from ' + limit + ' a day to zero on ' + fmt(days) + ', against the old one ending ' + fmt(oldDays),
+      diffs: [
+        { label: 'Vape-free from', from: fmt(oldDays), to: fmt(days) },
+        { label: 'One fewer every', from: '7 days', to: Math.round(rate) + (Math.round(rate) === 1 ? ' day' : ' days') },
+        { label: 'Sessions left', from: String(oldLeft), to: String(left) },
+        { label: 'Spend until then', from: money(oldLeft), to: money(left) },
+      ],
+      presets: ['Keep current', 'Suggested', '8 weeks', '16 weeks'].map((label) => ({
+        label,
+        pick: () => this.setState({ preset: label }),
+        bg: preset === label ? 'var(--accent)' : 'transparent',
+        fg: preset === label ? 'var(--on-accent)' : 'var(--ink)',
+        border: preset === label ? 'var(--accent)' : 'var(--line)',
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

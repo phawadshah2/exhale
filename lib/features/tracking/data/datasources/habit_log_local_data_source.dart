@@ -26,24 +26,33 @@ class HabitLogLocalDataSource {
             ..where(_database.habits.archivedAt.isNull()),
         );
 
+  SimpleSelectStatement<$HabitLogsTable, HabitLogRow> _inRange(
+    DateTime from,
+    DateTime to,
+    int? habitId,
+  ) => _database.select(_database.habitLogs)
+    ..where(
+      (row) =>
+          _ofHabit(row, habitId) &
+          row.loggedAt.isBiggerOrEqualValue(from) &
+          row.loggedAt.isSmallerThanValue(to),
+    )
+    ..orderBy([
+      (row) => OrderingTerm.asc(row.loggedAt),
+      (row) => OrderingTerm.asc(row.id),
+    ]);
+
   Stream<List<HabitLogRow>> watchLogs({
     required DateTime from,
     required DateTime to,
     int? habitId,
-  }) {
-    final query = _database.select(_database.habitLogs)
-      ..where(
-        (row) =>
-            _ofHabit(row, habitId) &
-            row.loggedAt.isBiggerOrEqualValue(from) &
-            row.loggedAt.isSmallerThanValue(to),
-      )
-      ..orderBy([
-        (row) => OrderingTerm.asc(row.loggedAt),
-        (row) => OrderingTerm.asc(row.id),
-      ]);
-    return query.watch();
-  }
+  }) => _inRange(from, to, habitId).watch();
+
+  Future<List<HabitLogRow>> getLogs({
+    required DateTime from,
+    required DateTime to,
+    int? habitId,
+  }) => _inRange(from, to, habitId).get();
 
   SimpleSelectStatement<$HabitLogsTable, HabitLogRow> _newest(
     int? habitId,

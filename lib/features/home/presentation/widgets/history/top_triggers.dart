@@ -29,7 +29,6 @@ class TopTriggers extends StatelessWidget {
     final text = context.textTheme;
 
     return Container(
-      padding: const EdgeInsets.only(top: 12),
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: colors.outlineVariant)),
       ),
@@ -53,7 +52,7 @@ class TopTriggers extends StatelessWidget {
                 behavior: HitTestBehavior.opaque,
                 onTap: onAll,
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 44),
+                  constraints: const BoxConstraints(minHeight: 34),
                   child: Align(
                     alignment: Alignment.centerRight,
                     widthFactor: 1,
@@ -70,8 +69,7 @@ class TopTriggers extends StatelessWidget {
             ],
           ),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: 6,
             children: [
               for (var i = 0; i < top.length; i++)
                 _Chip(
@@ -102,11 +100,11 @@ class _Chip extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 44),
+        constraints: const BoxConstraints(minHeight: 34),
         child: Center(
           widthFactor: 1,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
               border: Border.all(color: color.withValues(alpha: 0.35)),
@@ -114,7 +112,7 @@ class _Chip extends StatelessWidget {
             ),
             child: Text(
               label,
-              style: context.textTheme.labelMedium?.copyWith(
+              style: context.textTheme.labelSmall?.copyWith(
                 color: color,
                 fontWeight: FontWeight.w600,
               ),

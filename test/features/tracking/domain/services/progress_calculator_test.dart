@@ -1,9 +1,12 @@
 import 'package:exhale/core/domain/time/day_boundary.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/domain/entities/price_history.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
+import 'package:exhale/features/tracking/domain/entities/home_stats.dart';
 import 'package:exhale/features/tracking/domain/entities/period_range.dart';
 import 'package:exhale/features/tracking/domain/entities/period_summary.dart';
 import 'package:exhale/features/tracking/domain/services/progress_calculator.dart';
@@ -169,6 +172,10 @@ void main() {
   });
 
   group('homeStats', () {
+    final fiftyCents = PriceHistory.forHabit(Habit.caffeine, [
+      PricePoint(fromDay: start, priceCents: 50, unitsPerContainer: 20),
+    ]);
+
     List<DailyProgress> days(List<int> counts) => [
       for (var i = 0; i < counts.length; i++)
         DailyProgress(
@@ -183,7 +190,9 @@ void main() {
         days: days([0]),
         history: history,
         today: start,
-        unitPriceCents: 72.5,
+        prices: PriceHistory.forHabit(Habit.smoking, [
+          PricePoint(fromDay: start, priceCents: 1450, unitsPerContainer: 20),
+        ]),
       );
 
       expect(stats.dayNumber, 1);
@@ -199,7 +208,7 @@ void main() {
         days: days([5, 12, 6, 7, 3]),
         history: history,
         today: start.addDays(4),
-        unitPriceCents: null,
+        prices: null,
       );
 
       expect(stats.dayNumber, 5);
@@ -220,7 +229,7 @@ void main() {
         ],
         history: history,
         today: start.addDays(4),
-        unitPriceCents: null,
+        prices: null,
       );
 
       expect(stats.freeDays, 2);
@@ -234,7 +243,7 @@ void main() {
         ],
         history: history,
         today: start.addDays(1),
-        unitPriceCents: null,
+        prices: null,
       );
 
       expect(stats.freeDays, 1);
@@ -245,7 +254,7 @@ void main() {
         days: days([5, 6, 10]),
         history: history,
         today: start.addDays(2),
-        unitPriceCents: null,
+        prices: null,
       );
 
       expect(stats.streakDays, 0);
@@ -256,7 +265,7 @@ void main() {
         days: days([6, 6, 6, 1]),
         history: history,
         today: start.addDays(3),
-        unitPriceCents: 50,
+        prices: fiftyCents,
       );
 
       expect(stats.recentAverage, 6);
@@ -270,7 +279,7 @@ void main() {
         days: days([9, 9, 2, 2, 2, 2, 2, 2, 2, 0]),
         history: history,
         today: start.addDays(9),
-        unitPriceCents: null,
+        prices: null,
       );
 
       expect(stats.recentAverage, 2);
@@ -281,11 +290,88 @@ void main() {
         days: days([15, 15, 0]),
         history: history,
         today: start.addDays(2),
-        unitPriceCents: 50,
+        prices: fiftyCents,
       );
 
       expect(stats.avoided, 0);
+      expect(stats.moneySavedCents, 0);
       expect(stats.changeFromBaseline, closeTo(6 / 9, 1e-9));
+    });
+
+    group('money saved', () {
+      final nov1 = LogicalDay(2026, 11, 1);
+      final nov2 = LogicalDay(2026, 11, 2);
+      final nov3 = LogicalDay(2026, 11, 3);
+      final twelve = PlanHistory([
+        ReductionPlan(
+          startDay: nov1,
+          startLimit: 12,
+          quitDay: nov1.addDays(84),
+        ),
+      ]);
+      final logged = [
+        DailyProgress(day: nov1, count: 9, limit: 12),
+        DailyProgress(day: nov2, count: 8, limit: 12),
+        DailyProgress(day: nov3, count: 1, limit: 12),
+      ];
+
+      PricePoint point(LogicalDay day, int? cents) =>
+          PricePoint(fromDay: day, priceCents: cents, unitsPerContainer: 20);
+
+      HomeStats statsWith(List<PricePoint> points) =>
+          ProgressCalculator.homeStats(
+            days: logged,
+            history: twelve,
+            today: nov3,
+            prices: PriceHistory.forHabit(Habit.smoking, points),
+          );
+
+      test('each finished day counts at the price in force that day', () {
+        final stats = statsWith([point(nov1, 800), point(nov2, 900)]);
+
+        expect(stats.moneySavedCents, 300);
+        expect(stats.avoided, 7);
+      });
+
+      test('a price entered later counts from the first day', () {
+        expect(statsWith([point(nov3, 800)]).moneySavedCents, 280);
+      });
+
+      test('a day with no price counts nothing', () {
+        final stats = statsWith([
+          point(nov1, 800),
+          point(nov2, null),
+          point(nov3, 800),
+        ]);
+
+        expect(stats.moneySavedCents, 120);
+      });
+
+      test('a cleared price shows nothing, and a new one brings it back', () {
+        final cleared = statsWith([point(nov1, 800), point(nov3, null)]);
+        expect(cleared.moneySavedCents, isNull);
+        expect(cleared.avoided, 7);
+
+        final again = statsWith([
+          point(nov1, 800),
+          point(nov2, null),
+          point(nov3, 900),
+        ]);
+        expect(again.moneySavedCents, 120);
+        expect(again.avoided, 7);
+      });
+
+      test('no price history: nothing saved, avoided unchanged', () {
+        final stats = ProgressCalculator.homeStats(
+          days: logged,
+          history: twelve,
+          today: nov3,
+          prices: null,
+        );
+
+        expect(stats.moneySavedCents, isNull);
+        expect(stats.avoided, 7);
+      });
     });
   });
 }

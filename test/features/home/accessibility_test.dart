@@ -9,6 +9,7 @@ import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
+import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -116,7 +117,39 @@ void main() {
             ),
           );
           await tester.pumpAndSettle();
-          expect(find.text('Logs'), findsOneWidget);
+          expect(find.text('The evidence.'), findsOneWidget);
+          await expectGuidelines(tester, handle);
+        });
+
+        testWidgets('Logs with a trigger selected', (tester) async {
+          final handle = tester.ensureSemantics();
+          await seed(theme: theme, accent: accent);
+          for (final (hour, trigger) in [
+            (13, Trigger.stress),
+            (14, Trigger.work),
+          ]) {
+            await sl<AddHabitLog>()(
+              AddHabitLogInput(
+                habitId: 1,
+                loggedAt: DateTime(2026, 10, 29, hour),
+                trigger: trigger,
+              ),
+            );
+          }
+          await tester.pumpAppPastSplash(height: height);
+          final context = tester.element(find.byType(Scaffold).first);
+          unawaited(
+            GoRouter.of(context).push(
+              LogsQuery(
+                habitId: 1,
+                from: today,
+                to: today,
+                trigger: Trigger.stress,
+              ).toUri().toString(),
+            ),
+          );
+          await tester.pumpAndSettle();
+          expect(find.text('Stress 1'), findsOneWidget);
           await expectGuidelines(tester, handle);
         });
 
@@ -138,6 +171,17 @@ void main() {
           unawaited(GoRouter.of(context).push(AppRoutes.editPlanFor(1)));
           await tester.pumpAndSettle();
           expect(find.text('Change habit'), findsOneWidget);
+          await expectGuidelines(tester, handle);
+        });
+
+        testWidgets('Plan details', (tester) async {
+          final handle = tester.ensureSemantics();
+          await seed(theme: theme, accent: accent);
+          await tester.pumpAppPastSplash(height: height);
+          final context = tester.element(find.byType(Scaffold).first);
+          unawaited(GoRouter.of(context).push(AppRoutes.planDetailsFor(1)));
+          await tester.pumpAndSettle();
+          expect(find.text('The whole plan'), findsOneWidget);
           await expectGuidelines(tester, handle);
         });
 

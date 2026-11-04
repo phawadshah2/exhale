@@ -219,6 +219,39 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('trigger bars are thin and the tile icons are centred', (
+    tester,
+  ) async {
+    await startPlan(LogicalDay(2026, 10, 14));
+    await logAt(
+      DateTime(2026, 10, 16, 15, 18),
+      trigger: Trigger.stress,
+      note: 'Deadline',
+    );
+    await tester.pumpAppPastSplash(height: 2400);
+
+    final bar = tester.widget<LinearProgressIndicator>(
+      find.descendant(
+        of: find.byType(DayTriggers),
+        matching: find.byType(LinearProgressIndicator),
+      ),
+    );
+    expect(bar.minHeight, 5);
+
+    for (final label in ['Last entry', 'Last trigger']) {
+      final cell = find
+          .ancestor(of: find.text(label), matching: find.byType(Row))
+          .first;
+      final icon = find.descendant(of: cell, matching: find.byType(Icon));
+      expect(
+        tester.getCenter(icon).dy,
+        closeTo(tester.getCenter(cell).dy, 0.5),
+      );
+    }
+
+    await tester.disposeApp();
+  });
+
   testWidgets("a trigger row opens that day's logs for the trigger", (
     tester,
   ) async {
@@ -235,8 +268,10 @@ void main() {
       ),
     );
 
-    expect(find.text('Logs'), findsOneWidget);
-    expect(find.text('2 of 3 logs today · 67%'), findsOneWidget);
+    expect(find.text('The evidence.'), findsOneWidget);
+    expect(find.text('Stress 2'), findsOneWidget);
+    expect(find.text('2 logs this week'), findsOneWidget);
+    expect(find.byType(Dismissible), findsNWidgets(2));
 
     await tester.disposeApp();
   });

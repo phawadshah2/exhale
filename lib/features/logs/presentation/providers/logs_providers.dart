@@ -40,6 +40,7 @@ class LogsView {
     required this.stats,
     required this.breakdown,
     required this.days,
+    required this.hasPlanDays,
   });
 
   final PeriodStats stats;
@@ -50,6 +51,15 @@ class LogsView {
   /// Newest first, today at the latest; plan days with no logs are kept,
   /// days before the plan only when they have logs.
   final List<LogsDay> days;
+
+  /// False when the whole period is before the plan.
+  final bool hasPlanDays;
+
+  /// [day]'s entry. A day [days] leaves out is before the plan, with no logs.
+  LogsDay dayOf(LogicalDay day) => days.firstWhere(
+    (entry) => entry.day == day,
+    orElse: () => LogsDay(day: day, logs: const [], limit: null),
+  );
 }
 
 final ProviderFamily<LogsView?, LogsScope> logsViewProvider = Provider
@@ -96,5 +106,6 @@ final ProviderFamily<LogsView?, LogsScope> logsViewProvider = Provider
           ),
         ),
         days: days,
+        hasPlanDays: !range.to.isBefore(history.firstDay),
       );
     });

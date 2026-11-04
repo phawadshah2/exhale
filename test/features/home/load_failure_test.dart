@@ -6,6 +6,7 @@ import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
+import 'package:exhale/features/habit/domain/entities/price_history.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
@@ -169,4 +170,21 @@ class _FailFirstReadRepository implements HabitRepository {
   @override
   Future<Result<void>> archive(int id, {required DateTime at}) =>
       _real.archive(id, at: at);
+
+  @override
+  Stream<List<PricePoint>> watchPrices(int habitId) =>
+      _real.watchPrices(habitId);
+
+  @override
+  Future<Result<void>> setPrice(
+    int habitId, {
+    required LogicalDay day,
+    required int? priceCents,
+    required int unitsPerContainer,
+  }) => _real.setPrice(
+    habitId,
+    day: day,
+    priceCents: priceCents,
+    unitsPerContainer: unitsPerContainer,
+  );
 }

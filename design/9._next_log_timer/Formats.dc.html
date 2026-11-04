@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Timer formats</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1130px; height: 760px; box-sizing: border-box; background: #0E141D; color: #DDE2F0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 32px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 16px">
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">1. Digits with seconds</span>
+<span style="font-family: Manrope, sans-serif; font-size: 56px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; text-align: center">{{digits}}</span>
+<span style="font-size: 13px; color: #93A0AE; text-align: center">Over an hour: 1:12:04</span>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">2. Minutes in words</span>
+<span style="font-family: Manrope, sans-serif; font-size: 52px; font-weight: 700; letter-spacing: -0.02em; text-align: center">{{words}}</span>
+<span style="font-size: 13px; color: #93A0AE; text-align: center">Over an hour: 1 h 12 min</span>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">3. Split units</span>
+<div style="display: flex; align-items: baseline; justify-content: center; gap: 3px; font-family: Manrope, sans-serif; font-variant-numeric: tabular-nums"><span style="font-size: 52px; font-weight: 700; letter-spacing: -0.02em">{{mins}}</span><span style="font-size: 20px; font-weight: 600; color: #93A0AE">m</span><span style="font-size: 52px; font-weight: 700; letter-spacing: -0.02em; margin-left: 8px">{{secs}}</span><span style="font-size: 20px; font-weight: 600; color: #93A0AE">s</span></div>
+<span style="font-size: 13px; color: #93A0AE; text-align: center">Over an hour: 1h 12m</span>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">4. Clock time</span>
+<span style="font-family: Manrope, sans-serif; font-size: 52px; font-weight: 700; letter-spacing: -0.02em; text-align: center">5:09 PM</span>
+<span style="font-size: 13px; color: #93A0AE; text-align: center">Stays still until the next log</span>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; align-items: stretch">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">5. Draining ring</span>
+<div style="position: relative; width: 132px; height: 132px; align-self: center">
+<svg width="132" height="132" viewBox="0 0 132 132" aria-hidden="true"><circle cx="66" cy="66" r="52" fill="none" stroke="#2F353F" stroke-width="10"></circle><circle cx="66" cy="66" r="52" fill="none" stroke="#2DD4BF" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{ringDash}}" transform="rotate(-90 66 66)"></circle></svg>
+<div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center"><span style="font-family: Manrope, sans-serif; font-size: 28px; font-weight: 700">{{minsLeft}}</span><span style="font-size: 12px; color: #93A0AE">min</span></div>
+</div>
+<span style="font-size: 13px; color: #93A0AE; text-align: center">Full just after a log</span>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">6. Draining bar</span>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: Manrope, sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; text-align: center">{{digits}}</span>
+<div style="height: 10px; border-radius: 99px; background: #2F353F"><div style="width: {{barWidth}}; height: 10px; border-radius: 99px; background: #2DD4BF"></div></div>
+</div>
+<span style="font-size: 13px; color: #93A0AE; text-align: center">The bar is the whole gap, 87 min</span>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">7. Segments, no digits</span>
+<div style="display: flex; gap: 5px">
+<sc-for list="{{segments}}" as="seg" hint-placeholder-count="10">
+<div style="flex-grow: 1; height: 44px; border-radius: 8px; background: {{seg.color}}"></div>
+</sc-for>
+</div>
+<span style="font-size: 13px; color: #93A0AE; text-align: center">Each one is a tenth of the gap</span>
+</div>
+
+<div style="background: #161C25; border: 1px solid #2C333D; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between">
+<span style="font-size: 13px; font-weight: 700; color: #93A0AE">8. Shrinking breath, no digits</span>
+<div style="height: 132px; display: flex; align-items: center; justify-content: center"><div style="width: {{bubble}}; height: {{bubble}}; border-radius: 50%; background: rgba(45,212,191,0.28); border: 2px solid #2DD4BF; box-sizing: border-box"></div></div>
+<span style="font-size: 13px; color: #93A0AE; text-align: center">Gone when the gap is over</span>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1130,"height":760}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    this.timer = setInterval(() => {
+      const left = (this.state && this.state.left) ?? 2832;
+      this.setState({ left: left <= 0 ? 2832 : left - 1 });
+    }, 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+  renderVals() {
+    const left = (this.state && this.state.left) ?? 2832;
+    const gap = 5220;
+    const frac = left / gap;
+    const m = Math.floor(left / 60);
+    const s = left % 60;
+    const ss = s < 10 ? '0' + s : '' + s;
+    const lit = Math.ceil(frac * 10);
+    const segments = [];
+    for (let i = 0; i < 10; i++) {
+      segments.push({ color: i < lit ? '#2DD4BF' : '#2F353F' });
+    }
+    return {
+      digits: m + ':' + ss,
+      words: Math.ceil(left / 60) + ' min',
+      mins: '' + m,
+      secs: ss,
+      minsLeft: '' + Math.ceil(left / 60),
+      ringDash: (frac * 326.7).toFixed(1) + ' 326.7',
+      barWidth: (frac * 100).toFixed(1) + '%',
+      segments,
+      bubble: Math.round(32 + 100 * frac) + 'px',
+    };
+  }
+}
+</script>
+</body>
+</html>

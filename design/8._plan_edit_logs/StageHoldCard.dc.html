@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home, hold card</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t-light{--bg:#F4F7FA;--card:#FFFFFF;--card-line:transparent;--ink:#161C25;--muted:#5B6573;--line:#E4E9EF;--high:#E6EBF0;--pill:#ECF0F4;--inner:#F1F4F7;--good:#00704A;--warn:#855300;}
+.t-dark{--bg:#0E141D;--card:#161C25;--card-line:#2C333D;--ink:#DDE2F0;--muted:#93A0AE;--line:#2C333D;--high:#2F353F;--pill:#242A34;--inner:#1E252F;--good:#4EDEA3;--warn:#FFB95F;}
+.t-light.a-ink{--accent:#111418;--on-accent:#FFFFFF;--accent-text:#111418}
+.t-dark.a-ink{--accent:#F4F7FA;--on-accent:#111418;--accent-text:#F4F7FA}
+.t-light.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#00796B}
+.t-dark.a-eucalyptus{--accent:#2DD4BF;--on-accent:#003731;--accent-text:#57F1DB}
+.t-light.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#1D5FD1}
+.t-dark.a-ocean{--accent:#3B82F6;--on-accent:#FFFFFF;--accent-text:#A9C7FF}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="width: 390px; height: 960px; box-sizing: border-box; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 60px 20px 28px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+
+  <div style="display: flex; flex-direction: column; gap: 2px">
+    <span style="font-size: 13px; color: var(--muted)">Monday, Nov 9</span>
+    <span style="font-family: Manrope, sans-serif; font-size: 23px; font-weight: 700">Good morning</span>
+  </div>
+
+  <div style="height: 48px; box-sizing: border-box; border-radius: 99px; background: var(--pill); padding: 0 8px 0 12px; display: flex; align-items: center; gap: 10px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-text)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.1 9.6 4.2 4.2 0 0 0 7 18z"></path></svg>
+    <span style="flex-grow: 1; font-size: 14px; font-weight: 600">Vaping · Drops to 8 in 7d</span>
+    <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--accent-text); border: 1px solid var(--accent-text); border-radius: 99px; padding: 3px 10px">STAGE 4 / 12</span>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 14px; align-items: center">
+    <div style="position: relative; width: 220px; height: 220px">
+      <svg width="220" height="220" viewBox="0 0 220 220" role="img" aria-label="1 of 9 sessions today">
+        <circle cx="110" cy="110" r="96" fill="none" stroke="var(--high)" stroke-width="14"></circle>
+        <circle cx="110" cy="110" r="96" fill="none" stroke="var(--accent)" stroke-width="14" stroke-linecap="round" stroke-dasharray="67 603" transform="rotate(-90 110 110)"></circle>
+        <circle cx="110" cy="110" r="80" fill="none" stroke="var(--high)" stroke-width="3"></circle>
+        <circle cx="110" cy="110" r="80" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-dasharray="340 503" transform="rotate(-90 110 110)"></circle>
+      </svg>
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
+        <span style="font-family: Manrope, sans-serif; font-size: 36px; line-height: 44px; font-weight: 700; letter-spacing: -0.72px; font-variant-numeric: tabular-nums">1:12:08</span>
+        <span style="font-size: 13px; color: var(--muted)">until your next</span>
+        <span style="font-size: 12px; color: var(--muted)">1 of 9 · 8 left</span>
+      </div>
+    </div>
+    <span style="font-size: 12px; color: var(--muted)">Next one on schedule in 1 h 12 min.</span>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-family: Manrope, sans-serif; font-size: 20px; line-height: 28px; font-weight: 600">8 can wait.</span>
+      <span style="font-size: 14px; line-height: 20px; color: var(--muted)">Last week came to 74 against an allowed 63, so you stay at 9 for one more week. Nothing's lost.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <div style="background: var(--inner); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column">
+        <span style="font-size: 12px; line-height: 16px; color: var(--muted)">Next drop</span>
+        <span style="font-size: 15px; line-height: 22px; font-weight: 700">Nov 16</span>
+        <span style="font-size: 12px; line-height: 16px; color: var(--muted)">Was today</span>
+      </div>
+      <div style="background: var(--inner); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column">
+        <span style="font-size: 12px; line-height: 16px; color: var(--muted)">Quit date</span>
+        <span style="font-size: 15px; line-height: 22px; font-weight: 700">Jan 11</span>
+        <span style="font-size: 12px; line-height: 16px; color: var(--muted)">Was Jan 4</span>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px">
+      <button style="flex: 1 1 0; min-height: 48px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-family: inherit; font-size: 14px; font-weight: 600">Keep Jan 4</button>
+      <button style="flex: 1 1 0; min-height: 48px; border-radius: 99px; border: 0; background: var(--accent); color: var(--on-accent); font-family: inherit; font-size: 14px; font-weight: 600">Got it</button>
+    </div>
+    <span style="font-size: 12px; line-height: 18px; color: var(--muted)">Keep Jan 4 moves you to 8 today. You can choose it until tonight, then Edit plan is the way.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"enum","options":["ink","eucalyptus","ocean"],"default":"ink"},"$preview":{"width":390,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { themeClass: (this.props.dark ? 't-dark' : 't-light') + ' a-' + (this.props.accent ?? 'ink') };
+  }
+}
+</script>
+</body>
+</html>

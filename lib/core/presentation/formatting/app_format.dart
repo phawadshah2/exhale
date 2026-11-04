@@ -14,6 +14,9 @@ abstract final class AppFormat {
   static String monthDay(LogicalDay day) =>
       '${_months[day.month - 1]} ${day.day}';
 
+  /// Oct
+  static String shortMonth(LogicalDay day) => _months[day.month - 1];
+
   /// Oct 12 – 18, or Sep 28 – Oct 4 across months.
   static String dayRange(LogicalDay from, LogicalDay to) =>
       from.month == to.month
@@ -21,8 +24,10 @@ abstract final class AppFormat {
       : '${monthDay(from)} – ${monthDay(to)}';
 
   /// October 2026
-  static String monthYear(LogicalDay day) =>
-      '${_fullMonths[day.month - 1]} ${day.year}';
+  static String monthYear(LogicalDay day) => '${month(day)} ${day.year}';
+
+  /// October
+  static String month(LogicalDay day) => _fullMonths[day.month - 1];
 
   static const _fullMonths = [
     'January', 'February', 'March', 'April', 'May', 'June', //
@@ -39,7 +44,11 @@ abstract final class AppFormat {
 
   /// Wed, Oct 21
   static String shortWeekdayDate(LogicalDay day) =>
-      '${_weekdays[day.weekday - 1].substring(0, 3)}, ${monthDay(day)}';
+      '${shortWeekday(day)}, ${monthDay(day)}';
+
+  /// Wed
+  static String shortWeekday(LogicalDay day) =>
+      _weekdays[day.weekday - 1].substring(0, 3);
 
   /// Today, Oct 16 / Tomorrow, Oct 17 / Wednesday, Oct 18
   static String relativeDate(LogicalDay day, {required LogicalDay today}) {
@@ -73,15 +82,17 @@ abstract final class AppFormat {
     final dot = fixed.indexOf('.');
     final whole = dot < 0 ? fixed : fixed.substring(0, dot);
     final fraction = dot < 0 ? '' : fixed.substring(dot);
-    final grouped = whole.replaceAllMapped(
-      RegExp(r'\B(?=(\d{3})+$)'),
-      (_) => ',',
-    );
     final spaced = RegExp(r'\p{L}$', unicode: true).hasMatch(symbol)
         ? '$symbol '
         : symbol;
-    return '${cents < 0 ? '-' : ''}$spaced$grouped$fraction';
+    return '${cents < 0 ? '-' : ''}$spaced${_grouped(whole)}$fraction';
   }
+
+  /// 1,008
+  static String count(int value) => _grouped('$value');
+
+  static String _grouped(String digits) =>
+      digits.replaceAllMapped(RegExp(r'\B(?=(\d{3})+$)'), (_) => ',');
 
   /// Parses user input like "14.50" or "14,5" into cents.
   /// Returns null for blank, malformed or negative input.

@@ -3,9 +3,11 @@ import 'package:exhale/core/data/local/database/app_database.dart';
 import 'package:exhale/core/data/storage_guard.dart';
 import 'package:exhale/core/domain/error/failure.dart';
 import 'package:exhale/core/domain/result/result.dart';
+import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/habit/data/datasources/habit_local_data_source.dart';
 import 'package:exhale/features/habit/data/models/tracked_habit_model.dart';
 import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
+import 'package:exhale/features/habit/domain/entities/price_history.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/repositories/habit_repository.dart';
 
@@ -55,6 +57,29 @@ class LocalHabitRepository implements HabitRepository {
           ),
         ),
       );
+
+  @override
+  Stream<List<PricePoint>> watchPrices(int habitId) => _localDataSource
+      .watchPrices(habitId)
+      .map((rows) => rows.map((row) => row.toEntity()).toList());
+
+  @override
+  Future<Result<void>> setPrice(
+    int habitId, {
+    required LogicalDay day,
+    required int? priceCents,
+    required int unitsPerContainer,
+  }) async => _requireRow(
+    await guardStorage(
+      _source,
+      () => _localDataSource.setPrice(
+        habitId,
+        fromDay: day.toString(),
+        priceCents: priceCents,
+        unitsPerContainer: unitsPerContainer,
+      ),
+    ),
+  );
 
   List<TrackedHabit> _toEntities(List<HabitRow> rows) =>
       rows.map((row) => row.toEntity()).toList();

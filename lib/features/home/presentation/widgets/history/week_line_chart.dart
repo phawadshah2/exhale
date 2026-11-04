@@ -262,7 +262,7 @@ class _WeekPainter extends CustomPainter {
             Paint()
               ..color = accent
               ..style = PaintingStyle.stroke
-              ..strokeWidth = 4
+              ..strokeWidth = 3
               ..strokeCap = StrokeCap.round,
           );
       }
@@ -302,16 +302,16 @@ class _WeekPainter extends CustomPainter {
       canvas
         ..drawCircle(
           center,
-          5,
+          4,
           Paint()..color = fillBase.withValues(alpha: fillBase.a * shown),
         )
         ..drawCircle(
           center,
-          5,
+          4,
           Paint()
             ..color = color.withValues(alpha: color.a * shown)
             ..style = PaintingStyle.stroke
-            ..strokeWidth = 3,
+            ..strokeWidth = 2,
         );
       paintLabel(
         canvas,
