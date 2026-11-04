@@ -23,9 +23,8 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 
 - Branch `feat/plan-and-stages`, tree clean; `feat/green-under` fast-forwarded into it.
   Pushed up to 5715c87; every later commit is local. No PR is open, and CI was not read.
-- Green G1 and G2 (local only): their test files and
-  `test/features/home/accessibility_test.dart` passed; format and `analyze --fatal-infos`
-  clean; the full suite was not rerun.
+- Checks at 0cf6041: full suite 1206 passed, 0 failed (`build/test-report.json`); format
+  and `analyze --fatal-infos` clean.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
 ## M7 simulator walk (2026-11-04, `exhale` iOS 26.5)
@@ -59,8 +58,7 @@ Walked on `exhale`, light and dark, approved by Fawad. The sheet fix was not see
 
 ## Next action
 
-Fawad rules on the questions above. Then run the full suite once (the stage polish and
-green changes only ran their own files), push `feat/plan-and-stages` and open the PR to
+Fawad rules on the questions above. Then push `feat/plan-and-stages` and open the PR to
 `main` from the compare link. After merge: the real iPhone pass, including the M6 and M7
 screens (hold, review, reassess via `SEED_STAGE`) and the green and trigger colours.
 
