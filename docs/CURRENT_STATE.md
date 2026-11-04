@@ -21,8 +21,8 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 
 ## Repo
 
-- Branch `feat/plan-and-stages`, tree clean; `feat/green-under` fast-forwarded into it.
-  Pushed up to 5715c87; every later commit is local. No PR is open, and CI was not read.
+- Branch `feat/plan-and-stages`, 86 commits ahead of `main`; `feat/green-under`
+  fast-forwarded into it. Pushed up to d81f915. No PR is open, and CI was not read.
 - Checks at 0cf6041: full suite 1206 passed, 0 failed (`build/test-report.json`); format
   and `analyze --fatal-infos` clean.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
@@ -40,16 +40,12 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 - Reassess, dark and light: card, sheet, Still yours tiles, nicotine support line, Start
   again from 12 (Jan 27, 3 weeks later). Keep my plan closed the card, plan unchanged.
 
-## Questions for Fawad (from the walk, nothing changed)
+## Walk rulings (Fawad, 2026-11-05)
 
-1. "Start from your real number" uses the 14-day average (`plan_choices.dart:60`); spec 4
-   says the window's average, and spec 2 defines the window as 7 days. The seed shows 10,
-   where the 7-day window gives 11. Which is meant?
-2. After a hold, the review's 14 days are the held week plus the second failed week, so the
-   tiles can show logged under allowed (seed: 139 against 147) beside "Two weeks over
-   your limit".
-3. Hold card date tiles barely stand out from the card in light mode.
-4. Before M7: "Vs baseline" shows "↓ 0%" with an arrow at 0%.
+Plan `docs/superpowers/plans/2026-11-05-walk-rulings.md`, not started; spec 4, 5.2 and 5.3
+updated. R1: the review's tiles, average, triggers and "Start from your real number" use the
+two failed weeks (the hold's window and the review's), not 14 days in a row. R2: hold card
+tiles stand out in light mode. R3: "0%" with no arrow vs baseline.
 
 ## Stage polish and colours (2026-11-04)
 
@@ -61,10 +57,10 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 
 ## Next action
 
-Fawad rules on the questions above. Then push `feat/plan-and-stages` (17 commits ahead) and
-open the PR to `main` from the compare link. After merge: the real iPhone pass, including
-the M6 and M7 screens (hold, review, reassess via `SEED_STAGE`) and the colours. To
-continue, read only this file and, for question 1, `plan_choices.dart` and the M7 spec.
+Run the walk rulings plan, R1 to R3, with `execute-plan`. Then the simulator walk it lists
+(with Fawad's approval), push `feat/plan-and-stages` and open the PR to `main` from the
+compare link. After merge: the real iPhone pass, including the M6 and M7 screens (hold,
+review, reassess via `SEED_STAGE`) and the colours.
 
 ## Open checks
 
