@@ -8,6 +8,7 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/domain/services/plan_report.dart';
 import 'package:exhale/features/plan/presentation/plan_copy.dart';
+import 'package:exhale/features/plan/presentation/widgets/stage_days.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
 import 'package:exhale/features/settings/domain/entities/day_window.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
@@ -278,6 +279,8 @@ class _StagePanel extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 10,
         children: [
+          if (kind == StageRowKind.behind)
+            StageDays(report: report, today: today),
           if (context.hasLargeText)
             ...stats
           else

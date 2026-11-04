@@ -14,8 +14,9 @@ import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/repositories/plan_repository.dart';
 import 'package:exhale/features/plan/presentation/pages/plan_details_page.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
-import 'package:exhale/features/plan/presentation/widgets/current_stage_card.dart';
+import 'package:exhale/features/plan/presentation/widgets/stage_days.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
+import 'package:exhale/features/plan/presentation/widgets/stage_row.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
@@ -435,6 +436,82 @@ void main() {
         danger,
       );
       expect(tester.widget<Text>(find.text('1 of 7')).style?.color, danger);
+      await tester.disposeApp();
+    });
+
+    testWidgets('a past stage shows a ring per day, with no today', (
+      tester,
+    ) async {
+      await seedK();
+      await logOn(start, times: 13);
+      await openDetails(tester);
+
+      await tester.tap(find.text('Stage 1'));
+      await tester.pumpAndSettle();
+
+      final rings = find.descendant(
+        of: find.byType(StageRow).first,
+        matching: find.byType(StageDayRing),
+      );
+      expect(rings, findsNWidgets(7));
+      final days = tester.widgetList<StageDayRing>(rings).toList();
+      expect(days.first.day, start);
+      expect(days.last.day, start.addDays(6));
+      expect(days.any((ring) => ring.isToday), isFalse);
+      expect(days.every((ring) => ring.progress != null), isTrue);
+      expect(days.first.progress!.count, 13);
+      await tester.disposeApp();
+    });
+
+    testWidgets('a 15-day past stage shows its dots and both dates', (
+      tester,
+    ) async {
+      final planStart = today.addDays(-20);
+      await seedHabit(
+        PlanDraft(
+          startDay: planStart,
+          startLimit: 2,
+          quitDay: planStart.addDays(30),
+        ),
+        habit: Habit.vaping,
+        priceCents: 800,
+      );
+      await logOn(planStart, times: 3);
+      await openDetails(tester);
+
+      await tester.tap(find.text('Stage 1'));
+      await tester.pumpAndSettle();
+
+      final row = find.byType(StageRow).first;
+      expect(
+        find.descendant(of: row, matching: find.byType(StageDayRing)),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: row, matching: find.text('Oct 12')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: row, matching: find.text('Oct 26')),
+        findsOneWidget,
+      );
+      final painter =
+          tester
+                  .widget<CustomPaint>(
+                    find.descendant(
+                      of: row,
+                      matching: find.byWidgetPredicate(
+                        (widget) =>
+                            widget is CustomPaint &&
+                            widget.painter is DayDotsPainter,
+                      ),
+                    ),
+                  )
+                  .painter!
+              as DayDotsPainter;
+      expect(painter.dots, hasLength(15));
+      expect(painter.dots.first, DayDot.over);
+      expect(painter.dots.skip(1), everyElement(DayDot.under));
       await tester.disposeApp();
     });
 

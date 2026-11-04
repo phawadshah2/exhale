@@ -20,11 +20,11 @@ Spec: `docs/superpowers/specs/2026-11-04-stage-polish-design.md`. Branch
 
 ### Task P3: Day rings in past stages
 
-- [ ] Tests: a 7-day past stage's panel shows 7 `StageDayRing`s, none today; a 15-day one
+- [x] Tests: a 7-day past stage's panel shows 7 `StageDayRing`s, none today; a 15-day one
   shows the dots and both dates.
-- [ ] Move the rings and dots out of `current_stage_card.dart` into a shared `StageDays`
+- [x] Move the rings and dots out of `current_stage_card.dart` into a shared `StageDays`
   widget; the panel shows it above the figures.
-- [ ] Commit `feat(plan): show a past stage's days`.
+- [x] Commit `feat(plan): show a past stage's days`.
 
 ### Task P4: A day opens its logs
 

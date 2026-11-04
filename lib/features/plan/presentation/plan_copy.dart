@@ -52,10 +52,10 @@ abstract final class PlanCopy {
     required int days,
     required int limit,
     required int over,
-    required int dayNumber,
+    required int? dayNumber,
   }) =>
-      '$days ${days == 1 ? 'day' : 'days'}, limit $limit. $over over. '
-      'Today is day $dayNumber.';
+      '$days ${days == 1 ? 'day' : 'days'}, limit $limit. $over over.'
+      '${dayNumber == null ? '' : ' Today is day $dayNumber.'}';
 
   /// Sessions
   static String unitsTitle(Habit habit) =>
