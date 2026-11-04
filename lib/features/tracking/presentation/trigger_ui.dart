@@ -63,7 +63,7 @@ extension TriggerUi on Trigger {
   }
 
   /// Blue to magenta only, so a trigger never reads as under, at or over.
-  double get _hue => 195 + 17.0 * _slot;
+  double get _hue => 198 + 15.0 * _slot;
 
   /// One of 9 hues. No two triggers offered for the same habit share one.
   int get _slot => switch (this) {

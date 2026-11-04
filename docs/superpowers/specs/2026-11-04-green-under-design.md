@@ -46,26 +46,27 @@ Asked by Fawad on 2026-11-04: trigger colours must not look like a status colour
 each trigger has its own hue round the whole wheel, so vaping's Stress is red, After meal
 amber, and Social, Commute and Habit green.
 
-Triggers take 9 hues from blue to magenta: 195°, 212°, 229°, 246°, 263°, 280°, 297°,
-314°, 331° (at least 29° from emerald, red and amber). Each trigger has one fixed slot,
+Triggers take 9 hues from blue to magenta: 198°, 213°, 228°, 243°, 258°, 273°, 288°,
+303°, 318° (at least 38° from emerald and 42° from red). 331° read as crimson beside the
+red "Over" pill in the simulator, so the range stops at 318°. Each trigger has one fixed slot,
 so it keeps its colour everywhere, and no two triggers offered by the same `HabitKind`
 share a slot (8 slots cannot do this for the nine lists; 9 can):
 
 | Slot | Hue | Triggers |
 |---|---|---|
-| 0 | 195° | Stress |
-| 1 | 212° | Habit |
-| 2 | 229° | Boredom |
-| 3 | 246° | After meal, Notification, Workout, Late night |
-| 4 | 263° | Social, Bedtime |
-| 5 | 280° | Tired, Coffee, Avoiding tasks |
-| 6 | 297° | Work, Watching TV, Celebrating, Drinks |
-| 7 | 314° | Lonely, Studying |
-| 8 | 331° | Morning, Commute |
+| 0 | 198° | Stress |
+| 1 | 213° | Habit |
+| 2 | 228° | Boredom |
+| 3 | 243° | After meal, Notification, Workout, Late night |
+| 4 | 258° | Social, Bedtime |
+| 5 | 273° | Tired, Coffee, Avoiding tasks |
+| 6 | 288° | Work, Watching TV, Celebrating, Drinks |
+| 7 | 303° | Lonely, Studying |
+| 8 | 318° | Morning, Commute |
 
 Saturation and lightness stay as they are; `tint` and `textTint` keep their signatures.
 Under the Ocean accent the blue triggers sit near the accent; that is not a status colour.
 
 Tests: each `HabitKind`'s triggers have 8 different tints; every trigger hue is at least
-25° from 160° (green), 38° (amber) and 0° (red); the readability and light/dark hue tests
+35° from 160° (green), 38° (amber) and 0° (red); the readability and light/dark hue tests
 keep passing. "Every trigger has its own colour" gives way to the per-habit test.

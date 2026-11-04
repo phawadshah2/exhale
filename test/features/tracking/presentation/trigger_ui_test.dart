@@ -57,7 +57,7 @@ void main() {
       ]) {
         expect(
           apart(hue, statusHue),
-          greaterThanOrEqualTo(25),
+          greaterThanOrEqualTo(35),
           reason: '${trigger.name} near $status',
         );
       }

@@ -49,9 +49,9 @@ Files: `lib/features/tracking/presentation/trigger_ui.dart`,
 
 - [x] Tests (fail first): replace "every trigger has its own colour" with "a habit's
   triggers each have their own colour" (for each `HabitKind`, the 8 tints are a set of 8);
-  add "no trigger looks like a status colour" (each tint's hue is at least 25° on the
+  add "no trigger looks like a status colour" (each tint's hue is at least 35° on the
   wheel from 160, 38 and 0). Keep the readability and hue tests.
-- [x] `trigger_ui.dart`: `_hue` becomes `195 + 17 * _slot`, with `int get _slot` per the
+- [x] `trigger_ui.dart`: `_hue` becomes `198 + 15 * _slot`, with `int get _slot` per the
   spec's table. Update the doc comment on `tint`.
 - [x] Move `test/features/tracking/limit_status_ui_test.dart` into `presentation/`.
 - [x] Commit `fix(tracking): keep trigger colours clear of the status colours`.
