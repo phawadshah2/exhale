@@ -27,20 +27,20 @@ Files: `lib/features/home/presentation/providers/stage_card_provider.dart`,
 `lib/features/home/presentation/widgets/plan_review_sheet.dart`,
 `lib/features/plan/domain/services/plan_choices.dart` (doc comment only).
 
-- [ ] Tests (fail first), in `test/features/home/plan_sheets_test.dart` and
+- [x] Tests (fail first), in `test/features/home/plan_sheets_test.dart` and
   `test/features/home/stage_cards_test.dart`: a hold, then a passed-looking held week, then
   a failed week. The sheet's logged, allowed and "About N" count only the two failed weeks,
   logged is above allowed, the triggers leave out the held week's logs, and "Start from your
   real number" starts at that "About N". The card shows the number when both windows had
   one limit and drops it when they had two. The existing adjacent-window tests keep passing.
-- [ ] The review's key carries both window ends: the review check's `windowEndDay` and the
+- [x] The review's key carries both window ends: the review check's `windowEndDay` and the
   newest earlier check of the same plan (`stageChecksProvider`). Logs load for each 7-day
   window; `StageWindowStats` adds both; `average` divides by 14.
-- [ ] `_build` for `review` takes its limits from the two windows; `reassess` keeps the
+- [x] `_build` for `review` takes its limits from the two windows; `reassess` keeps the
   14 days ending on its window end.
-- [ ] Update doc comments that say "the 14 days" for the review, and `PlanChoices.review`'s
+- [x] Update doc comments that say "the 14 days" for the review, and `PlanChoices.review`'s
   `windowAverage` comment.
-- [ ] Commit `fix(plan): base the review on the two failed weeks`.
+- [x] Commit `fix(plan): base the review on the two failed weeks`.
 
 ### Task R2: Hold date tiles stand out in light mode
 

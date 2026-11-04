@@ -20,7 +20,11 @@ Future<void> showPlanReviewSheet(
 }) async {
   final history = ref.read(planHistoryProvider(habitId)).value;
   final stats = ref.read(
-    stageWindowStatsProvider((habitId: habitId, windowEnd: card.windowEndDay)),
+    stageWindowStatsProvider((
+      habitId: habitId,
+      earlierEnd: card.earlierWindowEndDay,
+      windowEnd: card.windowEndDay,
+    )),
   );
   if (history == null || stats == null) return;
   final today = ref.read(todayProvider);

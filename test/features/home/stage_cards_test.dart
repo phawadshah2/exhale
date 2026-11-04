@@ -425,6 +425,51 @@ void main() {
       await tester.disposeApp();
     });
 
+    testWidgets('takes its limits from the two failed windows', (tester) async {
+      // A drop every 14 days: 12 until Oct 25, held to Nov 1, then 11 to
+      // Nov 15. The 14 days before the review are all at 11.
+      await tester.runAsync(() async {
+        await start(
+          DateTime(2026, 11, 16, 15, 42),
+          plan: PlanDraft(
+            startDay: _oct(12),
+            startLimit: 12,
+            quitDay: _oct(12).addDays(168),
+          ),
+        );
+        await record(
+          StageOutcome.hold,
+          windowEnd: _oct(25),
+          checkDay: _oct(26),
+          hold: PlanHold(startDay: _oct(26)),
+        );
+        await spy.answer(
+          habitId,
+          _oct(12),
+          _oct(25),
+          DateTime(2026, 10, 26, 9),
+        );
+        await record(
+          StageOutcome.review,
+          windowEnd: _nov(15),
+          checkDay: _nov(16),
+        );
+      });
+      await pumpHome(tester);
+
+      expect(
+        inCards(
+          find.text(
+            'Two weeks over your limit. The plan can bend, and you decide '
+            'how.',
+          ),
+        ),
+        findsOneWidget,
+      );
+
+      await tester.disposeApp();
+    });
+
     testWidgets('hides the quit-date card', (tester) async {
       await tester.runAsync(() async {
         await start(

@@ -312,6 +312,56 @@ void main() {
       await tester.disposeApp();
     });
 
+    testWidgets('counts the two failed weeks, not the held week', (
+      tester,
+    ) async {
+      // Stage 2 (11 a day, Oct 19 to 25) failed and was held to Nov 1;
+      // stage 3 (10 a day, Nov 2 to 8) failed too. The held week went well.
+      await tester.runAsync(() async {
+        await start();
+        for (var d = 19; d <= 25; d++) {
+          await logDay(_oct(d), 12, trigger: Trigger.stress);
+        }
+        for (var d = 26; d <= 31; d++) {
+          await logDay(_oct(d), 8, trigger: Trigger.social);
+        }
+        await logDay(_nov(1), 8, trigger: Trigger.social);
+        for (var d = 2; d <= 8; d++) {
+          await logDay(_nov(d), 11);
+        }
+        final checks = sl<StageCheckRepository>();
+        await checks.record(
+          habitId,
+          StageCheck(
+            planStartDay: _oct(12),
+            windowEndDay: _oct(25),
+            checkDay: _oct(26),
+            outcome: StageOutcome.hold,
+          ),
+          hold: PlanHold(startDay: _oct(26)),
+        );
+        await checks.answer(
+          habitId,
+          _oct(12),
+          _oct(25),
+          DateTime(2026, 10, 26, 9),
+        );
+        await record(StageOutcome.review);
+      });
+      await pumpHome(tester);
+      await openSheet(tester, 'Review my plan');
+
+      // 84 + 77 logged against 77 + 70; 161 over 14 days is about 12.
+      expect(find.text('161'), findsOneWidget);
+      expect(find.text('147'), findsOneWidget);
+      expect(find.text('About 12'), findsOneWidget);
+      expect(find.text('Stress · 84'), findsOneWidget);
+      expect(find.textContaining('Social'), findsNothing);
+      expect(find.text('12 a day, one fewer every 7 days'), findsOneWidget);
+
+      await tester.disposeApp();
+    });
+
     testWidgets('hides the triggers when none are tagged', (tester) async {
       await seedReview(tester, triggers: false);
       await openSheet(tester, 'Review my plan');
