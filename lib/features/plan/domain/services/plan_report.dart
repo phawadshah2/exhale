@@ -99,6 +99,13 @@ class StageReport {
 
   bool get isOverAllowed => used > allowed;
 
+  /// Over, at or under by the stage's total.
+  LimitStatus get status => isOverAllowed
+      ? LimitStatus.over
+      : used == allowed && used > 0
+      ? LimitStatus.at
+      : LimitStatus.under;
+
   StageReport withNote(StageNote note) => StageReport(
     stage: stage,
     lastDay: lastDay,

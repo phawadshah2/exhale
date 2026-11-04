@@ -315,7 +315,7 @@ void main() {
                 .painter!
             as StageRingPainter;
 
-    testWidgets('fill is used over allowed, capped, and warns when over', (
+    testWidgets('fill is used over allowed, capped, and red when over', (
       tester,
     ) async {
       await seedK();
@@ -328,11 +328,23 @@ void main() {
 
       final over = painterOf(tester, find.byType(StageRing).at(0));
       expect(over.fill, 1);
-      expect(over.color, context.exhale.warning.solid);
+      expect(over.color, context.exhale.danger.solid);
 
       final under = painterOf(tester, find.byType(StageRing).at(1));
       expect(under.fill, closeTo(21 / 77, 0.001));
       expect(under.color, context.colors.primaryContainer);
+      await tester.disposeApp();
+    });
+
+    testWidgets('a stage used exactly to its limit is amber', (tester) async {
+      await seedK();
+      await logOn(start, times: 84);
+      await openDetails(tester);
+
+      final context = tester.element(find.byType(StageRing).first);
+      final atLimit = painterOf(tester, find.byType(StageRing).at(0));
+      expect(atLimit.fill, 1);
+      expect(atLimit.color, context.exhale.warning.solid);
       await tester.disposeApp();
     });
 
@@ -405,9 +417,7 @@ void main() {
       await tester.disposeApp();
     });
 
-    testWidgets("a stage's over figures use the warning colour", (
-      tester,
-    ) async {
+    testWidgets("a stage's over figures are red", (tester) async {
       await seedK();
       await logOn(start, times: 90);
       await openDetails(tester);
@@ -415,16 +425,16 @@ void main() {
       await tester.tap(find.text('Stage 1'));
       await tester.pumpAndSettle();
 
-      final warning = tester
+      final danger = tester
           .element(find.text('90 of 84 used'))
           .exhale
-          .warning
+          .danger
           .foreground;
       expect(
         tester.widget<Text>(find.text('90 of 84 used')).style?.color,
-        warning,
+        danger,
       );
-      expect(tester.widget<Text>(find.text('1 of 7')).style?.color, warning);
+      expect(tester.widget<Text>(find.text('1 of 7')).style?.color, danger);
       await tester.disposeApp();
     });
 

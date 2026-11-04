@@ -233,7 +233,7 @@ class _StagePanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final today = ref.watch(todayProvider);
-    final warning = context.exhale.warning.foreground;
+    final over = context.exhale.danger.foreground;
     final mostly = report.mostly;
     final pace = PlanCopy.paceEvery(window, report.stage.limit);
     final unitsTitle = PlanCopy.unitsTitle(habit);
@@ -243,12 +243,12 @@ class _StagePanel extends ConsumerWidget {
         _Stat(
           unitsTitle,
           PlanCopy.usedOf(report.used, report.allowed),
-          color: report.isOverAllowed ? warning : null,
+          color: report.isOverAllowed ? over : null,
         ),
         _Stat(
           PlanCopy.daysOver,
           PlanCopy.overOf(report.daysOver, report.days),
-          color: report.daysOver > 0 ? warning : null,
+          color: report.daysOver > 0 ? over : null,
         ),
         _Stat(PlanCopy.average, PlanCopy.perDay(report.average)),
         if (mostly != null) _Stat(PlanCopy.mostly, mostly.label),

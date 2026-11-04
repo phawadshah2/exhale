@@ -13,10 +13,10 @@ Spec: `docs/superpowers/specs/2026-11-04-stage-polish-design.md`. Branch
 
 ### Task P2: Stage ring colours
 
-- [ ] Tests: `StageReport.status` in `plan_report_test.dart`; ring and panel colours in
+- [x] Tests: `StageReport.status` in `plan_report_test.dart`; ring and panel colours in
   `plan_details_page_test.dart` (update "warns when over" and "warning colour" tests).
-- [ ] Add `LimitStatus get status` to `StageReport`; `StageRing` and the panel read it.
-- [ ] Commit `fix(plan): colour stages red when over and amber at the limit`.
+- [x] Add `LimitStatus get status` to `StageReport`; `StageRing` and the panel read it.
+- [x] Commit `fix(plan): colour stages red when over and amber at the limit`.
 
 ### Task P3: Day rings in past stages
 

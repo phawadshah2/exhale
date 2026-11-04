@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/fill_in.dart';
 import 'package:exhale/features/plan/domain/services/plan_report.dart';
+import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:flutter/material.dart';
 
 /// A stage's ring with its limit inside, filled by what was used. A stage
@@ -34,9 +35,11 @@ class StageRing extends StatelessWidget {
         painter: StageRingPainter(
           fill: fill,
           strokeWidth: size * _strokePerPoint,
-          color: report.isOverAllowed
-              ? context.exhale.warning.solid
-              : colors.primaryContainer,
+          color: switch (report.status) {
+            LimitStatus.over => context.exhale.danger.solid,
+            LimitStatus.at => context.exhale.warning.solid,
+            LimitStatus.under => colors.primaryContainer,
+          },
           track: ahead ? colors.outlineVariant : colors.surfaceContainerHigh,
           dashed: ahead,
         ),
