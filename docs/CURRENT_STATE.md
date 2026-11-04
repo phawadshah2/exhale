@@ -1,7 +1,6 @@
 # Current state
 
-Updated 2026-11-04. The full log of earlier sessions (including Tasks 13 to 19 and UI round
-2) is in `docs/history/2026-10-16_to_11-03_state_log.md`.
+Updated 2026-11-04. Earlier sessions: `docs/history/2026-10-16_to_11-03_state_log.md`.
 
 ## Where we are
 
@@ -13,7 +12,8 @@ Updated 2026-11-04. The full log of earlier sessions (including Tasks 13 to 19 a
 | UI fixes from Fawad's review (Phase 4b, F1 to F4) | Done; seen in the simulator, light mode |
 | UI review round 2 (Logs, Plan, Home, transitions) | Done, committed (a947c2d) |
 | M7 Stage management (Tasks 13 to 20) | Done: reviewed, fixed, simulator walk 2026-11-04 |
-| Stage polish P1 to P4 (`docs/superpowers/plans/2026-11-04-stage-polish.md`) | Done, committed; seen in the simulator, waiting for Fawad's review |
+| Stage polish P1 to P4 (`docs/superpowers/plans/2026-11-04-stage-polish.md`) | Done, committed; seen in the simulator, approved by Fawad |
+| Green under the limit G1 (`docs/superpowers/plans/2026-11-04-green-under.md`) | Done, committed on `feat/green-under`; not seen in the simulator |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 Plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md` (all tasks ticked). Spec for
@@ -21,8 +21,12 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 
 ## Repo
 
-- Branch `feat/plan-and-stages` at 4c27f78, tree clean. Pushed up to 5715c87; every later
+- Branch `feat/plan-and-stages` at ef45ca7, tree clean. Pushed up to 5715c87; every later
   commit is local. No PR is open, and CI was not read.
+- Branch `feat/green-under` off it (ef45ca7): spec, plan and G1, local only. G1's files
+  (`limit_status_ui_test`, `history_card_test`, `plan_details_page_test`,
+  `logs_page_test`) and `test/features/home/accessibility_test.dart` passed; format and
+  `analyze --fatal-infos` clean; the full suite was not rerun.
 - Checks at 679dc88: full suite 1192 passed (`build/test-report.json`). Stage polish: the
   four tasks' files plus `accessibility_test.dart` passed (163), format and
   `analyze --fatal-infos` clean; the full suite was not rerun.
@@ -54,22 +58,18 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 
 ## Stage polish (2026-11-04)
 
-Sheets fit their content; stage rings red when over, amber at the limit; a past stage
-shows its days; a day ring or dot opens that day's Logs. Walked on `exhale` (review seed,
-already answered): Stage 3 red, its rings and red figures, Fri opened Logs on Oct 30,
-light and dark. The sheet fix was not seen there (no card showed).
+Walked on `exhale`, light and dark, approved by Fawad. The sheet fix was not seen there
+(no card showed).
 
 ## Next action
 
-Fawad reviews the stage polish. Then, on a new branch off `feat/plan-and-stages`: green
-for "under limit" everywhere (his call, kept separate so it can be reverted). It needs a
-spec and plan first. Today under is `colors.primaryContainer` (the accent), set in
-`stage_days.dart` (`_statusColor`, the dot painter's `under`) and `stage_ring.dart`;
-grep the other screens for it before writing the spec. Read the stage polish spec and plan
-(`docs/superpowers/*/2026-11-04-stage-polish*.md`) first. Then he
-rules on the questions above, then push `feat/plan-and-stages` and open the PR to
-`main` from the compare link. After merge: the real iPhone pass, including the M6 and M7
-screens (hold, review, reassess via `SEED_STAGE`).
+Simulator walk of G1 for Fawad (ask first, mid-milestone): Ink accent, light and dark, on
+Home (History week and month), Plan details (stages, day rings, dots) and Logs (calendar,
+rail). Under the limit is green (`success.solid`) through `LimitStatus.barColor`; Home's
+today ring and all text keep the accent. Then he decides whether `feat/green-under` merges
+into `feat/plan-and-stages`, rules on the questions above, and the branch is pushed and
+the PR to `main` opened from the compare link. After merge: the real iPhone pass,
+including the M6 and M7 screens (hold, review, reassess via `SEED_STAGE`).
 
 ## Open checks
 
