@@ -51,16 +51,20 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 3. Hold card date tiles barely stand out from the card in light mode.
 4. Before M7: "Vs baseline" shows "↓ 0%" with an arrow at 0%.
 
-## Stage polish (2026-11-04)
+## Stage polish and colours (2026-11-04)
 
-Walked on `exhale`, light and dark, approved by Fawad. The sheet fix was not seen there
-(no card showed).
+- Stage polish walked and approved; the sheet fix was not seen (no card showed).
+- Under the limit is green (`success.solid`) through `LimitStatus.barColor` alone; Home's
+  today ring, all text and the week chart's line keep the accent.
+- Triggers use 9 fixed slots, 198° to 318° (`trigger_ui.dart`), distinct within each
+  habit. 331° looked crimson beside red, so the range stops at 318°.
 
 ## Next action
 
-Fawad rules on the questions above. Then push `feat/plan-and-stages` and open the PR to
-`main` from the compare link. After merge: the real iPhone pass, including the M6 and M7
-screens (hold, review, reassess via `SEED_STAGE`) and the green and trigger colours.
+Fawad rules on the questions above. Then push `feat/plan-and-stages` (17 commits ahead) and
+open the PR to `main` from the compare link. After merge: the real iPhone pass, including
+the M6 and M7 screens (hold, review, reassess via `SEED_STAGE`) and the colours. To
+continue, read only this file and, for question 1, `plan_choices.dart` and the M7 spec.
 
 ## Open checks
 
@@ -69,3 +73,4 @@ screens (hold, review, reassess via `SEED_STAGE`) and the green and trigger colo
   from the background, the M6 and M7 screens), a long plan, Plan details at 200%.
 - Round 2 not seen in the simulator: range mode, the date wheel, tab fade, dark mode.
 - M7 not seen: Reduce Transparency, text at 200%, the alcohol line, a late-open hold card.
+- Colours walked only under Ink: Eucalyptus and Ocean accents not seen.
