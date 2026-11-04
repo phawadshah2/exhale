@@ -13,7 +13,7 @@ Updated 2026-11-04. Earlier sessions: `docs/history/2026-10-16_to_11-03_state_lo
 | UI review round 2 (Logs, Plan, Home, transitions) | Done, committed (a947c2d) |
 | M7 Stage management (Tasks 13 to 20) | Done: reviewed, fixed, simulator walk 2026-11-04 |
 | Stage polish P1 to P4 (`docs/superpowers/plans/2026-11-04-stage-polish.md`) | Done, committed; seen in the simulator, approved by Fawad |
-| Green under the limit G1, trigger colours G2 (`docs/superpowers/plans/2026-11-04-green-under.md`) | Done on `feat/green-under`; walked light and dark, waiting for Fawad |
+| Green under the limit G1, trigger colours G2 (`docs/superpowers/plans/2026-11-04-green-under.md`) | Done, walked light and dark, approved; merged into `feat/plan-and-stages` |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 Plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md` (all tasks ticked). Spec for
@@ -21,9 +21,9 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 
 ## Repo
 
-- Branch `feat/plan-and-stages` at ef45ca7, tree clean. Pushed up to 5715c87; every later
-  commit is local. No PR is open, and CI was not read.
-- Branch `feat/green-under` off it (ef45ca7): G1 and G2, local only. Their test files and
+- Branch `feat/plan-and-stages`, tree clean; `feat/green-under` fast-forwarded into it.
+  Pushed up to 5715c87; every later commit is local. No PR is open, and CI was not read.
+- Green G1 and G2 (local only): their test files and
   `test/features/home/accessibility_test.dart` passed; format and `analyze --fatal-infos`
   clean; the full suite was not rerun.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
@@ -59,11 +59,10 @@ Walked on `exhale`, light and dark, approved by Fawad. The sheet fix was not see
 
 ## Next action
 
-Fawad reviews `feat/green-under` (walked on `exhale`, Ink, light and dark: green day,
-stage and week points; triggers blue to magenta, 198° to 318°). Then he decides whether
-it merges into `feat/plan-and-stages`, rules on the questions above, and the branch is
-pushed and the PR to `main` opened from the compare link. After merge: the real iPhone
-pass, including the M6 and M7 screens (hold, review, reassess via `SEED_STAGE`).
+Fawad rules on the questions above. Then run the full suite once (the stage polish and
+green changes only ran their own files), push `feat/plan-and-stages` and open the PR to
+`main` from the compare link. After merge: the real iPhone pass, including the M6 and M7
+screens (hold, review, reassess via `SEED_STAGE`) and the green and trigger colours.
 
 ## Open checks
 
