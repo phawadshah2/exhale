@@ -39,3 +39,33 @@ legend, the Logs calendar, the Logs rail days, the log menu. Reverting means cha
 - Logs: under days are green (`logs_page_test.dart`, same replacement).
 - Week chart: an under point is green, the line is the accent.
 - History legend: the "Under" swatch is green.
+
+## Trigger colours (G2)
+
+Asked by Fawad on 2026-11-04: trigger colours must not look like a status colour. Today
+each trigger has its own hue round the whole wheel, so vaping's Stress is red, After meal
+amber, and Social, Commute and Habit green.
+
+Triggers take 9 hues from blue to magenta: 195°, 212°, 229°, 246°, 263°, 280°, 297°,
+314°, 331° (at least 29° from emerald, red and amber). Each trigger has one fixed slot,
+so it keeps its colour everywhere, and no two triggers offered by the same `HabitKind`
+share a slot (8 slots cannot do this for the nine lists; 9 can):
+
+| Slot | Hue | Triggers |
+|---|---|---|
+| 0 | 195° | Stress |
+| 1 | 212° | Habit |
+| 2 | 229° | Boredom |
+| 3 | 246° | After meal, Notification, Workout, Late night |
+| 4 | 263° | Social, Bedtime |
+| 5 | 280° | Tired, Coffee, Avoiding tasks |
+| 6 | 297° | Work, Watching TV, Celebrating, Drinks |
+| 7 | 314° | Lonely, Studying |
+| 8 | 331° | Morning, Commute |
+
+Saturation and lightness stay as they are; `tint` and `textTint` keep their signatures.
+Under the Ocean accent the blue triggers sit near the accent; that is not a status colour.
+
+Tests: each `HabitKind`'s triggers have 8 different tints; every trigger hue is at least
+25° from 160° (green), 38° (amber) and 0° (red); the readability and light/dark hue tests
+keep passing. "Every trigger has its own colour" gives way to the per-habit test.

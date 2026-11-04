@@ -42,8 +42,23 @@ Files: `lib/features/tracking/presentation/limit_status_ui.dart`,
 - [x] Leave `progress_ring.dart` and all text colours as they are.
 - [x] Commit `feat(theme): colour under-limit days green`.
 
+### Task G2: Trigger colours stay clear of the status colours
+
+Files: `lib/features/tracking/presentation/trigger_ui.dart`,
+`test/features/tracking/presentation/trigger_ui_test.dart`. Spec: "Trigger colours (G2)".
+
+- [ ] Tests (fail first): replace "every trigger has its own colour" with "a habit's
+  triggers each have their own colour" (for each `HabitKind`, the 8 tints are a set of 8);
+  add "no trigger looks like a status colour" (each tint's hue is at least 25° on the
+  wheel from 160, 38 and 0). Keep the readability and hue tests.
+- [ ] `trigger_ui.dart`: `_hue` becomes `195 + 17 * _slot`, with `int get _slot` per the
+  spec's table. Update the doc comment on `tint`.
+- [ ] Move `test/features/tracking/limit_status_ui_test.dart` into `presentation/`.
+- [ ] Commit `fix(tracking): keep trigger colours clear of the status colours`.
+
 ### Then
 
-Format, analyze, the task's test files plus `test/features/home/accessibility_test.dart`, then the
-simulator for Fawad: Ink accent, light and dark, on Home (History week and month), Plan
-details (stages, day rings, dots) and Logs (calendar, rail).
+Format, analyze, each task's test files plus `test/features/home/accessibility_test.dart`,
+then the simulator for Fawad: Ink accent, light and dark, on Home (History week and month,
+top triggers), Plan details (stages, day rings, dots) and Logs (calendar, rail, triggers
+card, log rows).
