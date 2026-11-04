@@ -28,10 +28,10 @@ Spec: `docs/superpowers/specs/2026-11-04-stage-polish-design.md`. Branch
 
 ### Task P4: A day opens its logs
 
-- [ ] Tests: tapping a past ring, a current ring and a dot opens Logs on that day; a ring
+- [x] Tests: tapping a past ring, a current ring and a dot opens Logs on that day; a ring
   ahead does nothing; a ring is a VoiceOver button.
-- [ ] `StageDays` takes an `onDay` callback; Plan details opens `LogsQuery` for the day.
-- [ ] Commit `feat(plan): open a day's logs from its ring or dot`.
+- [x] `StageDays` takes an `onDay` callback; Plan details opens `LogsQuery` for the day.
+- [x] Commit `feat(plan): open a day's logs from its ring or dot`.
 
 ### Then
 

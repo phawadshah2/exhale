@@ -15,15 +15,22 @@ import 'package:flutter/material.dart';
 enum DayDot { under, atLimit, over, today, ahead }
 
 /// A stage's days: a ring per day up to [maxRingDays], then a dot per day.
-/// A stage that has ended has no today and no days ahead.
+/// A stage that has ended has no today and no days ahead. Tapping a day up to
+/// today calls [onDay].
 class StageDays extends StatelessWidget {
-  const StageDays({required this.report, required this.today, super.key});
+  const StageDays({
+    required this.report,
+    required this.today,
+    this.onDay,
+    super.key,
+  });
 
   /// The most days that still show as rings.
   static const int maxRingDays = 14;
 
   final StageReport report;
   final LogicalDay today;
+  final ValueChanged<LogicalDay>? onDay;
 
   @override
   Widget build(BuildContext context) {
@@ -36,14 +43,17 @@ class StageDays extends StatelessWidget {
           : report.stage.dayNumberOf(today),
     );
     if (report.days > maxRingDays) {
-      return _DayDots(report: report, today: today, semanticLabel: image);
+      return _DayDots(
+        report: report,
+        today: today,
+        semanticLabel: image,
+        onDay: onDay,
+      );
     }
     return Semantics(
       container: true,
-      image: true,
       label: image,
-      excludeSemantics: true,
-      child: _DayRings(report: report, today: today),
+      child: _DayRings(report: report, today: today, onDay: onDay),
     );
   }
 }
@@ -57,13 +67,18 @@ Color _statusColor(BuildContext context, LimitStatus status) =>
 
 /// Seven rings to a row. Fixed size, as the row above says the same thing.
 class _DayRings extends StatelessWidget {
-  const _DayRings({required this.report, required this.today});
+  const _DayRings({
+    required this.report,
+    required this.today,
+    required this.onDay,
+  });
 
   static const int _perRow = 7;
   static const double _ring = 40;
 
   final StageReport report;
   final LogicalDay today;
+  final ValueChanged<LogicalDay>? onDay;
 
   @override
   Widget build(BuildContext context) {
@@ -72,13 +87,20 @@ class _DayRings extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final size = math.min(_ring, constraints.maxWidth / _perRow);
-          Widget ringFor(LogicalDay day) => StageDayRing(
-            day: day,
-            progress: day.isAfter(today) ? null : byDay[day],
-            limit: report.stage.limit,
-            isToday: day == today,
-            size: size,
-          );
+          Widget ringFor(LogicalDay day) {
+            final onDay = this.onDay;
+            return StageDayRing(
+              day: day,
+              progress: day.isAfter(today) ? null : byDay[day],
+              limit: report.stage.limit,
+              isToday: day == today,
+              size: size,
+              onTap: onDay == null || day.isAfter(today)
+                  ? null
+                  : () => onDay(day),
+            );
+          }
+
           return Column(
             spacing: AppSpacing.xs,
             children: [
@@ -109,6 +131,7 @@ class StageDayRing extends StatelessWidget {
     required this.limit,
     required this.isToday,
     required this.size,
+    this.onTap,
     super.key,
   });
 
@@ -117,13 +140,15 @@ class StageDayRing extends StatelessWidget {
   final int limit;
   final bool isToday;
   final double size;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.textTheme;
     final progress = this.progress;
-    return Container(
+    final date = AppFormat.weekdayDate(day);
+    final ring = Container(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
       decoration: isToday
           ? BoxDecoration(
@@ -168,6 +193,20 @@ class StageDayRing extends StatelessWidget {
         ],
       ),
     );
+    return Semantics(
+      container: true,
+      button: onTap != null,
+      label: progress == null
+          ? '$date: limit $limit'
+          : '$date: ${progress.count} of ${progress.limit}',
+      excludeSemantics: true,
+      onTap: onTap,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: ring,
+      ),
+    );
   }
 }
 
@@ -177,11 +216,13 @@ class _DayDots extends StatelessWidget {
     required this.report,
     required this.today,
     required this.semanticLabel,
+    required this.onDay,
   });
 
   final StageReport report;
   final LogicalDay today;
   final String semanticLabel;
+  final ValueChanged<LogicalDay>? onDay;
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +251,8 @@ class _DayDots extends StatelessWidget {
                 days: report.days,
                 width: constraints.maxWidth,
               );
-              return SizedBox(
+              final onDay = this.onDay;
+              final grid = SizedBox(
                 height:
                     layout.rows * layout.size + (layout.rows - 1) * layout.gap,
                 child: CustomPaint(
@@ -223,6 +265,19 @@ class _DayDots extends StatelessWidget {
                     ahead: colors.outlineVariant,
                   ),
                 ),
+              );
+              if (onDay == null) return grid;
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapUp: (details) {
+                  final day = _dayAt(
+                    details.localPosition,
+                    layout,
+                    constraints,
+                  );
+                  if (day != null) onDay(day);
+                },
+                child: grid,
               );
             },
           ),
@@ -241,6 +296,32 @@ class _DayDots extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// The day of the dot nearest [position], or null past the last day or
+  /// after today.
+  LogicalDay? _dayAt(
+    Offset position,
+    DotGrid layout,
+    BoxConstraints constraints,
+  ) {
+    final across = layout.cols > 1
+        ? (constraints.maxWidth - layout.size) / (layout.cols - 1)
+        : 0.0;
+    final col = across == 0
+        ? 0
+        : ((position.dx - layout.size / 2) / across).round().clamp(
+            0,
+            layout.cols - 1,
+          );
+    final row = (position.dy / (layout.size + layout.gap)).floor().clamp(
+      0,
+      layout.rows - 1,
+    );
+    final index = row * layout.cols + col;
+    if (index >= report.days) return null;
+    final day = report.stage.startDay.addDays(index);
+    return day.isAfter(today) ? null : day;
   }
 
   DayDot _dotFor(LogicalDay day, Map<LogicalDay, DailyProgress> byDay) {

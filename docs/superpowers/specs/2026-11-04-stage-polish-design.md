@@ -27,8 +27,9 @@ In the past-stage panel, "Used" and "Days over" turn red, not amber, when over.
 
 On Plan details, tapping a day ring or a dot of any stage (current or past) opens Logs for
 that day, the way History's days do (`LogsQuery(habitId, from: day, to: day)`). Days after
-today do nothing. Each ring is a VoiceOver button ("Mon, Nov 2: 9 of 10. Opens that day's
-logs"). The dot grid stays one image to VoiceOver; its days are also reachable through Logs.
+today do nothing. Each ring is a VoiceOver button worded like History's days ("Monday,
+Nov 2: 9 of 10"), under the stage's summary. The dot grid stays one image to VoiceOver; its
+days are also reachable through Logs.
 
 ## Tests
 

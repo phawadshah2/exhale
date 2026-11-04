@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
@@ -116,6 +117,7 @@ class StageRow extends ConsumerStatefulWidget {
     required this.kind,
     required this.habit,
     required this.window,
+    this.onDay,
     super.key,
   });
 
@@ -123,6 +125,9 @@ class StageRow extends ConsumerStatefulWidget {
   final StageRowKind kind;
   final Habit habit;
   final DayWindow? window;
+
+  /// Opens a day of a stage behind.
+  final ValueChanged<LogicalDay>? onDay;
 
   @override
   ConsumerState<StageRow> createState() => _StageRowState();
@@ -210,6 +215,7 @@ class _StageRowState extends ConsumerState<StageRow> {
                   kind: widget.kind,
                   habit: widget.habit,
                   window: widget.window,
+                  onDay: widget.onDay,
                 )
               : const SizedBox(width: double.infinity),
         ),
@@ -224,12 +230,14 @@ class _StagePanel extends ConsumerWidget {
     required this.kind,
     required this.habit,
     required this.window,
+    required this.onDay,
   });
 
   final StageReport report;
   final StageRowKind kind;
   final Habit habit;
   final DayWindow? window;
+  final ValueChanged<LogicalDay>? onDay;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -280,7 +288,7 @@ class _StagePanel extends ConsumerWidget {
         spacing: 10,
         children: [
           if (kind == StageRowKind.behind)
-            StageDays(report: report, today: today),
+            StageDays(report: report, today: today, onDay: onDay),
           if (context.hasLargeText)
             ...stats
           else

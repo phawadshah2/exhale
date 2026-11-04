@@ -21,6 +21,7 @@ class CurrentStageCard extends ConsumerWidget {
     required this.report,
     required this.today,
     required this.nextLimit,
+    this.onDay,
     super.key,
   });
 
@@ -29,6 +30,7 @@ class CurrentStageCard extends ConsumerWidget {
 
   /// The limit after this stage; 0 on the last one.
   final int nextLimit;
+  final ValueChanged<LogicalDay>? onDay;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,7 +42,7 @@ class CurrentStageCard extends ConsumerWidget {
 
     final saved = report.savedCents;
     final toSave = report.toSaveCents;
-    final days = StageDays(report: report, today: today);
+    final days = StageDays(report: report, today: today, onDay: onDay);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),

@@ -9,11 +9,14 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/fill_in.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/logs/presentation/logs_query.dart';
+import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/repositories/plan_repository.dart';
 import 'package:exhale/features/plan/presentation/pages/plan_details_page.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
+import 'package:exhale/features/plan/presentation/widgets/current_stage_card.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_days.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_row.dart';
@@ -861,7 +864,7 @@ void main() {
       await tester.disposeApp();
     });
 
-    testWidgets('the days are one image to VoiceOver', (tester) async {
+    testWidgets('the days are summed up for VoiceOver', (tester) async {
       await seedStage(14);
       await logResults();
       final semantics = tester.ensureSemantics();
@@ -882,6 +885,101 @@ void main() {
       // One for each of the other 11 stages.
       expect(find.byIcon(AppIcons.chevronDown), findsNWidgets(11));
       await tester.disposeApp();
+    });
+
+    group('a day opens its logs', () {
+      LogsQuery? openedQuery(WidgetTester tester) {
+        final page = find.byType(LogsPage);
+        return page.evaluate().isEmpty
+            ? null
+            : tester.widget<LogsPage>(page).query;
+      }
+
+      Finder currentRing(int index) => find
+          .descendant(
+            of: find.byType(CurrentStageCard),
+            matching: find.byType(StageDayRing),
+          )
+          .at(index);
+
+      testWidgets('from a past ring', (tester) async {
+        await seedK();
+        await openDetails(tester);
+        await tester.tap(find.text('Stage 1'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find
+              .descendant(
+                of: find.byType(StageRow).first,
+                matching: find.byType(StageDayRing),
+              )
+              .at(2),
+        );
+        await tester.pumpAndSettle();
+
+        final day = start.addDays(2);
+        expect(openedQuery(tester), LogsQuery(habitId: 1, from: day, to: day));
+        await tester.disposeApp();
+      });
+
+      testWidgets('from a current ring, but not one ahead', (tester) async {
+        await seedK();
+        await openDetails(tester);
+
+        await tester.tap(currentRing(5));
+        await tester.pumpAndSettle();
+        expect(openedQuery(tester), isNull);
+
+        await tester.tap(currentRing(1));
+        await tester.pumpAndSettle();
+        final day = LogicalDay(2026, 10, 30);
+        expect(openedQuery(tester), LogsQuery(habitId: 1, from: day, to: day));
+        await tester.disposeApp();
+      });
+
+      testWidgets('from a dot', (tester) async {
+        await seedStage(15);
+        await openDetails(tester);
+
+        final dots = find.byWidgetPredicate(
+          (widget) => widget is CustomPaint && widget.painter is DayDotsPainter,
+        );
+        final layout =
+            (tester.widget<CustomPaint>(dots).painter! as DayDotsPainter)
+                .layout;
+        final box = tester.getRect(dots);
+        final across = (box.width - layout.size) / (layout.cols - 1);
+        await tester.tapAt(
+          box.topLeft + Offset(2 * across + layout.size / 2, layout.size / 2),
+        );
+        await tester.pumpAndSettle();
+
+        final day = stageStart.addDays(2);
+        expect(openedQuery(tester), LogsQuery(habitId: 1, from: day, to: day));
+        await tester.disposeApp();
+      });
+
+      testWidgets('a ring is a VoiceOver button', (tester) async {
+        await seedK();
+        final semantics = tester.ensureSemantics();
+        await openDetails(tester);
+
+        expect(
+          tester.getSemantics(currentRing(1)),
+          isSemantics(
+            label: 'Friday, Oct 30: 0 of 9',
+            isButton: true,
+            hasTapAction: true,
+          ),
+        );
+        expect(
+          tester.getSemantics(currentRing(5)),
+          isSemantics(isButton: false, hasTapAction: false),
+        );
+        semantics.dispose();
+        await tester.disposeApp();
+      });
     });
   });
 
