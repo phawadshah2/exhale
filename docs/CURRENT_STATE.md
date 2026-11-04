@@ -22,11 +22,12 @@ rows still to do).
 
 ## Repo
 
-- Branch `feat/plan-and-stages`. Round 2 is committed (a947c2d). Pushed up to 5715c87; every commit after it is
-  local (UI fixes, Tasks 13 and 14, docs). No PR is open, and CI was not read.
-- Checks at 0c513c3: full suite 1073 passed. Round 2, last run: format and `analyze
-  --fatal-infos` clean; `test/features/{logs,home,settings,plan}` and `test/app` pass. Full
-  suite not run since; simulator not run.
+- Branch `feat/plan-and-stages`, code at d090f30 (trigger chips 34 pt, stage ring track
+  darker). Pushed up to 5715c87; every later commit is local. No PR is open, and CI was not
+  read.
+- Checks: full suite 1073 passed at 0c513c3, not run since. After Task 19: format and
+  `analyze --fatal-infos` clean; `test/features/home`, `test/app` and the new use case tests
+  pass (265). Simulator not run for rounds 2 or M7.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
 ## Done this session (2026-11-03)
