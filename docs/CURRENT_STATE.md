@@ -1,7 +1,7 @@
 # Current state
 
-Updated 2026-11-03. The full log of earlier sessions is in
-`docs/history/2026-10-16_to_11-03_state_log.md`.
+Updated 2026-11-04. The full log of earlier sessions (including Tasks 13 to 19 and UI round
+2) is in `docs/history/2026-10-16_to_11-03_state_log.md`.
 
 ## Where we are
 
@@ -28,41 +28,6 @@ rows still to do).
   `analyze --fatal-infos` clean. Simulator not run for round 2 or M7.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
-## Done this session (2026-11-03)
-
-- F1 to F4 (543ecc0, 203877e, 381598e, 389f483): ring card, History, Plan card (Edit pill
-  removed), Logs (weeks only, calendar sheet, week swipe, current-stage highlight).
-- Tasks 13 and 14 (cdbb703, 0c513c3): `PlanHold` and `ReductionPlan.holds` (`quitDay` includes
-  held days, `agreedQuitDay` is stored); schema v11 (`plan_holds`, `stage_checks`,
-  `exhale_v10.sqlite` fixture), `StageCheck`, `StageCheckRepository`, `stageChecksProvider`.
-  `record(closesHoldWindow:)` stamps the old hold card with midnight of the new check's day.
-- Task 15: `StageChecks.evaluate` (`stage_checks.dart`); a skipped result closes no hold.
-- Task 16: `RunStageCheck` (one transaction) and `StageCheckListener` in the shell; runs at
-  start and on a day change. Added `HabitLogRepository.getLogs`.
-- Task 17: `PlanChoices.review` / `reassess` and `PlanChoice` (`plan_choices.dart`, integer
-  length maths), `HabitWording.supportLine` and `stopSuddenlyLine`.
-- Task 18: `stageCardProvider` (current plan's unanswered row only), `StageCards` in the
-  ring card's slot like `QuitReachedCard` (the mock draws separate cards; the spec says the
-  slot), `AnswerStageCheck`, `KeepOriginalDate`. Not seen in the simulator or dark mode.
-- Task 19: `StageChoiceSheet` (shared), review and reassess sheets, `AnswerWithNewPlan`
-  (answer first, one transaction), `stageWindowStatsProvider`. Not seen in the simulator.
-
-## UI review round 2 (a947c2d, 2026-11-03)
-
-- Logs: weekday above ring, highlight wraps both; iOS date wheel replaces the sheet
-  (`logs_date_picker.dart` deleted); count ring on the right of the day header
-  (`LogsCountRing`); a trigger filter lists the whole week's matches (`_RangeLogs`); picking
-  a date clears the filter; hint under the chips; no SafeArea.
-- Range mode: History Month/All opens `LogsSelection.isRange` (a span reaching before the
-  week of its end). No calendar; "Back to weeks"; filtered = matches across the range,
-  unfiltered = one row per day (tap opens that week). Fixed for a just-begun month.
-- Plan: Edit plan pace note ("Pace: ... (was ...)") and "Use suggested date"; "8 weeks" and
-  "16 weeks" pills, smaller; price card and preview animate; `ScrollReveal` moved to
-  `lib/core/widgets` and used on Plan details, Edit plan, Settings (`ReplayOnVisit` tab 1).
-- Home: trigger rows 28 pt (under the 44 pt rule, Fawad asked), smaller History pills, "Details
-  ›" on the plan card. Tab switch fades via `lib/app/shell/branch_fade.dart`.
-- Not done: Change habit and onboarding have no entry reveal.
-
 ## M7 review (2026-11-04, Opus 5.5 high)
 
 - a6c91d1: a skipped check now closes a waiting hold card (spec 5.1; it stayed with stale dates).
@@ -82,6 +47,9 @@ only; add hold, review and reassess scenarios (e.g. a `SEED_STAGE` define, with 
 the real check produce each outcome), wipe the app between them, walk light and dark. Then
 Steps 4 and 5. A choice that moves the quit date earlier reads "N days/weeks earlier" (my
 call; say if wrong).
+
+Read first: the plan's Task 20, Stages spec 2, 3 and 5, `lib/main_seed.dart`,
+`lib/features/plan/domain/services/stage_checks.dart`.
 
 ## Open checks
 
