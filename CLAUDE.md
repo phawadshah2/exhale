@@ -15,8 +15,9 @@ Progress and the single next action live in `docs/CURRENT_STATE.md`. Read it fir
 it when a task or milestone finishes. Older session logs are in `docs/history/`.
 
 - Active plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md` on branch
-  `feat/plan-and-stages`. M6 (Plan details, Edit plan, Logs) is done; M7 (stage
-  management) is next.
+  `feat/plan-and-stages`. M6 (Plan details, Edit plan, Logs) and M7 (stage management)
+  are done: reviewed and walked in the simulator. Next: merge to `main`, then the real
+  iPhone pass.
 - Specs: `docs/superpowers/specs/` (one per plan). Designs: `design/` (each folder has a
   README).
 - Launch scope (Fawad, 2026-10-31): the first release tracks one habit. Never offer a
@@ -82,14 +83,18 @@ This section overrides the global approval rules for this project only.
   Features: habit, home, logs, onboarding, plan, settings, tracking.
 - State: Riverpod 3 with hand-written providers. No riverpod_generator. Providers read
   repositories and use cases from `sl`.
-- Storage: drift, fully offline, schema v10 (`habits`; plans and logs keyed by
-  `habit_id`; v9 wake and bed times; v10 `habit_prices`). Repositories return `Result`
-  and wrap storage calls in `guardStorage`.
+- Storage: drift, fully offline, schema v11 (`habits`; plans and logs keyed by
+  `habit_id`; v9 wake and bed times; v10 `habit_prices`; v11 `plan_holds` and
+  `stage_checks`). Repositories return `Result` and wrap storage calls in `guardStorage`.
 - Day logic: a logical day resets at a user-set hour (default 4 AM). Logs between
   midnight and the reset hour belong to the previous day.
 - Plan: `ReductionPlan(startDay, startLimit, quitDay)`; the limit on day d is
   `ceil(start × (D − d) / D)`. `PlanHistory.replan` keeps earlier plans so past days keep
   their own limit.
+- Stages (M7, spec `2026-11-02-stage-management-design.md`): `StageChecks.evaluate` runs
+  on start and day change over the latest ended stage. A failed check holds the stage 7
+  days (`PlanHold`, which shifts later drops and the quit date); a second failure in a row
+  shows the review card, near the first limit the reassess card. Past limits never change.
 - Habits: `HabitKind` presets (vaping, smoking, nicotinePouches, alcohol, caffeine,
   energyDrinks, junkFood, socialMedia) plus custom. Logs carry an optional trigger (20
   `Trigger` values, 8 per habit) and a note.

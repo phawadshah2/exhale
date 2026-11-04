@@ -1,5 +1,6 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
+import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/home/presentation/widgets/history/month_ring_calendar.dart';
 import 'package:exhale/features/home/presentation/widgets/history/week_line_chart.dart';
 import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
@@ -97,6 +98,65 @@ void main() {
     expect(find.text('Over'), findsOneWidget);
     expect(find.text('Before plan'), findsOneWidget);
     expect(find.text('31'), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('the Under key is green', (tester) async {
+    await seedWeek();
+    await showHistory(tester);
+    await tester.tap(find.text('Month'));
+    await tester.pumpAndSettle();
+
+    final swatch = tester.widget<Container>(
+      find.descendant(
+        of: find.ancestor(of: find.text('Under'), matching: find.byType(Row)),
+        matching: find.byType(Container),
+      ),
+    );
+    final context = tester.element(find.text('Under'));
+    expect(
+      (swatch.decoration! as BoxDecoration).color,
+      context.exhale.success.solid,
+    );
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('week points under the limit are green, the line the accent', (
+    tester,
+  ) async {
+    await seedWeek();
+    await showHistory(tester);
+
+    final chart = find
+        .descendant(
+          of: find.byType(WeekLineChart),
+          matching: find.byType(CustomPaint),
+        )
+        .first;
+    final context = tester.element(chart);
+    final green = context.exhale.success.solid;
+    final accent = context.colors.primaryContainer;
+    // Paint keeps 8 bits a channel, so compare as ARGB.
+    expect(
+      tester.renderObject(chart),
+      paints..something(
+        (call, args) =>
+            call == #drawCircle &&
+            (args[2] as Paint).style == PaintingStyle.stroke &&
+            (args[2] as Paint).color.toARGB32() == green.toARGB32(),
+      ),
+    );
+    expect(
+      tester.renderObject(chart),
+      paints..something(
+        (call, args) =>
+            call == #drawPath &&
+            (args[1] as Paint).strokeWidth == 3 &&
+            (args[1] as Paint).color.toARGB32() == accent.toARGB32(),
+      ),
+    );
 
     await tester.disposeApp();
   });

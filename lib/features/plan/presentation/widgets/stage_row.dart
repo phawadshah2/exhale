@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
@@ -8,6 +9,7 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/domain/services/plan_report.dart';
 import 'package:exhale/features/plan/presentation/plan_copy.dart';
+import 'package:exhale/features/plan/presentation/widgets/stage_days.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
 import 'package:exhale/features/settings/domain/entities/day_window.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
@@ -115,6 +117,7 @@ class StageRow extends ConsumerStatefulWidget {
     required this.kind,
     required this.habit,
     required this.window,
+    this.onDay,
     super.key,
   });
 
@@ -122,6 +125,9 @@ class StageRow extends ConsumerStatefulWidget {
   final StageRowKind kind;
   final Habit habit;
   final DayWindow? window;
+
+  /// Opens a day of a stage behind.
+  final ValueChanged<LogicalDay>? onDay;
 
   @override
   ConsumerState<StageRow> createState() => _StageRowState();
@@ -209,6 +215,7 @@ class _StageRowState extends ConsumerState<StageRow> {
                   kind: widget.kind,
                   habit: widget.habit,
                   window: widget.window,
+                  onDay: widget.onDay,
                 )
               : const SizedBox(width: double.infinity),
         ),
@@ -223,17 +230,19 @@ class _StagePanel extends ConsumerWidget {
     required this.kind,
     required this.habit,
     required this.window,
+    required this.onDay,
   });
 
   final StageReport report;
   final StageRowKind kind;
   final Habit habit;
   final DayWindow? window;
+  final ValueChanged<LogicalDay>? onDay;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final today = ref.watch(todayProvider);
-    final warning = context.exhale.warning.foreground;
+    final over = context.exhale.danger.foreground;
     final mostly = report.mostly;
     final pace = PlanCopy.paceEvery(window, report.stage.limit);
     final unitsTitle = PlanCopy.unitsTitle(habit);
@@ -243,12 +252,12 @@ class _StagePanel extends ConsumerWidget {
         _Stat(
           unitsTitle,
           PlanCopy.usedOf(report.used, report.allowed),
-          color: report.isOverAllowed ? warning : null,
+          color: report.isOverAllowed ? over : null,
         ),
         _Stat(
           PlanCopy.daysOver,
           PlanCopy.overOf(report.daysOver, report.days),
-          color: report.daysOver > 0 ? warning : null,
+          color: report.daysOver > 0 ? over : null,
         ),
         _Stat(PlanCopy.average, PlanCopy.perDay(report.average)),
         if (mostly != null) _Stat(PlanCopy.mostly, mostly.label),
@@ -278,6 +287,8 @@ class _StagePanel extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 10,
         children: [
+          if (kind == StageRowKind.behind)
+            StageDays(report: report, today: today, onDay: onDay),
           if (context.hasLargeText)
             ...stats
           else

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:exhale/core/domain/time/logical_day.dart';
@@ -12,6 +13,7 @@ import 'package:exhale/core/widgets/scroll_reveal.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
+import 'package:exhale/features/logs/presentation/logs_query.dart';
 import 'package:exhale/features/plan/domain/services/plan_report.dart';
 import 'package:exhale/features/plan/presentation/plan_copy.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
@@ -23,6 +25,7 @@ import 'package:exhale/features/plan/presentation/widgets/stage_row.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -106,6 +109,11 @@ class _PlanDetails extends ConsumerWidget {
     String money(double cents) =>
         AppFormat.money(math.max(0, cents), symbol: settings.currencySymbol);
 
+    void openDay(LogicalDay day) {
+      unawaited(HapticFeedback.selectionClick());
+      openLogs(context, LogsQuery(habitId: habitId, from: day, to: day));
+    }
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: AppSpacing.page.copyWith(
@@ -175,6 +183,7 @@ class _PlanDetails extends ConsumerWidget {
                         kind: StageRowKind.behind,
                         habit: habit,
                         window: window,
+                        onDay: openDay,
                       ),
                   ],
                 ],
@@ -190,6 +199,7 @@ class _PlanDetails extends ConsumerWidget {
                     report: current,
                     today: today,
                     nextLimit: report.ahead.firstOrNull?.stage.limit ?? 0,
+                    onDay: openDay,
                   ),
                 ],
               ),

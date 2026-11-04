@@ -871,7 +871,7 @@ abstract final class StageChecks { static StageCheckResult? evaluate({required P
 - [x] **Step 1: Ask Fawad** for the review on Opus 5.5 high, in a fresh session, over the Stages spec and Phase 5's diff. Focus:
   the limit rule with holds, the streak, transactions, and past limits never changing.
 - [x] **Step 2: Fix findings**, each seen red first where a test can show it.
-- [ ] **Step 3: Ask Fawad** for a simulator walk: a hold, a review and a reassess from seeded data.
-- [ ] **Step 4: Update** `docs/CURRENT_STATE.md`, `CLAUDE.md` ("schema v11", new features) and the roadmap's rows.
-- [ ] **Step 5: Commit** `docs: record the M7 review`, and give Fawad the push command. The real iPhone pass stays pending
+- [x] **Step 3: Ask Fawad** for a simulator walk: a hold, a review and a reassess from seeded data.
+- [x] **Step 4: Update** `docs/CURRENT_STATE.md`, `CLAUDE.md` ("schema v11", new features) and the roadmap's rows.
+- [x] **Step 5: Commit** `docs: record the M7 review`, and give Fawad the push command. The real iPhone pass stays pending
   and must include these screens.

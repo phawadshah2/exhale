@@ -6,6 +6,7 @@ import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/clock.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/home/presentation/widgets/stage_cards.dart';
 import 'package:exhale/features/home/presentation/widgets/stage_choice_sheet.dart';
@@ -476,6 +477,24 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(spy.answers, 1);
+
+      await tester.disposeApp();
+    });
+
+    testWidgets('fits its content, with no space under the footer', (
+      tester,
+    ) async {
+      await seedReview(tester);
+      await openSheet(tester, 'Review my plan');
+
+      final screen =
+          tester.view.physicalSize.height / tester.view.devicePixelRatio;
+      final sheet = tester.getRect(find.byType(AppSheetFrame));
+      expect(sheet.height, lessThan(screen * 0.6));
+      final foot = tester.getRect(
+        find.text('Past days keep their limits. Stages start again at 1.'),
+      );
+      expect(sheet.bottom - foot.bottom, lessThan(40));
 
       await tester.disposeApp();
     });

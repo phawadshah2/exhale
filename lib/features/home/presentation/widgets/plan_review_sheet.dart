@@ -30,11 +30,9 @@ Future<void> showPlanReviewSheet(
     windowAverage: stats.average,
     checkedLimit: history.limitOn(card.windowEndDay),
   );
-  await showAppDraggableSheet<void>(
+  await showAppSheet<void>(
     context,
-    initialSize: 0.9,
-    builder: (context, controller) => StageChoiceSheet(
-      controller: controller,
+    builder: (context) => StageChoiceSheet(
       habitId: habitId,
       card: card,
       today: today,

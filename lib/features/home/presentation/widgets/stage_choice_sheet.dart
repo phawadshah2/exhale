@@ -60,7 +60,6 @@ abstract final class StageChoiceCopy {
 /// above, the choices, one button and the line under it.
 class StageChoiceSheet extends ConsumerStatefulWidget {
   const StageChoiceSheet({
-    required this.controller,
     required this.habitId,
     required this.card,
     required this.today,
@@ -72,7 +71,6 @@ class StageChoiceSheet extends ConsumerStatefulWidget {
     super.key,
   });
 
-  final ScrollController controller;
   final int habitId;
   final StageCard card;
 
@@ -158,47 +156,54 @@ class _StageChoiceSheetState extends ConsumerState<StageChoiceSheet> {
     ref.listen<LogicalDay>(todayProvider, (_, today) {
       if (today != widget.today && !_saving) Navigator.of(context).pop();
     });
-    return ListView(
-      controller: widget.controller,
-      padding: const EdgeInsets.fromLTRB(20, 28, 20, 24),
-      children: [
-        Text(widget.title, style: text.titleLarge),
-        const SizedBox(height: 4),
-        Text(widget.lead, style: muted),
-        const SizedBox(height: AppSpacing.md),
-        ...widget.header,
-        const SizedBox(height: AppSpacing.md),
-        Semantics(
-          container: true,
-          label: 'Choose how to go on',
-          child: Column(
-            spacing: AppSpacing.sm,
-            children: [
-              for (final choice in widget.choices)
-                _ChoiceTile(
-                  choice: choice,
-                  selected: choice.kind == _selected,
-                  onTap: () => _select(choice.kind),
-                ),
-            ],
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.lg,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(widget.title, style: text.titleLarge),
+          const SizedBox(height: 4),
+          Text(widget.lead, style: muted),
+          const SizedBox(height: AppSpacing.md),
+          ...widget.header,
+          const SizedBox(height: AppSpacing.md),
+          Semantics(
+            container: true,
+            label: 'Choose how to go on',
+            child: Column(
+              spacing: AppSpacing.sm,
+              children: [
+                for (final choice in widget.choices)
+                  _ChoiceTile(
+                    choice: choice,
+                    selected: choice.kind == _selected,
+                    onTap: () => _select(choice.kind),
+                  ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        PrimaryButton(
-          label: StageChoiceCopy.button(_selected),
-          isBusy: _saving,
-          onPressed: () => unawaited(_save()),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          StageChoiceCopy.foot(_selected),
-          style: text.bodySmall?.copyWith(
-            color: context.colors.onSurfaceVariant,
+          const SizedBox(height: AppSpacing.md),
+          PrimaryButton(
+            label: StageChoiceCopy.button(_selected),
+            isBusy: _saving,
+            onPressed: () => unawaited(_save()),
           ),
-        ),
-        if (widget.footer.isNotEmpty) const SizedBox(height: AppSpacing.md),
-        ...widget.footer,
-      ],
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            StageChoiceCopy.foot(_selected),
+            style: text.bodySmall?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
+          if (widget.footer.isNotEmpty) const SizedBox(height: AppSpacing.md),
+          ...widget.footer,
+        ],
+      ),
     );
   }
 }

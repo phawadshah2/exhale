@@ -32,11 +32,9 @@ Future<void> showPlanReassessSheet(
     today: today,
     average: card.average,
   );
-  await showAppDraggableSheet<void>(
+  await showAppSheet<void>(
     context,
-    initialSize: 0.9,
-    builder: (context, controller) => StageChoiceSheet(
-      controller: controller,
+    builder: (context) => StageChoiceSheet(
       habitId: habitId,
       card: card,
       today: today,

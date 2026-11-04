@@ -9,13 +9,17 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/fill_in.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/logs/presentation/logs_query.dart';
+import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/repositories/plan_repository.dart';
 import 'package:exhale/features/plan/presentation/pages/plan_details_page.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/plan/presentation/widgets/current_stage_card.dart';
+import 'package:exhale/features/plan/presentation/widgets/stage_days.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
+import 'package:exhale/features/plan/presentation/widgets/stage_row.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
@@ -315,7 +319,7 @@ void main() {
                 .painter!
             as StageRingPainter;
 
-    testWidgets('fill is used over allowed, capped, and warns when over', (
+    testWidgets('fill is used over allowed, capped, and red when over', (
       tester,
     ) async {
       await seedK();
@@ -328,11 +332,23 @@ void main() {
 
       final over = painterOf(tester, find.byType(StageRing).at(0));
       expect(over.fill, 1);
-      expect(over.color, context.exhale.warning.solid);
+      expect(over.color, context.exhale.danger.solid);
 
       final under = painterOf(tester, find.byType(StageRing).at(1));
       expect(under.fill, closeTo(21 / 77, 0.001));
-      expect(under.color, context.colors.primaryContainer);
+      expect(under.color, context.exhale.success.solid);
+      await tester.disposeApp();
+    });
+
+    testWidgets('a stage used exactly to its limit is amber', (tester) async {
+      await seedK();
+      await logOn(start, times: 84);
+      await openDetails(tester);
+
+      final context = tester.element(find.byType(StageRing).first);
+      final atLimit = painterOf(tester, find.byType(StageRing).at(0));
+      expect(atLimit.fill, 1);
+      expect(atLimit.color, context.exhale.warning.solid);
       await tester.disposeApp();
     });
 
@@ -405,9 +421,7 @@ void main() {
       await tester.disposeApp();
     });
 
-    testWidgets("a stage's over figures use the warning colour", (
-      tester,
-    ) async {
+    testWidgets("a stage's over figures are red", (tester) async {
       await seedK();
       await logOn(start, times: 90);
       await openDetails(tester);
@@ -415,16 +429,92 @@ void main() {
       await tester.tap(find.text('Stage 1'));
       await tester.pumpAndSettle();
 
-      final warning = tester
+      final danger = tester
           .element(find.text('90 of 84 used'))
           .exhale
-          .warning
+          .danger
           .foreground;
       expect(
         tester.widget<Text>(find.text('90 of 84 used')).style?.color,
-        warning,
+        danger,
       );
-      expect(tester.widget<Text>(find.text('1 of 7')).style?.color, warning);
+      expect(tester.widget<Text>(find.text('1 of 7')).style?.color, danger);
+      await tester.disposeApp();
+    });
+
+    testWidgets('a past stage shows a ring per day, with no today', (
+      tester,
+    ) async {
+      await seedK();
+      await logOn(start, times: 13);
+      await openDetails(tester);
+
+      await tester.tap(find.text('Stage 1'));
+      await tester.pumpAndSettle();
+
+      final rings = find.descendant(
+        of: find.byType(StageRow).first,
+        matching: find.byType(StageDayRing),
+      );
+      expect(rings, findsNWidgets(7));
+      final days = tester.widgetList<StageDayRing>(rings).toList();
+      expect(days.first.day, start);
+      expect(days.last.day, start.addDays(6));
+      expect(days.any((ring) => ring.isToday), isFalse);
+      expect(days.every((ring) => ring.progress != null), isTrue);
+      expect(days.first.progress!.count, 13);
+      await tester.disposeApp();
+    });
+
+    testWidgets('a 15-day past stage shows its dots and both dates', (
+      tester,
+    ) async {
+      final planStart = today.addDays(-20);
+      await seedHabit(
+        PlanDraft(
+          startDay: planStart,
+          startLimit: 2,
+          quitDay: planStart.addDays(30),
+        ),
+        habit: Habit.vaping,
+        priceCents: 800,
+      );
+      await logOn(planStart, times: 3);
+      await openDetails(tester);
+
+      await tester.tap(find.text('Stage 1'));
+      await tester.pumpAndSettle();
+
+      final row = find.byType(StageRow).first;
+      expect(
+        find.descendant(of: row, matching: find.byType(StageDayRing)),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: row, matching: find.text('Oct 12')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: row, matching: find.text('Oct 26')),
+        findsOneWidget,
+      );
+      final painter =
+          tester
+                  .widget<CustomPaint>(
+                    find.descendant(
+                      of: row,
+                      matching: find.byWidgetPredicate(
+                        (widget) =>
+                            widget is CustomPaint &&
+                            widget.painter is DayDotsPainter,
+                      ),
+                    ),
+                  )
+                  .painter!
+              as DayDotsPainter;
+      expect(painter.dots, hasLength(15));
+      expect(painter.dots.first, DayDot.over);
+      expect(painter.dots.skip(1), everyElement(DayDot.under));
       await tester.disposeApp();
     });
 
@@ -597,7 +687,7 @@ void main() {
       );
       expect(dayPainter(tester, 1).color, context.exhale.warning.solid);
       final under = dayPainter(tester, 2);
-      expect(under.color, context.colors.primaryContainer);
+      expect(under.color, context.exhale.success.solid);
       expect(under.fill, 0.5);
       await tester.disposeApp();
     });
@@ -610,7 +700,7 @@ void main() {
       await openDetails(tester);
 
       final context = tester.element(find.byType(StageDayRing).first);
-      expect(dayPainter(tester, 7).color, context.colors.primaryContainer);
+      expect(dayPainter(tester, 7).color, context.exhale.success.solid);
       expect(dayPainter(tester, 7).dashed, isFalse);
       expect(tester.widget<StageDayRing>(ringAt(7)).isToday, isTrue);
       expect(tester.widget<StageDayRing>(ringAt(6)).isToday, isFalse);
@@ -673,6 +763,10 @@ void main() {
       expect(painter.dots[7], DayDot.today);
       expect(painter.dots[8], DayDot.ahead);
       expect(painter.layout.cols, 13);
+      expect(
+        painter.under,
+        tester.element(find.text('Each dot is a day')).exhale.success.solid,
+      );
       await tester.disposeApp();
     });
 
@@ -774,7 +868,7 @@ void main() {
       await tester.disposeApp();
     });
 
-    testWidgets('the days are one image to VoiceOver', (tester) async {
+    testWidgets('the days are summed up for VoiceOver', (tester) async {
       await seedStage(14);
       await logResults();
       final semantics = tester.ensureSemantics();
@@ -795,6 +889,101 @@ void main() {
       // One for each of the other 11 stages.
       expect(find.byIcon(AppIcons.chevronDown), findsNWidgets(11));
       await tester.disposeApp();
+    });
+
+    group('a day opens its logs', () {
+      LogsQuery? openedQuery(WidgetTester tester) {
+        final page = find.byType(LogsPage);
+        return page.evaluate().isEmpty
+            ? null
+            : tester.widget<LogsPage>(page).query;
+      }
+
+      Finder currentRing(int index) => find
+          .descendant(
+            of: find.byType(CurrentStageCard),
+            matching: find.byType(StageDayRing),
+          )
+          .at(index);
+
+      testWidgets('from a past ring', (tester) async {
+        await seedK();
+        await openDetails(tester);
+        await tester.tap(find.text('Stage 1'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find
+              .descendant(
+                of: find.byType(StageRow).first,
+                matching: find.byType(StageDayRing),
+              )
+              .at(2),
+        );
+        await tester.pumpAndSettle();
+
+        final day = start.addDays(2);
+        expect(openedQuery(tester), LogsQuery(habitId: 1, from: day, to: day));
+        await tester.disposeApp();
+      });
+
+      testWidgets('from a current ring, but not one ahead', (tester) async {
+        await seedK();
+        await openDetails(tester);
+
+        await tester.tap(currentRing(5));
+        await tester.pumpAndSettle();
+        expect(openedQuery(tester), isNull);
+
+        await tester.tap(currentRing(1));
+        await tester.pumpAndSettle();
+        final day = LogicalDay(2026, 10, 30);
+        expect(openedQuery(tester), LogsQuery(habitId: 1, from: day, to: day));
+        await tester.disposeApp();
+      });
+
+      testWidgets('from a dot', (tester) async {
+        await seedStage(15);
+        await openDetails(tester);
+
+        final dots = find.byWidgetPredicate(
+          (widget) => widget is CustomPaint && widget.painter is DayDotsPainter,
+        );
+        final layout =
+            (tester.widget<CustomPaint>(dots).painter! as DayDotsPainter)
+                .layout;
+        final box = tester.getRect(dots);
+        final across = (box.width - layout.size) / (layout.cols - 1);
+        await tester.tapAt(
+          box.topLeft + Offset(2 * across + layout.size / 2, layout.size / 2),
+        );
+        await tester.pumpAndSettle();
+
+        final day = stageStart.addDays(2);
+        expect(openedQuery(tester), LogsQuery(habitId: 1, from: day, to: day));
+        await tester.disposeApp();
+      });
+
+      testWidgets('a ring is a VoiceOver button', (tester) async {
+        await seedK();
+        final semantics = tester.ensureSemantics();
+        await openDetails(tester);
+
+        expect(
+          tester.getSemantics(currentRing(1)),
+          isSemantics(
+            label: 'Friday, Oct 30: 0 of 9',
+            isButton: true,
+            hasTapAction: true,
+          ),
+        );
+        expect(
+          tester.getSemantics(currentRing(5)),
+          isSemantics(isButton: false, hasTapAction: false),
+        );
+        semantics.dispose();
+        await tester.disposeApp();
+      });
     });
   });
 

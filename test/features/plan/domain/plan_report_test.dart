@@ -6,6 +6,7 @@ import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/services/plan_report.dart';
 import 'package:exhale/features/tracking/domain/entities/habit_log.dart';
+import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/domain/services/daily_progress_builder.dart';
 import 'package:exhale/features/tracking/domain/services/progress_calculator.dart';
@@ -141,6 +142,18 @@ void main() {
       expect(second.allowed, 77);
       expect(second.daysOver, 2);
       expect(second.isOverAllowed, isTrue);
+    });
+
+    test('a stage is under, at or over by its total', () {
+      final [first, second, _] = k.behind.single.stages;
+      expect(first.status, LimitStatus.under);
+      expect(second.status, LimitStatus.over);
+
+      final atLimit = report(logs: logsFrom(start, List.filled(7, 12)));
+      expect(atLimit.behind.single.stages.first.status, LimitStatus.at);
+
+      final empty = report(logs: []);
+      expect(empty.behind.single.stages.first.status, LimitStatus.under);
     });
 
     test('the current stage counts today in used, not in saved', () {

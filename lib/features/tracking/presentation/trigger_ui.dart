@@ -49,7 +49,7 @@ extension TriggerUi on Trigger {
     Trigger.avoidingTasks => AppIcons.avoidingTasks,
   };
 
-  /// Each trigger keeps its own hue wherever it is shown, whatever its rank.
+  /// Each trigger keeps its hue wherever it is shown, whatever its rank.
   Color tint(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return HSLColor.fromAHSL(1, _hue, 0.62, dark ? 0.66 : 0.46).toColor();
@@ -62,26 +62,25 @@ extension TriggerUi on Trigger {
     return HSLColor.fromAHSL(1, _hue, 0.62, dark ? 0.76 : 0.27).toColor();
   }
 
-  double get _hue => switch (this) {
-    Trigger.stress => 4,
-    Trigger.coffee => 22,
-    Trigger.afterMeal => 38,
-    Trigger.work => 52,
-    Trigger.morning => 70,
-    Trigger.workout => 90,
-    Trigger.habit => 112,
-    Trigger.commute => 136,
-    Trigger.social => 156,
-    Trigger.drinks => 174,
-    Trigger.boredom => 190,
-    Trigger.watchingTv => 204,
-    Trigger.studying => 218,
-    Trigger.bedtime => 234,
-    Trigger.lateNight => 250,
-    Trigger.tired => 268,
-    Trigger.notification => 286,
-    Trigger.celebrating => 304,
-    Trigger.lonely => 322,
-    Trigger.avoidingTasks => 340,
+  /// Blue to magenta only, so a trigger never reads as under, at or over.
+  double get _hue => 198 + 15.0 * _slot;
+
+  /// One of 9 hues. No two triggers offered for the same habit share one.
+  int get _slot => switch (this) {
+    Trigger.stress => 0,
+    Trigger.habit => 1,
+    Trigger.boredom => 2,
+    Trigger.afterMeal ||
+    Trigger.notification ||
+    Trigger.workout ||
+    Trigger.lateNight => 3,
+    Trigger.social || Trigger.bedtime => 4,
+    Trigger.tired || Trigger.coffee || Trigger.avoidingTasks => 5,
+    Trigger.work ||
+    Trigger.watchingTv ||
+    Trigger.celebrating ||
+    Trigger.drinks => 6,
+    Trigger.lonely || Trigger.studying => 7,
+    Trigger.morning || Trigger.commute => 8,
   };
 }

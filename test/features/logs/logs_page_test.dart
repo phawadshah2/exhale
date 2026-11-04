@@ -276,7 +276,7 @@ void main() {
             matching: find.byType(CustomPaint),
           ),
         ),
-        paints..arc(color: under.colors.primaryContainer),
+        paints..arc(color: under.exhale.success.solid),
       );
 
       final over = await ring(limit: 2, count: 3);
@@ -400,7 +400,7 @@ void main() {
 
       final under = ringOf(tester, oct(14));
       expect(under.fill, closeTo(3 / 9, 0.001));
-      expect(under.color, context.colors.primaryContainer);
+      expect(under.color, context.exhale.success.solid);
       expect(under.dashed, isFalse);
 
       final at = ringOf(tester, oct(15));

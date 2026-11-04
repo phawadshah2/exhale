@@ -38,6 +38,8 @@ data from M1 stays, so the later release needs no data migration for this.
 | 3. Logging and editing | **M3:** + tap/hold, trigger sheet with habit, hint, Edit log, Edit plan | Yes | M | Yes |
 | 3b. Onboarding redesign | **O1–O4:** emphasis colour, schema v9 (wake/bed), six-step chat onboarding, pace guide on Home. Plan: `2026-10-29-onboarding-redesign.md` | Yes | L | Yes |
 | 5. States and launch polish | **M5:** every state from the "States" row, change habit, light mode, accessibility, release blockers, device QA | Yes | L | Release candidate |
+| 6. Plan details, Edit plan, Logs | **M6:** Plan details (frame K), Edit plan, Logs pass, schema v10 (`habit_prices`). Plan: `2026-11-02-plan-and-stages.md` | Yes | L | Yes |
+| 7. Stage management | **M7:** stage checks, 7-day holds, review and reassess cards and sheets, schema v11 (`plan_holds`, `stage_checks`). Same plan | Yes | L | Yes, with M6 |
 | 4. Multiple habits (after launch) | **M4:** Add habit, multi-habit Home, Details with switcher, Logs "All", stop tracking | Yes | L | Later release |
 
 Each milestone ends with: all tests passing, analyze clean, a simulator run

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:exhale/core/theme/app_palette.dart';
 import 'package:exhale/core/theme/app_theme.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
 import 'package:exhale/features/tracking/presentation/trigger_ui.dart';
 import 'package:flutter/material.dart';
@@ -27,10 +28,40 @@ void main() {
     return result;
   }
 
-  testWidgets('every trigger has its own colour', (tester) async {
+  testWidgets("a habit's triggers each have their own colour", (tester) async {
     final colors = await tints(tester, ThemeData.dark());
 
-    expect(colors.values.toSet(), hasLength(Trigger.values.length));
+    for (final kind in HabitKind.values) {
+      expect(
+        {for (final trigger in kind.triggers) colors[trigger]},
+        hasLength(kind.triggers.length),
+        reason: kind.name,
+      );
+    }
+  });
+
+  testWidgets('no trigger looks like a status colour', (tester) async {
+    final colors = await tints(tester, AppTheme.light);
+
+    double apart(double a, double b) {
+      final d = (a - b).abs() % 360;
+      return math.min(d, 360 - d);
+    }
+
+    for (final MapEntry(key: trigger, value: color) in colors.entries) {
+      final hue = HSLColor.fromColor(color).hue;
+      for (final (status, statusHue) in [
+        ('green', 160.0),
+        ('amber', 38.0),
+        ('red', 0.0),
+      ]) {
+        expect(
+          apart(hue, statusHue),
+          greaterThanOrEqualTo(35),
+          reason: '${trigger.name} near $status',
+        );
+      }
+    }
   });
 
   for (final (name, theme, card) in [
