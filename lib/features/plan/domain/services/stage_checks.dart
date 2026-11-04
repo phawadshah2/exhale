@@ -87,7 +87,17 @@ abstract final class StageChecks {
       (c) => c.outcome == StageOutcome.hold && c.answeredAt == null,
     );
 
-    if (today.daysSince(end) > maxLateDays) {
+    // A card that waited past the stage's end blocked the check on the days
+    // after it, so those days were shown unheld; a hold now would change them.
+    final blockedByCard = own.any(
+      (c) =>
+          (c.outcome == StageOutcome.review ||
+              c.outcome == StageOutcome.reassess) &&
+          !c.checkDay.isAfter(end) &&
+          boundary.dayOf(c.answeredAt!).isAfter(end),
+    );
+
+    if (blockedByCard || today.daysSince(end) > maxLateDays) {
       return StageCheckResult(
         outcome: StageOutcome.skipped,
         windowEndDay: end,

@@ -56,18 +56,24 @@ Map<LogicalDay, int> _every(LogicalDay last, int days, int count) => {
   for (var i = 0; i < days; i++) last.addDays(-i): count,
 };
 
+/// Answered at noon on [answeredOn], by default the day of the check.
 StageCheck _check(
   StageOutcome outcome,
   LogicalDay windowEnd, {
   LogicalDay? planStart,
   bool answered = true,
-}) => StageCheck(
-  planStartDay: planStart ?? _oct(12),
-  windowEndDay: windowEnd,
-  checkDay: windowEnd.addDays(1),
-  outcome: outcome,
-  answeredAt: answered ? DateTime(2026, 11, 20) : null,
-);
+  LogicalDay? answeredOn,
+}) {
+  final checkDay = windowEnd.addDays(1);
+  final on = answeredOn ?? checkDay;
+  return StageCheck(
+    planStartDay: planStart ?? _oct(12),
+    windowEndDay: windowEnd,
+    checkDay: checkDay,
+    outcome: outcome,
+    answeredAt: answered ? DateTime(on.year, on.month, on.day, 12) : null,
+  );
+}
 
 StageCheckResult? _evaluate({
   required LogicalDay today,
@@ -279,6 +285,45 @@ void main() {
         ),
         isNotNull,
       );
+    });
+
+    group('a stage that ended while a card waited is skipped', () {
+      final failing = _stage4(over: {_nov(3): 12, _nov(4): 12});
+
+      for (final outcome in [StageOutcome.review, StageOutcome.reassess]) {
+        test('${outcome.name}, answered after the stage ended', () {
+          final result = _evaluate(
+            today: _nov(10),
+            logs: failing,
+            checks: [_check(outcome, _oct(25), answeredOn: _nov(9))],
+          )!;
+
+          // Nov 9 was seen at 8 a day; a hold from it would change it.
+          expect(result.outcome, StageOutcome.skipped);
+          expect(result.hold, isNull);
+          expect(result.windowEndDay, _nov(8));
+        });
+      }
+
+      test('a card answered on the stage’s last day is not', () {
+        final result = _evaluate(
+          today: _nov(9),
+          logs: failing,
+          checks: [_check(StageOutcome.review, _oct(25), answeredOn: _nov(8))],
+        )!;
+
+        expect(result.outcome, StageOutcome.hold);
+      });
+
+      test('a waiting hold card is not', () {
+        final result = _evaluate(
+          today: _nov(9),
+          logs: failing,
+          checks: [_check(StageOutcome.hold, _oct(25), answeredOn: _nov(9))],
+        )!;
+
+        expect(result.outcome, StageOutcome.review);
+      });
     });
   });
 

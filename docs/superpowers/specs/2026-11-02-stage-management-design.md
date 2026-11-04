@@ -39,6 +39,10 @@ per 7 days.
 **Late opens.** If today is more than 2 days after the stage's end, store the check as `skipped`
 and change nothing.
 
+**Blocked stages** (Fawad, 2026-11-04). If a review or reassess card was still waiting when the
+stage ended (answered on a later logical day), store the check as `skipped` too: the days after
+the stage were shown unheld, and a hold would change them.
+
 **The window** is the 7 logical days ending on the stage's last day. Use `PlanHistory.limitOn`
 for each day's limit.
 
