@@ -29,7 +29,6 @@ class TopTriggers extends StatelessWidget {
     final text = context.textTheme;
 
     return Container(
-      padding: const EdgeInsets.only(top: 12),
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: colors.outlineVariant)),
       ),
@@ -53,7 +52,7 @@ class TopTriggers extends StatelessWidget {
                 behavior: HitTestBehavior.opaque,
                 onTap: onAll,
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 44),
+                  constraints: const BoxConstraints(minHeight: 34),
                   child: Align(
                     alignment: Alignment.centerRight,
                     widthFactor: 1,
@@ -101,7 +100,7 @@ class _Chip extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 44),
+        constraints: const BoxConstraints(minHeight: 34),
         child: Center(
           widthFactor: 1,
           child: Container(

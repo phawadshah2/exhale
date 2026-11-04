@@ -253,7 +253,7 @@ class StageDayRing extends StatelessWidget {
                     : _statusColor(context, progress.status),
                 track: progress == null
                     ? colors.outlineVariant
-                    : colors.surfaceContainerHigh,
+                    : colors.surfaceContainerHighest,
                 dashed: progress == null,
               ),
               child: Center(
