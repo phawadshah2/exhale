@@ -10,6 +10,7 @@ import 'package:exhale/features/plan/presentation/plan_copy.dart';
 import 'package:exhale/features/plan/presentation/widgets/stage_ring.dart';
 import 'package:exhale/features/tracking/domain/entities/daily_progress.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
+import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:flutter/material.dart';
 
 enum DayDot { under, atLimit, over, today, ahead }
@@ -57,13 +58,6 @@ class StageDays extends StatelessWidget {
     );
   }
 }
-
-Color _statusColor(BuildContext context, LimitStatus status) =>
-    switch (status) {
-      LimitStatus.under => context.colors.primaryContainer,
-      LimitStatus.at => context.exhale.warning.solid,
-      LimitStatus.over => context.exhale.danger.solid,
-    };
 
 /// Seven rings to a row. Fixed size, as the row above says the same thing.
 class _DayRings extends StatelessWidget {
@@ -167,7 +161,7 @@ class StageDayRing extends StatelessWidget {
                 strokeWidth: size / 11,
                 color: progress == null
                     ? colors.primaryContainer
-                    : _statusColor(context, progress.status),
+                    : progress.status.barColor(context),
                 track: progress == null
                     ? colors.outlineVariant
                     : colors.surfaceContainerHighest,
@@ -259,7 +253,7 @@ class _DayDots extends StatelessWidget {
                   painter: DayDotsPainter(
                     dots: dots,
                     layout: layout,
-                    under: colors.primaryContainer,
+                    under: LimitStatus.under.barColor(context),
                     atLimit: context.exhale.warning.solid,
                     over: context.exhale.danger.solid,
                     ahead: colors.outlineVariant,

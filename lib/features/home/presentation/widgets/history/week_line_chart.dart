@@ -7,6 +7,7 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/home/presentation/widgets/history/chart_paint.dart';
 import 'package:exhale/features/tracking/domain/entities/limit_status.dart';
 import 'package:exhale/features/tracking/domain/entities/period_summary.dart';
+import 'package:exhale/features/tracking/presentation/limit_status_ui.dart';
 import 'package:flutter/material.dart';
 
 /// A week as a smooth line of daily counts against a dotted limit line.
@@ -45,6 +46,7 @@ class WeekLineChart extends StatelessWidget {
                 reveal: reveal,
                 summary: summary,
                 accent: colors.primaryContainer,
+                under: LimitStatus.under.barColor(context),
                 warning: context.exhale.warning.solid,
                 danger: context.exhale.danger.solid,
                 neutral: colors.onSurfaceVariant,
@@ -117,6 +119,7 @@ class _WeekPainter extends CustomPainter {
     required this.reveal,
     required this.summary,
     required this.accent,
+    required this.under,
     required this.warning,
     required this.danger,
     required this.neutral,
@@ -132,6 +135,7 @@ class _WeekPainter extends CustomPainter {
   final double reveal;
   final PeriodSummary summary;
   final Color accent;
+  final Color under;
   final Color warning;
   final Color danger;
   final Color neutral;
@@ -291,7 +295,7 @@ class _WeekPainter extends CustomPainter {
       if (shown == 0) continue;
       final status = slot.progress?.status;
       final color = switch (status) {
-        LimitStatus.under => accent,
+        LimitStatus.under => under,
         LimitStatus.at => warning,
         LimitStatus.over => danger,
         null => neutral,

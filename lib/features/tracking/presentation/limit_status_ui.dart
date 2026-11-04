@@ -13,9 +13,9 @@ extension LimitStatusUi on LimitStatus {
     LimitStatus.over => context.exhale.danger,
   };
 
-  /// Fill for chart bars and the ring: the accent while under the limit.
+  /// Fill for chart bars, rings and dots.
   Color barColor(BuildContext context) => switch (this) {
-    LimitStatus.under => context.colors.primaryContainer,
+    LimitStatus.under => context.exhale.success.solid,
     LimitStatus.at => context.exhale.warning.solid,
     LimitStatus.over => context.exhale.danger.solid,
   };

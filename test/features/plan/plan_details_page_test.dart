@@ -336,7 +336,7 @@ void main() {
 
       final under = painterOf(tester, find.byType(StageRing).at(1));
       expect(under.fill, closeTo(21 / 77, 0.001));
-      expect(under.color, context.colors.primaryContainer);
+      expect(under.color, context.exhale.success.solid);
       await tester.disposeApp();
     });
 
@@ -687,7 +687,7 @@ void main() {
       );
       expect(dayPainter(tester, 1).color, context.exhale.warning.solid);
       final under = dayPainter(tester, 2);
-      expect(under.color, context.colors.primaryContainer);
+      expect(under.color, context.exhale.success.solid);
       expect(under.fill, 0.5);
       await tester.disposeApp();
     });
@@ -700,7 +700,7 @@ void main() {
       await openDetails(tester);
 
       final context = tester.element(find.byType(StageDayRing).first);
-      expect(dayPainter(tester, 7).color, context.colors.primaryContainer);
+      expect(dayPainter(tester, 7).color, context.exhale.success.solid);
       expect(dayPainter(tester, 7).dashed, isFalse);
       expect(tester.widget<StageDayRing>(ringAt(7)).isToday, isTrue);
       expect(tester.widget<StageDayRing>(ringAt(6)).isToday, isFalse);
@@ -763,6 +763,10 @@ void main() {
       expect(painter.dots[7], DayDot.today);
       expect(painter.dots[8], DayDot.ahead);
       expect(painter.layout.cols, 13);
+      expect(
+        painter.under,
+        tester.element(find.text('Each dot is a day')).exhale.success.solid,
+      );
       await tester.disposeApp();
     });
 
