@@ -169,6 +169,53 @@ void main() {
       await pumpHome(tester);
     }
 
+    BoxDecoration tileOf(WidgetTester tester, String label) =>
+        tester
+                .widget<Container>(
+                  find
+                      .ancestor(
+                        of: inCards(find.text(label)),
+                        matching: find.byType(Container),
+                      )
+                      .first,
+                )
+                .decoration!
+            as BoxDecoration;
+
+    testWidgets('date tiles are solid with a border in light mode', (
+      tester,
+    ) async {
+      tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+      await holdOnNov9(tester);
+
+      final colors = Theme.of(tester.element(find.text('Next drop')))
+          .colorScheme;
+      expect(colors.brightness, Brightness.light);
+      for (final label in ['Next drop', 'Quit date']) {
+        final tile = tileOf(tester, label);
+        expect(tile.color, colors.surface);
+        expect(tile.border, Border.all(color: colors.outlineVariant));
+      }
+
+      await tester.disposeApp();
+    });
+
+    testWidgets('date tiles stay soft in dark mode', (tester) async {
+      tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+      await holdOnNov9(tester);
+
+      final colors = Theme.of(tester.element(find.text('Next drop')))
+          .colorScheme;
+      expect(colors.brightness, Brightness.dark);
+      final tile = tileOf(tester, 'Next drop');
+      expect(tile.color, colors.surface.withValues(alpha: 0.6));
+      expect(tile.border, isNull);
+
+      await tester.disposeApp();
+    });
+
     testWidgets('shows the copy of the mock', (tester) async {
       await holdOnNov9(tester);
 

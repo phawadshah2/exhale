@@ -46,11 +46,11 @@ Files: `lib/features/home/presentation/providers/stage_card_provider.dart`,
 
 Files: `lib/features/home/presentation/widgets/stage_cards.dart`.
 
-- [ ] Test (fail first), in `stage_cards_test.dart`: in light mode, `_Tile`'s decoration has
+- [x] Test (fail first), in `stage_cards_test.dart`: in light mode, `_Tile`'s decoration has
   an opaque `colors.surface` fill and an `outlineVariant` border; in dark mode it keeps
   `surface` at 0.6 and no border.
-- [ ] `_Tile`: branch on `Theme.of(context).brightness`.
-- [ ] Commit `fix(home): make hold card tiles stand out in light mode`.
+- [x] `_Tile`: branch on `Theme.of(context).brightness`.
+- [x] Commit `fix(home): make hold card tiles stand out in light mode`.
 
 ### Task R3: No arrow at 0% vs baseline
 
