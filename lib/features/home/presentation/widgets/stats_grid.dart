@@ -40,6 +40,16 @@ class StatsGrid extends StatelessWidget {
             caption: 'After your first full day',
             captionColor: muted,
           )
+        : (change.abs() * 100).round() == 0
+        ? _StatTile(
+            label: 'Vs baseline',
+            icon: AppIcons.remove,
+            iconColor: muted,
+            value: '0%',
+            valueColor: muted,
+            caption: 'From ${stats.baseline}/day start',
+            captionColor: muted,
+          )
         : _StatTile(
             label: 'Vs baseline',
             icon: change <= 0 ? AppIcons.trendDown : AppIcons.trendUp,

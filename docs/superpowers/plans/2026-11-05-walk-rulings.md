@@ -56,12 +56,12 @@ Files: `lib/features/home/presentation/widgets/stage_cards.dart`.
 
 Files: `lib/features/home/presentation/widgets/stats_grid.dart`.
 
-- [ ] Test (fail first), in `test/features/home/home_page_test.dart` beside the "↓ 33%" test:
+- [x] Test (fail first), in `test/features/home/home_page_test.dart` beside the "↓ 33%" test:
   a change that rounds to 0% shows "0%", no "↓ 0%", and the tile's icon is `AppIcons.remove`
   in `onSurfaceVariant`.
-- [ ] `stats_grid.dart`: when `(change.abs() * 100).round() == 0`, value "0%", icon
+- [x] `stats_grid.dart`: when `(change.abs() * 100).round() == 0`, value "0%", icon
   `AppIcons.remove`, icon and value in the muted colour.
-- [ ] Commit `fix(home): show no arrow at 0% vs baseline`.
+- [x] Commit `fix(home): show no arrow at 0% vs baseline`.
 
 ### Then
 
