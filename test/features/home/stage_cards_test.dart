@@ -169,6 +169,53 @@ void main() {
       await pumpHome(tester);
     }
 
+    BoxDecoration tileOf(WidgetTester tester, String label) =>
+        tester
+                .widget<Container>(
+                  find
+                      .ancestor(
+                        of: inCards(find.text(label)),
+                        matching: find.byType(Container),
+                      )
+                      .first,
+                )
+                .decoration!
+            as BoxDecoration;
+
+    testWidgets('date tiles are solid with a border in light mode', (
+      tester,
+    ) async {
+      tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+      await holdOnNov9(tester);
+
+      final colors = Theme.of(tester.element(find.text('Next drop')))
+          .colorScheme;
+      expect(colors.brightness, Brightness.light);
+      for (final label in ['Next drop', 'Quit date']) {
+        final tile = tileOf(tester, label);
+        expect(tile.color, colors.surface);
+        expect(tile.border, Border.all(color: colors.outlineVariant));
+      }
+
+      await tester.disposeApp();
+    });
+
+    testWidgets('date tiles stay soft in dark mode', (tester) async {
+      tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+      await holdOnNov9(tester);
+
+      final colors = Theme.of(tester.element(find.text('Next drop')))
+          .colorScheme;
+      expect(colors.brightness, Brightness.dark);
+      final tile = tileOf(tester, 'Next drop');
+      expect(tile.color, colors.surface.withValues(alpha: 0.6));
+      expect(tile.border, isNull);
+
+      await tester.disposeApp();
+    });
+
     testWidgets('shows the copy of the mock', (tester) async {
       await holdOnNov9(tester);
 
@@ -408,6 +455,51 @@ void main() {
           StageOutcome.review,
           windowEnd: _nov(8),
           checkDay: _nov(9),
+        );
+      });
+      await pumpHome(tester);
+
+      expect(
+        inCards(
+          find.text(
+            'Two weeks over your limit. The plan can bend, and you decide '
+            'how.',
+          ),
+        ),
+        findsOneWidget,
+      );
+
+      await tester.disposeApp();
+    });
+
+    testWidgets('takes its limits from the two failed windows', (tester) async {
+      // A drop every 14 days: 12 until Oct 25, held to Nov 1, then 11 to
+      // Nov 15. The 14 days before the review are all at 11.
+      await tester.runAsync(() async {
+        await start(
+          DateTime(2026, 11, 16, 15, 42),
+          plan: PlanDraft(
+            startDay: _oct(12),
+            startLimit: 12,
+            quitDay: _oct(12).addDays(168),
+          ),
+        );
+        await record(
+          StageOutcome.hold,
+          windowEnd: _oct(25),
+          checkDay: _oct(26),
+          hold: PlanHold(startDay: _oct(26)),
+        );
+        await spy.answer(
+          habitId,
+          _oct(12),
+          _oct(25),
+          DateTime(2026, 10, 26, 9),
+        );
+        await record(
+          StageOutcome.review,
+          windowEnd: _nov(15),
+          checkDay: _nov(16),
         );
       });
       await pumpHome(tester);

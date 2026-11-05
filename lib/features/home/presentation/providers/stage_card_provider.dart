@@ -108,10 +108,15 @@ class ReviewCardData extends StageCard {
   const ReviewCardData({
     required super.planStartDay,
     required super.windowEndDay,
+    required this.earlierWindowEndDay,
     required this.limit,
   });
 
-  /// The checked stage's limit; null when the 14 days had more than one.
+  /// The end of the hold check's window, the first of the two failed weeks.
+  final LogicalDay earlierWindowEndDay;
+
+  /// The checked stage's limit; null when the two failed weeks had more than
+  /// one.
   final int? limit;
 
   @override
@@ -119,10 +124,12 @@ class ReviewCardData extends StageCard {
       other is ReviewCardData &&
       other.planStartDay == planStartDay &&
       other.windowEndDay == windowEndDay &&
+      other.earlierWindowEndDay == earlierWindowEndDay &&
       other.limit == limit;
 
   @override
-  int get hashCode => Object.hash(planStartDay, windowEndDay, limit);
+  int get hashCode =>
+      Object.hash(planStartDay, windowEndDay, earlierWindowEndDay, limit);
 }
 
 class ReassessCardData extends StageCard {
@@ -146,9 +153,22 @@ class ReassessCardData extends StageCard {
   int get hashCode => Object.hash(planStartDay, windowEndDay, average);
 }
 
-typedef StageWindow = ({int habitId, LogicalDay windowEnd});
+/// Two 7-day windows ending on `windowEnd` and `earlierEnd`. With
+/// `earlierEnd == windowEnd.addDays(-7)` they are 14 days in a row.
+typedef StageWindow = ({
+  int habitId,
+  LogicalDay earlierEnd,
+  LogicalDay windowEnd,
+});
 
-/// The 14 days of logs ending on a checked stage's last day.
+bool _inWindow(StageWindow key, LogicalDay day) =>
+    _inWeek(day, key.windowEnd) || _inWeek(day, key.earlierEnd);
+
+bool _inWeek(LogicalDay day, LogicalDay end) =>
+    !day.isAfter(end) && !day.isBefore(end.addDays(-6));
+
+/// The logs from the first day of the earlier window to `windowEnd`, gap
+/// included.
 final StreamProviderFamily<List<HabitLog>, StageWindow>
 stageWindowLogsProvider = StreamProvider.family<List<HabitLog>, StageWindow>((
   ref,
@@ -159,12 +179,12 @@ stageWindowLogsProvider = StreamProvider.family<List<HabitLog>, StageWindow>((
       .watch(habitLogRepositoryProvider)
       .watchLogs(
         habitId: key.habitId,
-        from: boundary.startOf(key.windowEnd.addDays(-13)),
+        from: boundary.startOf(key.earlierEnd.addDays(-6)),
         to: boundary.endOf(key.windowEnd),
       );
 });
 
-/// The 14 days ending on a checked stage's last day, added up.
+/// The 14 days of a [StageWindow], added up.
 @immutable
 class StageWindowStats {
   const StageWindowStats({
@@ -186,15 +206,20 @@ class StageWindowStats {
 final ProviderFamily<StageWindowStats?, StageWindow> stageWindowStatsProvider =
     Provider.family<StageWindowStats?, StageWindow>((ref, key) {
       final history = ref.watch(planHistoryProvider(key.habitId)).value;
-      final logs = ref.watch(stageWindowLogsProvider(key)).value;
-      if (history == null || logs == null) return null;
+      final all = ref.watch(stageWindowLogsProvider(key)).value;
+      if (history == null || all == null) return null;
+      final boundary = ref.watch(dayBoundaryProvider);
+      final logs = [
+        for (final log in all)
+          if (_inWindow(key, boundary.dayOf(log.loggedAt))) log,
+      ];
       final days = buildDailyProgress(
         logs: logs,
-        boundary: ref.watch(dayBoundaryProvider),
+        boundary: boundary,
         history: history,
-        from: key.windowEnd.addDays(-13),
+        from: key.earlierEnd.addDays(-6),
         to: key.windowEnd,
-      );
+      ).where((day) => _inWindow(key, day.day));
       return StageWindowStats(
         logged: days.fold<int>(0, (sum, day) => sum + day.count),
         allowed: days.fold<int>(0, (sum, day) => sum + day.limit),
@@ -224,23 +249,38 @@ final ProviderFamily<StageCard?, int> stageCardProvider =
       if (waiting.isEmpty) return null;
       final check = waiting.first;
 
-      final logs = ref
-          .watch(
-            stageWindowLogsProvider((
-              habitId: habitId,
-              windowEnd: check.windowEndDay,
-            )),
-          )
-          .value;
+      // A review covers its own window and the hold check's before it, the
+      // newest earlier check of the plan; the rest cover 14 days in a row.
+      final earlier = check.outcome == StageOutcome.review
+          ? checks
+                .where(
+                  (c) =>
+                      c.planStartDay == plan.startDay &&
+                      c.windowEndDay.isBefore(check.windowEndDay),
+                )
+                .map((c) => c.windowEndDay)
+                .fold<LogicalDay?>(
+                  null,
+                  (newest, day) =>
+                      newest == null || day.isAfter(newest) ? day : newest,
+                )
+          : null;
+      final window = (
+        habitId: habitId,
+        earlierEnd: earlier ?? check.windowEndDay.addDays(-7),
+        windowEnd: check.windowEndDay,
+      );
+      final logs = ref.watch(stageWindowLogsProvider(window)).value;
       if (logs == null) return null;
 
       final boundary = ref.watch(dayBoundaryProvider);
       final today = ref.watch(todayProvider);
-      return _build(check, history, plan, logs, boundary, today);
+      return _build(check, window, history, plan, logs, boundary, today);
     });
 
 StageCard? _build(
   StageCheck check,
+  StageWindow window,
   PlanHistory history,
   ReductionPlan plan,
   List<HabitLog> logs,
@@ -252,9 +292,9 @@ StageCard? _build(
     logs: logs,
     boundary: boundary,
     history: history,
-    from: end.addDays(-13),
+    from: window.earlierEnd.addDays(-6),
     to: end,
-  );
+  ).where((day) => _inWindow(window, day.day)).toList();
 
   switch (check.outcome) {
     case StageOutcome.review:
@@ -262,6 +302,7 @@ StageCard? _build(
       return ReviewCardData(
         planStartDay: check.planStartDay,
         windowEndDay: end,
+        earlierWindowEndDay: window.earlierEnd,
         limit: limits.length == 1 ? limits.single : null,
       );
     case StageOutcome.reassess:

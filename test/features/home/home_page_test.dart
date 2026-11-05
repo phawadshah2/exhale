@@ -432,6 +432,33 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('no change from baseline shows 0% with no arrow', (tester) async {
+    await startPlan(LogicalDay(2026, 10, 14));
+    await logOn(DateTime(2026, 10, 14, 9), times: 9);
+    await logOn(DateTime(2026, 10, 15, 9), times: 9);
+    await tester.pumpAppPastSplash(height: 2400);
+
+    await tester.ensureVisible(find.text('Vs baseline'));
+    await tester.pumpAndSettle();
+    final muted = Theme.of(tester.element(find.text('Vs baseline')))
+        .colorScheme
+        .onSurfaceVariant;
+    expect(find.text('0%'), findsOneWidget);
+    expect(find.text('↓ 0%'), findsNothing);
+    expect(tester.widget<Text>(find.text('0%')).style?.color, muted);
+    final icon = find.descendant(
+      of: find.ancestor(
+        of: find.text('Vs baseline'),
+        matching: find.byType(Card),
+      ),
+      matching: find.byIcon(AppIcons.remove),
+    );
+    expect(tester.widget<Icon>(icon).color, muted);
+    expect(find.byIcon(AppIcons.trendDown), findsNothing);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('counts down to quit day on the last stage', (tester) async {
     await seedHabit(
       PlanDraft(

@@ -58,8 +58,8 @@ abstract final class PlanChoices {
   static const double dailyPace = 1.5;
 
   /// Start from the real number, slow down, or keep. [windowAverage] is the
-  /// 14-day average rounded up, [checkedLimit] the limit of the stage that
-  /// failed.
+  /// review sheet's average of the two failed weeks, rounded up,
+  /// [checkedLimit] the limit of the stage that failed.
   static List<PlanChoice> review({
     required ReductionPlan current,
     required LogicalDay today,

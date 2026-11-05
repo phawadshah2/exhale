@@ -119,7 +119,7 @@ worked out when the sheet opens.
 
 | Choice | New plan from today | Selected at first |
 |---|---|---|
-| Start from your real number | Limit: the window's average, rounded up, at most 80. Length: limit × `pace` | Yes |
+| Start from your real number | Limit: the review sheet's average (5.3), at most 80. Length: limit × `pace` | Yes |
 | Slow down | Limit: the checked stage's limit. Length: limit × `pace` × 2 | No |
 | Keep my plan | None | No |
 
@@ -167,8 +167,8 @@ hold card still unanswered when the next check runs is closed by that check.
 
 - Title: "This pace isn't fitting."
 - Body: "Two weeks over {limit} a day. The plan can bend, and you decide how." Use the checked
-  stage's limit. When the 14 days ending on that stage's last day had more than one limit, drop
-  the number: "Two weeks over your limit."
+  stage's limit. When the two failed windows (5.3) had more than one limit, drop the number:
+  "Two weeks over your limit."
 - Button: "Review my plan". No dismiss.
 
 ### 5.3 Review sheet (AC)
@@ -176,9 +176,11 @@ hold card still unanswered when the next check runs is closed by that check.
 `showAppDraggableSheet`, with scrolling at large text sizes.
 
 - Title: "Let's look at the plan". Lead: "Not a telling-off. Just the numbers."
-- Tiles, for the 14 days ending on the checked stage's last day: {logged} logged, {allowed}
-  allowed, "About {average}" a day, rounded up.
-- "What came up most": the top 3 triggers with counts, from
+- Tiles, for the two failed windows: the review's own window and the window of the `hold`
+  check before it (the newest earlier check of the plan, always a `hold` by the streak rule).
+  These 14 days need not be in a row; a held week between them is left out (Fawad,
+  2026-11-05). {logged} logged, {allowed} allowed, "About {average}" a day, rounded up.
+- "What came up most": the top 3 triggers with counts in the same two windows, from
   `ProgressCalculator.triggerBreakdown`. Hide this when no log in those days has a trigger.
 - The three choices of section 4. Each shows name, detail, date and change.
 - Button: "Shake on it again", or "Keep my plan" when that is selected.
