@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-04. Earlier sessions: `docs/history/2026-10-16_to_11-03_state_log.md`.
+Updated 2026-11-05. Earlier sessions: `docs/history/2026-10-16_to_11-03_state_log.md`.
 
 ## Where we are
 
@@ -22,8 +22,8 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 ## Repo
 
 - Branch `feat/plan-and-stages`, 86 commits ahead of `main`; `feat/green-under`
-  fast-forwarded into it. Pushed up to d81f915. No PR is open, and CI was not read.
-- Checks at 0cf6041: full suite 1206 passed, 0 failed (`build/test-report.json`); format
+  fast-forwarded into it. Pushed up to 7e9170c. No PR is open, and CI was not read.
+- Checks at 7a80954: full suite 1211 passed, 0 failed (`build/test-report.json`); format
   and `analyze --fatal-infos` clean.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
@@ -43,10 +43,15 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 ## Walk rulings (Fawad, 2026-11-05)
 
 Plan `docs/superpowers/plans/2026-11-05-walk-rulings.md`, R1 to R3 done and committed, each
-with its tests, format and analyze clean; not yet seen in the simulator. Spec 4, 5.2 and 5.3
-updated. R1: the review's tiles, average, triggers and "Start from your real number" use the
-two failed weeks (the hold's window and the review's), not 14 days in a row. R2: hold card
-tiles stand out in light mode. R3: "0%" with no arrow vs baseline.
+with its tests, format and analyze clean. Spec 4, 5.2 and 5.3 updated. R1: the review's
+tiles, average, triggers and "Start from your real number" use the two failed weeks (the
+hold's window and the review's), not 14 days in a row. R2: hold card tiles stand out in
+light mode. R3: "0%" with no arrow vs baseline.
+
+Walked 2026-11-05 (`exhale` iOS 26.5): review seed, light and dark, 157 logged against 147,
+About 12, real number 12 a day (Jan 28); card without a number. Hold seed, light: tiles solid
+with an outline, 76 against 70 unchanged. Reassess seed: "0%" with the minus icon. Not seen:
+R2 and R3 in dark mode beyond the review sheet.
 
 ## Stage polish and colours (2026-11-04)
 
@@ -58,10 +63,8 @@ tiles stand out in light mode. R3: "0%" with no arrow vs baseline.
 
 ## Next action
 
-With Fawad's approval, walk the rulings in the simulator: `SEED_STAGE=review` (light and
-dark; logged now above allowed), `SEED_STAGE=hold` in light mode, Home at 0% vs baseline.
-Then push `feat/plan-and-stages` and open the PR to `main` from the compare link. After
-merge: the real iPhone pass, including the M6 and M7 screens and the colours.
+Push `feat/plan-and-stages` (when Fawad asks) and open the PR to `main` from the compare
+link. After merge: the real iPhone pass, including the M6 and M7 screens and the colours.
 
 ## Open checks
 
