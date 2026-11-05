@@ -21,11 +21,12 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 
 ## Repo
 
-- Branch `feat/plan-and-stages`, 91 commits ahead of `main`; `feat/green-under`
-  fast-forwarded into it. Fully pushed (6dcec71, 2026-11-05). No PR is open, and CI was not
-  read.
+- Branch `feat/plan-and-stages`, 94 commits ahead of `main`; `feat/green-under`
+  fast-forwarded into it. Pushed up to 6dcec71; 0854339, 4f45635 and b2c556a (iOS config,
+  docs) are local only. No PR is open, and CI was not read.
 - Checks at 7a80954: full suite 1211 passed, 0 failed (`build/test-report.json`); format
-  and `analyze --fatal-infos` clean.
+  and `analyze --fatal-infos` clean. Not rerun since: later commits change no Dart code;
+  the release build (`build ipa`) succeeded.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
 ## M7 simulator walk (2026-11-04, `exhale` iOS 26.5)
@@ -76,11 +77,13 @@ R2 and R3 in dark mode beyond the review sheet.
 
 ## Next action
 
-Fawad opens the PR to `main`:
-https://github.com/phawadshah2/exhale/compare/main...feat/plan-and-stages. Then read the
-"Analyze & test" check and fix anything it reports. After merge: the real iPhone pass
-(open checks below), including the M6 and M7 screens via `SEED_STAGE` and the colours. To
-continue, read only this file.
+Fawad confirms the TestFlight build finished processing, adds himself to an internal group
+and installs it; he reports what he sees on the real iPhone (open checks below). The
+TestFlight build runs `lib/main.dart`, so the seeded M7 screens (`SEED_STAGE`) still need a
+debug run on the device. In parallel: push the three local commits, open the PR to `main`
+(https://github.com/phawadshah2/exhale/compare/main...feat/plan-and-stages) and read the
+"Analyze & test" check. Before external testers: a real app icon (1024×1024 PNG, no alpha)
+and launch image from Fawad. To continue, read only this file.
 
 ## Open checks
 
