@@ -21,8 +21,9 @@ M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 
 ## Repo
 
-- Branch `feat/plan-and-stages`, 86 commits ahead of `main`; `feat/green-under`
-  fast-forwarded into it. Pushed up to 7e9170c. No PR is open, and CI was not read.
+- Branch `feat/plan-and-stages`, 91 commits ahead of `main`; `feat/green-under`
+  fast-forwarded into it. Fully pushed (6dcec71, 2026-11-05). No PR is open, and CI was not
+  read.
 - Checks at 7a80954: full suite 1211 passed, 0 failed (`build/test-report.json`); format
   and `analyze --fatal-infos` clean.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
@@ -61,10 +62,25 @@ R2 and R3 in dark mode beyond the review sheet.
 - Triggers use 9 fixed slots, 198° to 318° (`trigger_ui.dart`), distinct within each
   habit. 331° looked crimson beside red, so the range stops at 318°.
 
+## TestFlight (2026-11-05)
+
+- Personal team `5W8A3P22WK` (was the office team), iPhone only, portrait,
+  `ITSAppUsesNonExemptEncryption` false (0854339, 4f45635). App record created in App
+  Store Connect.
+- `fvm flutter build ipa --release --build-name=1.0.0 --build-number=1` built
+  `build/ios/ipa/exhale.ipa` from `feat/plan-and-stages`, signed with a cloud-managed
+  Apple Distribution certificate (no local key to back up). Uploaded via Transporter
+  2026-11-05; processing and the internal testing group not yet confirmed.
+- Icon and launch image are Flutter placeholders: fine for internal testing, needed before
+  external testers or review. Each new upload needs a higher `--build-number`.
+
 ## Next action
 
-Push `feat/plan-and-stages` (when Fawad asks) and open the PR to `main` from the compare
-link. After merge: the real iPhone pass, including the M6 and M7 screens and the colours.
+Fawad opens the PR to `main`:
+https://github.com/phawadshah2/exhale/compare/main...feat/plan-and-stages. Then read the
+"Analyze & test" check and fix anything it reports. After merge: the real iPhone pass
+(open checks below), including the M6 and M7 screens via `SEED_STAGE` and the colours. To
+continue, read only this file.
 
 ## Open checks
 
