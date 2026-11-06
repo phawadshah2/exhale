@@ -11,7 +11,7 @@ Updated 2026-11-06. Earlier sessions: `docs/history/2026-10-16_to_11-03_state_lo
 | M5 Release candidate | Done, merged to `main` (51e0bc6) |
 | M6 Plan details, Edit plan, Logs; M7 Stage management; polish rounds | Done on `feat/plan-and-stages`, walked in the simulator |
 | TestFlight build 1.0.0 (1) | Installed by Fawad; runs fine on his iPhone (2026-11-06) |
-| Onboarding redesign 2 (chat) | Design settled on the canvas; prototype not started |
+| Onboarding redesign 2 (chat) | Prototype committed (1efc0c1) on `feat/onboarding-chat-prototype`; not seen running; design tweaks coming |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 ## Repo
@@ -39,13 +39,27 @@ Canvas (source of truth): https://claude.ai/artifact/EMRb3MqhssfA6k4qLHTCQa, pag
 Every screen has a tagline under the main button. Paywall ideas are on the canvas's
 "Paywall ideas (later)" page; pricing model undecided.
 
+## Onboarding prototype (2026-11-06)
+
+- Branch `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`), commit 1efc0c1, not
+  pushed. Throwaway: no spec, plan or tests (Fawad's call).
+- Built: `steps/welcome_step.dart`, `steps/chat_step.dart`, reworked `steps/deal_step.dart`,
+  `providers/onboarding_chat.dart` (the script), `widgets/chat_widgets.dart`,
+  `widgets/chevron_button.dart`. Edited: form provider (`userName`; first-run steps are
+  welcome, chat, deal), `onboarding_page.dart`, `onboarding_copy.dart`, `app_icons.dart`.
+- Checks: format and `analyze --fatal-infos` clean. Tests not run; `welcome_step_test.dart`
+  deleted; the page, app and accessibility onboarding tests need rework.
+- Simulator: built on `exhale` (iOS 26.5), but the run lost its connection and no screen was
+  seen. Unwalked.
+- Deviations: alcohol and energy drinks store 1 unit per container; Steady blurb is generic;
+  custom habit is "Something else" / "time"; the name is saved to settings, not shown on Home.
+
 ## Next action
 
-Build a throwaway prototype on `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`):
-the three screens above, reusing `onboarding_form_provider.dart` and `OnboardingCopy`. No
-spec or tests (Fawad's call). Ask before the simulator run, then Fawad reviews and refines;
-spec, plan and tests come after. Read: this file, the canvas boards above,
-`lib/features/onboarding/presentation/`.
+Fawad will ask for a redesign or design tweaks next session. Relaunch with
+`fvm flutter run -d C1712C39-41B3-4CF1-95BE-9A5D6771A92A` (ask first), walk welcome, chat and
+plan, then apply his tweaks. After sign-off: spec, plan and tests, then merge. Read: this file,
+the files above, and the canvas boards.
 
 ## Open items from Fawad's iPhone review (2026-11-06)
 
