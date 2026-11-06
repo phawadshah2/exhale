@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/amount_step.dart';
+import 'package:exhale/features/onboarding/presentation/steps/chat_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/cost_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/day_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/deal_step.dart';
@@ -13,6 +15,7 @@ import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart'
 import 'package:exhale/features/onboarding/presentation/widgets/exhale_bubble.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/onboarding_stepper.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/round_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -85,6 +88,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   void _back() {
     final index = _steps.indexOf(_current);
     if (index <= 0 && !_canLeave) return;
+    // The chat has no way back to the welcome.
+    if (_current == OnboardingStep.chat) return;
     unawaited(HapticFeedback.selectionClick());
     if (index <= 0) {
       Navigator.of(context).pop();
@@ -116,11 +121,30 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         body: SafeArea(
           child: Column(
             children: [
-              OnboardingStepper(
-                index: index,
-                total: steps.length,
-                onBack: index > 0 || _canLeave ? _back : null,
-              ),
+              if (_canLeave)
+                OnboardingStepper(
+                  index: index,
+                  total: steps.length,
+                  onBack: _back,
+                )
+              else if (_current == OnboardingStep.deal)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.pageMargin,
+                      AppSpacing.gutterSm,
+                      0,
+                      0,
+                    ),
+                    child: RoundIconButton(
+                      icon: AppIcons.back,
+                      label: 'Back',
+                      size: 44,
+                      onTap: _back,
+                    ),
+                  ),
+                ),
               Expanded(
                 child: GestureDetector(
                   onHorizontalDragEnd: (details) {
@@ -138,6 +162,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           key: ValueKey(step),
                           child: switch (step) {
                             OnboardingStep.welcome => const WelcomeStep(),
+                            OnboardingStep.chat => const ChatStep(),
                             OnboardingStep.habit => const HabitStep(),
                             OnboardingStep.amount => const AmountStep(),
                             OnboardingStep.cost => const CostStep(),

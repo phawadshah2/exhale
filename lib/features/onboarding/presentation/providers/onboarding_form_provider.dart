@@ -21,7 +21,7 @@ import 'package:exhale/features/tracking/presentation/providers/tracking_provide
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum OnboardingStep { welcome, habit, amount, cost, day, deal }
+enum OnboardingStep { welcome, chat, habit, amount, cost, day, deal }
 
 /// The habit this form takes the place of; null on a first run. Overridden by
 /// a nested scope in `ChangeHabitPage`.
@@ -66,6 +66,7 @@ class OnboardingFormState {
     this.habitKind = defaultHabit,
     this.customName = '',
     this.customUnit = '',
+    this.userName = '',
     this.priceText = '',
     this.wakeMinute = DayWindow.defaultWake,
     this.bedMinute = DayWindow.defaultBed,
@@ -128,6 +129,9 @@ class OnboardingFormState {
   final HabitKind habitKind;
   final String customName;
   final String customUnit;
+
+  /// What the user told the chat to call them; empty when they declined.
+  final String userName;
   final int startLimit;
   final String priceText;
   final int unitsPerContainer;
@@ -147,15 +151,17 @@ class OnboardingFormState {
   bool isTracked(HabitKind kind) =>
       kind != HabitKind.custom && replaced?.habit.kind == kind;
 
-  /// Cost is skipped for habits that do not track it. Changing the habit also
-  /// skips Welcome and Your day.
-  List<OnboardingStep> get steps => [
-    for (final step in OnboardingStep.values)
-      if ((step != OnboardingStep.cost || habit.tracksCost) &&
-          (!isChangingHabit ||
-              (step != OnboardingStep.welcome && step != OnboardingStep.day)))
-        step,
-  ];
+  /// A first run is the welcome, the chat and the plan. Changing the habit
+  /// keeps the habit, amount and cost steps (cost only for habits that track
+  /// it) before the plan.
+  List<OnboardingStep> get steps => isChangingHabit
+      ? [
+          OnboardingStep.habit,
+          OnboardingStep.amount,
+          if (habit.tracksCost) OnboardingStep.cost,
+          OnboardingStep.deal,
+        ]
+      : [OnboardingStep.welcome, OnboardingStep.chat, OnboardingStep.deal];
 
   int get total => steps.length;
 
@@ -228,6 +234,7 @@ class OnboardingFormState {
     HabitKind? habitKind,
     String? customName,
     String? customUnit,
+    String? userName,
     int? startLimit,
     String? priceText,
     int? unitsPerContainer,
@@ -244,6 +251,7 @@ class OnboardingFormState {
     habitKind: habitKind ?? this.habitKind,
     customName: customName ?? this.customName,
     customUnit: customUnit ?? this.customUnit,
+    userName: userName ?? this.userName,
     startLimit: startLimit ?? this.startLimit,
     priceText: priceText ?? this.priceText,
     unitsPerContainer: unitsPerContainer ?? this.unitsPerContainer,
@@ -296,6 +304,8 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
   void setCustomName(String text) => state = state.copyWith(customName: text);
 
   void setCustomUnit(String text) => state = state.copyWith(customUnit: text);
+
+  void setUserName(String text) => state = state.copyWith(userName: text);
 
   void setStartLimit(int value) {
     final startLimit = value.clamp(
@@ -376,6 +386,7 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
               wakeMinute: () => form.wakeMinute,
               bedMinute: () => form.bedMinute,
               currencySymbol: form.currency,
+              userName: () => form.userName.isEmpty ? null : form.userName,
             ),
           );
       if (!ref.mounted) return false;

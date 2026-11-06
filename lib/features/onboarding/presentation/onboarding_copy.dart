@@ -5,27 +5,102 @@ abstract final class OnboardingCopy {
   static const splashLine = 'We need to talk.';
 
   // Welcome.
-  static const welcomeSender = 'You';
-  static const welcomeSentAt = ' · Tonight 11:48 PM';
   static const excuses = [
     'just one more',
     "it's basically flavoured air",
     "I'll quit properly on Monday",
   ];
-  static const welcomeRead = 'Read 11:49 PM';
-  static const List<String> welcomeReplies = [
-    'Heard them all. Twice.',
-    _welcomeOffer,
-  ];
-  static const _welcomeOffer =
-      'How about a limit that gets a little smaller every day, until it hits '
-      'zero?';
+  static const brand = 'EXHALE';
   static const welcomeTitle = 'Stop negotiating with your cravings.';
+  static const welcomeNegotiating = 'negotiating';
   static const welcomeBody =
-      "They're not your business partner. One tap to log, a limit that "
-      'drops every day, and nothing leaves your phone.';
-  static const welcomeButton = 'Make a plan';
+      "They're not your business partner. We'll handle them with a limit "
+      'that shrinks to zero.';
+  static const welcomeButton = "Let's talk";
   static const welcomeFinePrint = 'A behaviour tool, not medical advice.';
+  static const List<(String, String)> welcomeRows = [
+    (
+      'One tap to log',
+      'Every time, even over the limit. Honest beats perfect.',
+    ),
+    (
+      'A limit that steps down',
+      'One fewer at a time, until it hits zero on a date you pick.',
+    ),
+    (
+      'Bad weeks hold, never reset',
+      'Slip up and the step waits. You never start over.',
+    ),
+    ('Just you and your phone', 'No account. Nothing you log leaves it.'),
+  ];
+
+  // Chat.
+  static const chatName = 'Exhale';
+  static const chatIdle = 'here to help. Unfortunately.';
+  static const chatTyping = 'typing…';
+  static const chatFinePrint = 'Nothing you type leaves your phone.';
+  static const chatSeePlan = 'See my plan';
+  static const askWho = 'Before you send me a fourth one: who am I talking to?';
+  static const nameHint = 'Your first name';
+  static const send = 'Send';
+  static const nameSkip = "I'd rather not say";
+  static String nameReply(String name) =>
+      '$name. Lovely name. Shame about the excuses.';
+  static const nameSkipReply = "A mystery. Your excuses weren't.";
+  static const heardThemAll = 'Heard them all, by the way. Twice.';
+  static const helpingIsMyJob =
+      "Lucky for you, helping is my whole job. Let's start with the obvious. "
+      'What are we quitting?';
+  static String amountAsk(String verb) =>
+      'Be honest. How many times a day do you $verb? A real number. Not a '
+      'Monday one.';
+  static String aboutAmount(int n) => 'About $n';
+  static String painfulAsk(String? container) {
+    final question = container == null
+        ? 'What does one cost you, roughly?'
+        : 'What does a $container cost you?';
+    return ' Now the painful bit. $question';
+  }
+
+  static String perContainerAsk(String units, String container) =>
+      'And how many $units does one $container last? Ballpark is fine. '
+      "I'm not your accountant.";
+  static const regionNote = 'from your region';
+  static const change = 'Change';
+  static String noPriceReply(String reaction) =>
+      '$reaction No price tag on this one. Just your time, which is worse.';
+  static String skipPriceReply(String units) =>
+      "Ignorance is bliss. Expensive bliss. I'll count $units instead. Add a "
+      "price whenever you're brave.";
+  static const moneyCardTitle = 'YOUR HABIT, IN NUMBERS';
+  static const aDay = 'a day';
+  static const aYearShort = 'a year';
+  static String moneyLine({
+    required int amount,
+    required String price,
+    required String? container,
+    required int per,
+  }) => container != null
+      ? '$amount a day, a $price $container lasts $per. $costReply'
+      : '$amount a day at $price each. $costReply';
+  static const dayTwoMore = 'Two more, then your plan.';
+  static String daySpread(int amount) =>
+      "I'll spread your $amount so they don't all land before lunch. When "
+      "does your day start? Roughly. I won't check.";
+  static String wakeLead(int minute) => minute <= 360
+      ? 'Early bird. Respect.'
+      : minute == 420
+      ? 'Same. Sadly.'
+      : 'Lucky you. Some of us run all night.';
+  static const lightsOut = ' And lights out?';
+  static const dayCardTitle = 'YOUR DAY';
+  static String dayCardLine(String awake, String gap) =>
+      '$awake awake · one every $gap';
+  static const dayCardNote =
+      "That's why I asked. Home tells you when the next one's fair game.";
+  static String planReady(String name) =>
+      "That's everything${name.isEmpty ? '' : ', $name'}. Your plan's ready. "
+      'Brace yourself.';
 
   // Habit.
   static const habitPrompt = "Let's start with the obvious.";
@@ -126,6 +201,23 @@ abstract final class OnboardingCopy {
   static String paceLine(int minutes) =>
       "Today that's about one every $minutes min. It gets slower from here.";
   static const dealButton = 'Shake on it';
+  static String dealEyebrow(int amount) => '$amount today. Three ways to zero.';
+  static const dealHeadline = 'How fast do you want to go?';
+  static const suggested = 'SUGGESTED';
+  static String weeks(int n) => '$n weeks';
+  static String dealGo(String? pace, String date) =>
+      '${pace == null ? 'Go' : 'Go ${pace.toLowerCase()}'} · zero by $date';
+  static const pickOwnDate = 'Pick my own date';
+  static const ruleLog = 'Tap to log. Even the bad ones.';
+  static const ruleHold = 'Bad week? The dot waits a week. No lecture.';
+  static String ruleEvery(int days, String weekday) => days == 7
+      ? "Every $weekday, one dot goes. That's your new limit."
+      : 'About every $days days, one dot goes.';
+  static String dotsIntro(int amount, int unit, String units) => unit == 1
+      ? 'You start with $amount a day. Each dot is one of them, and goes on '
+            'its date:'
+      : 'You start with $amount a day. Each dot is $unit $units, and goes on '
+            'its date:';
   static const dealFinePrint = 'Change the plan any time from Home.';
 
   static const continueButton = 'Continue';

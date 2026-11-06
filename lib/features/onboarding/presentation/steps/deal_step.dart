@@ -8,36 +8,83 @@ import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
-import 'package:exhale/core/widgets/primary_button.dart';
-import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/chevron_button.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
-import 'package:exhale/features/onboarding/presentation/widgets/taper_chart.dart';
+import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Step 6: the taper to zero, the quit date, and the save.
+class _Pace {
+  const _Pace(this.name, this.weeks, this.blurb);
+
+  final String name;
+  final int weeks;
+  final String blurb;
+
+  int get days => weeks * 7;
+}
+
+const _paces = [
+  _Pace(
+    'Brisk',
+    4,
+    'Fast and firm. For people who’ve done this before. Allegedly.',
+  ),
+  _Pace('Steady', 8, 'Eight weeks. A resolution that actually sticks.'),
+  _Pace('Gentle', 12, 'One fewer a week. Slow enough to actually finish.'),
+];
+
+/// Step 3: three ways to zero, the plan's rules, and the save.
 class DealStep extends ConsumerStatefulWidget {
   const DealStep({super.key});
-
-  /// How long the date sheet takes to slide away before the chart redraws.
-  static const Duration sheetClose = Duration(milliseconds: 250);
 
   @override
   ConsumerState<DealStep> createState() => _DealStepState();
 }
 
 class _DealStepState extends ConsumerState<DealStep> {
-  /// The chart waits for the sheet when the date came from Pick.
-  Duration _chartDelay = Duration.zero;
-
   /// The replace alert is up, so another press must not open a second one.
   bool _asking = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // An untouched plan starts on the pace nearest the suggested date.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final form = ref.read(onboardingFormProvider);
+      if (form.quitPreset == null) return;
+      _choose(_paces[_suggestedIndex(form)]);
+    });
+  }
+
+  int _suggestedIndex(OnboardingFormState form) {
+    final target = ReductionPlan.suggestedQuitDay(
+      form.startDay,
+      form.startLimit,
+    ).daysSince(form.startDay);
+    var best = 0;
+    for (var i = 1; i < _paces.length; i++) {
+      if ((_paces[i].days - target).abs() <=
+          (_paces[best].days - target).abs()) {
+        best = i;
+      }
+    }
+    return best;
+  }
+
+  void _choose(_Pace pace) {
+    final form = ref.read(onboardingFormProvider);
+    ref
+        .read(onboardingFormProvider.notifier)
+        .setQuitDay(form.startDay.addDays(pace.days));
+  }
 
   Future<void> _pickDate() async {
     final controller = ref.read(onboardingFormProvider.notifier);
@@ -49,13 +96,7 @@ class _DealStepState extends ConsumerState<DealStep> {
       minimum: controller.earliestQuitDay.toLocalDate(),
     );
     if (picked == null || !mounted) return;
-    setState(() => _chartDelay = DealStep.sheetClose);
     controller.setQuitDay(LogicalDay.fromDate(picked));
-  }
-
-  void _preset(QuitPreset preset) {
-    setState(() => _chartDelay = Duration.zero);
-    ref.read(onboardingFormProvider.notifier).selectQuitPreset(preset);
   }
 
   Future<void> _shake() async {
@@ -91,21 +132,24 @@ class _DealStepState extends ConsumerState<DealStep> {
     final colors = context.colors;
     final text = context.textTheme;
     final plan = form.preview;
-    final yearly = form.yearlyCostCents;
     final error = form.errorMessage;
-    final muted = text.bodySmall?.copyWith(color: colors.onSurfaceVariant);
+    final suggested = _suggestedIndex(form);
+    final selected = _paces.indexWhere(
+      (p) => form.quitDay == form.startDay.addDays(p.days),
+    );
 
     return OnboardingStepFrame(
-      button: PrimaryButton(
-        label: OnboardingCopy.dealButton,
-        isBusy: form.isSubmitting,
-        onPressed: plan == null ? null : _shake,
+      button: ChevronButton(
+        label: OnboardingCopy.dealGo(
+          selected < 0 ? null : _paces[selected].name,
+          AppFormat.monthDay(form.quitDay),
+        ),
+        onPressed: plan == null || form.isSubmitting ? null : _shake,
       ),
       below: Padding(
         padding: const EdgeInsets.only(top: AppSpacing.sm),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          spacing: AppSpacing.sm,
           children: [
             if (error != null)
               Text(
@@ -116,7 +160,12 @@ class _DealStepState extends ConsumerState<DealStep> {
             Text(
               OnboardingCopy.dealFinePrint,
               textAlign: TextAlign.center,
-              style: muted,
+              style: text.labelSmall?.copyWith(color: colors.outline),
+            ),
+            TextButton.icon(
+              onPressed: _pickDate,
+              icon: const Icon(AppIcons.calendar, size: 16),
+              label: const Text(OnboardingCopy.pickOwnDate),
             ),
           ],
         ),
@@ -124,62 +173,49 @@ class _DealStepState extends ConsumerState<DealStep> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          OnboardingStepHeader(
-            prompt: OnboardingCopy.dealPrompt,
-            title: OnboardingCopy.dealTitle(
-              form.startLimit,
-              AppFormat.monthDay(form.quitDay),
+          const SizedBox(height: AppSpacing.md),
+          StepReveal(
+            child: Text(
+              OnboardingCopy.dealEyebrow(form.startLimit),
+              style: text.titleSmall?.copyWith(color: colors.onSurfaceVariant),
             ),
           ),
-          if (plan != null) ...[
-            const SizedBox(height: AppSpacing.md + 2),
+          const SizedBox(height: AppSpacing.sm),
+          StepReveal(
+            index: 1,
+            child: Text(
+              OnboardingCopy.dealHeadline,
+              style: text.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                height: 1.15,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md + 2),
+          for (final (i, pace) in _paces.indexed)
             StepReveal(
-              index: 2,
-              child: Card(
-                margin: EdgeInsets.zero,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.md,
-                    AppSpacing.md,
-                    AppSpacing.md,
-                    AppSpacing.gutterSm,
-                  ),
-                  child: TaperChart(plan: plan, delay: _chartDelay),
+              index: 2 + i,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _PaceCard(
+                  pace: pace,
+                  form: form,
+                  open: i == selected,
+                  suggested: i == suggested,
+                  onTap: () {
+                    unawaited(HapticFeedback.selectionClick());
+                    _choose(pace);
+                  },
                 ),
               ),
             ),
-          ],
-          const SizedBox(height: AppSpacing.md - 2),
-          StepReveal(
-            index: 3,
-            child: Wrap(
-              spacing: 7,
-              children: [
-                for (final preset in QuitPreset.values)
-                  _DealChip(
-                    label: preset.label,
-                    icon: preset == QuitPreset.suggested
-                        ? AppIcons.sparkles
-                        : null,
-                    selected: form.quitPreset == preset,
-                    onTap: () => _preset(preset),
-                  ),
-                _DealChip(
-                  label: OnboardingCopy.pick,
-                  icon: AppIcons.calendar,
-                  selected: form.quitPreset == null,
-                  onTap: _pickDate,
-                ),
-              ],
-            ),
-          ),
           AnimatedSize(
             duration: AppMotion.swap,
             curve: AppMotion.swapCurve,
             alignment: Alignment.topCenter,
             child: form.isSteep
                 ? Padding(
-                    padding: const EdgeInsets.only(top: AppSpacing.gutterSm),
+                    padding: const EdgeInsets.only(top: AppSpacing.sm),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: AppSpacing.sm,
@@ -200,66 +236,6 @@ class _DealStepState extends ConsumerState<DealStep> {
                   )
                 : const SizedBox(width: double.infinity),
           ),
-          if (plan != null) ...[
-            const SizedBox(height: AppSpacing.md - 2),
-            StepReveal(
-              index: 4,
-              child: Card(
-                margin: EdgeInsets.zero,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: AppSpacing.gutterSm,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        _Stat(
-                          label: OnboardingCopy.tomorrow,
-                          value: form.tomorrowLimit,
-                          format: (n) => '$n',
-                        ),
-                        VerticalDivider(color: colors.outlineVariant),
-                        _Stat(
-                          label: OnboardingCopy.quitIn,
-                          value: plan.totalDays,
-                          format: OnboardingCopy.days,
-                        ),
-                        if (yearly != null) ...[
-                          VerticalDivider(color: colors.outlineVariant),
-                          _Stat(
-                            label: OnboardingCopy.backAYear,
-                            value: yearly,
-                            format: (cents) => AppFormat.money(
-                              cents,
-                              symbol: form.currency,
-                              wholeUnits: true,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.gutterSm),
-            StepReveal(
-              index: 5,
-              child: SmoothSwitcher(
-                resize: true,
-                child: Text(
-                  OnboardingCopy.paceLine(form.paceMinutes),
-                  key: ValueKey(form.paceMinutes),
-                  textAlign: TextAlign.center,
-                  style: text.bodyMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
-                    height: 1.4,
-                  ),
-                ),
-              ),
-            ),
-          ],
           const SizedBox(height: AppSpacing.md),
         ],
       ),
@@ -267,74 +243,132 @@ class _DealStepState extends ConsumerState<DealStep> {
   }
 }
 
-class _DealChip extends StatelessWidget {
-  const _DealChip({
-    required this.label,
-    required this.selected,
+class _PaceCard extends StatelessWidget {
+  const _PaceCard({
+    required this.pace,
+    required this.form,
+    required this.open,
+    required this.suggested,
     required this.onTap,
-    this.icon,
   });
 
-  final String label;
-  final IconData? icon;
-  final bool selected;
+  final _Pace pace;
+  final OnboardingFormState form;
+  final bool open;
+  final bool suggested;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final pick = SelectionColors.of(context);
-    final foreground = selected ? pick.foreground : context.colors.onSurface;
+    final colors = context.colors;
+    final exhale = context.exhale;
+    final text = context.textTheme;
+    final quit = form.startDay.addDays(pace.days);
+    final plan = ReductionPlan(
+      startDay: form.startDay,
+      startLimit: form.startLimit,
+      quitDay: quit,
+    );
+    final cardColor =
+        context.theme.cardTheme.color ?? colors.surfaceContainerLow;
     return Semantics(
       button: true,
-      selected: selected,
-      label: label,
+      inMutuallyExclusiveGroup: true,
+      checked: open,
       onTap: onTap,
-      excludeSemantics: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () {
-          unawaited(HapticFeedback.selectionClick());
-          onTap();
-        },
-        // The pill stays small; the touch is 44 pt.
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 44),
-          child: Center(
-            widthFactor: 1,
-            child: PressScale(
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOut,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 13,
-                  vertical: 8,
-                ),
-                decoration: ShapeDecoration(
-                  color: selected ? pick.fill : pick.idleFill,
-                  shape: StadiumBorder(
-                    side: BorderSide(
-                      color: selected ? pick.line : pick.idleLine,
-                      width: selected ? 1.5 : 1,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 5,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: AppMotion.swap,
+          curve: AppMotion.swapCurve,
+          padding: EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: open ? 16 : 14,
+          ),
+          decoration: BoxDecoration(
+            color: open ? exhale.inset : cardColor,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: open ? exhale.emphasis : colors.outlineVariant,
+              width: open ? 1.5 : 1,
+            ),
+          ),
+          child: AnimatedSize(
+            duration: AppMotion.swap,
+            curve: AppMotion.swapCurve,
+            alignment: Alignment.topCenter,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: 10,
+              children: [
+                Row(
+                  spacing: 8,
                   children: [
-                    if (icon != null) Icon(icon, size: 15, color: foreground),
+                    Text(
+                      pace.name,
+                      style: text.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    if (suggested)
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: exhale.emphasis,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          child: Text(
+                            OnboardingCopy.suggested,
+                            style: text.labelSmall?.copyWith(
+                              color: exhale.onEmphasis,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.6,
+                            ),
+                          ),
+                        ),
+                      ),
                     Flexible(
                       child: Text(
-                        label,
-                        style: context.textTheme.labelLarge?.copyWith(
-                          color: foreground,
-                          fontWeight: selected ? FontWeight.w600 : null,
+                        OnboardingCopy.weeks(pace.weeks),
+                        style: text.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
                         ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      AppFormat.monthDay(quit),
+                      style: text.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
                 ),
-              ),
+                if (open) ...[
+                  Text(
+                    pace.blurb,
+                    style: text.bodyMedium?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      height: 1.4,
+                    ),
+                  ),
+                  Text(
+                    OnboardingCopy.dotsIntro(
+                      form.startLimit,
+                      form.dotUnit,
+                      form.habit.units,
+                    ),
+                    style: text.bodySmall?.copyWith(height: 1.4),
+                  ),
+                  _Dots(plan: plan, form: form),
+                  _Rules(plan: plan, form: form),
+                ],
+              ],
             ),
           ),
         ),
@@ -343,37 +377,199 @@ class _DealChip extends StatelessWidget {
   }
 }
 
-class _Stat extends StatelessWidget {
-  const _Stat({required this.label, required this.value, required this.format});
+/// The days each dot goes: a dot is [OnboardingFormState.dotUnit] of the
+/// starting limit, and goes on the first day the limit falls that far.
+List<LogicalDay> _dropDays(ReductionPlan plan, OnboardingFormState form) {
+  final unit = form.dotUnit;
+  return [
+    for (var k = 0; k < form.dotCount; k++)
+      () {
+        final target = (form.startLimit - (k + 1) * unit).clamp(0, 999);
+        for (var d = 0; d <= plan.totalDays; d++) {
+          final day = form.startDay.addDays(d);
+          if (plan.limitOn(day) <= target) return day;
+        }
+        return plan.quitDay;
+      }(),
+  ];
+}
 
-  final String label;
-  final int value;
-  final String Function(int value) format;
+/// One dot per unit of today's limit, each with the date it goes. In turn
+/// they fade out and back, so the taper plays on a loop. Still under Reduce
+/// Motion.
+class _Dots extends StatefulWidget {
+  const _Dots({required this.plan, required this.form});
+
+  final ReductionPlan plan;
+  final OnboardingFormState form;
+
+  @override
+  State<_Dots> createState() => _DotsState();
+}
+
+class _DotsState extends State<_Dots> with SingleTickerProviderStateMixin {
+  late final AnimationController _loop = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 10),
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _loop
+        ..stop()
+        ..value = 0;
+    } else if (!_loop.isAnimating) {
+      _loop.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _loop.dispose();
+    super.dispose();
+  }
+
+  /// 0 while the dot is on, 1 while it is gone. Dot [k] goes at 6% + 6% * k
+  /// of the loop and all return at 88% to 94%.
+  double _gone(double t, int k) {
+    final start = (6 + 6 * k) / 100;
+    if (t <= start) return 0;
+    if (t < start + 0.02) return (t - start) / 0.02;
+    if (t <= 0.88) return 1;
+    if (t < 0.94) return 1 - (t - 0.88) / 0.06;
+    return 0;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final text = context.textTheme;
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: text.bodySmall?.copyWith(
-              color: context.colors.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 2),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: CountTo(
-              value: value,
-              builder: (context, shown) => Text(
-                format(shown),
-                style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+    final days = _dropDays(widget.plan, widget.form);
+    final last = days.length - 1;
+    final unit = widget.form.dotUnit;
+    final unitText = unit == 1 ? 'unit' : '$unit units';
+    return Semantics(
+      label:
+          '${days.length} dots, one per $unitText of today. The first goes '
+          'on ${AppFormat.monthDay(days.first)}, the '
+          'last on ${AppFormat.monthDay(days[last])}, which is zero.',
+      excludeSemantics: true,
+      child: AnimatedBuilder(
+        animation: _loop,
+        builder: (context, _) => LayoutBuilder(
+          builder: (context, constraints) {
+            const columns = 6;
+            final width = constraints.maxWidth / columns;
+            return Wrap(
+              runSpacing: 8,
+              children: [
+                for (var k = 0; k <= last; k++)
+                  SizedBox(
+                    width: width,
+                    child: _dot(k, k == last, days[k], colors, text),
+                  ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _dot(
+    int k,
+    bool zero,
+    LogicalDay day,
+    ColorScheme colors,
+    TextTheme text,
+  ) {
+    final gone = _gone(_loop.value, k);
+    final ring = context.exhale.success.foreground;
+    return Column(
+      children: [
+        Opacity(
+          opacity: 1 - 0.84 * gone,
+          child: Transform.scale(
+            scale: 1 - 0.45 * gone,
+            child: Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: zero ? null : colors.onSurface,
+                border: zero ? Border.all(color: ring, width: 2.5) : null,
               ),
             ),
           ),
-        ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          AppFormat.monthDay(day),
+          maxLines: 1,
+          style: text.labelSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: zero ? ring : colors.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Rules extends StatelessWidget {
+  const _Rules({required this.plan, required this.form});
+
+  final ReductionPlan plan;
+  final OnboardingFormState form;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final per = plan.totalDays / form.dotCount;
+    final first = _dropDays(plan, form).first;
+    final weekday = const [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ][first.toLocalDate().weekday - 1];
+    final rules = [
+      (AppIcons.add, OnboardingCopy.ruleLog),
+      (AppIcons.habit, OnboardingCopy.ruleEvery(per.round(), weekday)),
+      (AppIcons.pause, OnboardingCopy.ruleHold),
+    ];
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colors.outlineVariant)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 6,
+          children: [
+            for (final (icon, line) in rules)
+              Row(
+                spacing: 10,
+                children: [
+                  Icon(icon, size: 15, color: colors.onSurface),
+                  Expanded(
+                    child: Text(
+                      line,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
       ),
     );
   }
