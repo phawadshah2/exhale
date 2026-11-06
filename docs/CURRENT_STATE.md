@@ -1,7 +1,6 @@
 # Current state
 
-Updated 2026-11-06. Earlier sessions: `docs/history/2026-10-16_to_11-03_state_log.md`,
-`docs/history/2026-11-04_to_11-05_state_log.md`.
+Updated 2026-11-06. Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `…11-04_to_11-05…`.
 
 ## Where we are
 
@@ -47,7 +46,6 @@ Row 1 dark, row 2 light, boards 1 to 7; the green "Decided" note lists every rul
   with "See my plan"; green dot on the avatar; timestamps at the bubble's bottom-right edge.
 - Tagline under the button reacts to the last answer and slides to a new line.
 - Light mode: Exhale's bubbles and cards black, the user's white.
-- Open: fixing a past answer (proposed: tap your bubble, its card reopens in place).
 
 ## Onboarding prototype (2026-11-06)
 
@@ -64,10 +62,12 @@ Row 1 dark, row 2 light, boards 1 to 7; the green "Decided" note lists every rul
 
 ## Next action
 
-Write the spec and task plan for the onboarding chat in `docs/superpowers/` from the
-"Questions inside the chat" boards (settle the open answer-fixing rule with Fawad first),
-then run it with `execute-plan`, reworking the prototype's chat step. Read: this file, the
-prototype files above, and the canvas page.
+Fawad: "write the spec automatically when I resume the work". On resume, without asking,
+write the spec in `docs/superpowers/specs/` from the "Questions inside the chat" boards and
+the green "Decided" note, using the proposed answer-fixing rule (tap your bubble, its card
+reopens in place; changing the habit clears later answers), marked as an assumption for
+Fawad to confirm. Then the task plan, then `execute-plan` on the prototype's chat step.
+Read: this file, the prototype files above, the canvas page. No checks run (design only).
 
 ## Open items from Fawad's iPhone review (2026-11-06)
 
