@@ -11,14 +11,13 @@ Updated 2026-11-06. Earlier sessions: `docs/history/2026-10-16_to_11-03_state_lo
 | M5 Release candidate | Done, merged to `main` (51e0bc6) |
 | M6 Plan details, Edit plan, Logs; M7 Stage management; polish rounds | Done on `feat/plan-and-stages`, walked in the simulator |
 | TestFlight build 1.0.0 (1) | Installed by Fawad; runs fine on his iPhone (2026-11-06) |
-| Onboarding redesign 2 (chat) | Prototype committed (1efc0c1) on `feat/onboarding-chat-prototype`; not seen running; design tweaks coming |
+| Onboarding redesign 2 (chat) | Design signed off (in-chat questions, 2026-11-06); prototype 1efc0c1 predates it |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 ## Repo
 
-- Branch `feat/plan-and-stages`, pushed; not merged to `main`, no PR open, CI not read.
-- Last checks at 7a80954: full suite 1211 passed, format and analyze clean. Not run since:
-  no Dart code changed.
+- `feat/plan-and-stages` pushed, not merged, no PR, CI not read. Last full suite at 7a80954:
+  1211 passed, format and analyze clean.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
 ## Onboarding redesign 2 (Fawad, 2026-11-06)
@@ -28,16 +27,27 @@ Canvas (source of truth): https://claude.ai/artifact/EMRb3MqhssfA6k4qLHTCQa, pag
 
 1. **Welcome** (`FlowIntro`, not a chat): "EXHALE", "Stop / negotiating (struck) / with
    your / cravings.", subtitle, four how-it-works rows, "Let's talk", tagline.
-2. **One chat** (`FlowChat`) replaces the welcome chat, habit, amount, cost and day steps:
-   excuses, name (or refuse), habit chips, amount stepper, price chips or skip, units per
-   container, money card, wake and bed chips, day card, "See my plan". Sardonic Exhale,
-   real times and sent/delivered/read ticks inside bubbles, answers in the area above a
-   fixed button, cards inside the chat. No step counter, no back button.
+2. **One chat** replaces the welcome chat, habit, amount, cost and day steps. Now specified
+   by the "Questions inside the chat" page (below), which supersedes `FlowChat`'s answer dock.
 3. **Plan** (`VisDots`, 2C): Brisk/Steady/Gentle cards, 12 dots in date order, plan rules,
    tagline. Back button; no counter.
 
 Every screen has a tagline under the main button. Paywall ideas are on the canvas's
 "Paywall ideas (later)" page; pricing model undecided.
+
+**Questions inside the chat** (canvas page of that name; signed off by Fawad 2026-11-06).
+Row 1 dark, row 2 light, boards 1 to 7; the green "Decided" note lists every ruling.
+- Each question is an Exhale message with its controls inside (name field, habit pills,
+  steppers, price chips plus Other, one wake-and-bed card). Answered cards fold back to a
+  plain message plus the user's bubble with ticks. No answer dock.
+- Opening: excuses, "Heard them all…", then "Before you send me another excuse: who am I
+  talking to?".
+- Habit picker is board **E** (not board 2): three rows of text-sized pills, eight habits + Other.
+- Chat fills from the top; edge-to-edge glass app bar (chat scrolls under it); solid dock
+  with "See my plan"; green dot on the avatar; timestamps at the bubble's bottom-right edge.
+- Tagline under the button reacts to the last answer and slides to a new line.
+- Light mode: Exhale's bubbles and cards black, the user's white.
+- Open: fixing a past answer (proposed: tap your bubble, its card reopens in place).
 
 ## Onboarding prototype (2026-11-06)
 
@@ -47,19 +57,17 @@ Every screen has a tagline under the main button. Paywall ideas are on the canva
   `providers/onboarding_chat.dart` (the script), `widgets/chat_widgets.dart`,
   `widgets/chevron_button.dart`. Edited: form provider (`userName`; first-run steps are
   welcome, chat, deal), `onboarding_page.dart`, `onboarding_copy.dart`, `app_icons.dart`.
-- Checks: format and `analyze --fatal-infos` clean. Tests not run; `welcome_step_test.dart`
-  deleted; the page, app and accessibility onboarding tests need rework.
-- Simulator: built on `exhale` (iOS 26.5), but the run lost its connection and no screen was
-  seen. Unwalked.
+- Format and analyze clean; tests not run (`welcome_step_test.dart` deleted; page, app and
+  a11y onboarding tests need rework). Never seen running in the simulator.
 - Deviations: alcohol and energy drinks store 1 unit per container; Steady blurb is generic;
   custom habit is "Something else" / "time"; the name is saved to settings, not shown on Home.
 
 ## Next action
 
-Fawad will ask for a redesign or design tweaks next session. Relaunch with
-`fvm flutter run -d C1712C39-41B3-4CF1-95BE-9A5D6771A92A` (ask first), walk welcome, chat and
-plan, then apply his tweaks. After sign-off: spec, plan and tests, then merge. Read: this file,
-the files above, and the canvas boards.
+Write the spec and task plan for the onboarding chat in `docs/superpowers/` from the
+"Questions inside the chat" boards (settle the open answer-fixing rule with Fawad first),
+then run it with `execute-plan`, reworking the prototype's chat step. Read: this file, the
+prototype files above, and the canvas page.
 
 ## Open items from Fawad's iPhone review (2026-11-06)
 
