@@ -280,16 +280,37 @@ abstract final class OnboardingCopy {
   static String dealGo(String? pace, String date) =>
       '${pace == null ? 'Go' : 'Go ${pace.toLowerCase()}'} · zero by $date';
   static const pickOwnDate = 'Pick my own date';
-  static const ruleLog = 'Tap to log. Even the bad ones.';
-  static const ruleHold = 'Bad week? The dot waits a week. No lecture.';
-  static String ruleEvery(int days, String weekday) => days == 7
-      ? "Every $weekday, one dot goes. That's your new limit."
-      : 'About every $days days, one dot goes.';
-  static String dotsIntro(int amount, int unit, String units) => unit == 1
-      ? 'You start with $amount a day. Each dot is one of them, and goes on '
-            'its date:'
-      : 'You start with $amount a day. Each dot is $unit $units, and goes on '
-            'its date:';
+  static const customPace = 'Your date';
+
+  /// "4 weeks", or "5 wk 5 d" when it is not whole weeks.
+  static String planLength(int days) => days % 7 == 0
+      ? weeks(days ~/ 7)
+      : days < 7
+      ? '$days d'
+      : '${days ~/ 7} wk ${days % 7} d';
+
+  /// How long a stage lasts, inside the closed card's ring.
+  static String stageSpan(int shortest, int longest) =>
+      shortest == longest ? '${shortest}d' : '$shortest–${longest}d';
+  static String stagesLine(int count, int shortest, int longest) {
+    final days = shortest == longest ? '$shortest' : '$shortest–$longest';
+    return '$count stages, $days ${longest == 1 ? 'day' : 'days'} each';
+  }
+
+  /// Under the grid: what a square is, by its length in days.
+  static String gridNote(int squareDays) => switch (squareDays) {
+    1 =>
+      "Each square is a day; its number is that day's limit. Today is "
+          'outlined.',
+    7 =>
+      'Each square is a week; its number is the daily limit when it '
+          'starts. This week is outlined.',
+    _ =>
+      'Each square is ${squareDays ~/ 7} weeks; its number is the daily '
+          'limit when they start. The first is outlined.',
+  };
+  static String gridSummary(int days, int start, String date) =>
+      '$days days, $start a day falling to zero by $date.';
   static const dealFinePrint = 'Change the plan any time from Home.';
 
   static const continueButton = 'Continue';

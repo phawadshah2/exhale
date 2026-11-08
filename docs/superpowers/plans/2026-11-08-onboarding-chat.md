@@ -131,6 +131,22 @@ moves.
   time in the opening; habit order; coral money card; clearer bar; dock behind the
   keyboard; jump follow-up; welcome word-by-word reveal; dock 8 pt above the safe area.
 
+### Task C9: Plan cards show their stages (spec section 10)
+
+- [x] Tests: `deal_step_test` for the ring's stage length, the selected card's stage line,
+  grid size (days, weeks, 4 to 7 rows), the Your date card appearing, staying and
+  reselecting; the button still loops.
+- [x] `deal_step.dart`: `_StageRing`, `_StageGrid`, the Your date card; drop the dots,
+  blurbs and rules and their copy.
+- [x] Commit `feat(onboarding): show each pace's stages on the plan`.
+
+### Task C10: A steady chat (spec section 10)
+
+- [ ] Tests: `chat_step_test`: after an answer, the scroll offset only moves forward and
+  the newest message stays in view on every frame.
+- [ ] `ChatEntrance` grows the height in; `chat_step.dart` follows the end each frame.
+- [ ] Commit `fix(onboarding): keep the chat steady as messages arrive`.
+
 ### Then
 
 Milestone end, per `CLAUDE.md`: the independent review (Opus 5.5 high) and its fixes, the

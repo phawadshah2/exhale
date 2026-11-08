@@ -47,6 +47,16 @@ void main() {
     ),
   );
 
+  Future<void> pickDate(WidgetTester tester, LogicalDay day) async {
+    await tester.tap(find.text(OnboardingCopy.pickOwnDate));
+    await tester.pumpAndSettle();
+    tester
+        .widget<CupertinoDatePicker>(find.byType(CupertinoDatePicker))
+        .onDateTimeChanged(day.toLocalDate());
+    await tester.tap(find.byTooltip('Done'));
+    await tester.pumpAndSettle();
+  }
+
   Future<void> save(WidgetTester tester) async {
     await tester.tap(planButton().hitTestable());
     await tester.pumpAndSettle();
@@ -107,21 +117,84 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('Pick my own date opens the wheel and closes the paces', (
+  testWidgets('Pick my own date adds a card that stays and selects again', (
+    tester,
+  ) async {
+    await pumpAppToPlan(tester);
+    expect(find.text(OnboardingCopy.customPace), findsNothing);
+
+    await pickDate(tester, today.addDays(40));
+    expect(form(tester).quitDay, today.addDays(40));
+    expect(go(null, today.addDays(40)), findsOneWidget);
+    expect(find.text(OnboardingCopy.customPace), findsOneWidget);
+    expect(find.text(OnboardingCopy.planLength(40)), findsOneWidget);
+    expect(OnboardingCopy.planLength(40), '5 wk 5 d');
+
+    await tester.tap(find.text('Gentle'));
+    await tester.pumpAndSettle();
+    expect(form(tester).quitDay, today.addDays(84));
+    expect(find.text(OnboardingCopy.customPace), findsOneWidget);
+
+    await tester.tap(find.text(OnboardingCopy.customPace));
+    await tester.pumpAndSettle();
+    expect(form(tester).quitDay, today.addDays(40));
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('closed cards ring their stages, the selected one lists them', (
     tester,
   ) async {
     await pumpAppToPlan(tester);
 
-    await tester.tap(find.text(OnboardingCopy.pickOwnDate));
-    await tester.pumpAndSettle();
-    tester
-        .widget<CupertinoDatePicker>(find.byType(CupertinoDatePicker))
-        .onDateTimeChanged(today.addDays(40).toLocalDate());
-    await tester.tap(find.byTooltip('Done'));
-    await tester.pumpAndSettle();
+    // 10 a day: Brisk drops every 2 to 3 days, Steady every 5 to 6.
+    expect(find.text(OnboardingCopy.stageSpan(2, 3)), findsOneWidget);
+    expect(find.text(OnboardingCopy.stageSpan(5, 6)), findsOneWidget);
+    expect(find.text(OnboardingCopy.stagesLine(10, 8, 9)), findsOneWidget);
+    expect(
+      find.text(
+        "Each square is a day; its number is that day's limit. Today is "
+        'outlined.',
+      ),
+      findsOneWidget,
+    );
 
-    expect(form(tester).quitDay, today.addDays(40));
-    expect(go(null, today.addDays(40)), findsOneWidget);
+    await tester.disposeApp();
+  });
+
+  testWidgets('the grid keeps 4 to 7 rows, by days or by weeks', (
+    tester,
+  ) async {
+    await pumpAppToPlan(tester);
+
+    // Squares carrying a limit, and the rows they and the quit day's check
+    // sit on.
+    (int, int) grid() {
+      final summary = find.byKey(DealStep.gridKey);
+      final squares = find.descendant(of: summary, matching: find.byType(Text));
+      final check = find.descendant(of: summary, matching: find.byType(Icon));
+      // Centres within 4 pt share a row; the check sits a hair off the
+      // numbers.
+      final ys = [
+        for (final element in [...squares.evaluate(), ...check.evaluate()])
+          tester.getCenter(find.byWidget(element.widget)).dy,
+      ]..sort();
+      var rows = ys.isEmpty ? 0 : 1;
+      for (var i = 1; i < ys.length; i++) {
+        if (ys[i] - ys[i - 1] > 4) rows++;
+      }
+      return (squares.evaluate().length, rows);
+    }
+
+    expect(grid(), (84, 7));
+
+    await tester.tap(find.text('Brisk'));
+    await tester.pumpAndSettle();
+    expect(grid(), (28, 5));
+
+    await pickDate(tester, today.addDays(180));
+    expect(grid(), (26, 4));
+    expect(find.text(OnboardingCopy.gridNote(7)), findsOneWidget);
 
     await tester.disposeApp();
   });
@@ -136,9 +209,7 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('the dots and the button loop, but not under Reduce Motion', (
-    tester,
-  ) async {
+  testWidgets('the button loops, but not under Reduce Motion', (tester) async {
     await pumpAppToPlan(tester);
 
     tester.platformDispatcher.clearAccessibilityFeaturesTestValue();

@@ -220,6 +220,25 @@ Copied from the welcome chat on `main` (`welcome_step.dart`, `you_bubble.dart`,
   surface reaches the bottom edge and the button sits 8 pt above the safe area. The welcome
   and plan frames place their button the same way, so it does not move between steps.
 
+## 10. Plan cards show their stages (Fawad, 2026-11-08)
+
+- **Closed card**: a 38 pt stage ring left of the name, one segment per stage (length by
+  days, darker for a higher limit); inside, how long a stage lasts ("7d", "2–3d").
+- **Selected card**: header, then "12 stages, 7 days each", then a grid of squares with
+  each square's limit inside, then "Each square is a day; its number is that day's limit.
+  Today is outlined." It replaces the blurb, the dots and the rules.
+- **Grid**: one square a day (plus the quit day, a check) while that fits 14 × 7; longer
+  plans use one square per week, or per N weeks, and say so ("its number is the daily
+  limit when it starts"). 7 to 14 columns and 4 to 7 rows, the fewest columns that fit, so
+  shorter plans get bigger squares; figures scale with the square (7 to 14 pt), fixed
+  against text size, the grid read by VoiceOver as one summary line. Today outlined, a
+  drop in bold, fill the emphasis colour at a strength set by the limit.
+- **Your date**: after "Pick my own date", a fourth card, styled like the others, with the
+  picked date; it stays after another pace is chosen and selects that date again.
+- **Chat smoothness**: a new message grows into place (height with its fade and rise),
+  and the list follows the newest message frame by frame instead of restarting a scroll
+  animation on each change.
+
 ## Tests
 
 - `OnboardingChat` (the script, fake timers, Reduce Motion on): the opening order; each

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
@@ -21,28 +22,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class _Pace {
-  const _Pace(this.name, this.weeks, this.blurb);
+  const _Pace(this.name, this.weeks);
 
   final String name;
   final int weeks;
-  final String blurb;
 
   int get days => weeks * 7;
 }
 
-const _paces = [
-  _Pace(
-    'Brisk',
-    4,
-    'Fast and firm. For people who’ve done this before. Allegedly.',
-  ),
-  _Pace('Steady', 8, 'Eight weeks. A resolution that actually sticks.'),
-  _Pace('Gentle', 12, 'One fewer a week. Slow enough to actually finish.'),
-];
+const _paces = [_Pace('Brisk', 4), _Pace('Steady', 8), _Pace('Gentle', 12)];
 
-/// Step 3: three ways to zero, the plan's rules, and the save.
+/// Step 3: three ways to zero, each showing its stages, an optional date of
+/// the user's own, and the save.
 class DealStep extends ConsumerStatefulWidget {
   const DealStep({super.key});
+
+  /// The selected card's grid of days.
+  static const Key gridKey = ValueKey('dealStageGrid');
 
   @override
   ConsumerState<DealStep> createState() => _DealStepState();
@@ -52,6 +48,9 @@ class _DealStepState extends ConsumerState<DealStep> {
   /// The replace alert is up, so another press must not open a second one.
   bool _asking = false;
 
+  /// The date picked with "Pick my own date"; its card stays once picked.
+  LogicalDay? _custom;
+
   @override
   void initState() {
     super.initState();
@@ -60,7 +59,7 @@ class _DealStepState extends ConsumerState<DealStep> {
       if (!mounted) return;
       final form = ref.read(onboardingFormProvider);
       if (form.quitPreset == null) return;
-      _choose(_paces[_suggestedIndex(form)]);
+      _choose(form.startDay.addDays(_paces[_suggestedIndex(form)].days));
     });
   }
 
@@ -79,12 +78,8 @@ class _DealStepState extends ConsumerState<DealStep> {
     return best;
   }
 
-  void _choose(_Pace pace) {
-    final form = ref.read(onboardingFormProvider);
-    ref
-        .read(onboardingFormProvider.notifier)
-        .setQuitDay(form.startDay.addDays(pace.days));
-  }
+  void _choose(LogicalDay quitDay) =>
+      ref.read(onboardingFormProvider.notifier).setQuitDay(quitDay);
 
   Future<void> _pickDate() async {
     final controller = ref.read(onboardingFormProvider.notifier);
@@ -97,6 +92,11 @@ class _DealStepState extends ConsumerState<DealStep> {
     );
     if (picked == null || !mounted) return;
     controller.setQuitDay(LogicalDay.fromDate(picked));
+    final form = ref.read(onboardingFormProvider);
+    final isPace = _paces.any(
+      (p) => form.quitDay == form.startDay.addDays(p.days),
+    );
+    if (!isPace) setState(() => _custom = form.quitDay);
   }
 
   Future<void> _shake() async {
@@ -137,6 +137,19 @@ class _DealStepState extends ConsumerState<DealStep> {
     final selected = _paces.indexWhere(
       (p) => form.quitDay == form.startDay.addDays(p.days),
     );
+    // A date that is no pace's, as when coming back to this step, is the
+    // user's own.
+    final custom = _custom ?? (selected < 0 ? form.quitDay : null);
+    final cards = [
+      for (final (i, pace) in _paces.indexed)
+        (
+          name: pace.name,
+          quit: form.startDay.addDays(pace.days),
+          suggested: i == suggested,
+        ),
+      if (custom != null)
+        (name: OnboardingCopy.customPace, quit: custom, suggested: false),
+    ];
 
     return OnboardingStepFrame(
       button: ChevronButton(
@@ -191,19 +204,20 @@ class _DealStepState extends ConsumerState<DealStep> {
             ),
           ),
           const SizedBox(height: AppSpacing.md + 2),
-          for (final (i, pace) in _paces.indexed)
+          for (final (i, card) in cards.indexed)
             StepReveal(
               index: 2 + i,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: _PaceCard(
-                  pace: pace,
+                  name: card.name,
+                  quit: card.quit,
                   form: form,
-                  open: i == selected,
-                  suggested: i == suggested,
+                  open: form.quitDay == card.quit,
+                  suggested: card.suggested,
                   onTap: () {
                     unawaited(HapticFeedback.selectionClick());
-                    _choose(pace);
+                    _choose(card.quit);
                   },
                 ),
               ),
@@ -242,16 +256,26 @@ class _DealStepState extends ConsumerState<DealStep> {
   }
 }
 
+/// The shortest and longest stage of [plan], in days.
+(int, int) _stageSpan(ReductionPlan plan) {
+  final lengths = [for (final stage in plan.stages) stage.lengthDays];
+  return (lengths.reduce(math.min), lengths.reduce(math.max));
+}
+
+/// One way to zero. Closed, a ring of its stages; selected, the stage count
+/// and a grid of its days.
 class _PaceCard extends StatelessWidget {
   const _PaceCard({
-    required this.pace,
+    required this.name,
+    required this.quit,
     required this.form,
     required this.open,
     required this.suggested,
     required this.onTap,
   });
 
-  final _Pace pace;
+  final String name;
+  final LogicalDay quit;
   final OnboardingFormState form;
   final bool open;
   final bool suggested;
@@ -262,16 +286,22 @@ class _PaceCard extends StatelessWidget {
     final colors = context.colors;
     final exhale = context.exhale;
     final text = context.textTheme;
-    final quit = form.startDay.addDays(pace.days);
     final plan = ReductionPlan(
       startDay: form.startDay,
       startLimit: form.startLimit,
       quitDay: quit,
     );
+    final (shortest, longest) = _stageSpan(plan);
+    final stagesLine = OnboardingCopy.stagesLine(
+      plan.stageCount,
+      shortest,
+      longest,
+    );
+    final length = OnboardingCopy.planLength(plan.totalDays);
     final cardColor =
         context.theme.cardTheme.color ?? colors.surfaceContainerLow;
-    final name = Text(
-      pace.name,
+    final title = Text(
+      name,
       overflow: TextOverflow.ellipsis,
       style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
     );
@@ -293,12 +323,16 @@ class _PaceCard extends StatelessWidget {
       ),
     );
     final weeks = Text(
-      OnboardingCopy.weeks(pace.weeks),
+      length,
       style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
     );
     final date = Text(
       AppFormat.monthDay(quit),
       style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+    );
+    final ring = _StageRing(
+      plan: plan,
+      label: OnboardingCopy.stageSpan(shortest, longest),
     );
     // The header is read as the card's label; the rest of an open card is
     // read after it.
@@ -308,17 +342,24 @@ class _PaceCard extends StatelessWidget {
               spacing: 8,
               runSpacing: 4,
               crossAxisAlignment: WrapCrossAlignment.center,
-              children: [name, if (suggested) badge, weeks, date],
+              children: [
+                if (!open) ring,
+                title,
+                if (suggested) badge,
+                weeks,
+                date,
+              ],
             )
           : Row(
               spacing: 8,
               children: [
+                if (!open) ring,
                 // Takes the rest of the row, so the date sits at its end.
                 Expanded(
                   child: Row(
                     spacing: 8,
                     children: [
-                      Flexible(child: name),
+                      Flexible(child: title),
                       if (suggested) badge,
                       Flexible(child: weeks),
                     ],
@@ -328,16 +369,21 @@ class _PaceCard extends StatelessWidget {
               ],
             ),
     );
+    final muted = text.bodySmall?.copyWith(
+      color: colors.onSurfaceVariant,
+      height: 1.35,
+    );
     return Semantics(
       button: true,
       inMutuallyExclusiveGroup: true,
       checked: open,
       onTap: onTap,
       label: [
-        pace.name,
+        name,
         if (suggested) OnboardingCopy.suggested.toLowerCase(),
-        OnboardingCopy.weeks(pace.weeks),
+        length,
         AppFormat.monthDay(quit),
+        stagesLine,
       ].join(', '),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -348,7 +394,7 @@ class _PaceCard extends StatelessWidget {
           curve: AppMotion.swapCurve,
           padding: EdgeInsets.symmetric(
             horizontal: 16,
-            vertical: open ? 16 : 14,
+            vertical: open ? 16 : 10,
           ),
           decoration: BoxDecoration(
             color: open ? exhale.inset : cardColor,
@@ -368,23 +414,12 @@ class _PaceCard extends StatelessWidget {
               children: [
                 header,
                 if (open) ...[
+                  ExcludeSemantics(child: Text(stagesLine, style: muted)),
+                  _StageGrid(key: DealStep.gridKey, plan: plan),
                   Text(
-                    pace.blurb,
-                    style: text.bodyMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
-                      height: 1.4,
-                    ),
+                    OnboardingCopy.gridNote(_StageGrid.squareDays(plan)),
+                    style: muted,
                   ),
-                  Text(
-                    OnboardingCopy.dotsIntro(
-                      form.startLimit,
-                      form.dotUnit,
-                      form.habit.units,
-                    ),
-                    style: text.bodySmall?.copyWith(height: 1.4),
-                  ),
-                  _Dots(plan: plan, form: form),
-                  _Rules(plan: plan, form: form),
                 ],
               ],
             ),
@@ -395,98 +430,161 @@ class _PaceCard extends StatelessWidget {
   }
 }
 
-/// The days each dot goes: a dot is [OnboardingFormState.dotUnit] of the
-/// starting limit, and goes on the first day the limit falls that far.
-List<LogicalDay> _dropDays(ReductionPlan plan, OnboardingFormState form) {
-  final unit = form.dotUnit;
-  return [
-    for (var k = 0; k < form.dotCount; k++)
-      () {
-        final target = (form.startLimit - (k + 1) * unit).clamp(0, 999);
-        for (var d = 0; d <= plan.totalDays; d++) {
-          final day = form.startDay.addDays(d);
-          if (plan.limitOn(day) <= target) return day;
-        }
-        return plan.quitDay;
-      }(),
-  ];
-}
-
-/// One dot per unit of today's limit, each with the date it goes. In turn
-/// they fade out and back, so the taper plays on a loop. Still under Reduce
-/// Motion.
-class _Dots extends StatefulWidget {
-  const _Dots({required this.plan, required this.form});
+/// A ring of [plan]'s stages: each segment as long as its stage, darker for
+/// a higher limit, with [label] (how long a stage lasts) inside.
+class _StageRing extends StatelessWidget {
+  const _StageRing({required this.plan, required this.label});
 
   final ReductionPlan plan;
-  final OnboardingFormState form;
+  final String label;
+
+  static const double size = 38;
 
   @override
-  State<_Dots> createState() => _DotsState();
+  Widget build(BuildContext context) => SizedBox.square(
+    dimension: size,
+    child: CustomPaint(
+      painter: _StageRingPainter(plan: plan, color: context.exhale.emphasis),
+      child: Center(
+        child: MediaQuery.withNoTextScaling(
+          child: Text(
+            label,
+            maxLines: 1,
+            style: context.textTheme.labelSmall?.copyWith(
+              fontSize: 9.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.2,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
-class _DotsState extends State<_Dots> with SingleTickerProviderStateMixin {
-  late final AnimationController _loop = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 10),
-  );
+class _StageRingPainter extends CustomPainter {
+  _StageRingPainter({required this.plan, required this.color});
+
+  final ReductionPlan plan;
+  final Color color;
+
+  static const double _stroke = 4;
+  static const double _gap = 1.2;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (MediaQuery.disableAnimationsOf(context)) {
-      _loop
-        ..stop()
-        ..value = 0;
-    } else if (!_loop.isAnimating) {
-      _loop.repeat();
+  void paint(Canvas canvas, Size size) {
+    final radius = (size.shortestSide - _stroke) / 2;
+    final rect = Rect.fromCircle(
+      center: size.center(Offset.zero),
+      radius: radius,
+    );
+    final gap = _gap / radius;
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = _stroke;
+    var start = -math.pi / 2;
+    for (final stage in plan.stages) {
+      final sweep = stage.lengthDays / plan.totalDays * 2 * math.pi;
+      paint.color = color.withValues(
+        alpha: 0.3 + 0.7 * stage.limit / plan.startLimit,
+      );
+      canvas.drawArc(
+        rect,
+        start,
+        math.max(sweep - gap, sweep / 2),
+        false,
+        paint,
+      );
+      start += sweep;
     }
   }
 
   @override
-  void dispose() {
-    _loop.dispose();
-    super.dispose();
+  bool shouldRepaint(_StageRingPainter old) =>
+      old.plan.totalDays != plan.totalDays ||
+      old.plan.startLimit != plan.startLimit ||
+      old.color != color;
+}
+
+/// [plan]'s limits as squares, the quit day last as a check: one a day
+/// while that fits [_maxColumns] × [_maxRows], else one per week (or per N
+/// weeks). It keeps [_minRows] to [_maxRows] rows, using the fewest columns
+/// that fit, so a shorter plan gets bigger squares. VoiceOver reads it as
+/// one line.
+class _StageGrid extends StatelessWidget {
+  const _StageGrid({required this.plan, super.key});
+
+  final ReductionPlan plan;
+
+  static const int _maxColumns = 14;
+  static const int _minColumns = 7;
+  static const int _maxRows = 7;
+  static const int _minRows = 4;
+  static const double _gap = 2;
+
+  /// Days each square stands for.
+  static int squareDays(ReductionPlan plan) {
+    const cells = _maxColumns * _maxRows;
+    if (plan.totalDays + 1 <= cells) return 1;
+    return ((plan.totalDays + 1) / cells / 7).ceil() * 7;
   }
 
-  /// 0 while the dot is on, 1 while it is gone. Dot [k] goes at 6% + 6% * k
-  /// of the loop and all return at 88% to 94%.
-  double _gone(double t, int k) {
-    final start = (6 + 6 * k) / 100;
-    if (t <= start) return 0;
-    if (t < start + 0.02) return (t - start) / 0.02;
-    if (t <= 0.88) return 1;
-    if (t < 0.94) return 1 - (t - 0.88) / 0.06;
-    return 0;
+  /// Columns for [count] squares.
+  static int columns(int count) {
+    var columns = (count / _maxRows).ceil().clamp(_minColumns, _maxColumns);
+    if ((count / columns).ceil() < _minRows) {
+      columns = math.max(1, (count / _minRows).ceil());
+    }
+    return columns;
   }
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final text = context.textTheme;
-    final days = _dropDays(widget.plan, widget.form);
-    final last = days.length - 1;
-    final unit = widget.form.dotUnit;
-    final unitText = unit == 1 ? 'unit' : '$unit units';
+    final step = squareDays(plan);
+    final squares = (plan.totalDays / step).ceil();
+    final limits = [
+      for (var i = 0; i < squares; i++)
+        plan.limitOn(plan.startDay.addDays(i * step)),
+    ];
+    final count = squares + 1;
+    final columnCount = columns(count);
     return Semantics(
-      label:
-          '${days.length} dots, one per $unitText of today. The first goes '
-          'on ${AppFormat.monthDay(days.first)}, the '
-          'last on ${AppFormat.monthDay(days[last])}, which is zero.',
+      label: OnboardingCopy.gridSummary(
+        plan.totalDays,
+        plan.startLimit,
+        AppFormat.monthDay(plan.quitDay),
+      ),
       excludeSemantics: true,
-      child: AnimatedBuilder(
-        animation: _loop,
-        builder: (context, _) => LayoutBuilder(
+      child: MediaQuery.withNoTextScaling(
+        child: LayoutBuilder(
           builder: (context, constraints) {
-            final columns = context.hasLargeText ? 3 : 6;
-            final width = constraints.maxWidth / columns;
-            return Wrap(
-              runSpacing: 8,
+            final side =
+                (constraints.maxWidth - _gap * (columnCount - 1)) / columnCount;
+            final rows = (count / columnCount).ceil();
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: _gap,
               children: [
-                for (var k = 0; k <= last; k++)
-                  SizedBox(
-                    width: width,
-                    child: _dot(k, k == last, days[k], colors, text),
+                for (var r = 0; r < rows; r++)
+                  Row(
+                    spacing: _gap,
+                    children: [
+                      for (
+                        var i = r * columnCount;
+                        i < math.min(count, (r + 1) * columnCount);
+                        i++
+                      )
+                        _square(
+                          context,
+                          side: side,
+                          limit: i < squares ? limits[i] : null,
+                          first: i == 0,
+                          drop:
+                              i > 0 &&
+                              i < squares &&
+                              limits[i] != limits[i - 1],
+                        ),
+                    ],
                   ),
               ],
             );
@@ -496,99 +594,52 @@ class _DotsState extends State<_Dots> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _dot(
-    int k,
-    bool zero,
-    LogicalDay day,
-    ColorScheme colors,
-    TextTheme text,
-  ) {
-    final gone = _gone(_loop.value, k);
-    final ring = context.exhale.success.foreground;
-    return Column(
-      children: [
-        Opacity(
-          opacity: 1 - 0.84 * gone,
-          child: Transform.scale(
-            scale: 1 - 0.45 * gone,
-            child: Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: zero ? null : colors.onSurface,
-                border: zero ? Border.all(color: ring, width: 2.5) : null,
+  /// A null [limit] is the quit day.
+  Widget _square(
+    BuildContext context, {
+    required double side,
+    required int? limit,
+    required bool first,
+    required bool drop,
+  }) {
+    final colors = context.colors;
+    final exhale = context.exhale;
+    final strength = limit == null
+        ? 0.0
+        : 0.12 + 0.78 * limit / plan.startLimit;
+    final fontSize = (side * 0.34).clamp(7.0, 14.0);
+    return Container(
+      width: side,
+      height: side,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: limit == null
+            ? exhale.success.soft
+            : exhale.emphasis.withValues(alpha: strength),
+        borderRadius: BorderRadius.circular(side < 24 ? 3 : 5),
+      ),
+      foregroundDecoration: first
+          ? BoxDecoration(
+              border: Border.all(color: colors.onSurface, width: 1.5),
+              borderRadius: BorderRadius.circular(side < 24 ? 3 : 5),
+            )
+          : null,
+      child: limit == null
+          ? Icon(
+              AppIcons.check,
+              size: fontSize + 2,
+              color: exhale.success.foreground,
+            )
+          : Text(
+              '$limit',
+              style: TextStyle(
+                fontSize: fontSize,
+                height: 1,
+                fontWeight: drop ? FontWeight.w700 : FontWeight.w500,
+                fontFeatures: const [FontFeature.tabularFigures()],
+                color: strength > 0.55 ? exhale.onEmphasis : colors.onSurface,
               ),
             ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          AppFormat.monthDay(day),
-          maxLines: 1,
-          style: text.labelSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: zero ? ring : colors.onSurfaceVariant,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Rules extends StatelessWidget {
-  const _Rules({required this.plan, required this.form});
-
-  final ReductionPlan plan;
-  final OnboardingFormState form;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final per = plan.totalDays / form.dotCount;
-    final first = _dropDays(plan, form).first;
-    final weekday = const [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ][first.toLocalDate().weekday - 1];
-    final rules = [
-      (AppIcons.add, OnboardingCopy.ruleLog),
-      (AppIcons.habit, OnboardingCopy.ruleEvery(per.round(), weekday)),
-      (AppIcons.pause, OnboardingCopy.ruleHold),
-    ];
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: colors.outlineVariant)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 6,
-          children: [
-            for (final (icon, line) in rules)
-              Row(
-                spacing: 10,
-                children: [
-                  Icon(icon, size: 15, color: colors.onSurface),
-                  Expanded(
-                    child: Text(
-                      line,
-                      style: context.textTheme.bodySmall?.copyWith(
-                        height: 1.35,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-          ],
-        ),
-      ),
     );
   }
 }
