@@ -65,14 +65,16 @@ moves.
 
 ### Task C5: Price, per-pod and day cards
 
-- [ ] Tests in `chat_cards_test.dart`: five scaled chips and Other for vaping ($5 to $15);
+- [x] Tests in `chat_cards_test.dart`: five scaled chips and Other for vaping ($5 to $15);
   Other's field rejects an invalid price; "Change" opens the currency wheel and the chips
   follow the new symbol; "I'd rather not know" skips; the per-pod card steps by 5 to 100 with
   the caption; the day card steps by 30 minutes, turns a step off at the minimum window and
   shows "16 h awake · one every 1 h 20 min".
-- [ ] `PriceCard`, `PerPodCard`, `DayQuestionCard` in `chat_cards.dart`; the money card keeps
+- [x] `PriceCard`, `PerPodCard`, `DayQuestionCard` in `chat_cards.dart`; the money card keeps
   `MoneyCardView`. Remove the last dock answers (`_Answers`, `_Grid`).
-- [ ] Commit `feat(onboarding): ask the price and the day inside the chat`.
+- [x] Also here: `CurrencyChip.pickCurrency` opens the wheel from the price card's "Change";
+  the money card's figures wrap at large text; the unused `ChatChip` is gone.
+- [x] Commit `feat(onboarding): ask the price and the day inside the chat`.
 
 ### Task C6: Tagline
 
@@ -88,7 +90,10 @@ moves.
 - [ ] Tests: `accessibility_test.dart` covers the chat (card group names, answer bubbles as
   buttons, 44 pt targets, text at 200% with no overflow, light mode, Reduce Transparency);
   `welcome_step_test.dart` back for the new welcome; `onboarding_page_test.dart` and the app
-  tests run a first run through welcome, chat and plan.
+  tests run a first run through welcome, chat and plan. The habit, amount, cost and day step
+  tests reach their steps through the change-habit flow (the first run no longer has them).
+  `change_habit_test.dart` "declining the confirm…" times out in `pumpAndSettle` on the plan
+  screen, already at the prototype commit f920bbd: find what never settles.
 - [ ] Fix what those tests find.
 - [ ] Commit `test(onboarding): cover the chat onboarding end to end`.
 

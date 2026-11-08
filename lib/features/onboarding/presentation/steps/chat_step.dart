@@ -4,7 +4,6 @@ import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/glass_surface.dart';
-import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_chat.dart';
@@ -12,18 +11,15 @@ import 'package:exhale/features/onboarding/presentation/providers/onboarding_for
 import 'package:exhale/features/onboarding/presentation/widgets/chat_cards.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/chat_widgets.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/chevron_button.dart';
-import 'package:exhale/features/onboarding/presentation/widgets/currency_chip.dart';
-import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
-import 'package:exhale/features/onboarding/presentation/widgets/round_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Step 2: one chat that collects the name, habit, amount, price and day.
-/// It fills from the top and scrolls under a glass bar; the dock under it
-/// holds the open question's controls and the button, which stays off until
-/// the plan is ready.
+/// It fills from the top and scrolls under a glass bar; each question's
+/// controls sit in its card. The dock holds the button, which stays off
+/// until the plan is ready.
 class ChatStep extends ConsumerStatefulWidget {
   const ChatStep({super.key});
 
@@ -176,13 +172,6 @@ class _ChatStepState extends ConsumerState<ChatStep>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SmoothSwitcher(
-                    resize: true,
-                    child: KeyedSubtree(
-                      key: ValueKey(_chat.ask),
-                      child: _Answers(chat: _chat),
-                    ),
-                  ),
                   ChevronButton(
                     label: OnboardingCopy.chatSeePlan,
                     onPressed: _chat.done
@@ -384,181 +373,6 @@ class _Messages extends StatelessWidget {
         ),
         MoneyCard() => MoneyCardView(card: item),
       },
-    );
-  }
-}
-
-/// The open question's controls, one tap each.
-class _Answers extends ConsumerWidget {
-  const _Answers({required this.chat});
-
-  final OnboardingChat chat;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final form = ref.watch(onboardingFormProvider);
-    return switch (chat.ask) {
-      ChatAsk.perContainer => _Stepper(
-        value: form.unitsPerContainer,
-        unit: '${form.habit.units} a ${chat.habit.container}',
-        step: 5,
-        min: 5,
-        max: 200,
-        onChanged: chat.setPerContainer,
-        onSend: chat.sendPerContainer,
-      ),
-      ChatAsk.price => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _Grid(
-            columns: 4,
-            children: [
-              for (final p in chat.priceChoices)
-                ChatChip(label: chat.money(p), onTap: () => chat.pickPrice(p)),
-            ],
-          ),
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Text(
-                '${OnboardingCopy.regionNote} · ',
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: context.colors.onSurfaceVariant,
-                ),
-              ),
-              CurrencyChip(
-                symbol: form.currency,
-                onChanged: ref
-                    .read(onboardingFormProvider.notifier)
-                    .setCurrency,
-              ),
-              TextButton(
-                onPressed: chat.skipPrice,
-                child: const Text(OnboardingCopy.skipPrice),
-              ),
-            ],
-          ),
-        ],
-      ),
-      ChatAsk.day => ChatChip(
-        label: OnboardingCopy.thatsMyDay,
-        onTap: chat.sendDay,
-      ),
-      ChatAsk.name ||
-      ChatAsk.habit ||
-      ChatAsk.amount ||
-      null => const SizedBox(width: double.infinity),
-    };
-  }
-}
-
-class _Grid extends StatelessWidget {
-  const _Grid({required this.columns, required this.children});
-
-  final int columns;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      const gap = 6.0;
-      final width = (constraints.maxWidth - gap * (columns - 1)) / columns;
-      return Wrap(
-        spacing: gap,
-        runSpacing: gap,
-        children: [
-          for (final child in children) SizedBox(width: width, child: child),
-        ],
-      );
-    },
-  );
-}
-
-class _SendButton extends StatelessWidget {
-  const _SendButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => OutlinedButton(
-    onPressed: () {
-      unawaited(HapticFeedback.selectionClick());
-      onTap();
-    },
-    style: OutlinedButton.styleFrom(
-      minimumSize: const Size(76, 48),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-    ),
-    child: const Text(OnboardingCopy.send),
-  );
-}
-
-class _Stepper extends StatelessWidget {
-  const _Stepper({
-    required this.value,
-    required this.unit,
-    required this.step,
-    required this.min,
-    required this.max,
-    required this.onChanged,
-    required this.onSend,
-  });
-
-  final int value;
-  final String unit;
-  final int step;
-  final int min;
-  final int max;
-  final ValueChanged<int> onChanged;
-  final VoidCallback onSend;
-
-  @override
-  Widget build(BuildContext context) {
-    final text = context.textTheme;
-    return Row(
-      spacing: 6,
-      children: [
-        RoundIconButton(
-          icon: AppIcons.remove,
-          label: OnboardingCopy.fewer,
-          onTap: value > min
-              ? () {
-                  unawaited(HapticFeedback.selectionClick());
-                  onChanged((value - step).clamp(min, max));
-                }
-              : null,
-        ),
-        Expanded(
-          child: Column(
-            children: [
-              RollingNumber(
-                value: value,
-                style: text.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              Text(
-                unit,
-                textAlign: TextAlign.center,
-                style: text.bodySmall?.copyWith(
-                  color: context.colors.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-        RoundIconButton(
-          icon: AppIcons.add,
-          label: OnboardingCopy.more,
-          onTap: value < max
-              ? () {
-                  unawaited(HapticFeedback.selectionClick());
-                  onChanged((value + step).clamp(min, max));
-                }
-              : null,
-        ),
-        _SendButton(onTap: onSend),
-      ],
     );
   }
 }

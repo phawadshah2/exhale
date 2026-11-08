@@ -399,9 +399,12 @@ class MoneyCardView extends StatelessWidget {
             letterSpacing: 0.9,
           ),
         ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // A year drops under a day when both do not fit, as at large text.
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.end,
+          spacing: 12,
+          runSpacing: 8,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -433,63 +436,6 @@ class MoneyCardView extends StatelessWidget {
         ),
         Text(figures.line, style: small?.copyWith(height: 1.4)),
       ],
-    );
-  }
-}
-
-/// A pill answer chip, 48 pt tall.
-class ChatChip extends StatelessWidget {
-  const ChatChip({
-    required this.label,
-    required this.onTap,
-    this.dashed = false,
-    super.key,
-  });
-
-  final String label;
-  final VoidCallback onTap;
-
-  /// "Something else" gets a quieter border.
-  final bool dashed;
-
-  @override
-  Widget build(BuildContext context) {
-    final pick = SelectionColors.of(context);
-    final colors = context.colors;
-    return Semantics(
-      button: true,
-      label: label,
-      onTap: onTap,
-      excludeSemantics: true,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          unawaited(HapticFeedback.selectionClick());
-          onTap();
-        },
-        child: PressScale(
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 48),
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            alignment: Alignment.center,
-            decoration: ShapeDecoration(
-              color: pick.idleFill,
-              shape: StadiumBorder(
-                side: BorderSide(
-                  color: dashed ? colors.outline : pick.idleLine,
-                ),
-              ),
-            ),
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: context.textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

@@ -47,6 +47,30 @@ abstract final class OnboardingCopy {
   static const cardName = 'Your name';
   static const cardHabit = 'What are we quitting?';
   static const cardAmount = 'Times a day';
+  static String cardPrice(String? container) =>
+      container == null ? 'Price of one' : 'Price of a $container';
+  static String cardPerPod(String units, String container) =>
+      perContainer(units, container);
+  static const cardDay = 'Your day';
+  static const sendPrice = 'Send your price';
+  static const priceHint = '0.00';
+  static const fiveFewer = '5 fewer';
+  static const fiveMore = '5 more';
+  static const upAt = 'Up at';
+  static const lightsOutAt = 'Lights out';
+  static const wakeEarlier = 'Wake up 30 minutes earlier';
+  static const wakeLater = 'Wake up 30 minutes later';
+  static const bedEarlier = 'Lights out 30 minutes earlier';
+  static const bedLater = 'Lights out 30 minutes later';
+
+  /// 45 min, 1 h, 1 h 20 min.
+  static String span(int minutes) {
+    final hours = minutes ~/ 60;
+    final rest = minutes % 60;
+    if (hours == 0) return '$rest min';
+    return rest == 0 ? '$hours h' : '$hours h $rest min';
+  }
+
   static const askWho =
       'Before you send me another excuse: who am I talking to?';
   static const nameHint = 'Your first name';

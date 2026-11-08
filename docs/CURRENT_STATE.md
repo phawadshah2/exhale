@@ -64,8 +64,8 @@ Row 1 dark, row 2 light, boards 1 to 7; the green "Decided" note lists every rul
 
 Spec `docs/superpowers/specs/2026-11-08-onboarding-chat-design.md` and plan
 `docs/superpowers/plans/2026-11-08-onboarding-chat.md` (Tasks C1 to C7) written 2026-11-08.
-C1 to C4 done (script, reopening, glass bar and dock, name/habit/amount cards); price,
-pod and day answers stay in the dock until C5. Next: `execute-plan` Task C5.
+C1 to C5 done: every question is a card in the chat, the dock holds only the button.
+Next: `execute-plan` Task C6 (tagline). C7 also fixes tests the prototype broke.
 
 Waiting on Fawad (marked in the spec): the answer-fixing rule (section 4), the italic
 tagline drafts and seven habit taglines (section 5), the Other habit and Other price

@@ -1,15 +1,19 @@
 import 'dart:async';
 
 import 'package:exhale/core/presentation/app_icons.dart';
+import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_chat.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/habit_step.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/chat_widgets.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/currency_chip.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
+import 'package:exhale/features/settings/domain/entities/day_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,18 +32,23 @@ class ChatQuestionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controls = question.open ? _controls() : null;
-    final child = controls == null
+    final child = !question.open
         ? ChatBubble(item: question)
         : ChatCardFrame(
             question: question,
             label: switch (question.ask) {
               ChatAsk.name => OnboardingCopy.cardName,
               ChatAsk.habit => OnboardingCopy.cardHabit,
-              _ => OnboardingCopy.cardAmount,
+              ChatAsk.amount => OnboardingCopy.cardAmount,
+              ChatAsk.price => OnboardingCopy.cardPrice(chat.habit.container),
+              ChatAsk.perContainer => OnboardingCopy.cardPerPod(
+                chat.form().habit.units,
+                chat.habit.container ?? '',
+              ),
+              ChatAsk.day => OnboardingCopy.cardDay,
             },
             width: question.ask == ChatAsk.habit ? 300 : 284,
-            child: controls,
+            child: _controls(),
           );
     if (MediaQuery.disableAnimationsOf(context)) return child;
     return AnimatedSize(
@@ -50,11 +59,13 @@ class ChatQuestionView extends StatelessWidget {
     );
   }
 
-  Widget? _controls() => switch (question.ask) {
+  Widget _controls() => switch (question.ask) {
     ChatAsk.name => NameCard(chat: chat),
     ChatAsk.habit => HabitCard(chat: chat),
     ChatAsk.amount => AmountCard(chat: chat),
-    _ => null,
+    ChatAsk.price => PriceCard(chat: chat),
+    ChatAsk.perContainer => PerPodCard(chat: chat),
+    ChatAsk.day => DayQuestionCard(chat: chat),
   };
 }
 
@@ -289,6 +300,314 @@ class AmountCard extends ConsumerWidget {
   }
 }
 
+/// The price: scaled chips and Other, the currency, or "I'd rather not
+/// know".
+class PriceCard extends ConsumerStatefulWidget {
+  const PriceCard({required this.chat, super.key});
+
+  final OnboardingChat chat;
+
+  @override
+  ConsumerState<PriceCard> createState() => _PriceCardState();
+}
+
+class _PriceCardState extends ConsumerState<PriceCard> {
+  late final TextEditingController _price;
+  bool _other = false;
+  bool _invalid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _price = TextEditingController(
+      text: ref.read(onboardingFormProvider).priceText,
+    );
+  }
+
+  @override
+  void dispose() {
+    _price.dispose();
+    super.dispose();
+  }
+
+  void _send(String text) {
+    if (!widget.chat.sendPriceText(text)) setState(() => _invalid = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final chat = widget.chat;
+    final form = ref.watch(onboardingFormProvider);
+    final card = ChatCardColors.of(context);
+    final text = context.textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10,
+      children: [
+        if (_other) ...[
+          _FieldRow(
+            controller: _price,
+            hint: OnboardingCopy.priceHint,
+            label: OnboardingCopy.cardPrice(chat.habit.container),
+            sendLabel: OnboardingCopy.sendPrice,
+            maxLength: 9,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            onSend: _send,
+          ),
+          if (_invalid)
+            Text(
+              OnboardingCopy.invalidPrice,
+              style: text.bodySmall?.copyWith(color: card.ink),
+            ),
+          _CardPill(
+            label: OnboardingCopy.backToList,
+            onTap: () => setState(() {
+              _other = false;
+              _invalid = false;
+            }),
+          ),
+        ] else
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final price in chat.priceChoices)
+                _CardPill(
+                  label: chat.money(price),
+                  strong: true,
+                  onTap: () => chat.pickPrice(price),
+                ),
+              _CardPill(
+                label: OnboardingCopy.other,
+                onTap: () => setState(() => _other = true),
+              ),
+            ],
+          ),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              '${form.currency} · ',
+              style: text.bodySmall?.copyWith(color: card.muted),
+            ),
+            Semantics(
+              button: true,
+              label: OnboardingCopy.currency,
+              value: form.currency,
+              excludeSemantics: true,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => unawaited(
+                  CurrencyChip.pickCurrency(
+                    context,
+                    symbol: form.currency,
+                    onChanged: ref
+                        .read(onboardingFormProvider.notifier)
+                        .setCurrency,
+                  ),
+                ),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  child: Center(
+                    widthFactor: 1,
+                    child: Text(
+                      OnboardingCopy.change,
+                      style: text.bodySmall?.copyWith(
+                        color: card.ink,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        _CardPill(label: OnboardingCopy.skipPrice, onTap: chat.skipPrice),
+      ],
+    );
+  }
+}
+
+/// How many one container holds, by fives, and how long one lasts.
+class PerPodCard extends ConsumerWidget {
+  const PerPodCard({required this.chat, super.key});
+
+  final OnboardingChat chat;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final form = ref.watch(onboardingFormProvider);
+    final container = chat.habit.container ?? '';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 12,
+      children: [
+        CardStepper(
+          value: form.unitsPerContainer,
+          unit: '${form.habit.units} a $container',
+          step: 5,
+          min: 5,
+          max: HabitValidation.maxUnitsPerContainer,
+          fewerLabel: OnboardingCopy.fiveFewer,
+          moreLabel: OnboardingCopy.fiveMore,
+          onChanged: chat.setPerContainer,
+        ),
+        Text(
+          OnboardingCopy.perPodCaption(
+            per: form.unitsPerContainer,
+            amount: form.startLimit,
+            container: container,
+          ),
+          textAlign: TextAlign.center,
+          style: context.textTheme.bodySmall?.copyWith(
+            color: ChatCardColors.of(context).muted,
+          ),
+        ),
+        CardButton(
+          label: OnboardingCopy.aboutRight,
+          onTap: chat.sendPerContainer,
+        ),
+      ],
+    );
+  }
+}
+
+/// Wake up and lights out in one well, by half hours.
+class DayQuestionCard extends ConsumerWidget {
+  const DayQuestionCard({required this.chat, super.key});
+
+  static const int _step = 30;
+
+  final OnboardingChat chat;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final form = ref.watch(onboardingFormProvider);
+    final card = ChatCardColors.of(context);
+    final wake = form.wakeMinute;
+    final bed = form.bedMinute;
+    final awake = form.dayWindow.awakeMinutes;
+    // A step stays put when it would leave less than the minimum awake, or
+    // wrap the window all the way round.
+    VoidCallback? move({int wakeBy = 0, int bedBy = 0}) {
+      final next = awake - wakeBy + bedBy;
+      if (next < DayWindow.minAwakeMinutes || next >= DayWindow.minutesPerDay) {
+        return null;
+      }
+      return () =>
+          chat.setDay(wakeMinute: wake + wakeBy, bedMinute: bed + bedBy);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 12,
+      children: [
+        Container(
+          padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
+          decoration: BoxDecoration(
+            color: card.fill,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: card.line),
+          ),
+          child: Column(
+            children: [
+              _TimeRow(
+                icon: AppIcons.morning,
+                label: OnboardingCopy.upAt,
+                minute: wake,
+                earlierLabel: OnboardingCopy.wakeEarlier,
+                laterLabel: OnboardingCopy.wakeLater,
+                onEarlier: move(wakeBy: -_step),
+                onLater: move(wakeBy: _step),
+              ),
+              Divider(height: 1, color: card.line),
+              _TimeRow(
+                icon: AppIcons.lateNight,
+                label: OnboardingCopy.lightsOutAt,
+                minute: bed,
+                earlierLabel: OnboardingCopy.bedEarlier,
+                laterLabel: OnboardingCopy.bedLater,
+                onEarlier: move(bedBy: -_step),
+                onLater: move(bedBy: _step),
+              ),
+            ],
+          ),
+        ),
+        Text(
+          OnboardingCopy.dayCardLine(
+            OnboardingCopy.span(awake),
+            OnboardingCopy.span((awake / form.startLimit).round()),
+          ),
+          textAlign: TextAlign.center,
+          style: context.textTheme.bodySmall?.copyWith(color: card.muted),
+        ),
+        CardButton(label: OnboardingCopy.thatsMyDay, onTap: chat.sendDay),
+      ],
+    );
+  }
+}
+
+class _TimeRow extends StatelessWidget {
+  const _TimeRow({
+    required this.icon,
+    required this.label,
+    required this.minute,
+    required this.earlierLabel,
+    required this.laterLabel,
+    required this.onEarlier,
+    required this.onLater,
+  });
+
+  final IconData icon;
+  final String label;
+  final int minute;
+  final String earlierLabel;
+  final String laterLabel;
+  final VoidCallback? onEarlier;
+  final VoidCallback? onLater;
+
+  @override
+  Widget build(BuildContext context) {
+    final card = ChatCardColors.of(context);
+    final text = context.textTheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        spacing: 8,
+        children: [
+          Icon(icon, size: 18, color: card.muted),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: text.bodySmall?.copyWith(color: card.muted)),
+                Text(
+                  AppFormat.minuteOfDay(minute),
+                  style: text.titleMedium?.copyWith(
+                    color: card.ink,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          CardRoundButton(
+            icon: AppIcons.remove,
+            label: earlierLabel,
+            onTap: onEarlier,
+          ),
+          CardRoundButton(
+            icon: AppIcons.add,
+            label: laterLabel,
+            onTap: onLater,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// − value + in a well. [step] is how far each tap moves.
 class CardStepper extends StatelessWidget {
   const CardStepper({
@@ -470,6 +789,7 @@ class _FieldRow extends StatelessWidget {
     required this.onSend,
     this.label,
     this.autofill,
+    this.keyboardType,
   });
 
   final TextEditingController controller;
@@ -481,6 +801,9 @@ class _FieldRow extends StatelessWidget {
   /// A field label for VoiceOver when it differs from [hint].
   final String? label;
   final String? autofill;
+
+  /// Null is plain text with capitalised words.
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -500,7 +823,10 @@ class _FieldRow extends StatelessWidget {
               controller: controller,
               maxLength: maxLength,
               autofillHints: [?autofill],
-              textCapitalization: TextCapitalization.words,
+              keyboardType: keyboardType,
+              textCapitalization: keyboardType == null
+                  ? TextCapitalization.words
+                  : TextCapitalization.none,
               textInputAction: TextInputAction.send,
               onSubmitted: onSend,
               cursorColor: card.ink,
@@ -554,10 +880,17 @@ class _FieldRow extends StatelessWidget {
 
 /// An outlined pill for a secondary answer, 44 pt tall.
 class _CardPill extends StatelessWidget {
-  const _CardPill({required this.label, required this.onTap});
+  const _CardPill({
+    required this.label,
+    required this.onTap,
+    this.strong = false,
+  });
 
   final String label;
   final VoidCallback onTap;
+
+  /// An answer (a price), rather than a way out.
+  final bool strong;
 
   @override
   Widget build(BuildContext context) {
@@ -577,13 +910,14 @@ class _CardPill extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 44),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: ShapeDecoration(
+            color: strong ? card.fill : null,
             shape: StadiumBorder(side: BorderSide(color: card.line)),
           ),
           child: Text(
             label,
             style: context.textTheme.labelLarge?.copyWith(
-              color: card.muted,
-              fontWeight: FontWeight.w600,
+              color: strong ? card.ink : card.muted,
+              fontWeight: strong ? FontWeight.w700 : FontWeight.w600,
             ),
           ),
         ),

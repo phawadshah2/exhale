@@ -6,6 +6,7 @@ import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
+import 'package:exhale/features/settings/domain/entities/day_window.dart';
 import 'package:flutter/foundation.dart';
 
 enum ChatAsk { name, habit, amount, price, perContainer, day }
@@ -521,6 +522,14 @@ class OnboardingChat extends ChangeNotifier {
     ChatAsk.day,
     () => OnboardingCopy.daySpread(form().startLimit),
   );
+
+  /// Moves the day window; ignored when it would leave too little time
+  /// awake.
+  void setDay({required int wakeMinute, required int bedMinute}) =>
+      controller().setDayWindow(
+        wakeMinute: wakeMinute % DayWindow.minutesPerDay,
+        bedMinute: bedMinute % DayWindow.minutesPerDay,
+      );
 
   /// Sends the wake and bed times already on the form.
   void sendDay() => _answer(

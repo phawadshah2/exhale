@@ -27,6 +27,15 @@ class CurrencyChip extends StatelessWidget {
   Future<void> _pick(BuildContext context) async {
     final changed = onChanged;
     if (changed == null) return;
+    await pickCurrency(context, symbol: symbol, onChanged: changed);
+  }
+
+  /// Opens the currency wheel on [symbol]; [onChanged] gets the pick.
+  static Future<void> pickCurrency(
+    BuildContext context, {
+    required String symbol,
+    required ValueChanged<String> onChanged,
+  }) async {
     unawaited(HapticFeedback.selectionClick());
     const choices = CurrencyChoices.all;
     final index = await showOptionWheel(
@@ -38,7 +47,7 @@ class CurrencyChip extends StatelessWidget {
           .clamp(0, choices.length - 1),
       itemExtent: itemExtent,
     );
-    if (index != null) changed(choices[index].symbol);
+    if (index != null) onChanged(choices[index].symbol);
   }
 
   @override
