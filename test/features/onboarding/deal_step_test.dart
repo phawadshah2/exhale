@@ -72,6 +72,41 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets("each quit date sits at its card's right edge", (tester) async {
+    await pumpAppToPlan(tester);
+
+    final dates = [
+      for (final days in const [28, 56, 84])
+        find.text(AppFormat.monthDay(today.addDays(days))),
+    ];
+    // Inside the 24 pt page margin, the 1 pt border and the 16 pt padding;
+    // the open card's border is half a point thicker.
+    final width = tester.getSize(find.byType(DealStep)).width;
+    for (final date in dates) {
+      expect(
+        tester.getTopRight(date.first).dx,
+        closeTo(width - 24 - 1 - 16, 0.6),
+      );
+    }
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('Pick my own date sits above the button', (tester) async {
+    await pumpAppToPlan(tester);
+
+    expect(
+      tester.getBottomLeft(find.text(OnboardingCopy.pickOwnDate)).dy,
+      lessThan(tester.getTopLeft(planButton()).dy),
+    );
+    expect(
+      tester.getTopLeft(find.text(OnboardingCopy.dealFinePrint)).dy,
+      greaterThan(tester.getBottomLeft(planButton()).dy),
+    );
+
+    await tester.disposeApp();
+  });
+
   testWidgets('Pick my own date opens the wheel and closes the paces', (
     tester,
   ) async {

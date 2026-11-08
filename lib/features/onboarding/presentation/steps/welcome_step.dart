@@ -21,14 +21,18 @@ class WelcomeStep extends StatelessWidget {
 
   /// The headline's words, then the line under it, then each row's title
   /// and its line.
-  static const Duration _firstWordAt = Duration(milliseconds: 280);
-  static const Duration _wordStagger = Duration(milliseconds: 120);
-  static const Duration _subtitleAt = Duration(milliseconds: 940);
-  static const Duration _rowsAt = Duration(milliseconds: 1120);
-  static const Duration _rowStagger = Duration(milliseconds: 220);
+  static const Duration _firstWordAt = Duration(milliseconds: 420);
+  static const Duration _wordStagger = Duration(milliseconds: 180);
+  static const Duration _subtitleAt = Duration(milliseconds: 1400);
+  static const Duration _rowsAt = Duration(milliseconds: 1700);
+  static const Duration _rowStagger = Duration(milliseconds: 330);
+  static const Duration fade = Duration(milliseconds: 700);
 
-  static Widget _word(int i, Widget word) =>
-      StepReveal(delay: _firstWordAt + _wordStagger * i, child: word);
+  static Widget _word(int i, Widget word) => StepReveal(
+    delay: _firstWordAt + _wordStagger * i,
+    duration: fade,
+    child: word,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +109,7 @@ class WelcomeStep extends StatelessWidget {
           const SizedBox(height: AppSpacing.md + 2),
           StepReveal(
             delay: _subtitleAt,
+            duration: WelcomeStep.fade,
             child: Text(
               OnboardingCopy.welcomeBody,
               style: text.bodyLarge?.copyWith(
@@ -151,11 +156,11 @@ class _Struck extends StatefulWidget {
 class _StruckState extends State<_Struck> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1600),
+    duration: const Duration(milliseconds: 2100),
   );
   late final Animation<double> _draw = CurvedAnimation(
     parent: _controller,
-    curve: const Interval(1000 / 1600, 1, curve: Curves.easeOutCubic),
+    curve: const Interval(1400 / 2100, 1, curve: Curves.easeOutCubic),
   );
   bool _started = false;
 
@@ -221,7 +226,7 @@ class _HowRow extends StatelessWidget {
   final String body;
   final Duration at;
 
-  static const Duration _bodyLag = Duration(milliseconds: 110);
+  static const Duration _bodyLag = Duration(milliseconds: 160);
 
   @override
   Widget build(BuildContext context) {
@@ -233,6 +238,7 @@ class _HowRow extends StatelessWidget {
       children: [
         StepReveal(
           delay: at,
+          duration: WelcomeStep.fade,
           child: Container(
             width: 40,
             height: 40,
@@ -252,6 +258,7 @@ class _HowRow extends StatelessWidget {
             children: [
               StepReveal(
                 delay: at,
+                duration: WelcomeStep.fade,
                 child: Text(
                   title,
                   style: text.titleMedium?.copyWith(
@@ -261,6 +268,7 @@ class _HowRow extends StatelessWidget {
               ),
               StepReveal(
                 delay: at + _bodyLag,
+                duration: WelcomeStep.fade,
                 child: Text(
                   body,
                   style: text.bodyMedium?.copyWith(

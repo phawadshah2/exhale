@@ -207,11 +207,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 /// the visible height, so a `Column` with `spaceBetween` puts its last
 /// child at the bottom. [below] (a link or fine print) sits [belowGap] under
 /// the button, and the button as low as the bottom inset allows, as in the
-/// chat's dock.
+/// chat's dock. [above] sits over the button and grows upwards, so the
+/// button stays where it is on every step.
 class OnboardingStepFrame extends StatelessWidget {
   const OnboardingStepFrame({
     required this.body,
     required this.button,
+    this.above,
     this.below,
     this.onTapBody,
     super.key,
@@ -224,11 +226,12 @@ class OnboardingStepFrame extends StatelessWidget {
     AppSpacing.pageMargin,
     AppSpacing.gutterSm,
     AppSpacing.pageMargin,
-    MediaQuery.paddingOf(context).bottom + AppSpacing.sm,
+    MediaQuery.paddingOf(context).bottom,
   );
 
   final Widget body;
   final Widget button;
+  final Widget? above;
   final Widget? below;
   final VoidCallback? onTapBody;
 
@@ -255,6 +258,7 @@ class OnboardingStepFrame extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ?above,
             SizedBox(width: double.infinity, child: button),
             if (below case final below?)
               Padding(

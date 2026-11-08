@@ -433,7 +433,7 @@ void main() {
       final button = tester.getRect(seePlan());
       final line = tester.getRect(find.byType(ChatTagline));
       expect(line.top - button.bottom, 4);
-      expect(line.bottom, 844 - 34 - 8);
+      expect(line.bottom, 844 - 34);
       final dock = find
           .ancestor(of: seePlan(), matching: find.byType(DecoratedBox))
           .first;
@@ -442,7 +442,7 @@ void main() {
       await tester.disposeApp();
     });
 
-    testWidgets('the button stays put from the welcome to the chat', (
+    testWidgets('the button stays put from the welcome to the plan', (
       tester,
     ) async {
       // The test font's square glyphs would wrap the welcome's fine print.
@@ -458,6 +458,11 @@ void main() {
       await tester.tap(find.text(OnboardingCopy.welcomeButton));
       await settleChat(tester);
       expect(tester.getRect(seePlan()), welcome);
+
+      await answerAll(tester);
+      await tester.tap(seePlan());
+      await tester.pumpAndSettle();
+      expect(tester.getRect(planButton()), welcome);
 
       await tester.disposeApp();
     });

@@ -146,7 +146,9 @@ class _DealStepState extends ConsumerState<DealStep> {
         ),
         onPressed: plan == null || form.isSubmitting ? null : _shake,
       ),
-      below: Column(
+      // The fine print alone sits under the button, one line as on the
+      // welcome and the chat, so the button does not move between them.
+      above: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (error != null)
@@ -155,17 +157,17 @@ class _DealStepState extends ConsumerState<DealStep> {
               textAlign: TextAlign.center,
               style: text.bodySmall?.copyWith(color: colors.error),
             ),
-          Text(
-            OnboardingCopy.dealFinePrint,
-            textAlign: TextAlign.center,
-            style: text.labelSmall?.copyWith(color: colors.outline),
-          ),
           TextButton.icon(
             onPressed: _pickDate,
             icon: const Icon(AppIcons.calendar, size: 16),
             label: const Text(OnboardingCopy.pickOwnDate),
           ),
         ],
+      ),
+      below: Text(
+        OnboardingCopy.dealFinePrint,
+        textAlign: TextAlign.center,
+        style: text.labelSmall?.copyWith(color: colors.outline),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -311,10 +313,17 @@ class _PaceCard extends StatelessWidget {
           : Row(
               spacing: 8,
               children: [
-                Flexible(child: name),
-                if (suggested) badge,
-                Flexible(child: weeks),
-                const Spacer(),
+                // Takes the rest of the row, so the date sits at its end.
+                Expanded(
+                  child: Row(
+                    spacing: 8,
+                    children: [
+                      Flexible(child: name),
+                      if (suggested) badge,
+                      Flexible(child: weeks),
+                    ],
+                  ),
+                ),
                 date,
               ],
             ),

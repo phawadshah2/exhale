@@ -45,7 +45,12 @@ dock hidden while the keyboard is up; jump button follows up to the newest messa
 headline word by word, then the subtitle, then each row's title, then its line
 (`StepReveal.delay`). Never seen in the simulator.
 
-Checks: analyze clean; `test/features/onboarding` 139 passed; `test/app` 21 passed.
+Round 3 (Fawad, same day): slower welcome (words 180 ms apart, 700 ms fades); plan cards
+pin the quit date right; "Pick my own date" sits above the button (`OnboardingStepFrame.above`)
+so the button matches the welcome and chat; dock padding back to the bare safe area (Fawad).
+Money card mockups shown (coral solid, year first, receipt, now vs plan); Fawad to pick.
+
+Checks: analyze clean; `test/features/onboarding` 141 passed; `test/app` 21 passed (round 2).
 
 Test gotcha: an enabled `ChevronButton` and the plan's dots loop, so tests on the welcome or
 the plan turn on Reduce Motion (`reduceMotion` in `test/helpers/onboarding.dart`) or pump
