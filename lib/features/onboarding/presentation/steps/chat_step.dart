@@ -93,7 +93,7 @@ class _ChatStepState extends ConsumerState<ChatStep>
               children: [
                 ChevronButton(
                   label: OnboardingCopy.chatSeePlan,
-                  onPressed: _chat.ask == ChatAsk.done
+                  onPressed: _chat.done
                       ? () => OnboardingScope.of(context).next()
                       : null,
                 ),
@@ -212,7 +212,6 @@ class _Messages extends StatelessWidget {
       child: switch (item) {
         ChatText() => ChatBubble(item: item),
         MoneyCard() => MoneyCardView(card: item),
-        DayCard() => DayCardView(card: item),
       },
     );
   }
@@ -248,7 +247,7 @@ class _Answers extends ConsumerWidget {
         min: 1,
         max: 80,
         onChanged: chat.setAmount,
-        onSend: chat.sendStepper,
+        onSend: chat.sendAmount,
       ),
       ChatAsk.perContainer => _Stepper(
         value: form.unitsPerContainer,
@@ -257,7 +256,7 @@ class _Answers extends ConsumerWidget {
         min: 5,
         max: 200,
         onChanged: chat.setPerContainer,
-        onSend: chat.sendStepper,
+        onSend: chat.sendPerContainer,
       ),
       ChatAsk.price => Column(
         mainAxisSize: MainAxisSize.min,
@@ -298,27 +297,11 @@ class _Answers extends ConsumerWidget {
           ),
         ],
       ),
-      ChatAsk.wake => _Grid(
-        columns: 3,
-        children: [
-          for (final m in OnboardingChat.wakeChoices)
-            ChatChip(
-              label: OnboardingChat.hour(m),
-              onTap: () => chat.pickTime(m),
-            ),
-        ],
+      ChatAsk.day => ChatChip(
+        label: OnboardingCopy.thatsMyDay,
+        onTap: chat.sendDay,
       ),
-      ChatAsk.bed => _Grid(
-        columns: 3,
-        children: [
-          for (final m in OnboardingChat.bedChoices)
-            ChatChip(
-              label: OnboardingChat.hour(m),
-              onTap: () => chat.pickTime(m),
-            ),
-        ],
-      ),
-      ChatAsk.none || ChatAsk.done => const SizedBox(width: double.infinity),
+      null => const SizedBox(width: double.infinity),
     };
   }
 }

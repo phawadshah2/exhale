@@ -7,18 +7,18 @@ moves.
 
 ### Task C1: The script as question cards
 
-- [ ] Tests in `test/features/onboarding/onboarding_chat_test.dart` (fake async, Reduce
+- [x] Tests in `test/features/onboarding/onboarding_chat_test.dart` (fake async, Reduce
   Motion on): the opening order (three excuses, "Heard them all…", the name question); each
   answer writes the form and adds the user's bubble; the branches: container habit (price,
   per pod, money card, day), no-container habit (price, money card, day), social media (no
   price), price skipped, name skipped; `ask` is `done` only after the day.
-- [ ] `OnboardingChat`: a `ChatQuestion` item (its `ChatAsk`, its text, open or folded)
+- [x] `OnboardingChat`: a `ChatQuestion` item (its `ChatAsk`, its text, open or folded)
   replaces the dock's `ask` switch; an answer bubble records the question it answers;
   Exhale's lines take a `String Function()` so they re-read the form. Wake and bed become
   one `ChatAsk.day` answered with both times. Drop `DayCard` and the wake and bed choices.
-- [ ] Copy in `OnboardingCopy`: the new opening line, "12 a day", "30 a pod", "7:00 AM to
+- [x] Copy in `OnboardingCopy`: the new opening line, "12 a day", "30 a pod", "7:00 AM to
   11:00 PM", the per-pod caption, the price Other and habit Other strings.
-- [ ] Commit `feat(onboarding): ask each chat question as a card`.
+- [x] Commit `feat(onboarding): ask each chat question as a card`.
 
 ### Task C2: Fixing an answer
 

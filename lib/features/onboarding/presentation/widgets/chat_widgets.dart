@@ -284,6 +284,7 @@ class MoneyCardView extends StatelessWidget {
     final success = context.exhale.success;
     final text = context.textTheme;
     final small = text.bodySmall?.copyWith(color: success.onSolid);
+    final figures = card.figures;
     return _CardFrame(
       color: success.solid,
       line: success.foreground.withValues(alpha: 0.4),
@@ -304,7 +305,7 @@ class MoneyCardView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  card.perDay,
+                  figures.perDay,
                   style: text.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: success.onSolid,
@@ -317,7 +318,7 @@ class MoneyCardView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  card.perYear,
+                  figures.perYear,
                   style: text.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: success.onSolid,
@@ -328,87 +329,7 @@ class MoneyCardView extends StatelessWidget {
             ),
           ],
         ),
-        Text(card.line, style: small?.copyWith(height: 1.4)),
-      ],
-    );
-  }
-}
-
-class DayCardView extends StatelessWidget {
-  const DayCardView({required this.card, super.key});
-
-  final DayCard card;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final exhale = context.exhale;
-    final text = context.textTheme;
-    final tag = text.labelSmall?.copyWith(fontWeight: FontWeight.w700);
-    return _CardFrame(
-      color: colors.surfaceContainerLow,
-      line: colors.outlineVariant,
-      children: [
-        Text(
-          OnboardingCopy.dayCardTitle,
-          style: text.labelSmall?.copyWith(
-            color: colors.onSurfaceVariant,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.9,
-          ),
-        ),
-        Semantics(
-          label: card.label,
-          excludeSemantics: true,
-          child: Row(
-            spacing: 6,
-            children: [
-              Text(
-                card.wakeShort,
-                style: tag?.copyWith(color: exhale.warning.foreground),
-              ),
-              Expanded(
-                child: Container(
-                  height: 14,
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  decoration: BoxDecoration(
-                    color: exhale.inset,
-                    borderRadius: BorderRadius.circular(7),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      for (var i = 0; i < card.dots; i++)
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: colors.onSurface,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              Text(
-                card.bedShort,
-                style: tag?.copyWith(color: colors.onSurfaceVariant),
-              ),
-            ],
-          ),
-        ),
-        Text(
-          OnboardingCopy.dayCardLine(card.awake, card.gap),
-          style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-        ),
-        Text(
-          OnboardingCopy.dayCardNote,
-          style: text.bodySmall?.copyWith(
-            color: colors.onSurfaceVariant,
-            height: 1.4,
-          ),
-        ),
+        Text(figures.line, style: small?.copyWith(height: 1.4)),
       ],
     );
   }

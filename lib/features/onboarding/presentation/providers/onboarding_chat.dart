@@ -3,53 +3,58 @@ import 'dart:math' as math;
 
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
+import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:flutter/foundation.dart';
 
-enum ChatAsk { none, name, habit, amount, price, perContainer, wake, bed, done }
+enum ChatAsk { name, habit, amount, price, perContainer, day }
 
 enum Delivery { sent, delivered, read }
 
 sealed class ChatItem {
-  ChatItem() : time = DateTime.now();
-
-  final DateTime time;
+  /// When the item landed in the chat.
+  late final DateTime time;
 }
 
+/// A text bubble. Its text is read when shown, so a line that quotes an
+/// answer always shows the current one.
 class ChatText extends ChatItem {
-  ChatText.exhale(this.text) : mine = false, delivery = Delivery.read;
-  ChatText.mine(this.text) : mine = true, delivery = Delivery.sent;
+  ChatText.exhale(this._text)
+    : mine = false,
+      answers = null,
+      delivery = Delivery.read;
+  ChatText.mine(this._text, {this.answers})
+    : mine = true,
+      delivery = Delivery.sent;
 
-  final String text;
+  final String Function() _text;
   final bool mine;
+
+  /// The question this bubble answers; null for Exhale's and the excuses.
+  final ChatQuestion? answers;
   Delivery delivery;
+
+  String get text => _text();
 }
+
+/// An Exhale message that asks for an answer. Its controls show while
+/// [open]; answering folds it back to its text.
+class ChatQuestion extends ChatText {
+  ChatQuestion(this.ask, String Function() text) : super.exhale(text);
+
+  final ChatAsk ask;
+  bool open = true;
+}
+
+typedef MoneyFigures = ({String perDay, String perYear, String line});
 
 class MoneyCard extends ChatItem {
-  MoneyCard({required this.perDay, required this.perYear, required this.line});
+  MoneyCard(this._figures);
 
-  final String perDay;
-  final String perYear;
-  final String line;
-}
+  final MoneyFigures Function() _figures;
 
-class DayCard extends ChatItem {
-  DayCard({
-    required this.wakeShort,
-    required this.bedShort,
-    required this.awake,
-    required this.gap,
-    required this.dots,
-    required this.label,
-  });
-
-  final String wakeShort;
-  final String bedShort;
-  final String awake;
-  final String gap;
-  final int dots;
-  final String label;
+  MoneyFigures get figures => _figures();
 }
 
 /// How one habit sounds in the chat. Containers are only asked about for the
@@ -98,7 +103,6 @@ class ChatHabit {
       container: 'can',
       per: 20,
     ),
-    ChatHabit(HabitKind.alcohol, verb: 'drink', typical: 3, price: 7),
     ChatHabit(
       HabitKind.caffeine,
       verb: 'reach for a coffee',
@@ -111,6 +115,7 @@ class ChatHabit {
       typical: 2,
       price: 3,
     ),
+    ChatHabit(HabitKind.alcohol, verb: 'drink', typical: 3, price: 7),
     ChatHabit(HabitKind.junkFood, verb: 'snack', typical: 2, price: 5),
     ChatHabit(
       HabitKind.socialMedia,
@@ -125,8 +130,8 @@ class ChatHabit {
       all.firstWhere((habit) => habit.kind == kind);
 }
 
-/// The scripted onboarding conversation: what Exhale says, what the user's
-/// taps send, and which answer is asked next. Answers go to the form.
+/// The scripted onboarding conversation: what Exhale says, the questions it
+/// asks, and the user's answers. Answers go to the form.
 class OnboardingChat extends ChangeNotifier {
   OnboardingChat({
     required this.form,
@@ -138,19 +143,25 @@ class OnboardingChat extends ChangeNotifier {
   final OnboardingFormController Function() controller;
   final bool Function() reduceMotion;
 
-  static const List<int> wakeChoices = [300, 360, 420, 480, 540, 600];
-  static const List<int> bedChoices = [1260, 1320, 1380, 1440, 1500, 1560];
+  static const String customUnit = 'time';
 
   final List<ChatItem> items = [];
   final List<Timer> _timers = [];
-  ChatAsk ask = ChatAsk.none;
   bool typing = false;
-  bool priceSkipped = false;
+  bool done = false;
   bool _disposed = false;
 
   ChatHabit get habit => ChatHabit.of(form().habitKind);
 
-  bool get busy => typing || ask == ChatAsk.none;
+  /// The newest open question, if any.
+  ChatQuestion? get question {
+    for (final item in items.reversed) {
+      if (item is ChatQuestion && item.open) return item;
+    }
+    return null;
+  }
+
+  ChatAsk? get ask => question?.ask;
 
   void _later(int ms, VoidCallback fn) {
     _timers.add(
@@ -161,6 +172,7 @@ class OnboardingChat extends ChangeNotifier {
   }
 
   void _add(ChatItem item) {
+    item.time = DateTime.now();
     items.add(item);
     notifyListeners();
   }
@@ -170,16 +182,11 @@ class OnboardingChat extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _ask(ChatAsk next) {
-    ask = next;
-    notifyListeners();
-  }
-
   /// The three excuses arrive, then Exhale asks who it is talking to.
   void start() {
     final still = reduceMotion();
     for (final (i, excuse) in OnboardingCopy.excuses.indexed) {
-      final item = ChatText.mine(excuse);
+      final item = ChatText.mine(() => excuse);
       _later(still ? 0 : 500 + i * 1000, () {
         _add(item);
         if (still) _mark(item, Delivery.read);
@@ -194,20 +201,17 @@ class OnboardingChat extends ChangeNotifier {
         notifyListeners();
       });
     }
-    _says(
-      [OnboardingCopy.askWho],
-      () => _ask(ChatAsk.name),
-      start: still ? 100 : 3700,
-    );
+    _says([
+      ChatText.exhale(() => OnboardingCopy.heardThemAll),
+      ChatQuestion(ChatAsk.name, () => OnboardingCopy.askWho),
+    ], start: still ? 100 : 3700);
   }
 
-  /// Plays [lines] with typing dots before each: a [String] is Exhale's line,
-  /// a function builds a card when it lands.
-  void _says(List<Object> lines, VoidCallback after, {int start = 0}) {
+  /// Plays [lines] with typing dots before each, then runs [after].
+  void _says(List<ChatItem> lines, {VoidCallback? after, int start = 0}) {
     final still = reduceMotion();
     var t = start;
     for (final line in lines) {
-      final text = line is String ? line : null;
       if (!still) {
         _later(t, () {
           typing = true;
@@ -216,30 +220,32 @@ class OnboardingChat extends ChangeNotifier {
       }
       t += still
           ? 250
-          : text != null
-          ? math.min(1700, 500 + text.length * 13)
+          : line is ChatText
+          ? math.min(1700, 500 + line.text.length * 13)
           : 1300;
       _later(t, () {
         typing = false;
-        _add(
-          text != null
-              ? ChatText.exhale(text)
-              : (line as ChatItem Function())(),
-        );
+        _add(line);
       });
       if (!still) t += 380;
     }
-    _later(t, after);
+    if (after != null) _later(t, after);
   }
 
-  /// Sends the user's [text], ticks it sent, delivered and read, then runs
-  /// [then] to apply the answer and let Exhale reply.
-  void _answer(String text, VoidCallback apply, VoidCallback then) {
-    if (busy) return;
+  /// Folds [question], applies the answer, sends [text] as the user's bubble
+  /// with sent, delivered and read ticks, then runs [then] for Exhale's reply.
+  void _answer(
+    ChatAsk ask,
+    String Function() text,
+    VoidCallback apply,
+    VoidCallback then,
+  ) {
+    final open = question;
+    if (typing || open == null || open.ask != ask) return;
     final still = reduceMotion();
-    final item = ChatText.mine(text);
-    ask = ChatAsk.none;
+    open.open = false;
     apply();
+    final item = ChatText.mine(text, answers: open);
     _add(item);
     if (still) {
       _mark(item, Delivery.read);
@@ -255,39 +261,57 @@ class OnboardingChat extends ChangeNotifier {
     final name = raw.trim();
     if (name.isEmpty) return;
     _answer(
-      name,
+      ChatAsk.name,
+      _nameAnswer,
       () => controller().setUserName(name),
-      () => _afterName(OnboardingCopy.nameReply(name)),
+      _askHabit,
     );
   }
 
   void skipName() => _answer(
-    OnboardingCopy.nameSkip,
+    ChatAsk.name,
+    _nameAnswer,
     () => controller().setUserName(''),
-    () => _afterName(OnboardingCopy.nameSkipReply),
+    _askHabit,
   );
 
-  void _afterName(String first) => _says([
-    first,
-    OnboardingCopy.heardThemAll,
-    OnboardingCopy.helpingIsMyJob,
-  ], () => _ask(ChatAsk.habit));
+  String _nameAnswer() {
+    final name = form().userName;
+    return name.isEmpty ? OnboardingCopy.nameSkip : name;
+  }
 
-  String labelOf(HabitKind kind) => kind == HabitKind.custom
-      ? OnboardingCopy.somethingElse
-      : Habit.preset(kind).name;
+  void _askHabit() => _says([
+    ChatText.exhale(() {
+      final name = form().userName;
+      return name.isEmpty
+          ? OnboardingCopy.nameSkipReply
+          : OnboardingCopy.nameReply(name);
+    }),
+    ChatQuestion(ChatAsk.habit, () => OnboardingCopy.helpingIsMyJob),
+  ]);
 
-  void pickHabit(HabitKind kind) {
+  String labelOf(HabitKind kind) =>
+      kind == HabitKind.custom ? OnboardingCopy.other : Habit.preset(kind).name;
+
+  /// Picks a preset, or with [customName] the user's own habit.
+  void pickHabit(HabitKind kind, {String? customName}) {
+    final name = customName?.trim() ?? '';
+    if (kind == HabitKind.custom && name.isEmpty) return;
     final chosen = ChatHabit.of(kind);
     _answer(
-      labelOf(kind),
+      ChatAsk.habit,
       () {
-        priceSkipped = false;
+        final f = form();
+        return f.habitKind == HabitKind.custom
+            ? f.customName
+            : Habit.preset(f.habitKind).name;
+      },
+      () {
         final c = controller()..selectHabit(kind);
         if (kind == HabitKind.custom) {
           c
-            ..setCustomName(OnboardingCopy.somethingElse)
-            ..setCustomUnit('time');
+            ..setCustomName(name)
+            ..setCustomUnit(customUnit);
         }
         c
           ..setStartLimit(chosen.typical)
@@ -295,9 +319,12 @@ class OnboardingChat extends ChangeNotifier {
           ..skipPrice();
       },
       () => _says([
-        OnboardingCopy.habitReply(kind),
-        OnboardingCopy.amountAsk(chosen.verb),
-      ], () => _ask(ChatAsk.amount)),
+        ChatText.exhale(() => OnboardingCopy.habitReply(form().habitKind)),
+        ChatQuestion(
+          ChatAsk.amount,
+          () => OnboardingCopy.amountAsk(habit.verb),
+        ),
+      ]),
     );
   }
 
@@ -305,80 +332,109 @@ class OnboardingChat extends ChangeNotifier {
 
   void setPerContainer(int value) => controller().setUnitsPerContainer(value);
 
-  /// Sends the stepper's value for whichever question is open.
-  void sendStepper() {
-    if (ask == ChatAsk.amount) {
-      _answer(OnboardingCopy.aboutAmount(form().startLimit), () {}, () {
-        final reaction = OnboardingCopy.amountReaction(
-          amount: form().startLimit,
-          typical: habit.typical,
-        );
-        if (habit.price == null) {
-          _says([
-            OnboardingCopy.noPriceReply(reaction),
-            ..._dayIntro(),
-          ], () => _ask(ChatAsk.wake));
-        } else {
-          _says([
-            reaction + OnboardingCopy.painfulAsk(habit.container),
-          ], () => _ask(ChatAsk.price));
-        }
-      });
-    } else if (ask == ChatAsk.perContainer) {
-      _answer(
-        OnboardingCopy.aboutAmount(form().unitsPerContainer),
-        () {},
-        () => _says([_moneyCard, ..._dayIntro()], () => _ask(ChatAsk.wake)),
-      );
-    }
-  }
+  String get _reaction => OnboardingCopy.amountReaction(
+    amount: form().startLimit,
+    typical: habit.typical,
+  );
+
+  void sendAmount() => _answer(
+    ChatAsk.amount,
+    () => OnboardingCopy.amountAnswer(form().startLimit),
+    () {},
+    () => habit.price == null
+        ? _says([
+            ChatText.exhale(() => OnboardingCopy.noPriceReply(_reaction)),
+            _dayQuestion(),
+          ])
+        : _says([
+            ChatQuestion(
+              ChatAsk.price,
+              () => _reaction + OnboardingCopy.painfulAsk(habit.container),
+            ),
+          ]),
+  );
 
   /// Price chips: the base price scaled, whole units, no duplicates.
   List<int> get priceChoices => habit.price == null
       ? const []
       : {
-          for (final f in const [0.5, 0.8, 1.0, 1.5])
+          for (final f in const [0.5, 0.8, 1.0, 1.2, 1.5])
             math.max(1, (habit.price! * f).round()),
         }.toList();
 
   String money(int whole) =>
       AppFormat.money(whole * 100, symbol: form().currency, wholeUnits: true);
 
-  void pickPrice(int price) =>
-      _answer(money(price), () => controller().setPriceText('$price'), () {
-        final container = habit.container;
-        if (container != null) {
-          _says([
-            OnboardingCopy.perContainerAsk(
-              Habit.preset(form().habitKind).units,
-              container,
-            ),
-          ], () => _ask(ChatAsk.perContainer));
-        } else {
-          _says([_moneyCard, ..._dayIntro()], () => _ask(ChatAsk.wake));
-        }
-      });
-
-  void skipPrice() => _answer(
-    OnboardingCopy.skipPrice,
-    () {
-      priceSkipped = true;
-      controller().skipPrice();
-    },
-    () => _says([
-      OnboardingCopy.skipPriceReply(_unitsLabel),
-      ..._dayIntro(),
-    ], () => _ask(ChatAsk.wake)),
+  String _price(int cents) => AppFormat.money(
+    cents,
+    symbol: form().currency,
+    wholeUnits: cents % 100 == 0,
   );
 
-  String get _unitsLabel => form().habit.units;
+  void pickPrice(int price) => _sendPrice('$price');
 
-  ChatItem _moneyCard() {
+  /// A price typed under Other. Returns false, and sends nothing, when it is
+  /// not a valid price.
+  bool sendPriceText(String raw) {
+    final cents = AppFormat.parseCents(raw.trim());
+    if (cents == null || cents <= 0) return false;
+    if (cents > HabitValidation.maxPriceCents) return false;
+    _sendPrice(raw.trim());
+    return true;
+  }
+
+  void _sendPrice(String text) => _answer(
+    ChatAsk.price,
+    () => _price(form().priceCents ?? 0),
+    () => controller().setPriceText(text),
+    () {
+      final container = habit.container;
+      _says([
+        if (container != null)
+          ChatQuestion(
+            ChatAsk.perContainer,
+            () => OnboardingCopy.perContainerAsk(form().habit.units, container),
+          )
+        else
+          ..._moneyAndDay(),
+      ]);
+    },
+  );
+
+  void skipPrice() => _answer(
+    ChatAsk.price,
+    () => OnboardingCopy.skipPrice,
+    () => controller().skipPrice(),
+    () => _says([
+      ChatText.exhale(() => OnboardingCopy.skipPriceReply(form().habit.units)),
+      _dayQuestion(),
+    ]),
+  );
+
+  void sendPerContainer() => _answer(
+    ChatAsk.perContainer,
+    () => OnboardingCopy.perContainerAnswer(
+      form().unitsPerContainer,
+      habit.container ?? '',
+    ),
+    () {},
+    () => _says(_moneyAndDay()),
+  );
+
+  List<ChatItem> _moneyAndDay() => [
+    MoneyCard(_moneyFigures),
+    ChatText.exhale(() => OnboardingCopy.dayTwoMore),
+    _dayQuestion(),
+  ];
+
+  MoneyFigures _moneyFigures() {
     final f = form();
     final unit = f.unitPriceCents ?? 0;
-    final daily = (unit * f.startLimit).round();
-    return MoneyCard(
-      perDay: AppFormat.money(daily, symbol: f.currency),
+    return (
+      perDay: AppFormat.money(
+        (unit * f.startLimit).round(),
+        symbol: f.currency,
+      ),
       perYear: AppFormat.money(
         (unit * f.startLimit * 365).round(),
         symbol: f.currency,
@@ -386,82 +442,34 @@ class OnboardingChat extends ChangeNotifier {
       ),
       line: OnboardingCopy.moneyLine(
         amount: f.startLimit,
-        price: AppFormat.money(
-          f.priceCents ?? 0,
-          symbol: f.currency,
-          wholeUnits: true,
-        ),
+        price: _price(f.priceCents ?? 0),
         container: habit.container,
         per: f.unitsPerContainer,
       ),
     );
   }
 
-  List<Object> _dayIntro() => [
-    OnboardingCopy.dayTwoMore,
-    OnboardingCopy.daySpread(form().startLimit),
-  ];
+  ChatQuestion _dayQuestion() => ChatQuestion(
+    ChatAsk.day,
+    () => OnboardingCopy.daySpread(form().startLimit),
+  );
 
-  static String hour(int minute) {
-    final h = (minute % 1440) ~/ 60;
-    final h12 = h % 12 == 0 ? 12 : h % 12;
-    return '$h12 ${h < 12 ? 'AM' : 'PM'}';
-  }
-
-  static String _short(int minute) {
-    final h = (minute % 1440) ~/ 60;
-    final h12 = h % 12 == 0 ? 12 : h % 12;
-    return '$h12${h < 12 ? 'a' : 'p'}';
-  }
-
-  static String _span(num minutes) {
-    final h = minutes ~/ 60;
-    final m = (minutes % 60).round();
-    if (h == 0) return '$m min';
-    return m == 0 ? '$h h' : '$h h $m min';
-  }
-
-  void pickTime(int minute) {
-    if (ask == ChatAsk.wake) {
-      _answer(
-        hour(minute),
-        () => controller().setDayWindow(
-          wakeMinute: minute,
-          bedMinute: form().bedMinute,
-        ),
-        () => _says([
-          OnboardingCopy.wakeLead(minute) + OnboardingCopy.lightsOut,
-        ], () => _ask(ChatAsk.bed)),
-      );
-    } else if (ask == ChatAsk.bed) {
-      _answer(
-        hour(minute),
-        () => controller().setDayWindow(
-          wakeMinute: form().wakeMinute,
-          bedMinute: minute,
-        ),
-        () => _says([
-          _dayCard,
-          OnboardingCopy.planReady(form().userName),
-        ], () => _ask(ChatAsk.done)),
-      );
-    }
-  }
-
-  ChatItem _dayCard() {
-    final f = form();
-    final span = f.dayWindow.awakeMinutes;
-    return DayCard(
-      wakeShort: _short(f.wakeMinute),
-      bedShort: _short(f.bedMinute),
-      awake: _span(span),
-      gap: _span(span / f.startLimit),
-      dots: math.min(f.startLimit, 16),
-      label:
-          '${f.startLimit} ${f.habit.units} spread from '
-          '${hour(f.wakeMinute)} to ${hour(f.bedMinute)}',
-    );
-  }
+  /// Sends the wake and bed times already on the form.
+  void sendDay() => _answer(
+    ChatAsk.day,
+    () => OnboardingCopy.dayAnswer(
+      AppFormat.minuteOfDay(form().wakeMinute),
+      AppFormat.minuteOfDay(form().bedMinute),
+    ),
+    () {},
+    () => _says(
+      [ChatText.exhale(() => OnboardingCopy.planReady(form().userName))],
+      after: () {
+        done = true;
+        notifyListeners();
+      },
+    ),
+  );
 
   @override
   void dispose() {

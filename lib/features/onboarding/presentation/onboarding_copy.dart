@@ -40,7 +40,8 @@ abstract final class OnboardingCopy {
   static const chatTyping = 'typing…';
   static const chatFinePrint = 'Nothing you type leaves your phone.';
   static const chatSeePlan = 'See my plan';
-  static const askWho = 'Before you send me a fourth one: who am I talking to?';
+  static const askWho =
+      'Before you send me another excuse: who am I talking to?';
   static const nameHint = 'Your first name';
   static const send = 'Send';
   static const nameSkip = "I'd rather not say";
@@ -54,7 +55,7 @@ abstract final class OnboardingCopy {
   static String amountAsk(String verb) =>
       'Be honest. How many times a day do you $verb? A real number. Not a '
       'Monday one.';
-  static String aboutAmount(int n) => 'About $n';
+  static String amountAnswer(int n) => '$n a day';
   static String painfulAsk(String? container) {
     final question = container == null
         ? 'What does one cost you, roughly?'
@@ -65,6 +66,27 @@ abstract final class OnboardingCopy {
   static String perContainerAsk(String units, String container) =>
       'And how many $units does one $container last? Ballpark is fine. '
       "I'm not your accountant.";
+  static String perContainerAnswer(int per, String container) =>
+      '$per a $container';
+
+  /// How long one container lasts at [amount] a day, to the nearest half day.
+  static String perPodCaption({
+    required int per,
+    required int amount,
+    required String container,
+  }) {
+    final halves = (per / amount * 2).round();
+    if (halves <= 2) return 'About one $container every day';
+    final whole = halves ~/ 2;
+    final days = halves.isOdd ? '$whole½' : '$whole';
+    return 'About one $container every $days days';
+  }
+
+  static const other = 'Other';
+  static const aboutRight = "That's about right";
+  static const thatsMyDay = "That's my day";
+  static const customHabitAsk = 'What is it?';
+  static const backToList = 'Back to the list';
   static const regionNote = 'from your region';
   static const change = 'Change';
   static String noPriceReply(String reaction) =>
@@ -86,18 +108,10 @@ abstract final class OnboardingCopy {
   static const dayTwoMore = 'Two more, then your plan.';
   static String daySpread(int amount) =>
       "I'll spread your $amount so they don't all land before lunch. When "
-      "does your day start? Roughly. I won't check.";
-  static String wakeLead(int minute) => minute <= 360
-      ? 'Early bird. Respect.'
-      : minute == 420
-      ? 'Same. Sadly.'
-      : 'Lucky you. Some of us run all night.';
-  static const lightsOut = ' And lights out?';
-  static const dayCardTitle = 'YOUR DAY';
+      "does your day start, and when's lights out? Roughly. I won't check.";
+  static String dayAnswer(String wake, String bed) => '$wake to $bed';
   static String dayCardLine(String awake, String gap) =>
       '$awake awake · one every $gap';
-  static const dayCardNote =
-      "That's why I asked. Home tells you when the next one's fair game.";
   static String planReady(String name) =>
       "That's everything${name.isEmpty ? '' : ', $name'}. Your plan's ready. "
       'Brace yourself.';
