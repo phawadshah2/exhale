@@ -338,6 +338,56 @@ class TypingBubble extends StatelessWidget {
   }
 }
 
+/// The one line under "See my plan". A new [text] slides in from below as
+/// the old one slides up and out; under Reduce Motion they only cross-fade.
+/// VoiceOver reads each new line as a live region.
+class ChatTagline extends StatelessWidget {
+  const ChatTagline(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final still = MediaQuery.disableAnimationsOf(context);
+    return Semantics(
+      liveRegion: true,
+      label: text,
+      excludeSemantics: true,
+      child: ClipRect(
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 320),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          transitionBuilder: (child, animation) {
+            final fade = FadeTransition(opacity: animation, child: child);
+            if (still) return fade;
+            // The outgoing line runs this animation in reverse, so it
+            // leaves upwards.
+            final incoming = child.key == ValueKey(text);
+            return SlideTransition(
+              position: Tween(
+                begin: Offset(0, incoming ? 1 : -1),
+                end: Offset.zero,
+              ).animate(animation),
+              child: fade,
+            );
+          },
+          child: Text(
+            text,
+            key: ValueKey(text),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: context.textTheme.labelSmall?.copyWith(
+              color: context.colors.outline,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// A card Exhale drops into the chat, 284 wide.
 class _CardFrame extends StatelessWidget {
   const _CardFrame({

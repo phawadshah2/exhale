@@ -19,7 +19,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Step 2: one chat that collects the name, habit, amount, price and day.
 /// It fills from the top and scrolls under a glass bar; each question's
 /// controls sit in its card. The dock holds the button, which stays off
-/// until the plan is ready.
+/// until the plan is ready, and the tagline that reacts to each answer.
 class ChatStep extends ConsumerStatefulWidget {
   const ChatStep({super.key});
 
@@ -121,7 +121,6 @@ class _ChatStepState extends ConsumerState<ChatStep>
     // The answer area reads the form (amount, price, currency).
     ref.watch(onboardingFormProvider);
     final colors = context.colors;
-    final text = context.textTheme;
     return ListenableBuilder(
       listenable: _chat,
       builder: (context, _) => Column(
@@ -184,11 +183,7 @@ class _ChatStepState extends ConsumerState<ChatStep>
                     ),
                     child: Padding(
                       padding: const EdgeInsets.only(top: AppSpacing.sm),
-                      child: Text(
-                        OnboardingCopy.chatFinePrint,
-                        textAlign: TextAlign.center,
-                        style: text.labelSmall?.copyWith(color: colors.outline),
-                      ),
+                      child: ChatTagline(_chat.tagline),
                     ),
                   ),
                 ],

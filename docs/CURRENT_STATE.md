@@ -10,70 +10,49 @@ Updated 2026-11-08. Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `�
 | M5 Release candidate | Done, merged to `main` (51e0bc6) |
 | M6 Plan details, Edit plan, Logs; M7 Stage management; polish rounds | Done on `feat/plan-and-stages`, walked in the simulator |
 | TestFlight build 1.0.0 (1) | Installed by Fawad; runs fine on his iPhone (2026-11-06) |
-| Onboarding redesign 2 (chat) | Signed off 2026-11-06; spec and plan 2026-11-08; prototype 1efc0c1 |
+| Onboarding redesign 2 (chat) | In progress: Tasks C1 to C6 of 7 done on `feat/onboarding-chat-prototype` |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 ## Repo
 
 - `feat/plan-and-stages` pushed, not merged, no PR, CI not read. Last full suite at 7a80954:
-  1211 passed, format and analyze clean.
+  1211 passed.
+- `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`), not pushed, tree clean.
+  Commits: spec and plan 96ebd6c, C1 cfbab93, C2 838aff3, C3 68c9427, C4 b5849d1, C5 98819c5,
+  C6 (tagline) after it.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
-## Onboarding redesign 2 (Fawad, 2026-11-06)
+## Onboarding chat (current goal)
 
-Canvas (source of truth): https://claude.ai/artifact/EMRb3MqhssfA6k4qLHTCQa, page
-"Onboarding, in order", top row; boards 1 to 3 play in order.
+Spec `docs/superpowers/specs/2026-11-08-onboarding-chat-design.md` (from the canvas
+https://claude.ai/artifact/EMRb3MqhssfA6k4qLHTCQa, page "Questions inside the chat").
+Plan `docs/superpowers/plans/2026-11-08-onboarding-chat.md`.
 
-1. **Welcome** (`FlowIntro`, not a chat): "EXHALE", "Stop / negotiating (struck) / with
-   your / cravings.", subtitle, four how-it-works rows, "Let's talk", tagline.
-2. **One chat** replaces the welcome chat, habit, amount, cost and day steps. Now specified
-   by the "Questions inside the chat" page (below), which supersedes `FlowChat`'s answer dock.
-3. **Plan** (`VisDots`, 2C): Brisk/Steady/Gentle cards, 12 dots in date order, plan rules,
-   tagline. Back button; no counter.
+Done: the script as question cards with reopen-to-change (`providers/onboarding_chat.dart`);
+glass bar, top-filled list, jump button, solid dock (`steps/chat_step.dart`,
+`pages/onboarding_page.dart`); every question's card (`widgets/chat_cards.dart`); bubbles
+(`widgets/chat_widgets.dart`); the tagline under the button (`ChatTagline`,
+`OnboardingChat.tagline`). Deviations are noted in the plan's ticked tasks.
 
-Every screen has a tagline under the main button. Paywall ideas are on the canvas's
-"Paywall ideas (later)" page; pricing model undecided.
+Checks at C6 (2026-11-08): format and `analyze --fatal-infos` clean; `onboarding_chat_test`,
+`chat_step_test`, `chat_cards_test`: 41 passed. Full suite not run (milestone end).
+Known failing, already at prototype f920bbd: first-run step tests (habit, amount, cost,
+day) and `change_habit_test` "declining the confirm…" (`pumpAndSettle` timeout on the plan
+screen). Both are in Task C7. Never seen in the simulator.
 
-**Questions inside the chat** (canvas page of that name; signed off by Fawad 2026-11-06).
-Row 1 dark, row 2 light, boards 1 to 7; the green "Decided" note lists every ruling.
-- Each question is an Exhale message with its controls inside (name field, habit pills,
-  steppers, price chips plus Other, one wake-and-bed card). Answered cards fold back to a
-  plain message plus the user's bubble with ticks. No answer dock.
-- Opening: excuses, "Heard them all…", then "Before you send me another excuse: who am I
-  talking to?".
-- Habit picker is board **E** (not board 2): three rows of text-sized pills, eight habits + Other.
-- Chat fills from the top; edge-to-edge glass app bar (chat scrolls under it); solid dock
-  with "See my plan"; green dot on the avatar; timestamps at the bubble's bottom-right edge.
-- Tagline under the button reacts to the last answer and slides to a new line.
-- Light mode: Exhale's bubbles and cards black, the user's white.
-
-## Onboarding prototype (2026-11-06)
-
-- Branch `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`), commit 1efc0c1, not
-  pushed. Throwaway: no spec, plan or tests (Fawad's call).
-- Built: `steps/welcome_step.dart`, `steps/chat_step.dart`, reworked `steps/deal_step.dart`,
-  `providers/onboarding_chat.dart` (the script), `widgets/chat_widgets.dart`,
-  `widgets/chevron_button.dart`. Edited: form provider (`userName`; first-run steps are
-  welcome, chat, deal), `onboarding_page.dart`, `onboarding_copy.dart`, `app_icons.dart`.
-- Format and analyze clean; tests not run (`welcome_step_test.dart` deleted; page, app and
-  a11y onboarding tests need rework). Never seen running in the simulator.
-- Deviations: alcohol and energy drinks store 1 unit per container; Steady blurb is generic;
-  custom habit is "Something else" / "time"; the name is saved to settings, not shown on Home.
+Waiting on Fawad (marked in the spec): the answer-fixing rule (section 4, plus the price
+skip rule), the italic tagline drafts (section 5), the Other habit and price fields, and
+the day's answer bubble.
 
 ## Next action
 
-Spec `docs/superpowers/specs/2026-11-08-onboarding-chat-design.md` and plan
-`docs/superpowers/plans/2026-11-08-onboarding-chat.md` (Tasks C1 to C7) written 2026-11-08.
-C1 to C5 done: every question is a card in the chat, the dock holds only the button.
-Next: `execute-plan` Task C6 (tagline). C7 also fixes tests the prototype broke.
-
-Waiting on Fawad (marked in the spec): the answer-fixing rule (section 4), the italic
-tagline drafts and seven habit taglines (section 5), the Other habit and Other price
-fields, and the day's answer bubble with the dropped day-dots card.
+`execute-plan` Task C7 (access and the rest of onboarding: accessibility, welcome, page and
+app tests; the first-run step tests and `change_habit_test` failures). Read: this file, the
+plan's C7, spec sections 6 and Tests. Chat test helpers are in `test/helpers/onboarding.dart`.
+Then the milestone end (review, full suite, simulator walk).
 
 ## Open items from Fawad's iPhone review (2026-11-06)
 
-- Currency from the region, changeable (in the chat design).
 - Home: tap the stage/plan card to open Plan; tap the ring to open that day's logs.
 - "Add a price" should scroll Plan to the price field; in Edit plan the keyboard hides it.
 - Edit plan: less space between pace and suggested date; text jumps start-then-centre.

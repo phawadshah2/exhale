@@ -1,5 +1,6 @@
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/chat_widgets.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/currency_chip.dart';
 import 'package:exhale/features/settings/domain/entities/currency_choices.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +16,12 @@ void main() {
   tearDown(InjectionContainer.reset);
 
   Finder nameField() => find.widgetWithText(TextField, OnboardingCopy.nameHint);
+
+  /// An answer bubble, not the tagline that may quote it.
+  Finder answer(String text) => find.descendant(
+    of: find.byType(ChatBubble),
+    matching: find.textContaining(text),
+  );
 
   group('name card', () {
     testWidgets('sends on the button and folds to its question', (
@@ -162,7 +169,7 @@ void main() {
       await tester.tap(find.text(OnboardingCopy.aboutRight));
       await settleChat(tester);
 
-      expect(find.textContaining('1 a day'), findsOneWidget);
+      expect(answer('1 a day'), findsOneWidget);
       expect(labelled(OnboardingCopy.cardAmount), findsNothing);
 
       await tester.disposeApp();
@@ -197,7 +204,7 @@ void main() {
       await tester.tap(find.text('AED 10'));
       await settleChat(tester);
 
-      expect(find.textContaining('AED 10'), findsOneWidget);
+      expect(answer('AED 10'), findsOneWidget);
       expect(labelled(OnboardingCopy.cardPrice('pod')), findsNothing);
       expect(
         labelled(OnboardingCopy.cardPerPod('sessions', 'pod')),
@@ -223,7 +230,7 @@ void main() {
       await tester.enterText(field(OnboardingCopy.priceHint), '7.50');
       await tester.tap(labelled(OnboardingCopy.sendPrice));
       await settleChat(tester);
-      expect(find.textContaining('AED 7.50'), findsOneWidget);
+      expect(answer('AED 7.50'), findsOneWidget);
 
       await tester.disposeApp();
     });

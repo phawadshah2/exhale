@@ -38,7 +38,6 @@ abstract final class OnboardingCopy {
   static const chatName = 'Exhale';
   static const chatIdle = 'here to help. Unfortunately.';
   static const chatTyping = 'typing…';
-  static const chatFinePrint = 'Nothing you type leaves your phone.';
   static const chatSeePlan = 'See my plan';
   static const jumpToNewest = 'Jump to the newest message';
   static const changeHint = 'Double tap to change.';
@@ -146,6 +145,40 @@ abstract final class OnboardingCopy {
   static String planReady(String name) =>
       "That's everything${name.isEmpty ? '' : ', $name'}. Your plan's ready. "
       'Brace yourself.';
+
+  // The tagline under "See my plan", after each answer.
+  static const taglineStart = 'Nothing you type leaves your phone.';
+  static const taglineExcuses = 'Three excuses before hello. Bold opener.';
+  static String taglineName(String name) =>
+      'Nice to meet you, $name. Your excuses already have.';
+  static const taglineNameSkipped = 'Fine. Your excuses introduced themselves.';
+  static String taglineHabit(HabitKind kind) => switch (kind) {
+    HabitKind.vaping => 'Vaping. Flavoured air with a monthly bill.',
+    HabitKind.smoking => 'Smoking. A classic with a cough.',
+    HabitKind.nicotinePouches => 'Pouches. Discreet, not free.',
+    HabitKind.caffeine => 'Caffeine. Borrowed energy, paid back at 3 PM.',
+    HabitKind.energyDrinks => 'Energy drinks. Rent for your heartbeat.',
+    HabitKind.alcohol => 'Alcohol. The weekend wants a word.',
+    HabitKind.junkFood => 'Junk food. Snacks are not a personality.',
+    HabitKind.socialMedia => "Social media. Hours you'll never get back.",
+    HabitKind.custom => 'Something else. Mysterious. Expensive, probably.',
+  };
+  static String taglineAmount(int n, HabitKind kind) => switch (kind) {
+    HabitKind.vaping ||
+    HabitKind.smoking ||
+    HabitKind.nicotinePouches => '$n a day. Your lungs have filed a complaint.',
+    _ => '$n a day. Noted. Judged, slightly.',
+  };
+  static String taglinePrice(String price, String? container) =>
+      '$price ${container == null ? 'each' : 'a $container'}. '
+      'Your wallet felt that.';
+  static const taglinePriceSkipped = 'Not knowing is still paying.';
+  static String taglineYear(String perYear, HabitKind kind) => switch (kind) {
+    HabitKind.vaping ||
+    HabitKind.smoking => "$perYear a year. That's a holiday you inhaled.",
+    _ => "$perYear a year. That's a holiday you spent on this.",
+  };
+  static const taglineDay = "Plan's ready. No more Mondays.";
 
   // Habit.
   static const habitPrompt = "Let's start with the obvious.";

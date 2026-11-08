@@ -78,12 +78,15 @@ moves.
 
 ### Task C6: Tagline
 
-- [ ] Tests in `chat_step_test.dart`: the tagline follows the spec's table after each answer
+- [x] Tests in `chat_step_test.dart`: the tagline follows the spec's table after each answer
   (vaping sample, name skipped, price skipped, a non-nicotine habit); under Reduce Motion it
   swaps without sliding; it is a live region.
-- [ ] `OnboardingCopy.tagline...` lines; `ChatTagline` widget (slide up and out, slide in
+- [x] `OnboardingCopy.tagline...` lines; `ChatTagline` widget (slide up and out, slide in
   from below); `OnboardingChat.tagline` set as each answer lands.
-- [ ] Commit `feat(onboarding): react to each answer under the button`.
+- [x] Also here: the tagline replaces `chatFinePrint` (now `taglineStart`); a reopened answer
+  sets it too; it is one line with an ellipsis at any text size. `chat_cards_test` finds
+  answers inside `ChatBubble`, since the tagline can quote them.
+- [x] Commit `feat(onboarding): react to each answer under the button`.
 
 ### Task C7: Access and the rest of onboarding
 

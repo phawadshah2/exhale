@@ -150,6 +150,9 @@ class OnboardingChat extends ChangeNotifier {
   final List<Timer> _timers = [];
   bool typing = false;
   bool done = false;
+
+  /// The line under the button, which reacts to the latest answer.
+  String tagline = OnboardingCopy.taglineStart;
   bool _disposed = false;
   ChatQuestion? _reopened;
 
@@ -227,6 +230,9 @@ class OnboardingChat extends ChangeNotifier {
     for (final (i, excuse) in OnboardingCopy.excuses.indexed) {
       final item = ChatText.mine(() => excuse);
       _later(still ? 0 : 500 + i * 1000, () {
+        if (i == OnboardingCopy.excuses.length - 1) {
+          tagline = OnboardingCopy.taglineExcuses;
+        }
         _add(item);
         if (still) _mark(item, Delivery.read);
       });
@@ -289,6 +295,7 @@ class OnboardingChat extends ChangeNotifier {
       _reopened = null;
       final before = path?.call();
       apply();
+      tagline = _taglineAfter(ask);
       if (path != null && path() != before) {
         _truncateAfter(answered);
         then();
@@ -298,6 +305,7 @@ class OnboardingChat extends ChangeNotifier {
     }
     final still = reduceMotion();
     apply();
+    tagline = _taglineAfter(ask);
     final item = ChatText.mine(text, answers: open);
     _add(item);
     if (still) {
@@ -308,6 +316,30 @@ class OnboardingChat extends ChangeNotifier {
     _later(400, () => _mark(item, Delivery.delivered));
     _later(900, () => _mark(item, Delivery.read));
     _later(1100, then);
+  }
+
+  String _taglineAfter(ChatAsk ask) {
+    final f = form();
+    return switch (ask) {
+      ChatAsk.name =>
+        f.userName.isEmpty
+            ? OnboardingCopy.taglineNameSkipped
+            : OnboardingCopy.taglineName(f.userName),
+      ChatAsk.habit => OnboardingCopy.taglineHabit(f.habitKind),
+      ChatAsk.amount => OnboardingCopy.taglineAmount(f.startLimit, f.habitKind),
+      ChatAsk.price => switch (f.priceCents) {
+        final cents? => OnboardingCopy.taglinePrice(
+          _price(cents),
+          habit.container,
+        ),
+        null => OnboardingCopy.taglinePriceSkipped,
+      },
+      ChatAsk.perContainer => OnboardingCopy.taglineYear(
+        _moneyFigures().perYear,
+        f.habitKind,
+      ),
+      ChatAsk.day => OnboardingCopy.taglineDay,
+    };
   }
 
   void sendName(String raw) {
