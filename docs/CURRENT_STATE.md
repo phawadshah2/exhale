@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-06. Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `…11-04_to_11-05…`.
+Updated 2026-11-08. Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `…11-04_to_11-05…`.
 
 ## Where we are
 
@@ -10,7 +10,7 @@ Updated 2026-11-06. Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `�
 | M5 Release candidate | Done, merged to `main` (51e0bc6) |
 | M6 Plan details, Edit plan, Logs; M7 Stage management; polish rounds | Done on `feat/plan-and-stages`, walked in the simulator |
 | TestFlight build 1.0.0 (1) | Installed by Fawad; runs fine on his iPhone (2026-11-06) |
-| Onboarding redesign 2 (chat) | Design signed off (in-chat questions, 2026-11-06); prototype 1efc0c1 predates it |
+| Onboarding redesign 2 (chat) | Signed off 2026-11-06; spec and plan 2026-11-08; prototype 1efc0c1 |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 ## Repo
@@ -62,12 +62,13 @@ Row 1 dark, row 2 light, boards 1 to 7; the green "Decided" note lists every rul
 
 ## Next action
 
-Fawad: "write the spec automatically when I resume the work". On resume, without asking,
-write the spec in `docs/superpowers/specs/` from the "Questions inside the chat" boards and
-the green "Decided" note, using the proposed answer-fixing rule (tap your bubble, its card
-reopens in place; changing the habit clears later answers), marked as an assumption for
-Fawad to confirm. Then the task plan, then `execute-plan` on the prototype's chat step.
-Read: this file, the prototype files above, the canvas page. No checks run (design only).
+Spec `docs/superpowers/specs/2026-11-08-onboarding-chat-design.md` and plan
+`docs/superpowers/plans/2026-11-08-onboarding-chat.md` (Tasks C1 to C7) written 2026-11-08.
+Next: `execute-plan` from Task C1 on `feat/onboarding-chat-prototype`.
+
+Waiting on Fawad (marked in the spec): the answer-fixing rule (section 4), the italic
+tagline drafts and seven habit taglines (section 5), the Other habit and Other price
+fields, and the day's answer bubble with the dropped day-dots card.
 
 ## Open items from Fawad's iPhone review (2026-11-06)
 
