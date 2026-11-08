@@ -150,11 +150,13 @@ class OnboardingChat extends ChangeNotifier {
   bool typing = false;
   bool done = false;
   bool _disposed = false;
+  ChatQuestion? _reopened;
 
   ChatHabit get habit => ChatHabit.of(form().habitKind);
 
-  /// The newest open question, if any.
+  /// The reopened question, else the newest open one, if any.
   ChatQuestion? get question {
+    if (_reopened case final reopened?) return reopened;
     for (final item in items.reversed) {
       if (item is ChatQuestion && item.open) return item;
     }
@@ -175,6 +177,39 @@ class OnboardingChat extends ChangeNotifier {
     item.time = DateTime.now();
     items.add(item);
     notifyListeners();
+  }
+
+  ChatText? _answerOf(ChatQuestion question) {
+    for (final item in items) {
+      if (item is ChatText && item.answers == question) return item;
+    }
+    return null;
+  }
+
+  /// Opens the question [answer] answered again, folding any other reopened
+  /// one. Not while Exhale types, and never for the excuses.
+  bool reopen(ChatText answer) {
+    final asked = answer.answers;
+    if (typing || asked == null || !items.contains(answer)) return false;
+    _reopened?.open = false;
+    _reopened = asked..open = true;
+    notifyListeners();
+    return true;
+  }
+
+  /// Drops everything after [answer], for an answer that changes which
+  /// questions follow.
+  void _truncateAfter(ChatText answer) {
+    for (final timer in _timers) {
+      timer.cancel();
+    }
+    _timers.clear();
+    typing = false;
+    done = false;
+    items.removeRange(items.indexOf(answer) + 1, items.length);
+    for (final item in items.whereType<ChatText>()) {
+      if (item.mine) item.delivery = Delivery.read;
+    }
   }
 
   void _mark(ChatText item, Delivery delivery) {
@@ -232,18 +267,32 @@ class OnboardingChat extends ChangeNotifier {
     if (after != null) _later(t, after);
   }
 
-  /// Folds [question], applies the answer, sends [text] as the user's bubble
-  /// with sent, delivered and read ticks, then runs [then] for Exhale's reply.
+  /// Folds the open [ask], applies the answer, sends [text] as the user's
+  /// bubble with sent, delivered and read ticks, then runs [then] for
+  /// Exhale's reply. A reopened question's bubble updates in place; only when
+  /// [path] changes does the chat drop what followed and run [then] again.
   void _answer(
     ChatAsk ask,
     String Function() text,
     VoidCallback apply,
-    VoidCallback then,
-  ) {
+    VoidCallback then, {
+    Object? Function()? path,
+  }) {
     final open = question;
     if (typing || open == null || open.ask != ask) return;
-    final still = reduceMotion();
     open.open = false;
+    if (_answerOf(open) case final answered?) {
+      _reopened = null;
+      final before = path?.call();
+      apply();
+      if (path != null && path() != before) {
+        _truncateAfter(answered);
+        then();
+      }
+      notifyListeners();
+      return;
+    }
+    final still = reduceMotion();
     apply();
     final item = ChatText.mine(text, answers: open);
     _add(item);
@@ -298,6 +347,8 @@ class OnboardingChat extends ChangeNotifier {
     final name = customName?.trim() ?? '';
     if (kind == HabitKind.custom && name.isEmpty) return;
     final chosen = ChatHabit.of(kind);
+    final question = this.question;
+    final again = question != null && _answerOf(question) != null;
     _answer(
       ChatAsk.habit,
       () {
@@ -307,16 +358,19 @@ class OnboardingChat extends ChangeNotifier {
             : Habit.preset(f.habitKind).name;
       },
       () {
-        final c = controller()..selectHabit(kind);
+        final c = controller();
+        if (!again || form().habitKind != kind) {
+          c
+            ..selectHabit(kind)
+            ..setStartLimit(chosen.typical)
+            ..setUnitsPerContainer(chosen.per)
+            ..skipPrice();
+        }
         if (kind == HabitKind.custom) {
           c
             ..setCustomName(name)
             ..setCustomUnit(customUnit);
         }
-        c
-          ..setStartLimit(chosen.typical)
-          ..setUnitsPerContainer(chosen.per)
-          ..skipPrice();
       },
       () => _says([
         ChatText.exhale(() => OnboardingCopy.habitReply(form().habitKind)),
@@ -325,6 +379,7 @@ class OnboardingChat extends ChangeNotifier {
           () => OnboardingCopy.amountAsk(habit.verb),
         ),
       ]),
+      path: () => form().habitKind,
     );
   }
 
@@ -385,7 +440,7 @@ class OnboardingChat extends ChangeNotifier {
 
   void _sendPrice(String text) => _answer(
     ChatAsk.price,
-    () => _price(form().priceCents ?? 0),
+    _priceAnswer,
     () => controller().setPriceText(text),
     () {
       final container = habit.container;
@@ -399,17 +454,27 @@ class OnboardingChat extends ChangeNotifier {
           ..._moneyAndDay(),
       ]);
     },
+    path: _priced,
   );
 
   void skipPrice() => _answer(
     ChatAsk.price,
-    () => OnboardingCopy.skipPrice,
+    _priceAnswer,
     () => controller().skipPrice(),
     () => _says([
       ChatText.exhale(() => OnboardingCopy.skipPriceReply(form().habit.units)),
       _dayQuestion(),
     ]),
+    path: _priced,
   );
+
+  String _priceAnswer() => switch (form().priceCents) {
+    final cents? => _price(cents),
+    null => OnboardingCopy.skipPrice,
+  };
+
+  /// Whether a price was given: it decides the pod and money card.
+  bool _priced() => form().priceCents != null;
 
   void sendPerContainer() => _answer(
     ChatAsk.perContainer,

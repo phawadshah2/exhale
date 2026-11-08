@@ -13,8 +13,10 @@ import '../../helpers/pump_app.dart';
 void main() {
   late ProviderContainer container;
   late OnboardingChat chat;
+  late bool still;
 
   setUp(() async {
+    still = true;
     await setUpTestDependencies(FixedClock(DateTime(2026, 11, 8, 9)));
     container = ProviderContainer.test(
       overrides: [deviceRegionProvider.overrideWithValue('US')],
@@ -22,7 +24,7 @@ void main() {
     chat = OnboardingChat(
       form: () => container.read(onboardingFormProvider),
       controller: () => container.read(onboardingFormProvider.notifier),
-      reduceMotion: () => true,
+      reduceMotion: () => still,
     );
   });
 
@@ -43,6 +45,13 @@ void main() {
   ];
 
   ChatQuestion question() => chat.items.whereType<ChatQuestion>().last;
+
+  ChatText answerTo(ChatAsk ask) => chat.items
+      .whereType<ChatText>()
+      .singleWhere((item) => item.answers?.ask == ask);
+
+  ChatQuestion asked(ChatAsk ask) =>
+      chat.items.whereType<ChatQuestion>().singleWhere((q) => q.ask == ask);
 
   ChatText lastMine() =>
       chat.items.whereType<ChatText>().where((item) => item.mine).last;
@@ -289,5 +298,166 @@ void main() {
       OnboardingCopy.perPodCaption(per: 10, amount: 12, container: 'pack'),
       'About one pack every day',
     );
+  });
+
+  group('fixing an answer', () {
+    // Vaping at 12 a day, a $10 pod lasting 30, the day still to answer.
+    Future<void> toTheDay(WidgetTester tester, {int amount = 12}) async {
+      await throughAmount(tester, HabitKind.vaping, amount: amount);
+      chat.pickPrice(10);
+      await settle(tester);
+      chat
+        ..setPerContainer(30)
+        ..sendPerContainer();
+      await settle(tester);
+    }
+
+    testWidgets('a new name updates its bubble and the reply in place', (
+      tester,
+    ) async {
+      await toTheDay(tester);
+      final count = chat.items.length;
+
+      expect(chat.reopen(answerTo(ChatAsk.name)), isTrue);
+      expect(asked(ChatAsk.name).open, isTrue);
+      expect(chat.ask, ChatAsk.name);
+      chat.sendName('Sam');
+      await settle(tester);
+
+      expect(chat.items, hasLength(count));
+      expect(answerTo(ChatAsk.name).text, 'Sam');
+      expect(texts(), contains('Sam. Lovely name. Shame about the excuses.'));
+      expect(asked(ChatAsk.name).open, isFalse);
+      expect(chat.ask, ChatAsk.day);
+    });
+
+    testWidgets('a new amount updates every line that quotes it', (
+      tester,
+    ) async {
+      await toTheDay(tester);
+      final count = chat.items.length;
+
+      chat
+        ..reopen(answerTo(ChatAsk.amount))
+        ..setAmount(20)
+        ..sendAmount();
+      await settle(tester);
+
+      expect(chat.items, hasLength(count));
+      expect(answerTo(ChatAsk.amount).text, '20 a day');
+      expect(
+        asked(ChatAsk.price).text,
+        startsWith("That's not a habit. That's a part-time job."),
+      );
+      final money = chat.items.whereType<MoneyCard>().single.figures;
+      expect(money.perDay, r'$6.67');
+      expect(money.line, startsWith(r'20 a day, a $10 pod lasts 30.'));
+      expect(asked(ChatAsk.day).text, OnboardingCopy.daySpread(20));
+      expect(chat.ask, ChatAsk.day);
+    });
+
+    testWidgets('a new habit drops what came after and asks again', (
+      tester,
+    ) async {
+      await toTheDay(tester);
+      chat.sendDay();
+      await settle(tester);
+      expect(chat.done, isTrue);
+
+      chat
+        ..reopen(answerTo(ChatAsk.habit))
+        ..pickHabit(HabitKind.caffeine);
+      await settle(tester);
+
+      final habitAnswer = chat.items.indexOf(answerTo(ChatAsk.habit));
+      expect(answerTo(ChatAsk.habit).text, 'Caffeine');
+      expect(
+        chat.items
+            .sublist(habitAnswer + 1)
+            .map((item) => item is ChatText ? item.text : item),
+        [
+          OnboardingCopy.habitReply(HabitKind.caffeine),
+          OnboardingCopy.amountAsk('reach for a coffee'),
+        ],
+      );
+      expect(form().habitKind, HabitKind.caffeine);
+      expect(form().startLimit, 3);
+      expect(form().priceText, isEmpty);
+      expect(form().unitsPerContainer, 1);
+      expect(chat.ask, ChatAsk.amount);
+      expect(chat.done, isFalse);
+    });
+
+    testWidgets('the same habit only folds its card', (tester) async {
+      await toTheDay(tester, amount: 15);
+      final count = chat.items.length;
+
+      chat
+        ..reopen(answerTo(ChatAsk.habit))
+        ..pickHabit(HabitKind.vaping);
+      await settle(tester);
+
+      expect(chat.items, hasLength(count));
+      expect(form().startLimit, 15);
+      expect(form().priceCents, 1000);
+      expect(asked(ChatAsk.habit).open, isFalse);
+      expect(chat.ask, ChatAsk.day);
+    });
+
+    testWidgets('pricing a skipped price asks the questions it skipped', (
+      tester,
+    ) async {
+      await throughAmount(tester, HabitKind.vaping);
+      chat.skipPrice();
+      await settle(tester);
+
+      chat
+        ..reopen(answerTo(ChatAsk.price))
+        ..pickPrice(10);
+      await settle(tester);
+
+      expect(answerTo(ChatAsk.price).text, r'$10');
+      expect(
+        texts(),
+        isNot(contains(OnboardingCopy.skipPriceReply('sessions'))),
+      );
+      expect(chat.ask, ChatAsk.perContainer);
+    });
+
+    testWidgets('one card reopens at a time', (tester) async {
+      await toTheDay(tester);
+
+      chat
+        ..reopen(answerTo(ChatAsk.name))
+        ..reopen(answerTo(ChatAsk.amount));
+
+      expect(asked(ChatAsk.name).open, isFalse);
+      expect(asked(ChatAsk.amount).open, isTrue);
+      expect(chat.ask, ChatAsk.amount);
+      expect(answerTo(ChatAsk.name).text, 'Alex');
+    });
+
+    testWidgets('nothing reopens while Exhale types', (tester) async {
+      still = false;
+      chat.start();
+      await settle(tester);
+      chat.sendName('Alex');
+      await tester.pump(const Duration(milliseconds: 1200));
+      expect(chat.typing, isTrue);
+
+      expect(chat.reopen(answerTo(ChatAsk.name)), isFalse);
+      expect(asked(ChatAsk.name).open, isFalse);
+      await settle(tester);
+    });
+
+    testWidgets('the excuses never reopen', (tester) async {
+      chat.start();
+      await settle(tester);
+
+      final excuse = chat.items.whereType<ChatText>().first;
+      expect(excuse.text, OnboardingCopy.excuses.first);
+      expect(chat.reopen(excuse), isFalse);
+      expect(chat.ask, ChatAsk.name);
+    });
   });
 }

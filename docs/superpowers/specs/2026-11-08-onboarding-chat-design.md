@@ -127,6 +127,9 @@ start, and when's lights out? Roughly. I won't check." Two rows in one well:
   amount, price and per-pod answers reset to the new habit's defaults, and the chat carries
   on from the habit reply. "See my plan" turns off until the day is answered again.
 - Picking the same habit just folds the card.
+- Switching the price between a price and "I'd rather not know" changes what follows (the
+  per-pod question and the money card), so it works like a new habit: what came after goes
+  and the chat carries on from the price.
 
 ## 5. Tagline
 

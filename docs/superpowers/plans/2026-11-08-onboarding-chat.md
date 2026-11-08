@@ -22,14 +22,14 @@ moves.
 
 ### Task C2: Fixing an answer
 
-- [ ] Tests in `onboarding_chat_test.dart`: reopening the name and sending a new one updates
+- [x] Tests in `onboarding_chat_test.dart`: reopening the name and sending a new one updates
   its bubble and the reply, with no new items; a new amount updates the reaction, the money
   card and "your 12"; a new habit drops every item after the habit answer, resets the amounts
   to the habit's defaults and asks the amount again; the same habit only folds; nothing
   reopens while Exhale types; the excuses never reopen.
-- [ ] `OnboardingChat.reopen(ChatQuestion)`, one reopened card at a time; answering a
-  reopened card updates in place; the habit case truncates and replays from the reply.
-- [ ] Commit `feat(onboarding): reopen a chat answer to change it`.
+- [x] `OnboardingChat.reopen(ChatText answer)`, one reopened card at a time; answering a
+  reopened card updates in place; the habit, and a price switched to or from skipped, truncate and replay.
+- [x] Commit `feat(onboarding): reopen a chat answer to change it`.
 
 ### Task C3: The chat screen
 
