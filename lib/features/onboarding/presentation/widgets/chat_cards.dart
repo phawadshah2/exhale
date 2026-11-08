@@ -24,18 +24,23 @@ class ChatQuestionView extends StatelessWidget {
   const ChatQuestionView({
     required this.question,
     required this.chat,
+    this.continued = false,
     super.key,
   });
 
   final ChatQuestion question;
   final OnboardingChat chat;
 
+  /// Follows another of Exhale's lines.
+  final bool continued;
+
   @override
   Widget build(BuildContext context) {
     final child = !question.open
-        ? ChatBubble(item: question)
+        ? ChatBubble(item: question, continued: continued)
         : ChatCardFrame(
             question: question,
+            continued: continued,
             label: switch (question.ask) {
               ChatAsk.name => OnboardingCopy.cardName,
               ChatAsk.habit => OnboardingCopy.cardHabit,
@@ -69,8 +74,8 @@ class ChatQuestionView extends StatelessWidget {
   };
 }
 
-/// Colours for controls inside a card, from its bubble: ink on light mode's
-/// black card, plain on dark mode's.
+/// Colours for controls inside a card, from Exhale's bubble: its text
+/// colour as ink on the emphasis colour.
 class ChatCardColors {
   factory ChatCardColors.of(BuildContext context) {
     final bubble = ChatBubbleColors.of(context, mine: false);
@@ -110,6 +115,7 @@ class ChatCardFrame extends StatelessWidget {
     required this.label,
     required this.width,
     required this.child,
+    this.continued = false,
     super.key,
   });
 
@@ -117,6 +123,7 @@ class ChatCardFrame extends StatelessWidget {
   final String label;
   final double width;
   final Widget child;
+  final bool continued;
 
   @override
   Widget build(BuildContext context) {
@@ -130,11 +137,7 @@ class ChatCardFrame extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: bubble.background,
-            border: switch (bubble.border) {
-              final line? => Border.all(color: line),
-              null => null,
-            },
-            borderRadius: chatBubbleRadius(mine: false),
+            borderRadius: chatBubbleRadius(mine: false, continued: continued),
           ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(14, 10, 12, 12),
@@ -142,7 +145,7 @@ class ChatCardFrame extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: 12,
               children: [
-                ChatMessageText(item: question, color: bubble.foreground),
+                ChatMessageText(text: question.text, color: bubble.foreground),
                 child,
               ],
             ),

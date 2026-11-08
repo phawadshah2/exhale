@@ -119,9 +119,11 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       back: _back,
       child: Scaffold(
         // The chat runs under the status bar; every other step and the
-        // header keep clear of it.
+        // header keep clear of it. Each step keeps its button clear of the
+        // bottom inset itself, so the chat's dock can reach the edge.
         body: SafeArea(
           top: false,
+          bottom: false,
           child: Column(
             children: [
               if (_canLeave)
@@ -203,9 +205,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
 /// A step's scrollable body above its pinned [button]. [body] gets at least
 /// the visible height, so a `Column` with `spaceBetween` puts its last
-/// child at the bottom. [below] (a link or fine print) sits in a slot of
-/// [belowHeight] under the button, so the button is at the same height on
-/// every step.
+/// child at the bottom. [below] (a link or fine print) sits [belowGap] under
+/// the button, and the button as low as the bottom inset allows, as in the
+/// chat's dock.
 class OnboardingStepFrame extends StatelessWidget {
   const OnboardingStepFrame({
     required this.body,
@@ -215,7 +217,15 @@ class OnboardingStepFrame extends StatelessWidget {
     super.key,
   });
 
-  static const double belowHeight = 44;
+  static const double belowGap = AppSpacing.xs;
+
+  /// Around a step's button and what is below it, clear of the bottom inset.
+  static EdgeInsets dockPadding(BuildContext context) => EdgeInsets.fromLTRB(
+    AppSpacing.pageMargin,
+    AppSpacing.gutterSm,
+    AppSpacing.pageMargin,
+    MediaQuery.paddingOf(context).bottom + AppSpacing.sm,
+  );
 
   final Widget body;
   final Widget button;
@@ -241,20 +251,16 @@ class OnboardingStepFrame extends StatelessWidget {
         ),
       ),
       Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.pageMargin,
-          AppSpacing.gutterSm,
-          AppSpacing.pageMargin,
-          AppSpacing.sm,
-        ),
+        padding: dockPadding(context),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(width: double.infinity, child: button),
-            ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: belowHeight),
-              child: Align(alignment: Alignment.topCenter, child: below),
-            ),
+            if (below case final below?)
+              Padding(
+                padding: const EdgeInsets.only(top: belowGap),
+                child: below,
+              ),
           ],
         ),
       ),

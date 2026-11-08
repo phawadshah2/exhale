@@ -96,6 +96,64 @@ void main() {
     expect(chat.done, isFalse);
   });
 
+  testWidgets('the excuses are sent now and read together', (tester) async {
+    final before = DateTime.now();
+    chat.start();
+    await settle(tester);
+
+    final excuses = chat.items.whereType<ChatText>().where((i) => i.mine);
+    expect(excuses.every((e) => !e.time.isBefore(before)), isTrue);
+    expect(excuses.map((e) => e.delivery), everyElement(Delivery.read));
+  });
+
+  testWidgets('with motion, the excuses are read 1.6 s after the last', (
+    tester,
+  ) async {
+    still = false;
+    chat.start();
+    final excuses = chat.items.whereType<ChatText>();
+
+    await tester.pump(const Duration(milliseconds: 1700));
+    expect(excuses, hasLength(3));
+    expect(excuses.map((e) => e.delivery), everyElement(Delivery.sent));
+    await tester.pump(const Duration(milliseconds: 1599));
+    expect(excuses.last.delivery, Delivery.sent);
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(excuses.map((e) => e.delivery), everyElement(Delivery.read));
+    await tester.pump(const Duration(seconds: 15));
+  });
+
+  testWidgets('the excuses come 600 ms apart, with motion on', (tester) async {
+    still = false;
+    chat.start();
+
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(chat.items, hasLength(1));
+    await tester.pump(const Duration(milliseconds: 599));
+    expect(chat.items, hasLength(1));
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(chat.items, hasLength(2));
+    await tester.pump(const Duration(seconds: 15));
+  });
+
+  testWidgets('Exhale replies 1.9 s after an answer', (tester) async {
+    chat.start();
+    await settle(tester);
+    still = false;
+
+    chat.sendName('Alex');
+    final count = chat.items.length;
+
+    await tester.pump(const Duration(milliseconds: 1899));
+    expect(chat.items, hasLength(count));
+    expect(chat.typing, isFalse);
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(chat.typing, isTrue);
+
+    await tester.pump(const Duration(seconds: 15));
+    expect(chat.items.length, greaterThan(count));
+  });
+
   testWidgets('the name folds its card and asks for the habit', (tester) async {
     await throughName(tester, name: '  Alex ');
 
@@ -442,7 +500,7 @@ void main() {
       chat.start();
       await settle(tester);
       chat.sendName('Alex');
-      await tester.pump(const Duration(milliseconds: 1200));
+      await tester.pump(const Duration(milliseconds: 2000));
       expect(chat.typing, isTrue);
 
       expect(chat.reopen(answerTo(ChatAsk.name)), isFalse);

@@ -35,12 +35,18 @@ class SelectionColors {
 
 /// Fades and lifts [child] in when its step appears. Children of one step
 /// come in one after another, ordered by [index], once the page has mostly
-/// slid in.
+/// slid in. A [delay] replaces the order's own.
 class StepReveal extends StatefulWidget {
-  const StepReveal({required this.child, this.index = 0, super.key});
+  const StepReveal({
+    required this.child,
+    this.index = 0,
+    this.delay,
+    super.key,
+  });
 
   final Widget child;
   final int index;
+  final Duration? delay;
 
   static const Duration _lead = Duration(milliseconds: 160);
   static const Duration _stagger = Duration(milliseconds: 70);
@@ -59,6 +65,7 @@ class _StepRevealState extends State<StepReveal>
   void initState() {
     super.initState();
     final delay =
+        widget.delay ??
         StepReveal._lead + StepReveal._stagger * widget.index.clamp(0, 8);
     final total = delay + StepReveal._each;
     _controller = AnimationController(vsync: this, duration: total);

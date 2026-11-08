@@ -11,11 +11,14 @@ import 'package:flutter/foundation.dart';
 
 enum ChatAsk { name, habit, amount, price, perContainer, day }
 
-enum Delivery { sent, delivered, read }
+enum Delivery { sent, read }
 
 sealed class ChatItem {
   /// When the item landed in the chat.
   late final DateTime time;
+
+  /// Whether the chat has played this item's entrance, so it plays once.
+  bool entered = false;
 }
 
 /// A text bubble. Its text is read when shown, so a line that quotes an
@@ -35,6 +38,10 @@ class ChatText extends ChatItem {
   /// The question this bubble answers; null for Exhale's and the excuses.
   final ChatQuestion? answers;
   Delivery delivery;
+  DateTime? _statusAt;
+
+  /// When [delivery] last changed.
+  DateTime get statusAt => _statusAt ?? time;
 
   String get text => _text();
 }
@@ -96,6 +103,7 @@ class ChatHabit {
       container: 'pack',
       per: 20,
     ),
+    ChatHabit(HabitKind.alcohol, verb: 'drink', typical: 3, price: 7),
     ChatHabit(
       HabitKind.nicotinePouches,
       verb: 'reach for a pouch',
@@ -105,18 +113,17 @@ class ChatHabit {
       per: 20,
     ),
     ChatHabit(
-      HabitKind.caffeine,
-      verb: 'reach for a coffee',
-      typical: 3,
-      price: 4,
-    ),
-    ChatHabit(
       HabitKind.energyDrinks,
       verb: 'crack one open',
       typical: 2,
       price: 3,
     ),
-    ChatHabit(HabitKind.alcohol, verb: 'drink', typical: 3, price: 7),
+    ChatHabit(
+      HabitKind.caffeine,
+      verb: 'reach for a coffee',
+      typical: 3,
+      price: 4,
+    ),
     ChatHabit(HabitKind.junkFood, verb: 'snack', typical: 2, price: 5),
     ChatHabit(
       HabitKind.socialMedia,
@@ -180,8 +187,8 @@ class OnboardingChat extends ChangeNotifier {
     );
   }
 
-  void _add(ChatItem item) {
-    item.time = DateTime.now();
+  void _add(ChatItem item, {DateTime? at}) {
+    item.time = at ?? DateTime.now();
     items.add(item);
     notifyListeners();
   }
@@ -214,34 +221,44 @@ class OnboardingChat extends ChangeNotifier {
     typing = false;
     done = false;
     items.removeRange(items.indexOf(answer) + 1, items.length);
-    for (final item in items.whereType<ChatText>()) {
-      if (item.mine) item.delivery = Delivery.read;
-    }
   }
 
-  void _mark(ChatText item, Delivery delivery) {
-    item.delivery = delivery;
+  void _mark(ChatText item, Delivery delivery, {DateTime? at}) {
+    item
+      ..delivery = delivery
+      .._statusAt = at ?? DateTime.now();
     notifyListeners();
   }
 
-  /// The three excuses arrive, then Exhale asks who it is talking to.
+  /// Between the last excuse landing and being read.
+  static const int _readMs = 1600;
+
+  /// Between an answer and Exhale's reply.
+  static const int _replyMs = 1900;
+
+  /// The three excuses arrive 600 ms apart, sent now and read together;
+  /// then Exhale asks who it is talking to.
   void start() {
     final still = reduceMotion();
-    for (final (i, excuse) in OnboardingCopy.excuses.indexed) {
-      final item = ChatText.mine(() => excuse);
-      _later(still ? 0 : 500 + i * 1000, () {
-        if (i == OnboardingCopy.excuses.length - 1) {
+    const excuses = OnboardingCopy.excuses;
+    final items = [for (final excuse in excuses) ChatText.mine(() => excuse)];
+    for (final (i, item) in items.indexed) {
+      _later(still ? 0 : 500 + i * 600, () {
+        if (i == excuses.length - 1) {
           tagline = OnboardingCopy.taglineExcuses;
         }
         _add(item);
         if (still) _mark(item, Delivery.read);
       });
-      if (!still) _later(850 + i * 1000, () => _mark(item, Delivery.delivered));
     }
+    final read = 500 + (excuses.length - 1) * 600 + _readMs;
     if (!still) {
-      _later(3300, () {
-        for (final item in items.whereType<ChatText>()) {
-          item.delivery = Delivery.read;
+      _later(read, () {
+        final at = DateTime.now();
+        for (final item in items) {
+          item
+            ..delivery = Delivery.read
+            .._statusAt = at;
         }
         notifyListeners();
       });
@@ -249,7 +266,7 @@ class OnboardingChat extends ChangeNotifier {
     _says([
       ChatText.exhale(() => OnboardingCopy.heardThemAll),
       ChatQuestion(ChatAsk.name, () => OnboardingCopy.askWho),
-    ], start: still ? 100 : 3700);
+    ], start: still ? 100 : read + 300);
   }
 
   /// Plays [lines] with typing dots before each, then runs [after].
@@ -278,9 +295,9 @@ class OnboardingChat extends ChangeNotifier {
   }
 
   /// Folds the open [ask], applies the answer, sends [text] as the user's
-  /// bubble with sent, delivered and read ticks, then runs [then] for
-  /// Exhale's reply. A reopened question's bubble updates in place; only when
-  /// [path] changes does the chat drop what followed and run [then] again.
+  /// bubble, then runs [then] for Exhale's reply. A reopened question's
+  /// bubble updates in place; only when [path] changes does the chat drop
+  /// what followed and run [then] again.
   void _answer(
     ChatAsk ask,
     String Function() text,
@@ -306,16 +323,8 @@ class OnboardingChat extends ChangeNotifier {
     final still = reduceMotion();
     apply();
     tagline = _taglineAfter(ask);
-    final item = ChatText.mine(text, answers: open);
-    _add(item);
-    if (still) {
-      _mark(item, Delivery.read);
-      _later(200, then);
-      return;
-    }
-    _later(400, () => _mark(item, Delivery.delivered));
-    _later(900, () => _mark(item, Delivery.read));
-    _later(1100, then);
+    _add(ChatText.mine(text, answers: open));
+    _later(still ? 200 : _replyMs, then);
   }
 
   String _taglineAfter(ChatAsk ask) {

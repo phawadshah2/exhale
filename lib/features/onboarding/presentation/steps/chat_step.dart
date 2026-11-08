@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:exhale/core/presentation/app_icons.dart';
-import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/glass_surface.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
@@ -19,7 +18,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Step 2: one chat that collects the name, habit, amount, price and day.
 /// It fills from the top and scrolls under a glass bar; each question's
 /// controls sit in its card. The dock holds the button, which stays off
-/// until the plan is ready, and the tagline that reacts to each answer.
+/// until the plan is ready, and the tagline that reacts to each answer. The
+/// dock stays down behind the keyboard.
 class ChatStep extends ConsumerStatefulWidget {
   const ChatStep({super.key});
 
@@ -28,7 +28,7 @@ class ChatStep extends ConsumerStatefulWidget {
 }
 
 class _ChatStepState extends ConsumerState<ChatStep>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   /// How close to the end still counts as reading the newest message.
   static const double _nearEnd = 80;
 
@@ -41,6 +41,7 @@ class _ChatStepState extends ConsumerState<ChatStep>
   bool _started = false;
   bool _away = false;
   double _barHeight = 0;
+  bool _keyboard = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -50,6 +51,15 @@ class _ChatStepState extends ConsumerState<ChatStep>
     super.initState();
     _chat.addListener(_onChat);
     _scroll.addListener(_onScroll);
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  /// The page resizes around the keyboard, so the body never sees its
+  /// inset; the view does.
+  @override
+  void didChangeMetrics() {
+    final up = View.of(context).viewInsets.bottom > 0;
+    if (up != _keyboard) setState(() => _keyboard = up);
   }
 
   @override
@@ -62,6 +72,7 @@ class _ChatStepState extends ConsumerState<ChatStep>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _chat
       ..removeListener(_onChat)
       ..dispose();
@@ -77,7 +88,7 @@ class _ChatStepState extends ConsumerState<ChatStep>
   void _onChat() {
     if (!_atEnd || _chat.reopened != null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _toEnd();
+      if (mounted) unawaited(_toEnd());
     });
   }
 
@@ -85,7 +96,7 @@ class _ChatStepState extends ConsumerState<ChatStep>
   bool _onMetrics(ScrollMetricsNotification notification) {
     if (!_away && _chat.reopened == null && !_atEnd) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _toEnd();
+        if (mounted) unawaited(_toEnd());
       });
     }
     return false;
@@ -96,13 +107,13 @@ class _ChatStepState extends ConsumerState<ChatStep>
     if (away != _away) setState(() => _away = away);
   }
 
-  void _toEnd() {
+  Future<void> _toEnd() async {
     if (!_scroll.hasClients) return;
     final end = _scroll.position.maxScrollExtent;
     if (MediaQuery.disableAnimationsOf(context)) {
       _scroll.jumpTo(end);
     } else {
-      _scroll.animateTo(
+      await _scroll.animateTo(
         end,
         duration: const Duration(milliseconds: 320),
         curve: Curves.easeOutCubic,
@@ -110,9 +121,16 @@ class _ChatStepState extends ConsumerState<ChatStep>
     }
   }
 
-  void _jump() {
+  /// The list guesses the height of rows it has not built yet, so one
+  /// scroll from far back can stop short of the newest message; it follows
+  /// up until that message is in view.
+  Future<void> _jump() async {
     unawaited(HapticFeedback.selectionClick());
-    _toEnd();
+    for (var i = 0; i < 4; i++) {
+      if (!mounted || !_scroll.hasClients) return;
+      if (_scroll.position.extentAfter == 0) return;
+      await _toEnd();
+    }
   }
 
   @override
@@ -156,40 +174,35 @@ class _ChatStepState extends ConsumerState<ChatStep>
               ],
             ),
           ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: colors.surface,
-              border: Border(top: BorderSide(color: colors.outlineVariant)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.pageMargin,
-                AppSpacing.gutterSm,
-                AppSpacing.pageMargin,
-                AppSpacing.sm,
+          if (!_keyboard)
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: colors.surface,
+                border: Border(top: BorderSide(color: colors.outlineVariant)),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ChevronButton(
-                    label: OnboardingCopy.chatSeePlan,
-                    onPressed: _chat.done
-                        ? () => OnboardingScope.of(context).next()
-                        : null,
-                  ),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      minHeight: OnboardingStepFrame.belowHeight,
+              // The surface runs to the bottom edge; the button sits just
+              // above the safe area, as on every other step.
+              child: Padding(
+                padding: OnboardingStepFrame.dockPadding(context),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ChevronButton(
+                      label: OnboardingCopy.chatSeePlan,
+                      onPressed: _chat.done
+                          ? () => OnboardingScope.of(context).next()
+                          : null,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: AppSpacing.sm),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: OnboardingStepFrame.belowGap,
+                      ),
                       child: ChatTagline(_chat.tagline),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -244,6 +257,7 @@ class _Header extends StatelessWidget {
     return GlassSurface(
       radius: 0,
       blur: 20,
+      opacity: 0.45,
       color: colors.brightness == Brightness.dark ? colors.surface : null,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
@@ -328,46 +342,82 @@ class _Messages extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = chat.items;
+    ChatText? lastExcuse;
+    for (final item in items) {
+      if (item is ChatText && item.mine && item.answers == null) {
+        lastExcuse = item;
+      }
+    }
     return ListView(
       controller: controller,
       padding: EdgeInsets.fromLTRB(16, top + 12, 16, 12),
       children: [
-        for (var i = 0; i < items.length; i++) _row(items, i),
+        for (var i = 0; i < items.length; i++) _row(items, i, lastExcuse),
         if (chat.typing)
           ChatRow(
             mine: false,
-            topGap: items.isNotEmpty && !_isExhale(items.last),
-            showAvatar: true,
+            gap: items.isEmpty
+                ? 0
+                : _isExhale(items.last)
+                ? ChatRow.runGap
+                : ChatRow.sideGap,
             child: const Align(
               alignment: Alignment.centerLeft,
-              child: TypingBubble(),
+              child: ChatTyping(),
             ),
           ),
       ],
     );
   }
 
-  Widget _row(List<ChatItem> items, int i) {
+  /// One item; the first carries who sent the excuses and when, and the
+  /// last excuse carries their status.
+  Widget _row(List<ChatItem> items, int i, ChatText? lastExcuse) {
     final item = items[i];
     final exhale = _isExhale(item);
     final previous = i > 0 ? items[i - 1] : null;
     final next = i < items.length - 1 ? items[i + 1] : null;
+    final continued = previous != null && _isExhale(previous) == exhale;
     final lastOfRun = next == null || _isExhale(next) != exhale;
-    return ChatRow(
-      key: ObjectKey(item),
+    Widget row = ChatRow(
       mine: !exhale,
-      topGap: previous != null && _isExhale(previous) != exhale,
+      gap: previous == null
+          ? 0
+          : continued
+          ? ChatRow.runGap
+          : ChatRow.sideGap,
       showAvatar: exhale && lastOfRun && !chat.typing,
       child: switch (item) {
-        ChatQuestion() => ChatQuestionView(question: item, chat: chat),
+        ChatQuestion() => ChatQuestionView(
+          question: item,
+          chat: chat,
+          continued: continued,
+        ),
         ChatText() => ChatBubble(
           item: item,
+          continued: continued,
+          last: lastOfRun,
           onTap: item.answers == null || chat.typing
               ? null
               : () => chat.reopen(item),
         ),
-        MoneyCard() => MoneyCardView(card: item),
+        MoneyCard() => MoneyCardView(card: item, continued: continued),
       },
     );
+    if (previous == null || item == lastExcuse) {
+      row = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (previous == null) ...[
+            ChatOpening(sentAt: item.time),
+            const SizedBox(height: ChatRow.sideGap),
+          ],
+          row,
+          if (lastExcuse != null && item == lastExcuse)
+            ChatStatus(item: lastExcuse),
+        ],
+      );
+    }
+    return ChatEntrance(key: ObjectKey(item), item: item, child: row);
   }
 }

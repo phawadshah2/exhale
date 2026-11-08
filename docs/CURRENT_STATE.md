@@ -10,16 +10,15 @@ Updated 2026-11-08. Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `�
 | M5 Release candidate | Done, merged to `main` (51e0bc6) |
 | M6 Plan details, Edit plan, Logs; M7 Stage management; polish rounds | Done on `feat/plan-and-stages`, walked in the simulator |
 | TestFlight build 1.0.0 (1) | Installed by Fawad; runs fine on his iPhone (2026-11-06) |
-| Onboarding redesign 2 (chat) | Tasks C1 to C7 done on `feat/onboarding-chat-prototype`; milestone end next |
+| Onboarding redesign 2 (chat) | C1 to C8 committed; milestone end next |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 ## Repo
 
 - `feat/plan-and-stages` pushed, not merged, no PR, CI not read. Last full suite at 7a80954:
   1211 passed.
-- `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`), not pushed, tree clean.
-  Commits: spec and plan 96ebd6c, C1 cfbab93, C2 838aff3, C3 68c9427, C4 b5849d1, C5 98819c5,
-  C6 e054678, C7 after it.
+- `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`), not pushed. Commits: spec
+  and plan 96ebd6c, C1 cfbab93 … C6 e054678, C7 554adfd. C8 committed.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
 ## Onboarding chat (current goal)
@@ -36,9 +35,17 @@ glass bar, top-filled list, jump button, solid dock (`steps/chat_step.dart`,
 first run, and the change-habit steps (C7). `DayStep` is deleted (Fawad, 2026-11-08).
 Deviations are noted in the plan's ticked tasks.
 
-Checks at C7 (2026-11-08): format and `analyze --fatal-infos` clean; every file in
-`test/features/onboarding` and `test/app/app_test.dart` passed, file by file. Full suite not
-run (milestone end). Never seen in the simulator.
+**C8 in progress** (Fawad, 2026-11-08; spec section 9, plan Task C8, boxes unticked): main's
+welcome colours, bubble shapes, 4/12 pt gaps, 450 ms entrance, no times or ticks in bubbles,
+tagline 4 pt under the button, dock to the bottom edge, button 8 pt above the safe area.
+Round 2 (Fawad, same day, in the spec): opening "You · <current time>"; Sent → Read only under
+the last excuse, answers show no status; habit order Vaping, Smoking, Alcohol, Pouches, Energy
+drinks, then the rest; money card coral (danger); glass bar fill 0.45 (`GlassSurface.opacity`);
+dock hidden while the keyboard is up; jump button follows up to the newest message. Welcome:
+headline word by word, then the subtitle, then each row's title, then its line
+(`StepReveal.delay`). Never seen in the simulator.
+
+Checks: analyze clean; `test/features/onboarding` 139 passed; `test/app` 21 passed.
 
 Test gotcha: an enabled `ChevronButton` and the plan's dots loop, so tests on the welcome or
 the plan turn on Reduce Motion (`reduceMotion` in `test/helpers/onboarding.dart`) or pump
@@ -50,9 +57,8 @@ the day's answer bubble.
 
 ## Next action
 
-Milestone end for the onboarding chat (plan "Then"): the independent review (Opus 5.5
-high) and its fixes, the full suite with the JSON report, then the simulator walk for Fawad
-(dark and light, a container habit, a no-container habit, social media, fixing an answer).
+Milestone end (plan "Then"): independent review (Opus 5.5 high), full suite, then the
+simulator walk (check the welcome reveal timing, the coral card, the bar over content).
 
 ## Open items from Fawad's iPhone review (2026-11-06)
 

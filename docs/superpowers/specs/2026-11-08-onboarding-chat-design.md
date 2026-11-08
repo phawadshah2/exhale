@@ -21,13 +21,12 @@ habit later keeps the old habit, amount, cost and plan steps; this spec does not
   sits at the chat's lower right and scrolls to the newest.
 - **Dock**: solid, with a hairline on top. "See my plan" (`ChevronButton`), off until every
   question is answered, then opens the plan screen. Under it, the tagline (section 5).
-- **Bubbles**: Exhale's on the left with the avatar on the last of a run; the user's on the
-  right. Every bubble carries its time ("9:42 AM") at its bottom-right edge, inside the
-  bubble; the user's also carry the sent, delivered and read ticks.
-- **Colours**: dark mode, Exhale's bubbles and cards are the raised surface with a hairline
-  and the user's are near-white. Light mode, Exhale's bubbles and cards are black with light
-  text and the user's are white with a hairline. The money card is pale mint in light mode.
-  The glass bar takes a white tint in light mode. All from theme tokens, no raw hex.
+- **Bubbles** *(revised by Fawad, 2026-11-08: as `main`'s welcome chat, section 9)*:
+  Exhale's on the left with the avatar on the last of a run; the user's on the right. No
+  time or ticks inside bubbles.
+- **Colours** *(revised, section 9)*: Exhale's bubbles and cards in the emphasis colour,
+  the user's in the raised surface, as `main`'s welcome chat. The money card is pale mint in
+  light mode. The glass bar takes a white tint in light mode. All from theme tokens.
 
 ## 2. Questions are cards
 
@@ -59,8 +58,9 @@ basically flavoured air", "I'll quit properly on Monday"), ticks going to read. 
   the excuses." (skipped: "A mystery. Your excuses weren't.").
 
 **Habit card** (board E). "Lucky for you, helping is my whole job. Let's start with the
-obvious. What are we quitting?" Three rows of text-sized pills: Vaping, Smoking, Nicotine
-pouches / Caffeine, Energy drinks, Alcohol / Junk food, Social media, Other (dashed border).
+obvious. What are we quitting?" Text-sized pills in this order (Fawad, 2026-11-08):
+Vaping, Smoking, Alcohol, Nicotine pouches, Energy drinks, Caffeine, Junk food, Social
+media, Other (dashed border).
 Rows wrap to more rows when the text is large.
 - Other swaps the pills for a field "What is it?" (30 characters, placeholder "Gaming") and
   a send button, plus "Back to the list". The custom unit is "time". *(Assumption: the
@@ -168,8 +168,8 @@ Expensive, probably."
 - Text at 200%: cards and bubbles grow, pills and chips wrap, the time drops under the text
   when it does not fit, the dock keeps one line of tagline (ellipsis).
 - Each card is a VoiceOver group named for its question ("Your name", "What are we
-  quitting?", "Times a day", "Price of a pod", "Sessions per pod", "Your day"). Ticks read
-  "read", "delivered" or "sent". New Exhale messages are announced.
+  quitting?", "Times a day", "Price of a pod", "Sessions per pod", "Your day"). The status
+  line reads as text ("Read 9:42 AM"). New Exhale messages are announced.
 - Reduce Motion: no typing delays beyond a short beat, no slide in the tagline, cards fold
   without animating.
 - The keyboard: the dock stays pinned above it, and the chat scrolls so the open card stays
@@ -185,6 +185,37 @@ submit; habit, start limit, price text, units per container, currency, wake and 
 
 The welcome and plan screens as prototyped (only their tests are added here), the
 change-habit steps, showing the name on Home, the paywall.
+
+## 9. The chat as `main`'s welcome (Fawad, 2026-11-08)
+
+Copied from the welcome chat on `main` (`welcome_step.dart`, `you_bubble.dart`,
+`exhale_bubble.dart`):
+
+- **Colours**: Exhale's bubbles, cards and typing dots in `exhale.emphasis` with
+  `onEmphasis` text; the user's in `surfaceContainerHighest` (light) or
+  `surfaceContainerHigh` (dark) with `onSurface` text; no hairlines. Card controls take
+  their ink from Exhale's bubble.
+- **Shape and sides**: the user's on the right, 20 pt corners, the tail corner 6 pt at the
+  bottom right, the top right 6 pt on a continued line, and the last line of a run back to
+  20 pt there. Exhale's on the left after a 32 pt avatar and a 9 pt gap, the bottom left
+  6 pt and the top left 6 pt on a continued line. Bubbles up to 280 pt, 14 by 10 padding.
+  Typing is the three dots, no bubble, at the avatar's offset.
+- **Gaps**: 4 pt within a run, 12 pt when the side changes.
+- **Motion**: each new message fades in and rises 12 pt, over 450 ms (`main`: 300 ms),
+  once; under Reduce Motion it just appears. The opening excuses come 600 ms apart.
+- **Opening**: "You · 9:42 AM" (the current time) centred above the excuses ("You"
+  semibold).
+- **Status** (Fawad, 2026-11-08): no time or ticks in bubbles. Under the last of the three
+  excuses only, right aligned and faint: "Sent 9:42 AM", then "Read 9:42 AM" 1.6 s after
+  the last lands. Answers show no status; Exhale replies 1.9 s after one. Reduce Motion goes
+  straight to read.
+- **Money card**: solid danger (coral), not success.
+- **Glass bar**: fill at 0.45 opacity. **Keyboard**: the dock stays behind it.
+- **Jump button**: follows up until the newest message is in view (the list estimates
+  rows it has not built).
+- **Dock**: the tagline 4 pt under the button, no reserved space under it; the dock's
+  surface reaches the bottom edge and the button sits 8 pt above the safe area. The welcome
+  and plan frames place their button the same way, so it does not move between steps.
 
 ## Tests
 

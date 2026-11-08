@@ -39,6 +39,11 @@ abstract final class OnboardingCopy {
   static const chatIdle = 'here to help. Unfortunately.';
   static const chatTyping = 'typing…';
   static const chatSeePlan = 'See my plan';
+  static const chatSender = 'You';
+  static String chatSentAt(String time) => ' · $time';
+  static const sent = 'Sent';
+  static const read = 'Read';
+  static String status(String state, String time) => '$state $time';
   static const jumpToNewest = 'Jump to the newest message';
   static const changeHint = 'Double tap to change.';
   static const sendName = 'Send your name';

@@ -146,29 +146,26 @@ class _DealStepState extends ConsumerState<DealStep> {
         ),
         onPressed: plan == null || form.isSubmitting ? null : _shake,
       ),
-      below: Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.sm),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (error != null)
-              Text(
-                error,
-                textAlign: TextAlign.center,
-                style: text.bodySmall?.copyWith(color: colors.error),
-              ),
+      below: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (error != null)
             Text(
-              OnboardingCopy.dealFinePrint,
+              error,
               textAlign: TextAlign.center,
-              style: text.labelSmall?.copyWith(color: colors.outline),
+              style: text.bodySmall?.copyWith(color: colors.error),
             ),
-            TextButton.icon(
-              onPressed: _pickDate,
-              icon: const Icon(AppIcons.calendar, size: 16),
-              label: const Text(OnboardingCopy.pickOwnDate),
-            ),
-          ],
-        ),
+          Text(
+            OnboardingCopy.dealFinePrint,
+            textAlign: TextAlign.center,
+            style: text.labelSmall?.copyWith(color: colors.outline),
+          ),
+          TextButton.icon(
+            onPressed: _pickDate,
+            icon: const Icon(AppIcons.calendar, size: 16),
+            label: const Text(OnboardingCopy.pickOwnDate),
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -115,6 +115,22 @@ moves.
   scales down to the width).
 - [x] Commit `test(onboarding): cover the chat onboarding end to end`.
 
+### Task C8: The chat as `main`'s welcome (spec section 9)
+
+- [x] Tests: `onboarding_chat_test` (motion on) for sent, delivered at 0.4 s, read 1.2 s
+  later, and Exhale only after the read; `chat_step_test` for the opening line, the status
+  under the latest message only, no times in bubbles, the 4 and 12 pt gaps, the bubble
+  colours in light and dark, the entrance under Reduce Motion, and the dock (tagline 4 pt
+  under the button, the dock to the bottom edge, the button at the welcome's height).
+- [x] `chat_widgets.dart`: `ChatBubbleColors` and the bubble shapes from `main`;
+  `ChatEntrance`; the status line; typing dots without a bubble; drop `ChatMessageText`
+  and `DeliveryTicks`. `onboarding_chat.dart`: the new timings, `ChatText.statusAt`, the
+  excuses at 11:48 PM. `chat_step.dart` and `OnboardingStepFrame`: the dock.
+- [x] Commit `feat(onboarding): give the chat the welcome's look`.
+  Round 2 (Fawad, 2026-11-08): status only under the last excuse, Sent → Read; current
+  time in the opening; habit order; coral money card; clearer bar; dock behind the
+  keyboard; jump follow-up; welcome word-by-word reveal; dock 8 pt above the safe area.
+
 ### Then
 
 Milestone end, per `CLAUDE.md`: the independent review (Opus 5.5 high) and its fixes, the

@@ -19,6 +19,17 @@ class WelcomeStep extends StatelessWidget {
     AppIcons.lock,
   ];
 
+  /// The headline's words, then the line under it, then each row's title
+  /// and its line.
+  static const Duration _firstWordAt = Duration(milliseconds: 280);
+  static const Duration _wordStagger = Duration(milliseconds: 120);
+  static const Duration _subtitleAt = Duration(milliseconds: 940);
+  static const Duration _rowsAt = Duration(milliseconds: 1120);
+  static const Duration _rowStagger = Duration(milliseconds: 220);
+
+  static Widget _word(int i, Widget word) =>
+      StepReveal(delay: _firstWordAt + _wordStagger * i, child: word);
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -36,13 +47,10 @@ class WelcomeStep extends StatelessWidget {
         label: OnboardingCopy.welcomeButton,
         onPressed: () => OnboardingScope.of(context).next(),
       ),
-      below: Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.sm),
-        child: Text(
-          OnboardingCopy.welcomeFinePrint,
-          textAlign: TextAlign.center,
-          style: text.labelSmall?.copyWith(color: colors.outline),
-        ),
+      below: Text(
+        OnboardingCopy.welcomeFinePrint,
+        textAlign: TextAlign.center,
+        style: text.labelSmall?.copyWith(color: colors.outline),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,38 +67,44 @@ class WelcomeStep extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          StepReveal(
-            index: 1,
-            // Capped, and shrunk to the width when "negotiating" would not
-            // fit a line.
-            child: MediaQuery.withClampedTextScaling(
-              maxScaleFactor: 1.5,
-              child: Semantics(
-                label: OnboardingCopy.welcomeTitle,
-                excludeSemantics: true,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Stop', style: headline),
+          // Capped, and shrunk to the width when "negotiating" would not
+          // fit a line. Each word comes in after the one before.
+          MediaQuery.withClampedTextScaling(
+            maxScaleFactor: 1.5,
+            child: Semantics(
+              label: OnboardingCopy.welcomeTitle,
+              excludeSemantics: true,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _word(0, Text('Stop', style: headline)),
+                    _word(
+                      1,
                       _Struck(
                         text: OnboardingCopy.welcomeNegotiating,
                         style: headline?.copyWith(color: colors.outline),
                         lineColor: colors.onSurface,
                       ),
-                      Text('with your', style: headline),
-                      Text('cravings.', style: headline),
-                    ],
-                  ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _word(2, Text('with ', style: headline)),
+                        _word(3, Text('your', style: headline)),
+                      ],
+                    ),
+                    _word(4, Text('cravings.', style: headline)),
+                  ],
                 ),
               ),
             ),
           ),
           const SizedBox(height: AppSpacing.md + 2),
           StepReveal(
-            index: 2,
+            delay: _subtitleAt,
             child: Text(
               OnboardingCopy.welcomeBody,
               style: text.bodyLarge?.copyWith(
@@ -101,11 +115,13 @@ class WelcomeStep extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           for (final (i, row) in OnboardingCopy.welcomeRows.indexed)
-            StepReveal(
-              index: 3 + i,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 14),
-                child: _HowRow(icon: _icons[i], title: row.$1, body: row.$2),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: _HowRow(
+                icon: _icons[i],
+                title: row.$1,
+                body: row.$2,
+                at: _rowsAt + _rowStagger * i,
               ),
             ),
           const SizedBox(height: AppSpacing.sm),
@@ -135,11 +151,11 @@ class _Struck extends StatefulWidget {
 class _StruckState extends State<_Struck> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1300),
+    duration: const Duration(milliseconds: 1600),
   );
   late final Animation<double> _draw = CurvedAnimation(
     parent: _controller,
-    curve: const Interval(700 / 1300, 1, curve: Curves.easeOutCubic),
+    curve: const Interval(1000 / 1600, 1, curve: Curves.easeOutCubic),
   );
   bool _started = false;
 
@@ -191,12 +207,21 @@ class _StruckState extends State<_Struck> with SingleTickerProviderStateMixin {
   );
 }
 
+/// The icon and title come in at [at], the line under them just after.
 class _HowRow extends StatelessWidget {
-  const _HowRow({required this.icon, required this.title, required this.body});
+  const _HowRow({
+    required this.icon,
+    required this.title,
+    required this.body,
+    required this.at,
+  });
 
   final IconData icon;
   final String title;
   final String body;
+  final Duration at;
+
+  static const Duration _bodyLag = Duration(milliseconds: 110);
 
   @override
   Widget build(BuildContext context) {
@@ -206,30 +231,42 @@ class _HowRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 14,
       children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: context.theme.cardTheme.color ?? colors.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colors.outlineVariant),
+        StepReveal(
+          delay: at,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color:
+                  context.theme.cardTheme.color ?? colors.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: colors.outlineVariant),
+            ),
+            child: Icon(icon, size: 18, color: colors.onSurface),
           ),
-          child: Icon(icon, size: 18, color: colors.onSurface),
         ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 2,
             children: [
-              Text(
-                title,
-                style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+              StepReveal(
+                delay: at,
+                child: Text(
+                  title,
+                  style: text.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
               ),
-              Text(
-                body,
-                style: text.bodyMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  height: 1.4,
+              StepReveal(
+                delay: at + _bodyLag,
+                child: Text(
+                  body,
+                  style: text.bodyMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    height: 1.4,
+                  ),
                 ),
               ),
             ],

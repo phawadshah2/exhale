@@ -101,28 +101,31 @@ void main() {
     );
   });
 
-  testWidgets('cards are named groups and answers are buttons with ticks', (
-    tester,
-  ) async {
-    final handle = tester.ensureSemantics();
-    await pumpOnboardingChat(tester);
-    expect(labelled(OnboardingCopy.cardName), findsOneWidget);
+  testWidgets(
+    'cards are named groups, answers are buttons, the status is read',
+    (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpOnboardingChat(tester);
+      expect(labelled(OnboardingCopy.cardName), findsOneWidget);
 
-    await answerName(tester);
-    expect(labelled(OnboardingCopy.cardName), findsNothing);
-    expect(labelled(OnboardingCopy.cardHabit), findsOneWidget);
-    expect(
-      tester.getSemantics(
-        find.bySemanticsLabel(RegExp(r'^You: Alex, .*, read$')),
-      ),
-      isSemantics(
-        isButton: true,
-        hasTapAction: true,
-        hint: OnboardingCopy.changeHint,
-      ),
-    );
+      await answerName(tester);
+      expect(labelled(OnboardingCopy.cardName), findsNothing);
+      expect(labelled(OnboardingCopy.cardHabit), findsOneWidget);
+      expect(
+        tester.getSemantics(find.bySemanticsLabel(RegExp(r'^You: Alex$'))),
+        isSemantics(
+          isButton: true,
+          hasTapAction: true,
+          hint: OnboardingCopy.changeHint,
+        ),
+      );
+      expect(
+        find.bySemanticsLabel(RegExp(r'^Read \d{1,2}:\d{2} [AP]M$')),
+        findsOneWidget,
+      );
 
-    await tester.disposeApp();
-    handle.dispose();
-  });
+      await tester.disposeApp();
+      handle.dispose();
+    },
+  );
 }
