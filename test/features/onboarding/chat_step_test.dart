@@ -14,54 +14,27 @@ void main() {
   setUp(() => setUpTestDependencies(FixedClock(DateTime(2026, 11, 8, 9))));
   tearDown(InjectionContainer.reset);
 
-  // Reduce Motion keeps every line of the script under a second.
-  Future<void> settle(WidgetTester tester) async {
-    await tester.pumpAndSettle();
-    await tester.pump(const Duration(seconds: 3));
-    await tester.pumpAndSettle();
-  }
-
-  Future<void> toChat(WidgetTester tester) async {
-    tester.platformDispatcher.accessibilityFeaturesTestValue =
-        const FakeAccessibilityFeatures(disableAnimations: true);
-    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
-    await pumpOnboarding(tester);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(OnboardingCopy.welcomeButton));
-    await settle(tester);
-  }
-
-  // Through the answers still in the dock: name, vaping, the default amount,
-  // no price, the default day.
+  // Name, vaping at the default amount, no price, the default day.
   Future<void> answerAll(WidgetTester tester) async {
-    await tester.enterText(
-      find.widgetWithText(TextField, OnboardingCopy.nameHint),
-      'Alex',
-    );
-    await tester.tap(find.text(OnboardingCopy.send));
-    await settle(tester);
+    await answerName(tester);
     await tester.tap(find.text('Vaping'));
-    await settle(tester);
-    await tester.tap(find.text(OnboardingCopy.send));
-    await settle(tester);
+    await settleChat(tester);
+    await tester.tap(find.text(OnboardingCopy.aboutRight));
+    await settleChat(tester);
     await tester.tap(find.text(OnboardingCopy.skipPrice));
-    await settle(tester);
+    await settleChat(tester);
     await tester.tap(find.text(OnboardingCopy.thatsMyDay));
-    await settle(tester);
+    await settleChat(tester);
   }
 
   Finder seePlan() =>
       find.widgetWithText(ChevronButton, OnboardingCopy.chatSeePlan);
-  Finder jump() => find.byWidgetPredicate(
-    (widget) =>
-        widget is Semantics &&
-        widget.properties.label == OnboardingCopy.jumpToNewest,
-  );
+  Finder jump() => labelled(OnboardingCopy.jumpToNewest);
 
   testWidgets('the chat fills from the top, under the glass bar', (
     tester,
   ) async {
-    await toChat(tester);
+    await pumpOnboardingChat(tester);
 
     final barBottom = tester
         .getBottomLeft(find.text(OnboardingCopy.chatIdle))
@@ -80,7 +53,7 @@ void main() {
   testWidgets('See my plan waits for the day, then opens the plan', (
     tester,
   ) async {
-    await toChat(tester);
+    await pumpOnboardingChat(tester);
     expect(tester.widget<ChevronButton>(seePlan()).onPressed, isNull);
 
     await answerAll(tester);
@@ -101,7 +74,7 @@ void main() {
   testWidgets('scrolling back offers a jump to the newest message', (
     tester,
   ) async {
-    await toChat(tester);
+    await pumpOnboardingChat(tester);
     await answerAll(tester);
 
     await tester.drag(

@@ -165,6 +165,9 @@ class OnboardingChat extends ChangeNotifier {
 
   ChatAsk? get ask => question?.ask;
 
+  /// An earlier question opened again to change its answer.
+  ChatQuestion? get reopened => _reopened;
+
   void _later(int ms, VoidCallback fn) {
     _timers.add(
       Timer(Duration(milliseconds: ms), () {

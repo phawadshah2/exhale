@@ -5,11 +5,11 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/glass_surface.dart';
 import 'package:exhale/core/widgets/smooth_switcher.dart';
-import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_chat.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/chat_cards.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/chat_widgets.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/chevron_button.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/currency_chip.dart';
@@ -41,7 +41,6 @@ class _ChatStepState extends ConsumerState<ChatStep>
     controller: () => ref.read(onboardingFormProvider.notifier),
     reduceMotion: () => MediaQuery.disableAnimationsOf(context),
   );
-  final TextEditingController _name = TextEditingController();
   final ScrollController _scroll = ScrollController();
   bool _started = false;
   bool _away = false;
@@ -70,7 +69,6 @@ class _ChatStepState extends ConsumerState<ChatStep>
     _chat
       ..removeListener(_onChat)
       ..dispose();
-    _name.dispose();
     _scroll.dispose();
     super.dispose();
   }
@@ -78,12 +76,23 @@ class _ChatStepState extends ConsumerState<ChatStep>
   bool get _atEnd =>
       !_scroll.hasClients || _scroll.position.extentAfter < _nearEnd;
 
-  /// Keeps the newest message in view, unless the user has scrolled back.
+  /// Keeps the newest message in view, unless the user has scrolled back or
+  /// reopened an earlier answer.
   void _onChat() {
-    if (!_atEnd) return;
+    if (!_atEnd || _chat.reopened != null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _toEnd();
     });
+  }
+
+  /// A card that grows or shrinks at the bottom keeps the newest in view.
+  bool _onMetrics(ScrollMetricsNotification notification) {
+    if (!_away && _chat.reopened == null && !_atEnd) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _toEnd();
+      });
+    }
+    return false;
   }
 
   void _onScroll() {
@@ -125,10 +134,13 @@ class _ChatStepState extends ConsumerState<ChatStep>
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: _Messages(
-                    chat: _chat,
-                    controller: _scroll,
-                    top: _barHeight,
+                  child: NotificationListener<ScrollMetricsNotification>(
+                    onNotification: _onMetrics,
+                    child: _Messages(
+                      chat: _chat,
+                      controller: _scroll,
+                      top: _barHeight,
+                    ),
                   ),
                 ),
                 Positioned(
@@ -168,7 +180,7 @@ class _ChatStepState extends ConsumerState<ChatStep>
                     resize: true,
                     child: KeyedSubtree(
                       key: ValueKey(_chat.ask),
-                      child: _Answers(chat: _chat, name: _name),
+                      child: _Answers(chat: _chat),
                     ),
                   ),
                   ChevronButton(
@@ -363,7 +375,13 @@ class _Messages extends StatelessWidget {
       topGap: previous != null && _isExhale(previous) != exhale,
       showAvatar: exhale && lastOfRun && !chat.typing,
       child: switch (item) {
-        ChatText() => ChatBubble(item: item),
+        ChatQuestion() => ChatQuestionView(question: item, chat: chat),
+        ChatText() => ChatBubble(
+          item: item,
+          onTap: item.answers == null || chat.typing
+              ? null
+              : () => chat.reopen(item),
+        ),
         MoneyCard() => MoneyCardView(card: item),
       },
     );
@@ -372,36 +390,14 @@ class _Messages extends StatelessWidget {
 
 /// The open question's controls, one tap each.
 class _Answers extends ConsumerWidget {
-  const _Answers({required this.chat, required this.name});
+  const _Answers({required this.chat});
 
   final OnboardingChat chat;
-  final TextEditingController name;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final form = ref.watch(onboardingFormProvider);
     return switch (chat.ask) {
-      ChatAsk.name => _NameAnswer(chat: chat, name: name),
-      ChatAsk.habit => _Grid(
-        columns: 3,
-        children: [
-          for (final h in ChatHabit.all)
-            ChatChip(
-              label: chat.labelOf(h.kind),
-              dashed: h.kind == HabitKind.custom,
-              onTap: () => chat.pickHabit(h.kind),
-            ),
-        ],
-      ),
-      ChatAsk.amount => _Stepper(
-        value: form.startLimit,
-        unit: '${form.habit.units} a day',
-        step: 1,
-        min: 1,
-        max: 80,
-        onChanged: chat.setAmount,
-        onSend: chat.sendAmount,
-      ),
       ChatAsk.perContainer => _Stepper(
         value: form.unitsPerContainer,
         unit: '${form.habit.units} a ${chat.habit.container}',
@@ -448,6 +444,9 @@ class _Answers extends ConsumerWidget {
         label: OnboardingCopy.thatsMyDay,
         onTap: chat.sendDay,
       ),
+      ChatAsk.name ||
+      ChatAsk.habit ||
+      ChatAsk.amount ||
       null => const SizedBox(width: double.infinity),
     };
   }
@@ -472,45 +471,6 @@ class _Grid extends StatelessWidget {
         ],
       );
     },
-  );
-}
-
-class _NameAnswer extends StatelessWidget {
-  const _NameAnswer({required this.chat, required this.name});
-
-  final OnboardingChat chat;
-  final TextEditingController name;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        spacing: 8,
-        children: [
-          Expanded(
-            child: TextField(
-              controller: name,
-              maxLength: 24,
-              autofillHints: const [AutofillHints.givenName],
-              textCapitalization: TextCapitalization.words,
-              textInputAction: TextInputAction.send,
-              onSubmitted: chat.sendName,
-              decoration: const InputDecoration(
-                hintText: OnboardingCopy.nameHint,
-                counterText: '',
-              ),
-            ),
-          ),
-          _SendButton(onTap: () => chat.sendName(name.text)),
-        ],
-      ),
-      TextButton(
-        onPressed: chat.skipName,
-        child: const Text(OnboardingCopy.nameSkip),
-      ),
-    ],
   );
 }
 

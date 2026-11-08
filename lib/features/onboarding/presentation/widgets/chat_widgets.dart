@@ -141,78 +141,107 @@ class ChatRow extends StatelessWidget {
   );
 }
 
+/// The shape of a bubble on Exhale's side or the user's.
+BorderRadius chatBubbleRadius({required bool mine}) => BorderRadius.only(
+  topLeft: const Radius.circular(18),
+  topRight: const Radius.circular(18),
+  bottomLeft: Radius.circular(mine ? 18 : 6),
+  bottomRight: Radius.circular(mine ? 6 : 18),
+);
+
 /// A text bubble with its time (and, for the user's, delivery ticks) set at
-/// the end of the last line.
+/// the end of the last line. [onTap] makes an answer a button that reopens
+/// its question.
 class ChatBubble extends StatelessWidget {
-  const ChatBubble({required this.item, super.key});
+  const ChatBubble({required this.item, this.onTap, super.key});
 
   final ChatText item;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final mine = item.mine;
     final bubble = ChatBubbleColors.of(context, mine: mine);
-    final foreground = bubble.foreground;
-    final faint = foreground.withValues(alpha: mine ? 0.65 : 0.6);
-    final text = context.textTheme;
     final time = AppFormat.time(item.time);
+    final tap = onTap;
+    Widget child = ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: mine ? 264 : _bubbleMax),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: bubble.background,
+          border: switch (bubble.border) {
+            final line? => Border.all(color: line),
+            null => null,
+          },
+          borderRadius: chatBubbleRadius(mine: mine),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 9, 10, 7),
+          child: ChatMessageText(item: item, color: bubble.foreground),
+        ),
+      ),
+    );
+    if (tap != null) {
+      child = GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          unawaited(HapticFeedback.selectionClick());
+          tap();
+        },
+        child: PressScale(child: child),
+      );
+    }
     return Semantics(
+      button: tap != null,
+      onTap: tap,
       label:
           '${mine ? 'You' : OnboardingCopy.chatName}: ${item.text}, $time'
           '${mine ? ', ${item.delivery.name}' : ''}',
+      hint: tap == null ? null : OnboardingCopy.changeHint,
       excludeSemantics: true,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: mine ? 264 : _bubbleMax),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: bubble.background,
-            border: switch (bubble.border) {
-              final line? => Border.all(color: line),
-              null => null,
-            },
-            borderRadius: BorderRadius.only(
-              topLeft: const Radius.circular(18),
-              topRight: const Radius.circular(18),
-              bottomLeft: Radius.circular(mine ? 18 : 6),
-              bottomRight: Radius.circular(mine ? 6 : 18),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 9, 10, 7),
-            child: Text.rich(
-              TextSpan(
+      child: child,
+    );
+  }
+}
+
+/// A message's text with its time, and ticks on the user's, at the end of
+/// the last line.
+class ChatMessageText extends StatelessWidget {
+  const ChatMessageText({required this.item, required this.color, super.key});
+
+  final ChatText item;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = context.textTheme;
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(text: item.text),
+          WidgetSpan(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 3,
                 children: [
-                  TextSpan(text: item.text),
-                  WidgetSpan(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 3,
-                        children: [
-                          Text(
-                            time,
-                            style: text.labelSmall?.copyWith(
-                              color: faint,
-                              fontSize: 11,
-                            ),
-                          ),
-                          if (mine)
-                            DeliveryTicks(
-                              delivery: item.delivery,
-                              color: foreground,
-                            ),
-                        ],
-                      ),
+                  Text(
+                    AppFormat.time(item.time),
+                    style: text.labelSmall?.copyWith(
+                      color: color.withValues(alpha: item.mine ? 0.65 : 0.6),
+                      fontSize: 11,
                     ),
                   ),
+                  if (item.mine)
+                    DeliveryTicks(delivery: item.delivery, color: color),
                 ],
               ),
-              style: text.bodyLarge?.copyWith(color: foreground, height: 1.4),
             ),
           ),
-        ),
+        ],
       ),
+      style: text.bodyLarge?.copyWith(color: color, height: 1.4),
     );
   }
 }

@@ -41,6 +41,12 @@ abstract final class OnboardingCopy {
   static const chatFinePrint = 'Nothing you type leaves your phone.';
   static const chatSeePlan = 'See my plan';
   static const jumpToNewest = 'Jump to the newest message';
+  static const changeHint = 'Double tap to change.';
+  static const sendName = 'Send your name';
+  static const sendHabit = 'Send your habit';
+  static const cardName = 'Your name';
+  static const cardHabit = 'What are we quitting?';
+  static const cardAmount = 'Times a day';
   static const askWho =
       'Before you send me another excuse: who am I talking to?';
   static const nameHint = 'Your first name';

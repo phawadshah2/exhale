@@ -50,15 +50,18 @@ moves.
 
 ### Task C4: Name, habit and amount cards
 
-- [ ] Tests in `test/features/onboarding/chat_cards_test.dart`: the name card sends on the
+- [x] Tests in `test/features/onboarding/chat_cards_test.dart`: the name card sends on the
   button and on the keyboard, ignores a blank name, skips with "I'd rather not say"; the
   habit card shows eight habits and Other in three rows, Other swaps in a field and "Back to
   the list"; the amount card steps 1 to 80 and sends "12 a day"; an answered card folds to its
   text.
-- [ ] `widgets/chat_cards.dart`: `ChatCardFrame` (bubble with the controls under the text,
+- [x] `widgets/chat_cards.dart`: `ChatCardFrame` (bubble with the controls under the text,
   animated fold), `NameCard`, `HabitCard` (text-sized pills with a 44 pt hit area),
   `AmountCard` (stepper well and "That's about right"). Drop their dock answers.
-- [ ] Commit `feat(onboarding): ask the name, habit and amount inside the chat`.
+- [x] Also here: tapping an answer bubble reopens its card (spec section 4), and a card that
+  resizes at the bottom keeps the newest in view. Chat test helpers moved to
+  `test/helpers/onboarding.dart`.
+- [x] Commit `feat(onboarding): ask the name, habit and amount inside the chat`.
 
 ### Task C5: Price, per-pod and day cards
 
