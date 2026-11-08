@@ -212,9 +212,11 @@ void main() {
     expect(lastMine().text, '30 a pod');
     expect(form().unitsPerContainer, 30);
     final money = chat.items.whereType<MoneyCard>().single.figures;
-    expect(money.perDay, r'$4.00');
     expect(money.perYear, r'$1,460');
-    expect(money.line, r'12 a day, a $10 pod lasts 30. Your rent is jealous.');
+    // The suggested pace tapers 12 a day to zero within the year.
+    expect(money.withPlan, r'$182');
+    expect(money.kept, r'$1,278');
+    expect(money.planShare, closeTo(182 / 1460, 0.01));
     expect(texts().sublist(texts().length - 2), [
       OnboardingCopy.dayTwoMore,
       OnboardingCopy.daySpread(12),
@@ -251,10 +253,9 @@ void main() {
     chat.pickPrice(4);
     await settle(tester);
 
-    expect(
-      chat.items.whereType<MoneyCard>().single.figures.line,
-      r'3 a day at $4 each. Your rent is jealous.',
-    );
+    final money = chat.items.whereType<MoneyCard>().single.figures;
+    expect(money.perYear, r'$4,380');
+    expect(money.withPlan, r'$168');
     expect(chat.ask, ChatAsk.day);
   });
 
@@ -408,8 +409,8 @@ void main() {
         startsWith("That's not a habit. That's a part-time job."),
       );
       final money = chat.items.whereType<MoneyCard>().single.figures;
-      expect(money.perDay, r'$6.67');
-      expect(money.line, startsWith(r'20 a day, a $10 pod lasts 30.'));
+      expect(money.perYear, r'$2,433');
+      expect(money.withPlan, r'$317');
       expect(asked(ChatAsk.day).text, OnboardingCopy.daySpread(20));
       expect(chat.ask, ChatAsk.day);
     });

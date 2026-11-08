@@ -129,17 +129,10 @@ abstract final class OnboardingCopy {
   static String skipPriceReply(String units) =>
       "Ignorance is bliss. Expensive bliss. I'll count $units instead. Add a "
       "price whenever you're brave.";
-  static const moneyCardTitle = 'YOUR HABIT, IN NUMBERS';
-  static const aDay = 'a day';
-  static const aYearShort = 'a year';
-  static String moneyLine({
-    required int amount,
-    required String price,
-    required String? container,
-    required int per,
-  }) => container != null
-      ? '$amount a day, a $price $container lasts $per. $costReply'
-      : '$amount a day at $price each. $costReply';
+  static const moneyCardTitle = 'YOUR NEXT 12 MONTHS';
+  static const asItIs = 'As it is';
+  static const withPlan = 'With the plan';
+  static const youKeep = 'You keep ';
   static const dayTwoMore = 'Two more, then your plan.';
   static String daySpread(int amount) =>
       "I'll spread your $amount so they don't all land before lunch. When "

@@ -55,7 +55,14 @@ class ChatQuestion extends ChatText {
   bool open = true;
 }
 
-typedef MoneyFigures = ({String perDay, String perYear, String line});
+/// The next 12 months as it is and with the plan, and what the plan keeps;
+/// `planShare` is the plan's spend as a share of as it is.
+typedef MoneyFigures = ({
+  String perYear,
+  String withPlan,
+  String kept,
+  double planShare,
+});
 
 class MoneyCard extends ChatItem {
   MoneyCard(this._figures);
@@ -537,25 +544,27 @@ class OnboardingChat extends ChangeNotifier {
     _dayQuestion(),
   ];
 
+  /// The plan's spend is its daily limits over the next 365 days, the
+  /// plan the chat would make now (the suggested pace).
   MoneyFigures _moneyFigures() {
     final f = form();
     final unit = f.unitPriceCents ?? 0;
+    final asItIs = (unit * f.startLimit * 365).round();
+    var units = f.startLimit * 365;
+    if (f.preview case final plan?) {
+      units = 0;
+      for (var d = 0; d < 365; d++) {
+        units += plan.limitOn(plan.startDay.addDays(d));
+      }
+    }
+    final withPlan = (unit * units).round();
+    String money(int cents) =>
+        AppFormat.money(cents, symbol: f.currency, wholeUnits: true);
     return (
-      perDay: AppFormat.money(
-        (unit * f.startLimit).round(),
-        symbol: f.currency,
-      ),
-      perYear: AppFormat.money(
-        (unit * f.startLimit * 365).round(),
-        symbol: f.currency,
-        wholeUnits: true,
-      ),
-      line: OnboardingCopy.moneyLine(
-        amount: f.startLimit,
-        price: _price(f.priceCents ?? 0),
-        container: habit.container,
-        per: f.unitsPerContainer,
-      ),
+      perYear: money(asItIs),
+      withPlan: money(withPlan),
+      kept: money(asItIs - withPlan),
+      planShare: asItIs == 0 ? 0 : withPlan / asItIs,
     );
   }
 

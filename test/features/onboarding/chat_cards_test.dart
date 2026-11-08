@@ -294,8 +294,13 @@ void main() {
 
     await tester.tap(find.text(OnboardingCopy.aboutRight));
     await settleChat(tester);
-    expect(find.textContaining('pod lasts 100.'), findsOneWidget);
     expect(find.text(OnboardingCopy.moneyCardTitle), findsOneWidget);
+    expect(find.text(OnboardingCopy.asItIs), findsOneWidget);
+    expect(find.text(OnboardingCopy.withPlan), findsOneWidget);
+    expect(
+      find.textContaining(OnboardingCopy.youKeep, findRichText: true),
+      findsOneWidget,
+    );
     expect(labelled(OnboardingCopy.cardDay), findsOneWidget);
 
     await tester.disposeApp();

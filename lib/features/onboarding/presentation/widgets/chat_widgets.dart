@@ -451,6 +451,8 @@ class _CardFrame extends StatelessWidget {
   );
 }
 
+/// The next 12 months: as it is on a full danger bar, with the plan on a
+/// bar its share of that, and what the plan keeps.
 class MoneyCardView extends StatelessWidget {
   const MoneyCardView({required this.card, this.continued = false, super.key});
 
@@ -461,60 +463,84 @@ class MoneyCardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final danger = context.exhale.danger;
+    final colors = context.colors;
+    final exhale = context.exhale;
     final text = context.textTheme;
-    final small = text.bodySmall?.copyWith(color: danger.onSolid);
+    final bubble = ChatBubbleColors.of(context, mine: false);
     final figures = card.figures;
+    final label = text.bodySmall?.copyWith(color: bubble.foreground);
+    final strong = label?.copyWith(fontWeight: FontWeight.w700);
+    Widget row(String name, String value, Color? valueColor) => Row(
+      spacing: 8,
+      children: [
+        Expanded(child: Text(name, style: label)),
+        Text(value, style: strong?.copyWith(color: valueColor)),
+      ],
+    );
     return _CardFrame(
-      color: danger.solid,
-      line: danger.foreground.withValues(alpha: 0.4),
+      color: bubble.background,
+      line: colors.outlineVariant,
       continued: continued,
       children: [
         Text(
           OnboardingCopy.moneyCardTitle,
           style: text.labelSmall?.copyWith(
-            color: danger.onSolid,
+            color: colors.onSurfaceVariant,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.9,
           ),
         ),
-        // A year drops under a day when both do not fit, as at large text.
-        Wrap(
-          alignment: WrapAlignment.spaceBetween,
-          crossAxisAlignment: WrapCrossAlignment.end,
-          spacing: 12,
-          runSpacing: 8,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  figures.perDay,
-                  style: text.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: danger.onSolid,
-                  ),
+        row(OnboardingCopy.asItIs, figures.perYear, exhale.danger.foreground),
+        _MoneyBar(share: 1, color: exhale.danger.solid),
+        row(OnboardingCopy.withPlan, figures.withPlan, null),
+        _MoneyBar(share: figures.planShare, color: colors.onSurfaceVariant),
+        Text.rich(
+          TextSpan(
+            children: [
+              const TextSpan(text: OnboardingCopy.youKeep),
+              TextSpan(
+                text: figures.kept,
+                style: TextStyle(
+                  color: exhale.success.foreground,
+                  fontWeight: FontWeight.w700,
                 ),
-                Text(OnboardingCopy.aDay, style: small),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  figures.perYear,
-                  style: text.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: danger.onSolid,
-                  ),
-                ),
-                Text(OnboardingCopy.aYearShort, style: small),
-              ],
-            ),
-          ],
+              ),
+              const TextSpan(text: '.'),
+            ],
+          ),
+          style: text.bodyMedium?.copyWith(color: bubble.foreground),
         ),
-        Text(figures.line, style: small?.copyWith(height: 1.4)),
       ],
     );
   }
+}
+
+/// An 8 pt track filled to [share] of its width.
+class _MoneyBar extends StatelessWidget {
+  const _MoneyBar({required this.share, required this.color});
+
+  final double share;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: Container(
+      height: 8,
+      alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(
+        color: context.colors.outlineVariant,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: FractionallySizedBox(
+        widthFactor: share.clamp(0.02, 1),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: const SizedBox.expand(),
+        ),
+      ),
+    ),
+  );
 }

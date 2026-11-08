@@ -48,7 +48,7 @@ headline word by word, then the subtitle, then each row's title, then its line
 Round 3 (Fawad, same day): slower welcome (words 180 ms apart, 700 ms fades); plan cards
 pin the quit date right; "Pick my own date" sits above the button (`OnboardingStepFrame.above`)
 so the button matches the welcome and chat; dock padding back to the bare safe area (Fawad).
-Money card mockups shown (coral solid, year first, receipt, now vs plan); Fawad to pick.
+Money card is mockup D (now vs plan), in the spec.
 
 Checks: analyze clean; `test/features/onboarding` 141 passed; `test/app` 21 passed (round 2).
 

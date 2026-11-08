@@ -209,7 +209,10 @@ Copied from the welcome chat on `main` (`welcome_step.dart`, `you_bubble.dart`,
   excuses only, right aligned and faint: "Sent 9:42 AM", then "Read 9:42 AM" 1.6 s after
   the last lands. Answers show no status; Exhale replies 1.9 s after one. Reduce Motion goes
   straight to read.
-- **Money card**: solid danger (coral), not success.
+- **Money card** (Fawad, 2026-11-08, mockup D): "YOUR NEXT 12 MONTHS" on Exhale's bubble
+  colours. "As it is" with the year in danger and a full danger bar; "With the plan" (the
+  suggested pace's daily limits over 365 days) with a grey bar at its share; "You keep $X."
+  with the amount in success. The per-day figure and the price line are gone.
 - **Glass bar**: fill at 0.45 opacity. **Keyboard**: the dock stays behind it.
 - **Jump button**: follows up until the newest message is in view (the list estimates
   rows it has not built).
