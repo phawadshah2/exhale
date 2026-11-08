@@ -14,12 +14,21 @@ const double _avatar = 28;
 const double _gap = 8;
 const double _bubbleMax = 284;
 
-/// Exhale's round avatar; [visible] false keeps its space.
+/// Exhale's round avatar; [visible] false keeps its space. [online] adds
+/// the green dot at its lower right.
 class ChatAvatar extends StatelessWidget {
-  const ChatAvatar({this.visible = true, this.size = _avatar, super.key});
+  const ChatAvatar({
+    this.visible = true,
+    this.size = _avatar,
+    this.online = false,
+    super.key,
+  });
+
+  static const Key onlineKey = ValueKey('chat-online');
 
   final bool visible;
   final double size;
+  final bool online;
 
   @override
   Widget build(BuildContext context) {
@@ -27,20 +36,77 @@ class ChatAvatar extends StatelessWidget {
     return SizedBox.square(
       dimension: size,
       child: visible
-          ? DecoratedBox(
-              decoration: BoxDecoration(
-                color: exhale.emphasis,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                AppIcons.breath,
-                size: size * 0.55,
-                color: exhale.onEmphasis,
-              ),
+          ? Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: exhale.emphasis,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      AppIcons.breath,
+                      size: size * 0.55,
+                      color: exhale.onEmphasis,
+                    ),
+                  ),
+                ),
+                if (online)
+                  Positioned(
+                    right: -1,
+                    bottom: -1,
+                    child: Container(
+                      key: onlineKey,
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: exhale.success.foreground,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: context.colors.surface,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             )
           : null,
     );
   }
+}
+
+/// A bubble's colours. One side is ink (Exhale's in light mode, the user's
+/// in dark), the other a plain card with a hairline.
+class ChatBubbleColors {
+  factory ChatBubbleColors.of(BuildContext context, {required bool mine}) {
+    final colors = context.colors;
+    final dark = colors.brightness == Brightness.dark;
+    if (mine == dark) {
+      return ChatBubbleColors._(
+        background: colors.onSurface,
+        foreground: colors.surface,
+      );
+    }
+    return ChatBubbleColors._(
+      background: dark
+          ? colors.surfaceContainer
+          : colors.surfaceContainerLowest,
+      foreground: colors.onSurface,
+      border: colors.outlineVariant,
+    );
+  }
+
+  const ChatBubbleColors._({
+    required this.background,
+    required this.foreground,
+    this.border,
+  });
+
+  final Color background;
+  final Color foreground;
+  final Color? border;
 }
 
 /// A row of the chat: Exhale's side has the avatar slot, the user's side
@@ -84,11 +150,9 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final exhale = context.exhale;
     final mine = item.mine;
-    final background = mine ? exhale.emphasis : colors.surfaceContainerHigh;
-    final foreground = mine ? exhale.onEmphasis : colors.onSurface;
+    final bubble = ChatBubbleColors.of(context, mine: mine);
+    final foreground = bubble.foreground;
     final faint = foreground.withValues(alpha: mine ? 0.65 : 0.6);
     final text = context.textTheme;
     final time = AppFormat.time(item.time);
@@ -101,8 +165,11 @@ class ChatBubble extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: mine ? 264 : _bubbleMax),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: background,
-            border: mine ? null : Border.all(color: colors.outlineVariant),
+            color: bubble.background,
+            border: switch (bubble.border) {
+              final line? => Border.all(color: line),
+              null => null,
+            },
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(18),
               topRight: const Radius.circular(18),
@@ -211,15 +278,18 @@ class TypingBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
+    final bubble = ChatBubbleColors.of(context, mine: false);
     final still = MediaQuery.disableAnimationsOf(context);
     return Semantics(
       label: '${OnboardingCopy.chatName} is typing',
       excludeSemantics: true,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: colors.surfaceContainerHigh,
-          border: Border.all(color: colors.outlineVariant),
+          color: bubble.background,
+          border: switch (bubble.border) {
+            final line? => Border.all(color: line),
+            null => null,
+          },
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(18),
             topRight: Radius.circular(18),
@@ -229,7 +299,10 @@ class TypingBubble extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-          child: TypingDots(animate: !still, color: colors.onSurfaceVariant),
+          child: TypingDots(
+            animate: !still,
+            color: bubble.foreground.withValues(alpha: 0.6),
+          ),
         ),
       ),
     );

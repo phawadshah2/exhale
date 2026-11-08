@@ -40,6 +40,7 @@ abstract final class OnboardingCopy {
   static const chatTyping = 'typing…';
   static const chatFinePrint = 'Nothing you type leaves your phone.';
   static const chatSeePlan = 'See my plan';
+  static const jumpToNewest = 'Jump to the newest message';
   static const askWho =
       'Before you send me another excuse: who am I talking to?';
   static const nameHint = 'Your first name';

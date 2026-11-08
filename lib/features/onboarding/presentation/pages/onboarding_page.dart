@@ -113,64 +113,85 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       });
     final steps = _steps;
     final index = steps.indexOf(_current);
+    final header = _canLeave || _current == OnboardingStep.deal;
 
     return OnboardingScope(
       next: _next,
       back: _back,
       child: Scaffold(
+        // The chat runs under the status bar; every other step and the
+        // header keep clear of it.
         body: SafeArea(
+          top: false,
           child: Column(
             children: [
               if (_canLeave)
-                OnboardingStepper(
-                  index: index,
-                  total: steps.length,
-                  onBack: _back,
+                SafeArea(
+                  bottom: false,
+                  child: OnboardingStepper(
+                    index: index,
+                    total: steps.length,
+                    onBack: _back,
+                  ),
                 )
               else if (_current == OnboardingStep.deal)
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.pageMargin,
-                      AppSpacing.gutterSm,
-                      0,
-                      0,
-                    ),
-                    child: RoundIconButton(
-                      icon: AppIcons.back,
-                      label: 'Back',
-                      size: 44,
-                      onTap: _back,
+                SafeArea(
+                  bottom: false,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.pageMargin,
+                        AppSpacing.gutterSm,
+                        0,
+                        0,
+                      ),
+                      child: RoundIconButton(
+                        icon: AppIcons.back,
+                        label: 'Back',
+                        size: 44,
+                        onTap: _back,
+                      ),
                     ),
                   ),
                 ),
               Expanded(
-                child: GestureDetector(
-                  onHorizontalDragEnd: (details) {
-                    if ((details.primaryVelocity ?? 0) > _backFlingVelocity) {
-                      _back();
-                    }
-                  },
-                  child: PageView(
-                    controller: _pages,
-                    physics: const NeverScrollableScrollPhysics(),
-                    onPageChanged: (i) => setState(() => _current = steps[i]),
-                    children: [
-                      for (final step in steps)
-                        KeyedSubtree(
-                          key: ValueKey(step),
-                          child: switch (step) {
-                            OnboardingStep.welcome => const WelcomeStep(),
-                            OnboardingStep.chat => const ChatStep(),
-                            OnboardingStep.habit => const HabitStep(),
-                            OnboardingStep.amount => const AmountStep(),
-                            OnboardingStep.cost => const CostStep(),
-                            OnboardingStep.day => const DayStep(),
-                            OnboardingStep.deal => const DealStep(),
-                          },
-                        ),
-                    ],
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: header,
+                  child: GestureDetector(
+                    onHorizontalDragEnd: (details) {
+                      if ((details.primaryVelocity ?? 0) > _backFlingVelocity) {
+                        _back();
+                      }
+                    },
+                    child: PageView(
+                      controller: _pages,
+                      physics: const NeverScrollableScrollPhysics(),
+                      onPageChanged: (i) => setState(() => _current = steps[i]),
+                      children: [
+                        for (final step in steps)
+                          KeyedSubtree(
+                            key: ValueKey(step),
+                            child: step == OnboardingStep.chat
+                                ? const ChatStep()
+                                : SafeArea(
+                                    bottom: false,
+                                    child: switch (step) {
+                                      OnboardingStep.welcome =>
+                                        const WelcomeStep(),
+                                      OnboardingStep.habit => const HabitStep(),
+                                      OnboardingStep.amount =>
+                                        const AmountStep(),
+                                      OnboardingStep.cost => const CostStep(),
+                                      OnboardingStep.day => const DayStep(),
+                                      OnboardingStep.deal => const DealStep(),
+                                      OnboardingStep.chat => const ChatStep(),
+                                    },
+                                  ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -305,10 +305,13 @@ class _PaceCard extends StatelessWidget {
                 Row(
                   spacing: 8,
                   children: [
-                    Text(
-                      pace.name,
-                      style: text.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
+                    Flexible(
+                      child: Text(
+                        pace.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: text.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                     if (suggested)

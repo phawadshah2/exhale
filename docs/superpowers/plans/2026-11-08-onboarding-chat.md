@@ -33,17 +33,20 @@ moves.
 
 ### Task C3: The chat screen
 
-- [ ] Tests in `test/features/onboarding/chat_step_test.dart`: the list fills from the top
+- [x] Tests in `test/features/onboarding/chat_step_test.dart`: the list fills from the top
   and keeps the newest in view; scrolling back shows "Jump to the newest message", which
   scrolls down and hides; "See my plan" is off until the day is answered, then opens the
   plan screen; the green dot is in the header.
-- [ ] `ChatStep`: a `Stack` with a top-anchored `ListView` under an edge-to-edge
+- [x] `ChatStep`: a `Stack` with a top-anchored `ListView` under an edge-to-edge
   `GlassSurface` app bar (top padding from the bar's height), the jump button, and a solid
-  dock with a top hairline. Remove `_Answers`, `_Grid` and the dock's controls.
-- [ ] Bubbles in `chat_widgets.dart`: the time at the bottom-right edge of every bubble,
+  dock with a top hairline. The interim answers stay in the
+  dock until C4 and C5 move each into its card, so the chat can still be answered.
+- [x] Bubbles in `chat_widgets.dart`: the time at the bottom-right edge of every bubble,
   ticks on the user's; dark and light colours from theme tokens (Exhale black in light mode,
   the user's white with a hairline; money card mint in light mode).
-- [ ] Commit `feat(onboarding): give the chat a glass bar and a fixed dock`.
+- [x] `OnboardingPage` keeps the safe area for every step but the chat. The plan card's
+  pace name shrinks rather than overflow (seen in the test font).
+- [x] Commit `feat(onboarding): give the chat a glass bar and a fixed dock`.
 
 ### Task C4: Name, habit and amount cards
 
@@ -54,7 +57,7 @@ moves.
   text.
 - [ ] `widgets/chat_cards.dart`: `ChatCardFrame` (bubble with the controls under the text,
   animated fold), `NameCard`, `HabitCard` (text-sized pills with a 44 pt hit area),
-  `AmountCard` (stepper well and "That's about right").
+  `AmountCard` (stepper well and "That's about right"). Drop their dock answers.
 - [ ] Commit `feat(onboarding): ask the name, habit and amount inside the chat`.
 
 ### Task C5: Price, per-pod and day cards
@@ -65,7 +68,7 @@ moves.
   the caption; the day card steps by 30 minutes, turns a step off at the minimum window and
   shows "16 h awake · one every 1 h 20 min".
 - [ ] `PriceCard`, `PerPodCard`, `DayQuestionCard` in `chat_cards.dart`; the money card keeps
-  `MoneyCardView`.
+  `MoneyCardView`. Remove the last dock answers (`_Answers`, `_Grid`).
 - [ ] Commit `feat(onboarding): ask the price and the day inside the chat`.
 
 ### Task C6: Tagline
