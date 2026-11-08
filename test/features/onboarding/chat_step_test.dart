@@ -108,20 +108,95 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('the dock stays down while the keyboard is up', (tester) async {
+  Finder list() => find.descendant(
+    of: find.byType(ChatStep),
+    matching: find.byType(ListView),
+  );
+
+  testWidgets('the keyboard slides over the dock; the list ends above it', (
+    tester,
+  ) async {
     await pumpOnboardingChat(tester);
-    expect(seePlan(), findsOneWidget);
+    final dock = tester.getRect(seePlan());
 
     tester.view.viewInsets = const FakeViewPadding(bottom: 336 * 3);
     await tester.pump();
-    expect(seePlan(), findsNothing);
-    expect(find.byType(ChatTagline), findsNothing);
+    expect(tester.getRect(seePlan()), dock);
+    expect(find.byType(ChatTagline), findsOneWidget);
+    expect(tester.getRect(list()).bottom, 844 - 336);
 
     tester.view.resetViewInsets();
     await tester.pump();
-    expect(seePlan(), findsOneWidget);
+    expect(tester.getRect(list()).bottom, lessThan(dock.top));
 
     await tester.disposeApp();
+  });
+
+  group('with motion on, after an answer', () {
+    /// Answers the name with Reduce Motion off, so Exhale types its reply.
+    Future<void> answerWithMotion(WidgetTester tester) async {
+      await pumpOnboardingChat(tester);
+      tester.platformDispatcher.clearAccessibilityFeaturesTestValue();
+      await tester.pump();
+      await tester.enterText(
+        find.widgetWithText(TextField, OnboardingCopy.nameHint),
+        'Alex',
+      );
+      await tester.tap(labelled(OnboardingCopy.sendName));
+    }
+
+    Iterable<ChatAvatar> shownAvatars(WidgetTester tester) => tester
+        .widgetList<ChatAvatar>(
+          find.descendant(of: list(), matching: find.byType(ChatAvatar)),
+        )
+        .where((avatar) => avatar.visible);
+
+    testWidgets('earlier avatars stay while Exhale types', (tester) async {
+      await answerWithMotion(tester);
+      await tester.pump(const Duration(milliseconds: 1950));
+      expect(find.byType(ChatTyping), findsOneWidget);
+      // The run that asked the name keeps its avatar; the dots carry one.
+      expect(shownAvatars(tester), hasLength(2));
+
+      await tester.pump(const Duration(seconds: 15));
+      await tester.disposeApp();
+    });
+
+    testWidgets('the list only moves forward and ends on the newest', (
+      tester,
+    ) async {
+      await answerWithMotion(tester);
+      var last = tester
+          .state<ScrollableState>(
+            find
+                .descendant(of: list(), matching: find.byType(Scrollable))
+                .first,
+          )
+          .position
+          .pixels;
+      for (var i = 0; i < 400; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+        final now = tester
+            .state<ScrollableState>(
+              find
+                  .descendant(of: list(), matching: find.byType(Scrollable))
+                  .first,
+            )
+            .position
+            .pixels;
+        expect(now, greaterThanOrEqualTo(last));
+        last = now;
+      }
+      final card = find.text('Vaping');
+      expect(card, findsOneWidget);
+      expect(
+        tester.getBottomLeft(card).dy,
+        lessThanOrEqualTo(tester.getRect(list()).bottom),
+      );
+
+      await tester.pump(const Duration(seconds: 15));
+      await tester.disposeApp();
+    });
   });
 
   group('the tagline', () {
@@ -388,29 +463,38 @@ void main() {
       MaterialApp(
         home: MediaQuery(
           data: MediaQueryData(disableAnimations: still),
-          child: ChatEntrance(item: item, child: const Text('Hi')),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: ChatEntrance(item: item, child: const Text('Hi')),
+          ),
         ),
       ),
     );
 
-    double opacity(WidgetTester tester) => tester
-        .widget<Opacity>(
-          find.descendant(
-            of: find.byType(ChatEntrance),
-            matching: find.byType(Opacity),
-          ),
-        )
-        .opacity;
+    /// The entrance's fade; it drops the fade once fully in.
+    double opacity(WidgetTester tester) {
+      final fade = find.descendant(
+        of: find.byType(ChatEntrance),
+        matching: find.byType(Opacity),
+      );
+      return fade.evaluate().isEmpty ? 1 : tester.widget<Opacity>(fade).opacity;
+    }
 
-    testWidgets('a new message fades and rises in once', (tester) async {
+    double height(WidgetTester tester) =>
+        tester.getSize(find.byType(ChatEntrance)).height;
+
+    testWidgets('a new message grows, fades and rises in once', (tester) async {
       final item = ChatText.exhale(() => 'Hi');
       await pumpEntrance(tester, item, still: false);
       expect(opacity(tester), 0);
+      expect(height(tester), 0);
 
       await tester.pump(const Duration(milliseconds: 225));
       expect(opacity(tester), allOf(greaterThan(0), lessThan(1)));
+      final halfway = height(tester);
       await tester.pump(const Duration(milliseconds: 225));
       expect(opacity(tester), 1);
+      expect(height(tester), greaterThan(halfway));
 
       await tester.pumpWidget(const SizedBox());
       await pumpEntrance(tester, item, still: false);
@@ -432,7 +516,7 @@ void main() {
 
       final button = tester.getRect(seePlan());
       final line = tester.getRect(find.byType(ChatTagline));
-      expect(line.top - button.bottom, 4);
+      expect(line.top - button.bottom, 8);
       expect(line.bottom, 844 - 34);
       final dock = find
           .ancestor(of: seePlan(), matching: find.byType(DecoratedBox))

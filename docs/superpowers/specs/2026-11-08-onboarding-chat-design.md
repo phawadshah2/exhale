@@ -237,7 +237,11 @@ Copied from the welcome chat on `main` (`welcome_step.dart`, `you_bubble.dart`,
   picked date; it stays after another pace is chosen and selects that date again.
 - **Chat smoothness**: a new message grows into place (height with its fade and rise),
   and the list follows the newest message frame by frame instead of restarting a scroll
-  animation on each change.
+  animation on each change. The keyboard slides over a dock that stays put: the page does
+  not resize for it, the list ends above the keyboard as it moves, and the dock is never
+  removed. Exhale's avatar stays on each of its earlier runs while it types; only the run
+  the dots continue hands its avatar to the dots. The tagline sits 8 pt (was 4) under the
+  button on every step, so the button still lines up.
 
 ## Tests
 

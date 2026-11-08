@@ -49,8 +49,12 @@ Round 3 (Fawad, same day): slower welcome (words 180 ms apart, 700 ms fades); pl
 pin the quit date right; "Pick my own date" sits above the button (`OnboardingStepFrame.above`)
 so the button matches the welcome and chat; dock padding back to the bare safe area (Fawad).
 Money card is mockup D (now vs plan), in the spec.
+C9 (46b8912): plan cards show stages (ring when closed, day/week grid when selected, Your
+date card). C10: chat grows messages in and follows the end per frame; the page skips
+resizing on the chat so the keyboard slides over a fixed dock; earlier avatars stay while
+Exhale types; tagline gap 8 pt on every step. Spec section 10.
 
-Checks: analyze clean; `test/features/onboarding` 141 passed; `test/app` 21 passed (round 2).
+Checks (C10): analyze clean; `test/features/onboarding` 145 passed; `test/app` 21 passed.
 
 Test gotcha: an enabled `ChevronButton` and the plan's dots loop, so tests on the welcome or
 the plan turn on Reduce Motion (`reduceMotion` in `test/helpers/onboarding.dart`) or pump
@@ -63,7 +67,7 @@ the day's answer bubble.
 ## Next action
 
 Milestone end (plan "Then"): independent review (Opus 5.5 high), full suite, then the
-simulator walk (check the welcome reveal timing, the coral card, the bar over content).
+simulator walk (welcome timing, money card, plan grid, chat smoothness with the keyboard).
 
 ## Open items from Fawad's iPhone review (2026-11-06)
 

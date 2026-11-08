@@ -118,6 +118,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       next: _next,
       back: _back,
       child: Scaffold(
+        // The chat lets the keyboard slide over its dock and pads its own
+        // list instead.
+        resizeToAvoidBottomInset: _current != OnboardingStep.chat,
         // The chat runs under the status bar; every other step and the
         // header keep clear of it. Each step keeps its button clear of the
         // bottom inset itself, so the chat's dock can reach the edge.
@@ -219,7 +222,7 @@ class OnboardingStepFrame extends StatelessWidget {
     super.key,
   });
 
-  static const double belowGap = AppSpacing.xs;
+  static const double belowGap = AppSpacing.sm;
 
   /// Around a step's button and what is below it, clear of the bottom inset.
   static EdgeInsets dockPadding(BuildContext context) => EdgeInsets.fromLTRB(

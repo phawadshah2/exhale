@@ -142,10 +142,13 @@ moves.
 
 ### Task C10: A steady chat (spec section 10)
 
-- [ ] Tests: `chat_step_test`: after an answer, the scroll offset only moves forward and
-  the newest message stays in view on every frame.
-- [ ] `ChatEntrance` grows the height in; `chat_step.dart` follows the end each frame.
-- [ ] Commit `fix(onboarding): keep the chat steady as messages arrive`.
+- [x] Tests: `chat_step_test`: after an answer, the scroll offset only moves forward and
+  the newest message stays in view on every frame; the dock keeps its place with the
+  keyboard up; earlier avatars stay while Exhale types; the tagline 8 pt under the button.
+- [x] `ChatEntrance` grows the height in; `chat_step.dart` follows the end each frame and
+  pads for the keyboard; the page skips resizing on the chat; the avatar rule;
+  `OnboardingStepFrame.belowGap` to `AppSpacing.sm`.
+- [x] Commit `fix(onboarding): keep the chat steady as messages arrive`.
 
 ### Then
 

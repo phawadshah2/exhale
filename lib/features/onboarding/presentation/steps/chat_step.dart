@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
@@ -19,7 +20,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// It fills from the top and scrolls under a glass bar; each question's
 /// controls sit in its card. The dock holds the button, which stays off
 /// until the plan is ready, and the tagline that reacts to each answer. The
-/// dock stays down behind the keyboard.
+/// keyboard slides over the dock, and the list ends above the keyboard.
 class ChatStep extends ConsumerStatefulWidget {
   const ChatStep({super.key});
 
@@ -28,7 +29,7 @@ class ChatStep extends ConsumerStatefulWidget {
 }
 
 class _ChatStepState extends ConsumerState<ChatStep>
-    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
+    with AutomaticKeepAliveClientMixin {
   /// How close to the end still counts as reading the newest message.
   static const double _nearEnd = 80;
 
@@ -41,7 +42,7 @@ class _ChatStepState extends ConsumerState<ChatStep>
   bool _started = false;
   bool _away = false;
   double _barHeight = 0;
-  bool _keyboard = false;
+  double _dockHeight = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -49,17 +50,7 @@ class _ChatStepState extends ConsumerState<ChatStep>
   @override
   void initState() {
     super.initState();
-    _chat.addListener(_onChat);
     _scroll.addListener(_onScroll);
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  /// The page resizes around the keyboard, so the body never sees its
-  /// inset; the view does.
-  @override
-  void didChangeMetrics() {
-    final up = View.of(context).viewInsets.bottom > 0;
-    if (up != _keyboard) setState(() => _keyboard = up);
   }
 
   @override
@@ -72,10 +63,7 @@ class _ChatStepState extends ConsumerState<ChatStep>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _chat
-      ..removeListener(_onChat)
-      ..dispose();
+    _chat.dispose();
     _scroll.dispose();
     super.dispose();
   }
@@ -83,22 +71,20 @@ class _ChatStepState extends ConsumerState<ChatStep>
   bool get _atEnd =>
       !_scroll.hasClients || _scroll.position.extentAfter < _nearEnd;
 
-  /// Keeps the newest message in view, unless the user has scrolled back or
-  /// reopened an earlier answer.
-  void _onChat() {
-    if (!_atEnd || _chat.reopened != null) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(_toEnd());
-    });
-  }
-
-  /// A card that grows or shrinks at the bottom keeps the newest in view.
+  /// While the user reads the newest message, the list follows the end as
+  /// it moves: a message growing in, a card folding, the keyboard. It jumps
+  /// each frame rather than restarting a scroll animation on each change,
+  /// so the motion is the content's own. Not after scrolling back or
+  /// reopening an earlier answer.
   bool _onMetrics(ScrollMetricsNotification notification) {
-    if (!_away && _chat.reopened == null && !_atEnd) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) unawaited(_toEnd());
-      });
-    }
+    if (_away || _chat.reopened != null) return false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scroll.hasClients) return;
+      final position = _scroll.position;
+      if (position.pixels != position.maxScrollExtent) {
+        position.jumpTo(position.maxScrollExtent);
+      }
+    });
     return false;
   }
 
@@ -139,6 +125,9 @@ class _ChatStepState extends ConsumerState<ChatStep>
     // The answer area reads the form (amount, price, currency).
     ref.watch(onboardingFormProvider);
     final colors = context.colors;
+    // The page does not resize for the keyboard here, so the dock stays put
+    // under it; the list ends where the keyboard begins.
+    final keyboard = MediaQuery.viewInsetsOf(context).bottom;
     return ListenableBuilder(
       listenable: _chat,
       builder: (context, _) => Column(
@@ -174,8 +163,10 @@ class _ChatStepState extends ConsumerState<ChatStep>
               ],
             ),
           ),
-          if (!_keyboard)
-            DecoratedBox(
+          SizedBox(height: math.max(0, keyboard - _dockHeight)),
+          _HeightReporter(
+            onHeight: (height) => setState(() => _dockHeight = height),
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 color: colors.surface,
                 border: Border(top: BorderSide(color: colors.outlineVariant)),
@@ -203,6 +194,7 @@ class _ChatStepState extends ConsumerState<ChatStep>
                 ),
               ),
             ),
+          ),
         ],
       ),
     );
@@ -356,6 +348,7 @@ class _Messages extends StatelessWidget {
         if (chat.typing)
           ChatRow(
             mine: false,
+            showAvatar: true,
             gap: items.isEmpty
                 ? 0
                 : _isExhale(items.last)
@@ -386,7 +379,8 @@ class _Messages extends StatelessWidget {
           : continued
           ? ChatRow.runGap
           : ChatRow.sideGap,
-      showAvatar: exhale && lastOfRun && !chat.typing,
+      // The dots take the avatar only from the run they continue.
+      showAvatar: exhale && lastOfRun && !(chat.typing && next == null),
       child: switch (item) {
         ChatQuestion() => ChatQuestionView(
           question: item,

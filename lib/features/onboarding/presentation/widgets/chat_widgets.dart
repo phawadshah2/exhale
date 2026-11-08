@@ -237,8 +237,9 @@ class ChatMessageText extends StatelessWidget {
   );
 }
 
-/// Fades [child] in and lifts it 12 pt the first time [item] shows; at once
-/// under Reduce Motion, and never again for the same item.
+/// Grows [child]'s height in from zero while it fades in and lifts 12 pt,
+/// the first time [item] shows, so the list makes room for it smoothly; at
+/// once under Reduce Motion, and never again for the same item.
 class ChatEntrance extends StatefulWidget {
   const ChatEntrance({required this.item, required this.child, super.key});
 
@@ -286,13 +287,23 @@ class _ChatEntranceState extends State<ChatEntrance>
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _in,
-    builder: (context, child) => Opacity(
-      opacity: _in.value,
-      child: Transform.translate(
-        offset: Offset(0, _rise * (1 - _in.value)),
-        child: child,
-      ),
-    ),
+    builder: (context, child) {
+      final t = _in.value;
+      if (t == 1) return child!;
+      return ClipRect(
+        child: Align(
+          alignment: Alignment.topCenter,
+          heightFactor: t,
+          child: Opacity(
+            opacity: t,
+            child: Transform.translate(
+              offset: Offset(0, _rise * (1 - t)),
+              child: child,
+            ),
+          ),
+        ),
+      );
+    },
     child: widget.child,
   );
 }
