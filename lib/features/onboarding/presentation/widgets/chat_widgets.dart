@@ -289,8 +289,10 @@ class _ChatEntranceState extends State<ChatEntrance>
     animation: _in,
     builder: (context, child) {
       final t = _in.value;
-      if (t == 1) return child!;
+      // One shape throughout, so the message (and a card's field) is not
+      // built again when the entrance ends; it stops clipping once in.
       return ClipRect(
+        clipBehavior: t < 1 ? Clip.hardEdge : Clip.none,
         child: Align(
           alignment: Alignment.topCenter,
           heightFactor: t,

@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-08. Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `…11-04_to_11-05…`.
+Updated 2026-11-08 (handoff after C10). Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `…11-04_to_11-05…`.
 
 ## Where we are
 
@@ -10,55 +10,36 @@ Updated 2026-11-08. Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `�
 | M5 Release candidate | Done, merged to `main` (51e0bc6) |
 | M6 Plan details, Edit plan, Logs; M7 Stage management; polish rounds | Done on `feat/plan-and-stages`, walked in the simulator |
 | TestFlight build 1.0.0 (1) | Installed by Fawad; runs fine on his iPhone (2026-11-06) |
-| Onboarding redesign 2 (chat) | C1 to C8 committed; milestone end next |
+| Onboarding redesign 2 (chat) | C1 to C10 committed; milestone end next |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 ## Repo
 
 - `feat/plan-and-stages` pushed, not merged, no PR, CI not read. Last full suite at 7a80954:
   1211 passed.
-- `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`), not pushed. Commits: spec
-  and plan 96ebd6c, C1 cfbab93 … C6 e054678, C7 554adfd. C8 committed.
+- `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`), not pushed, clean. Latest:
+  C8 a6e38c9, round 3 395fef1, money card 7837e5c, C9 46b8912, C10 bf88e04 plus its review fix.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
 ## Onboarding chat (current goal)
 
-Spec `docs/superpowers/specs/2026-11-08-onboarding-chat-design.md` (from the canvas
-https://claude.ai/artifact/EMRb3MqhssfA6k4qLHTCQa, page "Questions inside the chat").
-Plan `docs/superpowers/plans/2026-11-08-onboarding-chat.md`.
+Spec `docs/superpowers/specs/2026-11-08-onboarding-chat-design.md` (sections 9 and 10 hold
+every change Fawad asked for on 2026-11-08). Plan `docs/superpowers/plans/2026-11-08-onboarding-chat.md`,
+C1 to C10 ticked, "Then" open.
 
-Done: the script as question cards with reopen-to-change (`providers/onboarding_chat.dart`);
-glass bar, top-filled list, jump button, solid dock (`steps/chat_step.dart`,
-`pages/onboarding_page.dart`); every question's card (`widgets/chat_cards.dart`); bubbles
-(`widgets/chat_widgets.dart`); the tagline under the button (`ChatTagline`,
-`OnboardingChat.tagline`); every onboarding test reworked for the welcome, chat and plan
-first run, and the change-habit steps (C7). `DayStep` is deleted (Fawad, 2026-11-08).
-Deviations are noted in the plan's ticked tasks.
+Done on 2026-11-08: C8 (main's welcome look; Sent → Read under the last excuse only;
+money card D, now vs plan; welcome word-by-word reveal, slowed); plan page
+(quit date right, Pick my own date above the button, C9 stage ring and day/week grid, Your
+date card); C10 (messages grow in, list follows the end per frame, keyboard slides over a
+fixed dock, avatars stay while Exhale types, tagline 8 pt under the button; a message
+keeps its state when its entrance ends). Never seen in the simulator.
 
-**C8 in progress** (Fawad, 2026-11-08; spec section 9, plan Task C8, boxes unticked): main's
-welcome colours, bubble shapes, 4/12 pt gaps, 450 ms entrance, no times or ticks in bubbles,
-tagline 4 pt under the button, dock to the bottom edge, button 8 pt above the safe area.
-Round 2 (Fawad, same day, in the spec): opening "You · <current time>"; Sent → Read only under
-the last excuse, answers show no status; habit order Vaping, Smoking, Alcohol, Pouches, Energy
-drinks, then the rest; money card coral (danger); glass bar fill 0.45 (`GlassSurface.opacity`);
-dock hidden while the keyboard is up; jump button follows up to the newest message. Welcome:
-headline word by word, then the subtitle, then each row's title, then its line
-(`StepReveal.delay`). Never seen in the simulator.
+Checks (bf88e04): analyze clean; `test/features/onboarding` 145 passed; `test/app` 21
+passed. Full suite: not run since 7a80954 (due at the milestone end).
 
-Round 3 (Fawad, same day): slower welcome (words 180 ms apart, 700 ms fades); plan cards
-pin the quit date right; "Pick my own date" sits above the button (`OnboardingStepFrame.above`)
-so the button matches the welcome and chat; dock padding back to the bare safe area (Fawad).
-Money card is mockup D (now vs plan), in the spec.
-C9 (46b8912): plan cards show stages (ring when closed, day/week grid when selected, Your
-date card). C10: chat grows messages in and follows the end per frame; the page skips
-resizing on the chat so the keyboard slides over a fixed dock; earlier avatars stay while
-Exhale types; tagline gap 8 pt on every step. Spec section 10.
-
-Checks (C10): analyze clean; `test/features/onboarding` 145 passed; `test/app` 21 passed.
-
-Test gotcha: an enabled `ChevronButton` and the plan's dots loop, so tests on the welcome or
-the plan turn on Reduce Motion (`reduceMotion` in `test/helpers/onboarding.dart`) or pump
-fixed time. A failing test there hangs past `--timeout`; run such files in the background.
+Test gotcha: an enabled `ChevronButton` loops, so welcome and plan tests turn on Reduce
+Motion (`reduceMotion` in `test/helpers/onboarding.dart`) or pump fixed time. A failing
+test there hangs past `--timeout`; run such files in the background.
 
 Waiting on Fawad (marked in the spec): the answer-fixing rule (section 4, plus the price
 skip rule), the italic tagline drafts (section 5), the Other habit and price fields, and
@@ -66,8 +47,10 @@ the day's answer bubble.
 
 ## Next action
 
-Milestone end (plan "Then"): independent review (Opus 5.5 high), full suite, then the
-simulator walk (welcome timing, money card, plan grid, chat smoothness with the keyboard).
+Milestone end (plan "Then"), on Opus 5.5 high: independent review of
+`feat/plan-and-stages..HEAD` (the chat onboarding), fix its findings, run the full suite, then the simulator walk (welcome
+timing, money card, plan grid, chat with the keyboard). Read the plan's "Then" and spec
+sections 9 and 10 first.
 
 ## Open items from Fawad's iPhone review (2026-11-06)
 

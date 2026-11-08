@@ -501,6 +501,30 @@ void main() {
       expect(opacity(tester), 1);
     });
 
+    testWidgets('a field inside keeps its text when the entrance ends', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: ChatEntrance(
+              item: ChatText.exhale(() => 'Hi'),
+              // No controller passed, so a rebuilt field would come back
+              // empty.
+              child: const TextField(),
+            ),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.enterText(find.byType(TextField), 'Alex');
+      final before = tester.state(find.byType(EditableText));
+
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(tester.state(find.byType(EditableText)), same(before));
+      expect(find.text('Alex'), findsOneWidget);
+    });
+
     testWidgets('under Reduce Motion a new message just appears', (
       tester,
     ) async {
