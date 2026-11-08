@@ -61,24 +61,29 @@ class WelcomeStep extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           StepReveal(
             index: 1,
-            // Capped: past this "negotiating" no longer fits a line.
+            // Capped, and shrunk to the width when "negotiating" would not
+            // fit a line.
             child: MediaQuery.withClampedTextScaling(
               maxScaleFactor: 1.5,
               child: Semantics(
                 label: OnboardingCopy.welcomeTitle,
                 excludeSemantics: true,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Stop', style: headline),
-                    _Struck(
-                      text: OnboardingCopy.welcomeNegotiating,
-                      style: headline?.copyWith(color: colors.outline),
-                      lineColor: colors.onSurface,
-                    ),
-                    Text('with your', style: headline),
-                    Text('cravings.', style: headline),
-                  ],
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Stop', style: headline),
+                      _Struck(
+                        text: OnboardingCopy.welcomeNegotiating,
+                        style: headline?.copyWith(color: colors.outline),
+                        lineColor: colors.onSurface,
+                      ),
+                      Text('with your', style: headline),
+                      Text('cravings.', style: headline),
+                    ],
+                  ),
                 ),
               ),
             ),

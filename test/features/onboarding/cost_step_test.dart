@@ -5,10 +5,7 @@ import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/cost_step.dart';
-import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
-import 'package:exhale/features/onboarding/presentation/widgets/currency_chip.dart';
-import 'package:exhale/features/settings/domain/entities/currency_choices.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:exhale/features/onboarding/presentation/steps/deal_step.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,17 +23,8 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<void> toHabit(WidgetTester tester) async {
-    await pumpOnboarding(tester);
-    await tester.pump();
-    await tester.tap(find.byType(WelcomeStep));
-    await tester.pump();
-    await tester.tap(find.text(OnboardingCopy.welcomeButton));
-    await tester.pumpAndSettle();
-  }
-
   Future<void> toCost(WidgetTester tester, Habit habit) async {
-    await toHabit(tester);
+    await pumpChangeHabit(tester);
     await tester.tap(find.text(habit.name));
     await tester.pumpAndSettle();
     await tapContinue(tester);
@@ -58,7 +46,7 @@ void main() {
 
   testWidgets('a pack price shows the month and year totals', (tester) async {
     await toCost(tester, Habit.smoking);
-    expect(find.text('4/6'), findsOneWidget);
+    expect(find.text('3/4'), findsOneWidget);
     expect(find.text(OnboardingCopy.costPrompt), findsOneWidget);
     expect(find.text('What does a pack cost?'), findsOneWidget);
     expect(find.text(OnboardingCopy.aMonth), findsNothing);
@@ -139,7 +127,7 @@ void main() {
     await tapContinue(tester);
 
     expect(find.text(OnboardingCopy.invalidPrice), findsOneWidget);
-    expect(find.text('4/6'), findsOneWidget);
+    expect(find.text('3/4'), findsOneWidget);
 
     await tester.enterText(priceField(), '1.2');
     await tester.pump();
@@ -158,49 +146,13 @@ void main() {
     await tester.tap(find.text(OnboardingCopy.skipPrice));
     await tester.pumpAndSettle();
 
-    expect(find.text('5/6'), findsOneWidget);
-    expect(find.text(OnboardingCopy.dayTitle), findsOneWidget);
+    expect(find.text('4/4'), findsOneWidget);
+    expect(find.byType(DealStep), findsOneWidget);
     expect(
-      ProviderScope.containerOf(tester.element(find.text('5/6')))
+      ProviderScope.containerOf(tester.element(find.byType(DealStep)))
           .read(onboardingFormProvider)
           .priceText,
       isEmpty,
-    );
-
-    await tester.disposeApp();
-  });
-
-  testWidgets('the currency chip opens a wheel of currencies', (tester) async {
-    await toCost(tester, Habit.smoking);
-    final start = CurrencyChoices.all.indexWhere((c) => c.symbol == 'AED');
-    expect(
-      find.descendant(
-        of: find.byType(CurrencyChip),
-        matching: find.text('AED'),
-      ),
-      findsOneWidget,
-    );
-
-    await tester.tap(find.byType(CurrencyChip));
-    await tester.pumpAndSettle();
-    expect(find.byType(CupertinoPicker), findsOneWidget);
-
-    await tester.drag(
-      find.byType(CupertinoPicker),
-      const Offset(0, -CurrencyChip.itemExtent * 2),
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Done'));
-    await tester.pumpAndSettle();
-
-    final picked = CurrencyChoices.all[start + 2].symbol;
-    expect(form(tester).currency, picked);
-    expect(
-      find.descendant(
-        of: find.byType(CurrencyChip),
-        matching: find.text(picked),
-      ),
-      findsOneWidget,
     );
 
     await tester.disposeApp();
@@ -211,28 +163,28 @@ void main() {
   ) async {
     await toCost(tester, Habit.smoking);
     await tapContinue(tester);
-    expect(find.text('5/6'), findsOneWidget);
+    expect(find.text('4/4'), findsOneWidget);
 
     for (var i = 0; i < 3; i++) {
       await tester.tap(find.byIcon(AppIcons.back));
       await tester.pumpAndSettle();
     }
-    expect(find.text('2/6'), findsOneWidget);
+    expect(find.text('1/4'), findsOneWidget);
 
     await tester.tap(find.text(Habit.socialMedia.name));
     await tester.pumpAndSettle();
-    expect(find.text('2/5'), findsOneWidget);
+    expect(find.text('1/3'), findsOneWidget);
 
     await tapContinue(tester);
-    expect(find.text('3/5'), findsOneWidget);
+    expect(find.text('2/3'), findsOneWidget);
     await tapContinue(tester);
-    expect(find.text('4/5'), findsOneWidget);
-    expect(find.text(OnboardingCopy.dayTitle), findsOneWidget);
+    expect(find.text('3/3'), findsOneWidget);
+    expect(find.byType(DealStep), findsOneWidget);
     expect(find.byType(CostStep), findsNothing);
 
     await tester.tap(find.byIcon(AppIcons.back));
     await tester.pumpAndSettle();
-    expect(find.text('3/5'), findsOneWidget);
+    expect(find.text('2/3'), findsOneWidget);
     expect(
       find.text(OnboardingCopy.amountTitle(Habit.socialMedia.units)),
       findsOneWidget,

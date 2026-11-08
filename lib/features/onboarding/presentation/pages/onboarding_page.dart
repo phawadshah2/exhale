@@ -8,7 +8,6 @@ import 'package:exhale/features/onboarding/presentation/providers/onboarding_for
 import 'package:exhale/features/onboarding/presentation/steps/amount_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/chat_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/cost_step.dart';
-import 'package:exhale/features/onboarding/presentation/steps/day_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/deal_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/habit_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
@@ -184,7 +183,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                                       OnboardingStep.amount =>
                                         const AmountStep(),
                                       OnboardingStep.cost => const CostStep(),
-                                      OnboardingStep.day => const DayStep(),
                                       OnboardingStep.deal => const DealStep(),
                                       OnboardingStep.chat => const ChatStep(),
                                     },

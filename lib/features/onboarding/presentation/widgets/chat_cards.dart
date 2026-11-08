@@ -833,6 +833,7 @@ class _FieldRow extends StatelessWidget {
               style: text.bodyLarge?.copyWith(color: card.ink),
               decoration: InputDecoration(
                 hintText: hint,
+                hintMaxLines: 2,
                 hintStyle: text.bodyLarge?.copyWith(color: card.muted),
                 counterText: '',
                 isDense: true,

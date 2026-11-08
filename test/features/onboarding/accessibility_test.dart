@@ -1,11 +1,15 @@
 import 'package:exhale/core/di/injection_container.dart';
+import 'package:exhale/core/platform/native_ui.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
-import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/chat_widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../helpers/fixed_clock.dart';
 import '../../helpers/large_text.dart';
+import '../../helpers/onboarding.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
@@ -14,56 +18,111 @@ void main() {
   setUp(() => setUpTestDependencies(FixedClock(DateTime(2026, 10, 20, 9))));
   tearDown(InjectionContainer.reset);
 
-  /// Walks the first-run flow, running [check] on every step.
+  /// Walks a first run with Reduce Motion on, running [check] on the
+  /// welcome, on each chat card as it opens, and on the plan.
   Future<void> walk(
     WidgetTester tester,
-    Future<void> Function() check,
-    double height,
-  ) async {
-    Future<void> next() async {
-      final button = find.text(OnboardingCopy.continueButton).hitTestable();
-      await tester.ensureVisible(button);
+    Future<void> Function() check, {
+    double height = 2400,
+    List<Override> overrides = const [],
+  }) async {
+    Future<void> tapThenCheck(Finder target) async {
+      await tester.ensureVisible(target);
       await tester.pumpAndSettle();
-      await tester.tap(button);
-      await tester.pumpAndSettle();
+      await tester.tap(target);
+      await settleChat(tester);
+      await check();
     }
 
-    await tester.pumpAppPastSplash(height: height);
-    await tester.tap(find.byType(WelcomeStep));
-    await tester.pump();
-    await check();
-    await tester.tap(find.text(OnboardingCopy.welcomeButton));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(Habit.smoking.name));
-    await tester.pumpAndSettle();
-    await check(); // Habit.
-    await next();
-    await check(); // Daily amount.
-    await next();
-    await check(); // Cost.
-    await next();
-    await check(); // Your day.
-    await next();
-    await check(); // The deal.
+    reduceMotion(tester);
+    await tester.pumpAppPastSplash(height: height, overrides: overrides);
+    await check(); // Welcome.
+    await tapThenCheck(find.text(OnboardingCopy.welcomeButton)); // Name.
+    await tester.enterText(
+      find.widgetWithText(TextField, OnboardingCopy.nameHint),
+      'Alex',
+    );
+    await tapThenCheck(labelled(OnboardingCopy.sendName)); // Habit.
+    await tapThenCheck(find.text(Habit.smoking.name)); // Amount.
+    await tapThenCheck(find.text(OnboardingCopy.aboutRight)); // Price.
+    await tapThenCheck(find.text(OnboardingCopy.other)); // Its field.
+    await tester.enterText(
+      find.widgetWithText(TextField, OnboardingCopy.priceHint),
+      '14.50',
+    );
+    await tapThenCheck(labelled(OnboardingCopy.sendPrice)); // Per pack.
+    await tapThenCheck(find.text(OnboardingCopy.aboutRight)); // Day.
+    await tapThenCheck(find.text(OnboardingCopy.thatsMyDay)); // Done.
+    await tapThenCheck(find.text(OnboardingCopy.chatSeePlan)); // The plan.
     await tester.disposeApp();
   }
 
-  testWidgets('every step meets the 44 pt tap target', (tester) async {
+  testWidgets('every screen meets the 44 pt tap target', (tester) async {
     final handle = tester.ensureSemantics();
     await walk(tester, () async {
       await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
-    }, 2400);
+    });
     handle.dispose();
   });
 
-  testWidgets('every step has no overflow at 3x text', (tester) async {
-    binding.platformDispatcher.textScaleFactorTestValue = 3;
+  testWidgets('every screen has no overflow at 200% text', (tester) async {
+    binding.platformDispatcher.textScaleFactorTestValue = 2;
     addTearDown(binding.platformDispatcher.clearTextScaleFactorTestValue);
     await loadAppFonts();
     final clipped = <String>{};
-    // An overflow on any step fails the test by itself.
-    await walk(tester, () async => clipped.addAll(tester.clippedTexts()), 5000);
+    // An overflow fails the test by itself. The tagline keeps to one line
+    // with an ellipsis by design.
+    await walk(tester, () async {
+      final taglines = {
+        for (final line in tester.widgetList<ChatTagline>(
+          find.byType(ChatTagline),
+        ))
+          line.text,
+      };
+      clipped.addAll(
+        tester.clippedTexts().where((text) => !taglines.contains(text)),
+      );
+    }, height: 5000);
     expect(clipped, isEmpty);
+  });
+
+  testWidgets('dark mode with Reduce Transparency renders every screen', (
+    tester,
+  ) async {
+    tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+    addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+    await walk(
+      tester,
+      () async => expect(tester.takeException(), isNull),
+      overrides: [
+        reduceTransparencyProvider.overrideWith((ref) => Stream.value(true)),
+      ],
+    );
+  });
+
+  testWidgets('cards are named groups and answers are buttons with ticks', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await pumpOnboardingChat(tester);
+    expect(labelled(OnboardingCopy.cardName), findsOneWidget);
+
+    await answerName(tester);
+    expect(labelled(OnboardingCopy.cardName), findsNothing);
+    expect(labelled(OnboardingCopy.cardHabit), findsOneWidget);
+    expect(
+      tester.getSemantics(
+        find.bySemanticsLabel(RegExp(r'^You: Alex, .*, read$')),
+      ),
+      isSemantics(
+        isButton: true,
+        hasTapAction: true,
+        hint: OnboardingCopy.changeHint,
+      ),
+    );
+
+    await tester.disposeApp();
+    handle.dispose();
   });
 }

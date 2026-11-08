@@ -240,12 +240,7 @@ class _CostStepState extends ConsumerState<CostStep> {
               ),
             ),
           ],
-          AnimatedSize(
-            duration: MediaQuery.disableAnimationsOf(context)
-                ? Duration.zero
-                : const Duration(milliseconds: 250),
-            curve: Curves.easeOutCubic,
-            alignment: Alignment.topCenter,
+          StepGrow(
             child: showTotals
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

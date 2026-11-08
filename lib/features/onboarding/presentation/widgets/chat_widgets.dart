@@ -219,23 +219,27 @@ class ChatMessageText extends StatelessWidget {
       TextSpan(
         children: [
           TextSpan(text: item.text),
+          // The span already scales with the text, so its own text must not
+          // scale again.
           WidgetSpan(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 3,
-                children: [
-                  Text(
-                    AppFormat.time(item.time),
-                    style: text.labelSmall?.copyWith(
-                      color: color.withValues(alpha: item.mine ? 0.65 : 0.6),
-                      fontSize: 11,
+            child: MediaQuery.withNoTextScaling(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 3,
+                  children: [
+                    Text(
+                      AppFormat.time(item.time),
+                      style: text.labelSmall?.copyWith(
+                        color: color.withValues(alpha: item.mine ? 0.65 : 0.6),
+                        fontSize: 11,
+                      ),
                     ),
-                  ),
-                  if (item.mine)
-                    DeliveryTicks(delivery: item.delivery, color: color),
-                ],
+                    if (item.mine)
+                      DeliveryTicks(delivery: item.delivery, color: color),
+                  ],
+                ),
               ),
             ),
           ),

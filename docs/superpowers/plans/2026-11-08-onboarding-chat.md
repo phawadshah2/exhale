@@ -90,15 +90,30 @@ moves.
 
 ### Task C7: Access and the rest of onboarding
 
-- [ ] Tests: `accessibility_test.dart` covers the chat (card group names, answer bubbles as
+- [x] Tests: `accessibility_test.dart` covers the chat (card group names, answer bubbles as
   buttons, 44 pt targets, text at 200% with no overflow, light mode, Reduce Transparency);
   `welcome_step_test.dart` back for the new welcome; `onboarding_page_test.dart` and the app
   tests run a first run through welcome, chat and plan. The habit, amount, cost and day step
   tests reach their steps through the change-habit flow (the first run no longer has them).
   `change_habit_test.dart` "declining the confirm…" times out in `pumpAndSettle` on the plan
   screen, already at the prototype commit f920bbd: find what never settles.
-- [ ] Fix what those tests find.
-- [ ] Commit `test(onboarding): cover the chat onboarding end to end`.
+- [x] Fix what those tests find.
+- [x] Found and decided (Fawad, 2026-11-08): an enabled `ChevronButton` and the plan's dots
+  loop forever, so `pumpAndSettle` never returns on the welcome or the plan. Tests turn
+  Reduce Motion on (`reduceMotion` in `test/helpers/onboarding.dart`); one plan test checks
+  the loops run with motion on and stop under Reduce Motion. `DayStep` was in no flow, so it,
+  `OnboardingStep.day`, its test and its copy are gone (the chat's day card replaced it).
+- [x] Also here: a zero-length `AnimatedSize` under Reduce Motion threw on the habit and cost
+  steps; `StepGrow` skips it instead. `deal_step_test` rewritten for the paces screen; the
+  cost step's currency test dropped (Change habit locks the currency; the chat's price card
+  covers the wheel); the form controller tests follow the three-step first run and the
+  saved name. Helpers: `chatToPlan`, `pumpAppToPlan`, `pumpChangeHabit`, `planButton`.
+- [x] The 200% walk found: a bubble's time and ticks scaled twice (`WidgetSpan`, now
+  unscaled inside); the name hint clipped (wraps to two lines); the pace card header clipped
+  (wraps at large text) and had no VoiceOver label (now "Brisk, 4 weeks, Nov 17"); the dot
+  dates clipped (3 columns at large text); "negotiating" did not fit at 1.5 (the headline
+  scales down to the width).
+- [x] Commit `test(onboarding): cover the chat onboarding end to end`.
 
 ### Then
 

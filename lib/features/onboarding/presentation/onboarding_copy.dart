@@ -248,10 +248,7 @@ abstract final class OnboardingCopy {
   static const skipPrice = "I'd rather not know";
   static const invalidPrice = 'Enter a valid price, or leave it empty.';
 
-  // Your day.
-  static const dayPrompt =
-      "When are you awake? I'll spread your limit across it.";
-  static const dayTitle = 'When does your day run?';
+  // Your day (the day window picker in Settings).
   static String awakeDuration(int minutes) {
     final rest = minutes % 60;
     return rest == 0 ? '${minutes ~/ 60} h' : '${minutes ~/ 60} h $rest min';
@@ -262,7 +259,6 @@ abstract final class OnboardingCopy {
   static const minuteUnit = 'min';
   static const wakeUp = 'Wake up';
   static const bedtime = 'Bedtime';
-  static const dayNote = 'Used to pace your limit. Never to lock you out.';
 
   // The deal.
   static const dealPrompt = "Here's the deal.";

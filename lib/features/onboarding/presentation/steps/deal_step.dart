@@ -271,13 +271,71 @@ class _PaceCard extends StatelessWidget {
     );
     final cardColor =
         context.theme.cardTheme.color ?? colors.surfaceContainerLow;
+    final name = Text(
+      pace.name,
+      overflow: TextOverflow.ellipsis,
+      style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+    );
+    final badge = DecoratedBox(
+      decoration: BoxDecoration(
+        color: exhale.emphasis,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        child: Text(
+          OnboardingCopy.suggested,
+          style: text.labelSmall?.copyWith(
+            color: exhale.onEmphasis,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.6,
+          ),
+        ),
+      ),
+    );
+    final weeks = Text(
+      OnboardingCopy.weeks(pace.weeks),
+      style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+    );
+    final date = Text(
+      AppFormat.monthDay(quit),
+      style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+    );
+    // The header is read as the card's label; the rest of an open card is
+    // read after it.
+    final header = ExcludeSemantics(
+      child: context.hasLargeText
+          ? Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [name, if (suggested) badge, weeks, date],
+            )
+          : Row(
+              spacing: 8,
+              children: [
+                Flexible(child: name),
+                if (suggested) badge,
+                Flexible(child: weeks),
+                const Spacer(),
+                date,
+              ],
+            ),
+    );
     return Semantics(
       button: true,
       inMutuallyExclusiveGroup: true,
       checked: open,
       onTap: onTap,
+      label: [
+        pace.name,
+        if (suggested) OnboardingCopy.suggested.toLowerCase(),
+        OnboardingCopy.weeks(pace.weeks),
+        AppFormat.monthDay(quit),
+      ].join(', '),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
+        excludeFromSemantics: true,
         onTap: onTap,
         child: AnimatedContainer(
           duration: AppMotion.swap,
@@ -302,56 +360,7 @@ class _PaceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: 10,
               children: [
-                Row(
-                  spacing: 8,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        pace.name,
-                        overflow: TextOverflow.ellipsis,
-                        style: text.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                    if (suggested)
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: exhale.emphasis,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          child: Text(
-                            OnboardingCopy.suggested,
-                            style: text.labelSmall?.copyWith(
-                              color: exhale.onEmphasis,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.6,
-                            ),
-                          ),
-                        ),
-                      ),
-                    Flexible(
-                      child: Text(
-                        OnboardingCopy.weeks(pace.weeks),
-                        style: text.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      AppFormat.monthDay(quit),
-                      style: text.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
+                header,
                 if (open) ...[
                   Text(
                     pace.blurb,
@@ -463,7 +472,7 @@ class _DotsState extends State<_Dots> with SingleTickerProviderStateMixin {
         animation: _loop,
         builder: (context, _) => LayoutBuilder(
           builder: (context, constraints) {
-            const columns = 6;
+            final columns = context.hasLargeText ? 3 : 6;
             final width = constraints.maxWidth / columns;
             return Wrap(
               runSpacing: 8,

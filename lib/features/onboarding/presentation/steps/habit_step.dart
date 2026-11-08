@@ -112,12 +112,7 @@ class _HabitStepState extends ConsumerState<HabitStep> {
               onTap: () => controller.selectHabit(HabitKind.custom),
             ),
           ),
-          AnimatedSize(
-            duration: MediaQuery.disableAnimationsOf(context)
-                ? Duration.zero
-                : const Duration(milliseconds: 250),
-            curve: Curves.easeOutCubic,
-            alignment: Alignment.topCenter,
+          StepGrow(
             child: kind == HabitKind.custom
                 ? Padding(
                     padding: const EdgeInsets.only(top: AppSpacing.gutterSm),

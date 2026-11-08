@@ -4,8 +4,7 @@ import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/theme/app_palette.dart';
 import 'package:exhale/core/theme/app_theme.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
-import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
-import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
+import 'package:exhale/features/onboarding/presentation/providers/onboarding_chat.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
@@ -15,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/fixed_clock.dart';
+import '../helpers/onboarding.dart';
 import '../helpers/pump_app.dart';
 
 void main() {
@@ -45,25 +45,13 @@ void main() {
     tester,
   ) async {
     clock.current = DateTime(2026, 10, 16, 8);
-    await tester.pumpAppPastSplash(height: 2400);
-    expect(find.text('1/6'), findsOneWidget);
+    await pumpAppToPlan(tester, habit: Habit.vaping.name);
 
-    await tester.tap(find.byType(WelcomeStep));
-    await tester.pump();
-    await tester.tap(find.text(OnboardingCopy.welcomeButton));
-    await tester.pumpAndSettle();
-    for (final label in ['2/6', '3/6', '4/6', '5/6']) {
-      expect(find.text(label), findsOneWidget);
-      await tester.tap(find.text(OnboardingCopy.continueButton).hitTestable());
-      await tester.pumpAndSettle();
-    }
-    expect(find.text('6/6'), findsOneWidget);
-
-    await tester.tap(find.text(OnboardingCopy.dealButton).hitTestable());
+    await tester.tap(planButton().hitTestable());
     await tester.pumpAndSettle();
 
     // Onboarding saved the day window, so Home opens on the timer.
-    final limit = Habit.vaping.defaultDailyAmount;
+    final limit = ChatHabit.of(HabitKind.vaping).typical;
     expect(find.text('0 of $limit · $limit left'), findsOneWidget);
 
     await tester.disposeApp();

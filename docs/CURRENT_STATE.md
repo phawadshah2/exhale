@@ -10,7 +10,7 @@ Updated 2026-11-08. Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `â
 | M5 Release candidate | Done, merged to `main` (51e0bc6) |
 | M6 Plan details, Edit plan, Logs; M7 Stage management; polish rounds | Done on `feat/plan-and-stages`, walked in the simulator |
 | TestFlight build 1.0.0 (1) | Installed by Fawad; runs fine on his iPhone (2026-11-06) |
-| Onboarding redesign 2 (chat) | In progress: Tasks C1 to C6 of 7 done on `feat/onboarding-chat-prototype` |
+| Onboarding redesign 2 (chat) | Tasks C1 to C7 done on `feat/onboarding-chat-prototype`; milestone end next |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
 
 ## Repo
@@ -19,7 +19,7 @@ Updated 2026-11-08. Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `â
   1211 passed.
 - `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`), not pushed, tree clean.
   Commits: spec and plan 96ebd6c, C1 cfbab93, C2 838aff3, C3 68c9427, C4 b5849d1, C5 98819c5,
-  C6 (tagline) after it.
+  C6 e054678, C7 after it.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
 ## Onboarding chat (current goal)
@@ -32,13 +32,17 @@ Done: the script as question cards with reopen-to-change (`providers/onboarding_
 glass bar, top-filled list, jump button, solid dock (`steps/chat_step.dart`,
 `pages/onboarding_page.dart`); every question's card (`widgets/chat_cards.dart`); bubbles
 (`widgets/chat_widgets.dart`); the tagline under the button (`ChatTagline`,
-`OnboardingChat.tagline`). Deviations are noted in the plan's ticked tasks.
+`OnboardingChat.tagline`); every onboarding test reworked for the welcome, chat and plan
+first run, and the change-habit steps (C7). `DayStep` is deleted (Fawad, 2026-11-08).
+Deviations are noted in the plan's ticked tasks.
 
-Checks at C6 (2026-11-08): format and `analyze --fatal-infos` clean; `onboarding_chat_test`,
-`chat_step_test`, `chat_cards_test`: 41 passed. Full suite not run (milestone end).
-Known failing, already at prototype f920bbd: first-run step tests (habit, amount, cost,
-day) and `change_habit_test` "declining the confirmâ€¦" (`pumpAndSettle` timeout on the plan
-screen). Both are in Task C7. Never seen in the simulator.
+Checks at C7 (2026-11-08): format and `analyze --fatal-infos` clean; every file in
+`test/features/onboarding` and `test/app/app_test.dart` passed, file by file. Full suite not
+run (milestone end). Never seen in the simulator.
+
+Test gotcha: an enabled `ChevronButton` and the plan's dots loop, so tests on the welcome or
+the plan turn on Reduce Motion (`reduceMotion` in `test/helpers/onboarding.dart`) or pump
+fixed time. A failing test there hangs past `--timeout`; run such files in the background.
 
 Waiting on Fawad (marked in the spec): the answer-fixing rule (section 4, plus the price
 skip rule), the italic tagline drafts (section 5), the Other habit and price fields, and
@@ -46,10 +50,9 @@ the day's answer bubble.
 
 ## Next action
 
-`execute-plan` Task C7 (access and the rest of onboarding: accessibility, welcome, page and
-app tests; the first-run step tests and `change_habit_test` failures). Read: this file, the
-plan's C7, spec sections 6 and Tests. Chat test helpers are in `test/helpers/onboarding.dart`.
-Then the milestone end (review, full suite, simulator walk).
+Milestone end for the onboarding chat (plan "Then"): the independent review (Opus 5.5
+high) and its fixes, the full suite with the JSON report, then the simulator walk for Fawad
+(dark and light, a container habit, a no-container habit, social media, fixing an answer).
 
 ## Open items from Fawad's iPhone review (2026-11-06)
 

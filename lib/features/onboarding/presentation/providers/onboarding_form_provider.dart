@@ -21,7 +21,7 @@ import 'package:exhale/features/tracking/presentation/providers/tracking_provide
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum OnboardingStep { welcome, chat, habit, amount, cost, day, deal }
+enum OnboardingStep { welcome, chat, habit, amount, cost, deal }
 
 /// The habit this form takes the place of; null on a first run. Overridden by
 /// a nested scope in `ChangeHabitPage`.

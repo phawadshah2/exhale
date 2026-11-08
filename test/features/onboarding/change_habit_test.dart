@@ -33,6 +33,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../helpers/fixed_clock.dart';
+import '../../helpers/onboarding.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
@@ -49,6 +50,7 @@ void main() {
   tearDown(InjectionContainer.reset);
 
   Future<void> openEditPlan(WidgetTester tester) async {
+    reduceMotion(tester);
     await tester.pumpAppPastSplash(height: 2400);
     await tester.tap(find.byTooltip('Edit plan'));
     await tester.pumpAndSettle();
@@ -74,7 +76,7 @@ void main() {
   }
 
   Future<void> shake(WidgetTester tester) async {
-    await tester.tap(find.text(OnboardingCopy.dealButton).hitTestable());
+    await tester.tap(planButton().hitTestable());
     await tester.pumpAndSettle();
   }
 
@@ -315,11 +317,7 @@ void main() {
     await openChangeHabit(tester);
     await walkToDeal(tester);
 
-    final press = tester
-        .widget<FilledButton>(
-          find.widgetWithText(FilledButton, OnboardingCopy.dealButton),
-        )
-        .onPressed!;
+    final press = tester.widget<FilledButton>(planButton()).onPressed!;
     press();
     press();
     await tester.pumpAndSettle();
@@ -348,11 +346,7 @@ void main() {
 
     // The busy button drops its handler, so a press from the same frame as
     // the save starting has to use the one from before.
-    final press = tester
-        .widget<FilledButton>(
-          find.widgetWithText(FilledButton, OnboardingCopy.dealButton),
-        )
-        .onPressed!;
+    final press = tester.widget<FilledButton>(planButton()).onPressed!;
     await shake(tester);
     await tester.tap(find.text(OnboardingCopy.replaceConfirm));
     await tester.pump();

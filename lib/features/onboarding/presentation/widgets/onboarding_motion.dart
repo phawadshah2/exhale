@@ -134,6 +134,25 @@ class _PressScaleState extends State<PressScale> {
   );
 }
 
+/// Animates a change in [child]'s height, except under Reduce Motion, where
+/// a zero-length [AnimatedSize] would lay itself out again mid-layout.
+class StepGrow extends StatelessWidget {
+  const StepGrow({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.topCenter,
+      child: child,
+    );
+  }
+}
+
 /// [value] as text that rolls up when it grows and down when it shrinks.
 class RollingNumber extends StatefulWidget {
   const RollingNumber({required this.value, this.style, super.key});
