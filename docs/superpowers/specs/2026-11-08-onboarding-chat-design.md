@@ -243,6 +243,21 @@ Copied from the welcome chat on `main` (`welcome_step.dart`, `you_bubble.dart`,
   the dots continue hands its avatar to the dots. The tagline sits 8 pt (was 4) under the
   button on every step, so the button still lines up.
 
+## 11. After the milestone review (decided 2026-11-09)
+
+- **Drinks priced one at a time**: alcohol and energy drinks keep the simple "What does one
+  cost you?" question. The answer saves as the preset's container (a $7 drink is a $35
+  bottle of 5; a $3 can is a $12 pack of 4), so Edit plan reads a real container the user
+  can adjust. The unit price, and so every figure, is unchanged. This replaces section 7's
+  "keep one unit per container" for those two habits.
+- **Short plans**: the grid keeps at least 7 columns; a plan under four weeks takes fewer
+  than 4 rows rather than squares the width of the card.
+- **Double tap**: no change. The page view ignores touches while it slides, so a double
+  tap on "See my plan" cannot land on the plan's save (a test guards it).
+- **Selected plan card**: stays as the mockup has it (header, stages line, grid, note); the
+  pace blurb, dots and rules stay out, since the grid shows the same thing.
+- **Tagline gap**: 8 pt under the button on every step, as section 10 says.
+
 ## Tests
 
 - `OnboardingChat` (the script, fake timers, Reduce Motion on): the opening order; each

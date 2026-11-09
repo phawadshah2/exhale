@@ -49,13 +49,10 @@ Back. Not walked: dark mode, Reduce Transparency, text at 200%, a no-container p
 habit, fixing every card. Log, once: chat Column overflow 29,310 px (`chat_step.dart:143`),
 likely a keyboard toggle in the simulator; not reproduced.
 
-Open for Fawad: the selected plan card dropped the pace blurb, the dots and the three rules
-(per the mockup); bring any back? C10 widened the tagline gap under the button to 8 pt
-(spec section 9 said 4); keep it? Alcohol and energy drinks save as a priced bottle/pack
-holding 1 (spec section 7), so Edit plan reads "Price of a bottle, 1 a bottle"; ask the
-container question or save per drink? Plans under 4 weeks now take fewer than 4 grid rows
-(spec section 10 said 4 to 7); fine? A quick double tap on "See my plan" lands on the plan's
-save button, which is live during its entrance.
+Decided (Claude, Fawad's go-ahead, 2026-11-09; spec section 11): drinks priced one at a
+time save as the preset container; short plans keep 7 grid columns; a double tap on "See my
+plan" already cannot save (the slide ignores touches; tested); selected card stays as the
+mockup; tagline gap 8 pt.
 
 Test gotcha: an enabled `ChevronButton` loops, so welcome and plan tests turn on Reduce Motion (`reduceMotion` in `test/helpers/onboarding.dart`) or pump fixed time. A failing test there hangs past `--timeout`; run such files in the background.
 
@@ -65,7 +62,7 @@ the day's answer bubble.
 
 ## Next action
 
-Fawad: answer the open questions above and walk the rest (dark, Reduce Transparency, 200%).
+Fawad: walk the rest (dark, Reduce Transparency, 200%, a priced drink in Edit plan).
 Then merge `feat/plan-and-stages` and this branch to `main` (PRs from compare links) and
 do the real iPhone pass.
 
