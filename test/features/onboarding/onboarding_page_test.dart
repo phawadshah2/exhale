@@ -3,6 +3,7 @@ import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/steps/chat_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/deal_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../helpers/fixed_clock.dart';
@@ -79,6 +80,23 @@ void main() {
     expect(find.byType(ChatStep), findsOneWidget);
     expect(find.byType(DealStep), findsNothing);
     expect(find.textContaining("That's everything, Alex."), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
+  testWidgets("the chat's tickers stop while the plan shows", (tester) async {
+    await pumpOnboardingChat(tester);
+    bool ticking() => TickerMode.valuesOf(
+      tester.element(find.byType(ChatStep, skipOffstage: false)),
+    ).enabled;
+    expect(ticking(), isTrue);
+
+    await chatToPlan(tester);
+    expect(ticking(), isFalse);
+
+    await tester.tap(back());
+    await tester.pumpAndSettle();
+    expect(ticking(), isTrue);
 
     await tester.disposeApp();
   });

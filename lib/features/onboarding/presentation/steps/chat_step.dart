@@ -37,6 +37,16 @@ class _ChatStepState extends ConsumerState<ChatStep>
     form: () => ref.read(onboardingFormProvider),
     controller: () => ref.read(onboardingFormProvider.notifier),
     reduceMotion: () => MediaQuery.disableAnimationsOf(context),
+    announce: (message) {
+      if (!mounted || !MediaQuery.accessibleNavigationOf(context)) return;
+      unawaited(
+        SemanticsService.sendAnnouncement(
+          View.of(context),
+          message,
+          Directionality.of(context),
+        ),
+      );
+    },
   );
   final ScrollController _scroll = ScrollController();
   bool _started = false;

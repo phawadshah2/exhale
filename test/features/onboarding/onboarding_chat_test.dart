@@ -1,8 +1,11 @@
 import 'package:exhale/core/di/injection_container.dart';
+import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
+import 'package:exhale/features/onboarding/presentation/onboarding_pace.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_chat.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
+import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -243,6 +246,51 @@ void main() {
     expect(chat.done, isTrue);
   });
 
+  testWidgets("Exhale's new messages are announced, not the user's", (
+    tester,
+  ) async {
+    final heard = <String>[];
+    chat.dispose();
+    chat = OnboardingChat(
+      form: () => container.read(onboardingFormProvider),
+      controller: () => container.read(onboardingFormProvider.notifier),
+      reduceMotion: () => still,
+      announce: heard.add,
+    );
+    await throughName(tester);
+
+    expect(heard, [
+      for (final item in chat.items)
+        if (item is ChatText && !item.mine) item.text,
+    ]);
+    expect(heard, hasLength(greaterThanOrEqualTo(3)));
+    expect(heard, isNot(contains('Alex')));
+  });
+
+  testWidgets('the money card uses the pace the plan screen opens on', (
+    tester,
+  ) async {
+    await throughAmount(tester, HabitKind.caffeine);
+    chat.pickPrice(4);
+    await settle(tester);
+
+    final f = form();
+    final plan = ReductionPlan(
+      startDay: f.startDay,
+      startLimit: 3,
+      quitDay: OnboardingPace.suggestedQuitDay(f.startDay, 3),
+    );
+    var units = 0;
+    for (var d = 0; d < 365; d++) {
+      units += plan.limitOn(plan.startDay.addDays(d));
+    }
+    final money = chat.items.whereType<MoneyCard>().single.figures;
+    expect(
+      money.withPlan,
+      AppFormat.money(units * 400, symbol: r'$', wholeUnits: true),
+    );
+  });
+
   testWidgets('a habit without a container prices one and skips the pod', (
     tester,
   ) async {
@@ -255,7 +303,8 @@ void main() {
 
     final money = chat.items.whereType<MoneyCard>().single.figures;
     expect(money.perYear, r'$4,380');
-    expect(money.withPlan, r'$168');
+    // The plan screen opens on Brisk (4 weeks) at 3 a day.
+    expect(money.withPlan, r'$228');
     expect(chat.ask, ChatAsk.day);
   });
 
@@ -410,7 +459,10 @@ void main() {
       );
       final money = chat.items.whereType<MoneyCard>().single.figures;
       expect(money.perYear, r'$2,433');
-      expect(money.withPlan, r'$317');
+      // Gentle (12 weeks), the pace the plan screen opens on at 20.
+      expect(money.withPlan, r'$297');
+      // Whole units, so the kept figure is the difference shown.
+      expect(money.kept, r'$2,136');
       expect(asked(ChatAsk.day).text, OnboardingCopy.daySpread(20));
       expect(chat.ask, ChatAsk.day);
     });
@@ -481,6 +533,38 @@ void main() {
         isNot(contains(OnboardingCopy.skipPriceReply('sessions'))),
       );
       expect(chat.ask, ChatAsk.perContainer);
+    });
+
+    testWidgets('the newest card still answers while another is reopened', (
+      tester,
+    ) async {
+      await toTheDay(tester);
+      expect(chat.reopen(answerTo(ChatAsk.name)), isTrue);
+
+      chat.sendDay();
+      await settle(tester);
+
+      expect(chat.reopened, isNull);
+      expect(asked(ChatAsk.name).open, isFalse);
+      expect(answerTo(ChatAsk.name).text, 'Alex');
+      expect(answerTo(ChatAsk.day).mine, isTrue);
+      expect(chat.done, isTrue);
+    });
+
+    testWidgets('a habit picked while the name is reopened sets its amounts', (
+      tester,
+    ) async {
+      await throughName(tester);
+      chat
+        ..reopen(answerTo(ChatAsk.name))
+        ..pickHabit(HabitKind.vaping);
+      await settle(tester);
+
+      expect(asked(ChatAsk.name).open, isFalse);
+      expect(form().habitKind, HabitKind.vaping);
+      expect(form().startLimit, ChatHabit.of(HabitKind.vaping).typical);
+      expect(form().unitsPerContainer, ChatHabit.of(HabitKind.vaping).per);
+      expect(chat.ask, ChatAsk.amount);
     });
 
     testWidgets('one card reopens at a time', (tester) async {

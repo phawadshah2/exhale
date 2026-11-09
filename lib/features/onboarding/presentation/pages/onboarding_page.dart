@@ -175,8 +175,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                       onPageChanged: (i) => setState(() => _current = steps[i]),
                       children: [
                         for (final step in steps)
-                          KeyedSubtree(
+                          // The chat stays alive off screen; its tickers
+                          // stop there.
+                          TickerMode(
                             key: ValueKey(step),
+                            enabled:
+                                step != OnboardingStep.chat ||
+                                _current == OnboardingStep.chat,
                             child: step == OnboardingStep.chat
                                 ? const ChatStep()
                                 : SafeArea(

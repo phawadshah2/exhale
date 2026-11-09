@@ -10,6 +10,7 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_dialogs.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
+import 'package:exhale/features/onboarding/presentation/onboarding_pace.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/chevron_button.dart';
@@ -21,16 +22,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class _Pace {
-  const _Pace(this.name, this.weeks);
-
-  final String name;
-  final int weeks;
-
-  int get days => weeks * 7;
-}
-
-const _paces = [_Pace('Brisk', 4), _Pace('Steady', 8), _Pace('Gentle', 12)];
+const List<OnboardingPace> _paces = OnboardingPace.all;
 
 /// Step 3: three ways to zero, each showing its stages, an optional date of
 /// the user's own, and the save.
@@ -48,9 +40,6 @@ class _DealStepState extends ConsumerState<DealStep> {
   /// The replace alert is up, so another press must not open a second one.
   bool _asking = false;
 
-  /// The date picked with "Pick my own date"; its card stays once picked.
-  LogicalDay? _custom;
-
   @override
   void initState() {
     super.initState();
@@ -63,20 +52,8 @@ class _DealStepState extends ConsumerState<DealStep> {
     });
   }
 
-  int _suggestedIndex(OnboardingFormState form) {
-    final target = ReductionPlan.suggestedQuitDay(
-      form.startDay,
-      form.startLimit,
-    ).daysSince(form.startDay);
-    var best = 0;
-    for (var i = 1; i < _paces.length; i++) {
-      if ((_paces[i].days - target).abs() <=
-          (_paces[best].days - target).abs()) {
-        best = i;
-      }
-    }
-    return best;
-  }
+  int _suggestedIndex(OnboardingFormState form) =>
+      OnboardingPace.suggestedIndex(form.startDay, form.startLimit);
 
   void _choose(LogicalDay quitDay) =>
       ref.read(onboardingFormProvider.notifier).setQuitDay(quitDay);
@@ -96,7 +73,7 @@ class _DealStepState extends ConsumerState<DealStep> {
     final isPace = _paces.any(
       (p) => form.quitDay == form.startDay.addDays(p.days),
     );
-    if (!isPace) setState(() => _custom = form.quitDay);
+    if (!isPace) controller.keepOwnQuitDay(form.quitDay);
   }
 
   Future<void> _shake() async {
@@ -139,7 +116,7 @@ class _DealStepState extends ConsumerState<DealStep> {
     );
     // A date that is no pace's, as when coming back to this step, is the
     // user's own.
-    final custom = _custom ?? (selected < 0 ? form.quitDay : null);
+    final custom = form.ownQuitDay ?? (selected < 0 ? form.quitDay : null);
     final cards = [
       for (final (i, pace) in _paces.indexed)
         (
@@ -508,8 +485,8 @@ class _StageRingPainter extends CustomPainter {
 
 /// [plan]'s limits as squares, the quit day last as a check: one a day
 /// while that fits [_maxColumns] × [_maxRows], else one per week (or per N
-/// weeks). It keeps [_minRows] to [_maxRows] rows, using the fewest columns
-/// that fit, so a shorter plan gets bigger squares. VoiceOver reads it as
+/// weeks). It uses the fewest columns that fit in [_maxRows] rows, so a
+/// shorter plan gets bigger squares. VoiceOver reads it as
 /// one line.
 class _StageGrid extends StatelessWidget {
   const _StageGrid({required this.plan, super.key});
@@ -519,7 +496,6 @@ class _StageGrid extends StatelessWidget {
   static const int _maxColumns = 14;
   static const int _minColumns = 7;
   static const int _maxRows = 7;
-  static const int _minRows = 4;
   static const double _gap = 2;
 
   /// Days each square stands for.
@@ -529,14 +505,10 @@ class _StageGrid extends StatelessWidget {
     return ((plan.totalDays + 1) / cells / 7).ceil() * 7;
   }
 
-  /// Columns for [count] squares.
-  static int columns(int count) {
-    var columns = (count / _maxRows).ceil().clamp(_minColumns, _maxColumns);
-    if ((count / columns).ceil() < _minRows) {
-      columns = math.max(1, (count / _minRows).ceil());
-    }
-    return columns;
-  }
+  /// Columns for [count] squares. Never fewer than [_minColumns], so a
+  /// plan of under four weeks takes fewer rows instead of huge squares.
+  static int columns(int count) =>
+      (count / _maxRows).ceil().clamp(_minColumns, _maxColumns);
 
   @override
   Widget build(BuildContext context) {

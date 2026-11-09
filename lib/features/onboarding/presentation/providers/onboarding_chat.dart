@@ -5,7 +5,9 @@ import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
+import 'package:exhale/features/onboarding/presentation/onboarding_pace.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
+import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/settings/domain/entities/day_window.dart';
 import 'package:flutter/foundation.dart';
 
@@ -152,11 +154,15 @@ class OnboardingChat extends ChangeNotifier {
     required this.form,
     required this.controller,
     required this.reduceMotion,
+    this.announce,
   });
 
   final OnboardingFormState Function() form;
   final OnboardingFormController Function() controller;
   final bool Function() reduceMotion;
+
+  /// Reads a new Exhale message out to VoiceOver.
+  final void Function(String message)? announce;
 
   static const String customUnit = 'time';
 
@@ -197,7 +203,19 @@ class OnboardingChat extends ChangeNotifier {
   void _add(ChatItem item, {DateTime? at}) {
     item.time = at ?? DateTime.now();
     items.add(item);
+    if (item is ChatText && !item.mine) announce?.call(item.text);
     notifyListeners();
+  }
+
+  /// The open question for [ask]. Answering the newest card while an
+  /// earlier one is reopened folds the reopened one as it is.
+  ChatQuestion? _openFor(ChatAsk ask) {
+    if (_reopened case final reopened? when reopened.ask != ask) {
+      reopened.open = false;
+      _reopened = null;
+    }
+    final open = question;
+    return open?.ask == ask ? open : null;
   }
 
   ChatText? _answerOf(ChatQuestion question) {
@@ -312,8 +330,9 @@ class OnboardingChat extends ChangeNotifier {
     VoidCallback then, {
     Object? Function()? path,
   }) {
-    final open = question;
-    if (typing || open == null || open.ask != ask) return;
+    if (typing) return;
+    final open = _openFor(ask);
+    if (open == null) return;
     open.open = false;
     if (_answerOf(open) case final answered?) {
       _reopened = null;
@@ -399,7 +418,7 @@ class OnboardingChat extends ChangeNotifier {
     final name = customName?.trim() ?? '';
     if (kind == HabitKind.custom && name.isEmpty) return;
     final chosen = ChatHabit.of(kind);
-    final question = this.question;
+    final question = typing ? null : _openFor(ChatAsk.habit);
     final again = question != null && _answerOf(question) != null;
     _answer(
       ChatAsk.habit,
@@ -545,19 +564,28 @@ class OnboardingChat extends ChangeNotifier {
   ];
 
   /// The plan's spend is its daily limits over the next 365 days, the
-  /// plan the chat would make now (the suggested pace).
+  /// plan the chat would make now: the pace the plan screen opens on, or
+  /// the date chosen there. Figures are whole units, so the three agree.
   MoneyFigures _moneyFigures() {
     final f = form();
     final unit = f.unitPriceCents ?? 0;
-    final asItIs = (unit * f.startLimit * 365).round();
+    int whole(num cents) => (cents / 100).round() * 100;
+    final asItIs = whole(unit * f.startLimit * 365);
     var units = f.startLimit * 365;
-    if (f.preview case final plan?) {
+    final plan = f.quitPreset == null
+        ? f.preview
+        : ReductionPlan(
+            startDay: f.startDay,
+            startLimit: f.startLimit,
+            quitDay: OnboardingPace.suggestedQuitDay(f.startDay, f.startLimit),
+          );
+    if (plan != null) {
       units = 0;
       for (var d = 0; d < 365; d++) {
         units += plan.limitOn(plan.startDay.addDays(d));
       }
     }
-    final withPlan = (unit * units).round();
+    final withPlan = whole(unit * units);
     String money(int cents) =>
         AppFormat.money(cents, symbol: f.currency, wholeUnits: true);
     return (

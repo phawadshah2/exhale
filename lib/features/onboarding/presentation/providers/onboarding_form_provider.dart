@@ -63,6 +63,7 @@ class OnboardingFormState {
     required this.currency,
     this.replaced,
     this.quitPreset = QuitPreset.suggested,
+    this.ownQuitDay,
     this.habitKind = defaultHabit,
     this.customName = '',
     this.customUnit = '',
@@ -125,6 +126,10 @@ class OnboardingFormState {
 
   /// Null once the user picks a date on the wheel.
   final QuitPreset? quitPreset;
+
+  /// A date picked on the plan screen that is no pace's; its card stays
+  /// after another pace is chosen.
+  final LogicalDay? ownQuitDay;
 
   final HabitKind habitKind;
   final String customName;
@@ -231,6 +236,7 @@ class OnboardingFormState {
   OnboardingFormState copyWith({
     LogicalDay? quitDay,
     QuitPreset? Function()? quitPreset,
+    LogicalDay? ownQuitDay,
     HabitKind? habitKind,
     String? customName,
     String? customUnit,
@@ -248,6 +254,7 @@ class OnboardingFormState {
     startDay: startDay,
     quitDay: quitDay ?? this.quitDay,
     quitPreset: quitPreset != null ? quitPreset() : this.quitPreset,
+    ownQuitDay: ownQuitDay ?? this.ownQuitDay,
     habitKind: habitKind ?? this.habitKind,
     customName: customName ?? this.customName,
     customUnit: customUnit ?? this.customUnit,
@@ -332,6 +339,10 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
       errorMessage: () => null,
     );
   }
+
+  /// Remembers [day] as the user's own date on the plan screen.
+  void keepOwnQuitDay(LogicalDay day) =>
+      state = state.copyWith(ownQuitDay: day);
 
   void setPriceText(String text) =>
       state = state.copyWith(priceText: text, errorMessage: () => null);

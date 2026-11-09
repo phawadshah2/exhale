@@ -134,6 +134,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(form(tester).quitDay, today.addDays(84));
     expect(find.text(OnboardingCopy.customPace), findsOneWidget);
+    // The form keeps it, so leaving the step does not lose the card.
+    expect(form(tester).ownQuitDay, today.addDays(40));
 
     await tester.tap(find.text(OnboardingCopy.customPace));
     await tester.pumpAndSettle();
@@ -162,7 +164,7 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('the grid keeps 4 to 7 rows, by days or by weeks', (
+  testWidgets('the grid keeps 7 to 14 columns and up to 7 rows', (
     tester,
   ) async {
     await pumpAppToPlan(tester);
@@ -195,6 +197,17 @@ void main() {
     await pickDate(tester, today.addDays(180));
     expect(grid(), (26, 4));
     expect(find.text(OnboardingCopy.gridNote(7)), findsOneWidget);
+
+    // Short plans keep 7 columns and take fewer rows, not huge squares.
+    await pickDate(tester, today.addDays(20));
+    expect(grid(), (20, 3));
+    await pickDate(tester, today.addDays(3));
+    expect(grid(), (3, 1));
+    final card = tester.getSize(find.byKey(DealStep.gridKey)).width;
+    expect(
+      tester.getSize(find.byKey(DealStep.gridKey)).height,
+      lessThan(card / 6),
+    );
 
     await tester.disposeApp();
   });
