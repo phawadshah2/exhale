@@ -384,15 +384,21 @@ void main() {
         findsNothing,
       );
 
+      await tester.disposeApp();
+    });
+
+    testWidgets('the status moves to each new answer, Sent then Read', (
+      tester,
+    ) async {
+      await pumpOnboardingChat(tester);
       await answerName(tester);
-      expect(
-        tester
-            .widgetList<ChatStatus>(
-              find.byType(ChatStatus, skipOffstage: false),
-            )
-            .map((status) => status.item.text),
-        everyElement(OnboardingCopy.excuses.last),
+
+      final statuses = tester.widgetList<ChatStatus>(
+        find.byType(ChatStatus, skipOffstage: false),
       );
+      expect(statuses, hasLength(1));
+      expect(statuses.single.item.answers, isNotNull);
+      expect(statuses.single.item.delivery, Delivery.read);
 
       await tester.disposeApp();
     });

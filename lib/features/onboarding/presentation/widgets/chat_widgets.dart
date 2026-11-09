@@ -479,7 +479,8 @@ class MoneyCardView extends StatelessWidget {
     final colors = context.colors;
     final exhale = context.exhale;
     final text = context.textTheme;
-    final bubble = ChatBubbleColors.of(context, mine: false);
+    // The card wears the user's bubble colour: it is their numbers.
+    final bubble = ChatBubbleColors.of(context, mine: true);
     final figures = card.figures;
     final label = text.bodySmall?.copyWith(color: bubble.foreground);
     final strong = label?.copyWith(fontWeight: FontWeight.w700);
@@ -541,7 +542,7 @@ class _MoneyBar extends StatelessWidget {
       height: 8,
       alignment: Alignment.centerLeft,
       decoration: BoxDecoration(
-        color: context.colors.outlineVariant,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(4),
       ),
       child: FractionallySizedBox(

@@ -349,8 +349,13 @@ class OnboardingChat extends ChangeNotifier {
     final still = reduceMotion();
     apply();
     tagline = _taglineAfter(ask);
-    _add(ChatText.mine(text, answers: open));
-    _later(still ? 200 : _replyMs, then);
+    final sent = ChatText.mine(text, answers: open);
+    _add(sent);
+    if (still) _mark(sent, Delivery.read);
+    _later(still ? 200 : _replyMs, () {
+      if (!still) _mark(sent, Delivery.read);
+      then();
+    });
   }
 
   String _taglineAfter(ChatAsk ask) {

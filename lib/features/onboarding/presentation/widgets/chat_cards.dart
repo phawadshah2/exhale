@@ -255,22 +255,16 @@ class _HabitCardState extends ConsumerState<HabitCard> {
       );
     }
     const habits = ChatHabit.all;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Wrap(
+      spacing: 6,
       children: [
-        for (var row = 0; row < habits.length; row += 3)
-          Wrap(
-            spacing: 6,
-            children: [
-              for (final habit in habits.skip(row).take(3))
-                _HabitPill(
-                  label: chat.labelOf(habit.kind),
-                  dashed: habit.kind == HabitKind.custom,
-                  onTap: habit.kind == HabitKind.custom
-                      ? () => setState(() => _other = true)
-                      : () => chat.pickHabit(habit.kind),
-                ),
-            ],
+        for (final habit in habits)
+          _HabitPill(
+            label: chat.labelOf(habit.kind),
+            dashed: habit.kind == HabitKind.custom,
+            onTap: habit.kind == HabitKind.custom
+                ? () => setState(() => _other = true)
+                : () => chat.pickHabit(habit.kind),
           ),
       ],
     );
