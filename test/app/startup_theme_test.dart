@@ -22,7 +22,7 @@ void main() {
 
   testWidgets('the very first frame uses the saved theme', (tester) async {
     await sl<SaveSettings>()(
-      const AppSettings(themePreference: ThemePreference.light),
+      const AppSettings(themePreference: ThemePreference.dark),
     );
 
     await tester.pumpWidget(
@@ -33,7 +33,7 @@ void main() {
     );
 
     final splash = tester.element(find.byType(SplashPage));
-    expect(Theme.of(splash).brightness, Brightness.light);
+    expect(Theme.of(splash).brightness, Brightness.dark);
 
     await tester.disposeApp();
   });

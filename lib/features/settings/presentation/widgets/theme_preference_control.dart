@@ -11,7 +11,7 @@ class ThemePreferenceControl extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selected =
         ref.watch(settingsProvider).value?.themePreference ??
-        ThemePreference.system;
+        ThemePreference.light;
 
     return PillSegmentedControl<ThemePreference>(
       selected: selected,

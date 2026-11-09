@@ -10,6 +10,7 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/circle_icon_button.dart';
 import 'package:exhale/core/widgets/load_failure.dart';
 import 'package:exhale/core/widgets/scroll_reveal.dart';
+import 'package:exhale/core/widgets/status_bar_glass.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/habit/presentation/habit_wording.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
@@ -115,116 +116,123 @@ class _PlanDetails extends ConsumerWidget {
     }
 
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: AppSpacing.page.copyWith(
-          top: insets.top + AppSpacing.sm,
-          bottom: insets.bottom + AppSpacing.lg,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: AppSpacing.md,
-          children: [
-            ScrollReveal(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const _BackButton(),
-                  EditPill(habitId: habitId),
-                ],
+      body: StatusBarGlass(
+        child: SingleChildScrollView(
+          padding: AppSpacing.page.copyWith(
+            top: insets.top + AppSpacing.sm,
+            bottom: insets.bottom + AppSpacing.lg,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: AppSpacing.md,
+            children: [
+              ScrollReveal(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const _BackButton(),
+                    EditPill(habitId: habitId),
+                  ],
+                ),
               ),
-            ),
-            ScrollReveal(
-              index: 1,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: AppSpacing.xs,
-                children: [
-                  // "Regrettably." has to fit one line on the smallest phone.
-                  MediaQuery.withClampedTextScaling(
-                    maxScaleFactor: 1.5,
-                    child: Text(
-                      report.quitReached ? PlanCopy.quitTitle : PlanCopy.title,
-                      style: text.headlineLarge,
+              ScrollReveal(
+                index: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: AppSpacing.xs,
+                  children: [
+                    // "Regrettably." has to fit one line on the smallest phone.
+                    MediaQuery.withClampedTextScaling(
+                      maxScaleFactor: 1.5,
+                      child: Text(
+                        report.quitReached
+                            ? PlanCopy.quitTitle
+                            : PlanCopy.title,
+                        style: text.headlineLarge,
+                      ),
                     ),
-                  ),
-                  Text(
-                    PlanCopy.lead,
-                    style: text.bodyMedium?.copyWith(
-                      color: context.colors.onSurfaceVariant,
+                    Text(
+                      PlanCopy.lead,
+                      style: text.bodyMedium?.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
                     ),
+                  ],
+                ),
+              ),
+              ScrollReveal(
+                index: 2,
+                child: PlanTotalsCard(
+                  habitId: habitId,
+                  totals: report.totals,
+                  habit: habit,
+                ),
+              ),
+              if (report.behind.isNotEmpty)
+                _Section(
+                  index: 3,
+                  title: PlanCopy.behindTitle,
+                  side: behindSaved == null
+                      ? null
+                      : PlanCopy.savedSide(money(behindSaved)),
+                  children: [
+                    for (final group in report.behind) ...[
+                      if (group.earlierUntil case final until?)
+                        _GroupLabel(PlanCopy.earlierPlan(until))
+                      else if (report.showsThisPlanLabel)
+                        const _GroupLabel(PlanCopy.thisPlan),
+                      for (final stage in group.stages)
+                        StageRow(
+                          report: stage,
+                          kind: StageRowKind.behind,
+                          habit: habit,
+                          window: window,
+                          onDay: openDay,
+                        ),
+                    ],
+                  ],
+                ),
+              if (current != null)
+                _Section(
+                  index: 4,
+                  title: PlanCopy.youTitle,
+                  side: PlanCopy.stageOf(
+                    current.stage.number,
+                    report.stageCount,
                   ),
-                ],
-              ),
-            ),
-            ScrollReveal(
-              index: 2,
-              child: PlanTotalsCard(
-                habitId: habitId,
-                totals: report.totals,
-                habit: habit,
-              ),
-            ),
-            if (report.behind.isNotEmpty)
-              _Section(
-                index: 3,
-                title: PlanCopy.behindTitle,
-                side: behindSaved == null
-                    ? null
-                    : PlanCopy.savedSide(money(behindSaved)),
-                children: [
-                  for (final group in report.behind) ...[
-                    if (group.earlierUntil case final until?)
-                      _GroupLabel(PlanCopy.earlierPlan(until))
-                    else if (report.showsThisPlanLabel)
-                      const _GroupLabel(PlanCopy.thisPlan),
-                    for (final stage in group.stages)
+                  highlighted: true,
+                  children: [
+                    CurrentStageCard(
+                      report: current,
+                      today: today,
+                      nextLimit: report.ahead.firstOrNull?.stage.limit ?? 0,
+                      onDay: openDay,
+                    ),
+                  ],
+                ),
+              if (report.ahead.isNotEmpty)
+                _Section(
+                  index: 5,
+                  title: PlanCopy.aheadTitle,
+                  side: aheadToSave == null
+                      ? null
+                      : PlanCopy.toSaveSide(money(aheadToSave)),
+                  children: [
+                    for (final stage in report.ahead)
                       StageRow(
                         report: stage,
-                        kind: StageRowKind.behind,
+                        kind: StageRowKind.ahead,
                         habit: habit,
                         window: window,
-                        onDay: openDay,
                       ),
                   ],
-                ],
+                ),
+              ScrollReveal(
+                index: 6,
+                child: _FinishRow(report: report, habit: habit, today: today),
               ),
-            if (current != null)
-              _Section(
-                index: 4,
-                title: PlanCopy.youTitle,
-                side: PlanCopy.stageOf(current.stage.number, report.stageCount),
-                highlighted: true,
-                children: [
-                  CurrentStageCard(
-                    report: current,
-                    today: today,
-                    nextLimit: report.ahead.firstOrNull?.stage.limit ?? 0,
-                    onDay: openDay,
-                  ),
-                ],
-              ),
-            if (report.ahead.isNotEmpty)
-              _Section(
-                index: 5,
-                title: PlanCopy.aheadTitle,
-                side: aheadToSave == null
-                    ? null
-                    : PlanCopy.toSaveSide(money(aheadToSave)),
-                children: [
-                  for (final stage in report.ahead)
-                    StageRow(
-                      report: stage,
-                      kind: StageRowKind.ahead,
-                      habit: habit,
-                      window: window,
-                    ),
-                ],
-              ),
-            ScrollReveal(
-              index: 6,
-              child: _FinishRow(report: report, habit: habit, today: today),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

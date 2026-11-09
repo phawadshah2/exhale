@@ -15,6 +15,9 @@ import 'package:exhale/features/plan/domain/repositories/plan_repository.dart';
 import 'package:exhale/features/plan/domain/repositories/stage_check_repository.dart';
 import 'package:exhale/features/plan/domain/usecases/answer_stage_check.dart';
 import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
+import 'package:exhale/features/settings/domain/entities/app_settings.dart';
+import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
+import 'package:exhale/features/settings/domain/usecases/save_settings.dart';
 import 'package:exhale/features/tracking/domain/usecases/add_habit_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -155,7 +158,7 @@ void main() {
   group('hold card', () {
     final nov9 = DateTime(2026, 11, 9, 15, 42);
 
-    Future<void> holdOnNov9(WidgetTester tester) async {
+    Future<void> holdOnNov9(WidgetTester tester, {bool dark = false}) async {
       await tester.runAsync(() async {
         await start(nov9);
         await logFailingWeek();
@@ -165,6 +168,11 @@ void main() {
           checkDay: _nov(9),
           hold: PlanHold(startDay: _nov(9)),
         );
+        if (dark) {
+          await sl<SaveSettings>()(
+            const AppSettings(themePreference: ThemePreference.dark),
+          );
+        }
       });
       await pumpHome(tester);
     }
@@ -202,9 +210,7 @@ void main() {
     });
 
     testWidgets('date tiles stay soft in dark mode', (tester) async {
-      tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
-      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
-      await holdOnNov9(tester);
+      await holdOnNov9(tester, dark: true);
 
       final colors = Theme.of(tester.element(find.text('Next drop')))
           .colorScheme;
