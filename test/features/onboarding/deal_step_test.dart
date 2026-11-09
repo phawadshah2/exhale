@@ -343,6 +343,47 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('a double tap on See my plan does not save the plan', (
+    tester,
+  ) async {
+    reduceMotion(tester);
+    await tester.pumpAppPastSplash(height: 2400);
+    await tester.tap(find.text(OnboardingCopy.welcomeButton));
+    await settleChat(tester);
+    await chatToPlan(tester, open: false);
+
+    // With motion, so the pages slide. The plan's save sits where See my
+    // plan was; the page view ignores the second tap, most of the way
+    // through the slide.
+    tester.platformDispatcher.clearAccessibilityFeaturesTestValue();
+    await tester.pump();
+    final spot = tester.getCenter(find.text(OnboardingCopy.chatSeePlan));
+    await tester.tapAt(spot);
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tapAt(spot);
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(find.byType(DealStep), findsOneWidget);
+    expect(find.byType(HomePage), findsNothing);
+    await tester.runAsync(() async {
+      final habits =
+          await sl<HabitRepository>().getActive()
+              as Success<List<TrackedHabit>>;
+      expect(habits.value, isEmpty);
+    });
+
+    // Once the plan has settled, its button saves.
+    reduceMotion(tester);
+    await tester.pump();
+    await tester.tapAt(spot);
+    await tester.pumpAndSettle();
+    expect(find.byType(HomePage), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('a fast double tap saves one habit', (tester) async {
     await pumpAppToPlan(tester);
 

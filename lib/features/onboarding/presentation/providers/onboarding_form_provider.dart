@@ -64,6 +64,7 @@ class OnboardingFormState {
     this.replaced,
     this.quitPreset = QuitPreset.suggested,
     this.ownQuitDay,
+    this.pricedPerUnit = false,
     this.habitKind = defaultHabit,
     this.customName = '',
     this.customUnit = '',
@@ -131,6 +132,10 @@ class OnboardingFormState {
   /// after another pace is chosen.
   final LogicalDay? ownQuitDay;
 
+  /// The price is for one unit, though the habit comes in a container (the
+  /// chat asks what one drink costs). It saves as the preset's container.
+  final bool pricedPerUnit;
+
   final HabitKind habitKind;
   final String customName;
   final String customUnit;
@@ -191,7 +196,23 @@ class OnboardingFormState {
   double? get unitPriceCents {
     final price = priceCents;
     if (price == null) return null;
-    return habit.hasContainer ? price / unitsPerContainer : price.toDouble();
+    return habit.hasContainer && !pricedPerUnit
+        ? price / unitsPerContainer
+        : price.toDouble();
+  }
+
+  /// The price and container size to save: a unit price becomes the
+  /// preset's container, so Edit plan reads it as that container.
+  ({int? priceCents, int unitsPerContainer}) get savedPrice {
+    final price = priceCents;
+    if (price == null || !pricedPerUnit || !habit.hasContainer) {
+      return (priceCents: price, unitsPerContainer: unitsPerContainer);
+    }
+    final units = habit.defaultUnitsPerContainer;
+    final container = price * units;
+    return container > HabitValidation.maxPriceCents
+        ? (priceCents: price, unitsPerContainer: 1)
+        : (priceCents: container, unitsPerContainer: units);
   }
 
   int? get monthlyCostCents => _costOver(30);
@@ -237,6 +258,7 @@ class OnboardingFormState {
     LogicalDay? quitDay,
     QuitPreset? Function()? quitPreset,
     LogicalDay? ownQuitDay,
+    bool? pricedPerUnit,
     HabitKind? habitKind,
     String? customName,
     String? customUnit,
@@ -255,6 +277,7 @@ class OnboardingFormState {
     quitDay: quitDay ?? this.quitDay,
     quitPreset: quitPreset != null ? quitPreset() : this.quitPreset,
     ownQuitDay: ownQuitDay ?? this.ownQuitDay,
+    pricedPerUnit: pricedPerUnit ?? this.pricedPerUnit,
     habitKind: habitKind ?? this.habitKind,
     customName: customName ?? this.customName,
     customUnit: customUnit ?? this.customUnit,
@@ -344,6 +367,9 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
   void keepOwnQuitDay(LogicalDay day) =>
       state = state.copyWith(ownQuitDay: day);
 
+  void setPricedPerUnit({required bool perUnit}) =>
+      state = state.copyWith(pricedPerUnit: perUnit);
+
   void setPriceText(String text) =>
       state = state.copyWith(priceText: text, errorMessage: () => null);
 
@@ -406,10 +432,11 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
       }
     }
 
+    final saved = form.savedPrice;
     final draft = HabitDraft(
       habit: form.habit,
-      priceCents: form.priceCents,
-      unitsPerContainer: form.unitsPerContainer,
+      priceCents: saved.priceCents,
+      unitsPerContainer: saved.unitsPerContainer,
     );
     final result = replaced == null
         ? await ref.read(startTrackingProvider)((

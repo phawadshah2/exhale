@@ -308,6 +308,36 @@ void main() {
     expect(chat.ask, ChatAsk.day);
   });
 
+  testWidgets('a drink priced alone saves as the preset bottle', (
+    tester,
+  ) async {
+    await throughAmount(tester, HabitKind.alcohol);
+    expect(question().text, endsWith('What does one cost you, roughly?'));
+    chat.pickPrice(7);
+    await settle(tester);
+
+    expect(form().pricedPerUnit, isTrue);
+    expect(form().unitPriceCents, 700);
+    // Edit plan reads a bottle of 5 at 5 drinks' price.
+    expect(form().savedPrice, (priceCents: 3500, unitsPerContainer: 5));
+    expect(chat.ask, ChatAsk.day);
+  });
+
+  testWidgets('a container question saves the container as answered', (
+    tester,
+  ) async {
+    await throughAmount(tester, HabitKind.vaping);
+    chat.pickPrice(10);
+    await settle(tester);
+    chat
+      ..setPerContainer(30)
+      ..sendPerContainer();
+    await settle(tester);
+
+    expect(form().pricedPerUnit, isFalse);
+    expect(form().savedPrice, (priceCents: 1000, unitsPerContainer: 30));
+  });
+
   testWidgets('social media has no price and goes to the day', (tester) async {
     await throughAmount(tester, HabitKind.socialMedia);
 

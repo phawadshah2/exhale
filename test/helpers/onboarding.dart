@@ -119,11 +119,12 @@ bool _shows(String text) => find.text(text).evaluate().isNotEmpty;
 
 /// Answers the chat as Alex: [habit] at its usual amount, [price] typed
 /// under Other (skipped when null), the usual count per container, the
-/// default day. Then opens the plan.
+/// default day. Then opens the plan, unless [open] is false.
 Future<void> chatToPlan(
   WidgetTester tester, {
   String habit = 'Smoking',
   String? price,
+  bool open = true,
 }) async {
   await answerName(tester);
   await tester.tap(find.text(habit));
@@ -150,6 +151,7 @@ Future<void> chatToPlan(
   }
   await tester.tap(find.text(OnboardingCopy.thatsMyDay));
   await settleChat(tester);
+  if (!open) return;
   await tester.tap(find.text(OnboardingCopy.chatSeePlan));
   await tester.pumpAndSettle();
 }

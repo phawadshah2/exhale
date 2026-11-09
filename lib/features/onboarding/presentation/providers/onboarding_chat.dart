@@ -435,6 +435,7 @@ class OnboardingChat extends ChangeNotifier {
             ..selectHabit(kind)
             ..setStartLimit(chosen.typical)
             ..setUnitsPerContainer(chosen.per)
+            ..setPricedPerUnit(perUnit: chosen.container == null)
             ..skipPrice();
         }
         if (kind == HabitKind.custom) {
