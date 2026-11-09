@@ -294,7 +294,8 @@ abstract final class OnboardingCopy {
       shortest == longest ? '${shortest}d' : '$shortest–${longest}d';
   static String stagesLine(int count, int shortest, int longest) {
     final days = shortest == longest ? '$shortest' : '$shortest–$longest';
-    return '$count stages, $days ${longest == 1 ? 'day' : 'days'} each';
+    final stages = count == 1 ? 'stage' : 'stages';
+    return '$count $stages, $days ${longest == 1 ? 'day' : 'days'} each';
   }
 
   /// Under the grid: what a square is, by its length in days.

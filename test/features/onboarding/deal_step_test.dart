@@ -153,6 +153,8 @@ void main() {
     expect(find.text(OnboardingCopy.stageSpan(2, 3)), findsOneWidget);
     expect(find.text(OnboardingCopy.stageSpan(5, 6)), findsOneWidget);
     expect(find.text(OnboardingCopy.stagesLine(10, 8, 9)), findsOneWidget);
+    expect(OnboardingCopy.stagesLine(10, 8, 9), '10 stages, 8–9 days each');
+    expect(OnboardingCopy.stagesLine(1, 1, 1), '1 stage, 1 day each');
     expect(
       find.text(
         "Each square is a day; its number is that day's limit. Today is "
