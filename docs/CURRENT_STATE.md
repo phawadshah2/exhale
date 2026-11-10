@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-09 (handoff after Fawad's corrections round, uncommitted). Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `…11-04_to_11-05…`.
+Updated 2026-11-10 (monetization and sync decisions locked). Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `…11-04_to_11-05…`.
 
 ## Where we are
 
@@ -17,9 +17,8 @@ Updated 2026-11-09 (handoff after Fawad's corrections round, uncommitted). Earli
 
 - `feat/plan-and-stages` pushed, not merged, no PR, CI not read. Last full suite at 7a80954:
   1211 passed.
-- `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`), not pushed. Latest commit:
-  decisions 46c2135. **Uncommitted: the corrections round below** (17 modified files, plus
-  new `lib/core/widgets/status_bar_glass.dart` and its test).
+- `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`) on origin, local ahead by
+  the corrections round (c9d9e6b, 0aba537), its docs and the decisions record.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
 ## Onboarding chat (current goal)
@@ -50,7 +49,7 @@ Waiting on Fawad (marked in the spec): the answer-fixing rule (section 4, plus t
 skip rule), the italic tagline drafts (section 5), the Other habit and price fields, and
 the day's answer bubble.
 
-## Corrections round (2026-11-09, uncommitted)
+## Corrections round (2026-11-09, committed)
 
 - Chat could not be scrolled up: `chat_step.dart` `_onMetrics` no longer follows the end
   while a finger scrolls (`isScrollingNotifier`). Not seen in the simulator.
@@ -71,7 +70,13 @@ Checks: full suite 1279 passed, 0 failed (`build/test-report.json`); analyze cle
 
 ## Next action
 
-Fawad: commit the corrections round (Claude commits per project rules, e.g. `fix(onboarding)` + `feat(app)` for the status bar and theme default), then walk the rest (dark, Reduce Transparency, 200%, a priced drink in Edit plan; the
+Locked 2026-11-10: `docs/decisions/2026-11-10-monetization-and-sync.md` (paywall with
+three offers, locked screen, payment notifications, Export/Import and iCloud sync in the
+launch build, Stay at zero). Now: Fawad sets up App Store Connect payments step by step
+(Paid Apps agreement, banking, tax, Small Business Program, products). Then specs for the
+paywall and sync.
+
+Still open: walk the rest (dark, Reduce Transparency, 200%, a priced drink in Edit plan; the
 walk needs `stash@{0}`, which now conflicts in `splash_page.dart`: keep upstream's switch,
 send `Success()` to `_startTalking()`). Then push, merge `feat/plan-and-stages` and this
 branch to `main` (PRs from compare links), and do the real iPhone pass. Read first: this
