@@ -72,9 +72,19 @@ Checks: full suite 1279 passed, 0 failed (`build/test-report.json`); analyze cle
 
 Locked 2026-11-10: `docs/decisions/2026-11-10-monetization-and-sync.md` (paywall with
 three offers, locked screen, payment notifications, Export/Import and iCloud sync in the
-launch build, Stay at zero). Now: Fawad sets up App Store Connect payments step by step
-(Paid Apps agreement, banking, tax, Small Business Program, products). Then specs for the
-paywall and sync.
+launch build, Stay at zero).
+
+App Store Connect (done 2026-11-10/11): Paid Apps agreement, bank (AED), W-8BEN and the
+Certificate of Foreign Status all Active; Small Business Program applied (awaiting email).
+Products (drafts, submit with the paywall build): group `Exhale` with Annual
+`com.phawadshah.exhale.annual` (level 1, 1 year upfront, US$34.99, 7-day free intro offer)
+and Monthly `com.phawadshah.exhale.monthly` (level 2, US$7.99); non-consumable Lifetime
+`com.phawadshah.exhale.lifetime` (US$59.99). Billing grace period 16 days, paid-to-paid.
+Sandbox tester (UAE) exists; web verification failed, check sign-in on device.
+Before submission: group display name (save kept hanging), review screenshots for all three,
+Family Sharing decision (irreversible), privacy policy and terms URLs, App Privacy answers.
+
+Next: spec and plan for the paywall, then sync.
 
 Still open: walk the rest (dark, Reduce Transparency, 200%, a priced drink in Edit plan; the
 walk needs `stash@{0}`, which now conflicts in `splash_page.dart`: keep upstream's switch,
