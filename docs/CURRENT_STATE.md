@@ -15,14 +15,15 @@ the corrections round).
 | Onboarding redesign 2 (chat) | C1 to C10 done, reviewed, full suite 1279 passed; walked in part |
 | Monetization and sync decisions | Locked 2026-11-10 |
 | App Store Connect payments | Set up 2026-11-10/11 (below) |
-| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1, P2 done; P3 next |
+| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P3 done; P4 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 ## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
 
 Decisions: `docs/decisions/2026-11-10-monetization-and-sync.md`. Hard paywall after the
 plan reveal; Annual (7-day trial, default), Monthly, Lifetime; nothing free after the
-trial; StoreKit 2 via `in_app_purchase` (dependency change: ask Fawad before `pub get`).
+trial; StoreKit 2 via `in_app_purchase` 3.3.1 and `in_app_purchase_storekit` 0.4.17
+(added with Fawad's yes, 2026-11-13).
 
 App Store Connect: agreements, bank (AED), W-8BEN and Certificate of Foreign Status Active;
 Small Business Program applied, awaiting email. Draft products: group `Exhale` with Annual
@@ -40,9 +41,9 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
 - `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
   decisions, this handoff). Nothing pushed this session. Untracked on purpose:
   `design/all-designs.html`, `design/figma-import/`.
-- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 and P2;
+- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P3;
   nothing pushed.
-- Checks: full suite not run since the 1279 pass; P1 and P2's format, analyze and tests
+- Checks: full suite not run since the 1279 pass; P1 to P3's format, analyze and tests
   pass (plus `test/features/settings`).
 
 ## Paywall
@@ -58,16 +59,18 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
 - P2 done: schema v12 (`access_state`, `access_plan`, `access_until` in settings),
   `access_cache.dart`, fixture `test/fixtures/exhale_v11.sqlite`. The cache does not keep
   the trial flag: an offline start in the trial shows a paid Annual until the store answers.
-- Unverified until the package is installed: how the plugin reports new transactions in
-  StoreKit 2 mode (P3 reads its source first).
+- P3 done: `StoreRepository` over a `StoreKitGateway` (the only plugin import),
+  `FakeStoreRepository` (test default: Lifetime), `StoreFailure`. Read from the plugin's
+  source: updates come through `InAppPurchase.instance.purchaseStream` (also fires after
+  every purchase call); purchases are not finished natively, and an unfinished one blocks
+  buying that product again. The 10 s timeout covers offers and access only.
 - Not in this plan, and needed in the same release: the payment reminders spec (the
   paywall promises the day-5 reminder).
 
 ## Next action
 
-Get Fawad's yes to add `in_app_purchase` and `in_app_purchase_storekit` and run
-`fvm flutter pub get`, then run Task P3 with the `execute-plan` skill (Sonnet 5.5 medium).
-Read: this file, the plan's header and P3, the spec's §7 and §13.
+Run Task P4 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
+plan's header and P4, the spec's §7.
 
 Open: the privacy policy URL (`LegalLinks.privacy`, before release); the Terms link in the
 App Store description. Sync stays in the launch build; fallback (1.0.1) on Fawad's call.
