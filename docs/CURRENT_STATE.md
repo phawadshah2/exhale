@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-13 (paywall P1 to P6 committed; P7 next).
+Updated 2026-11-13 (paywall P1 to P7 committed; P8 next).
 Earlier: `docs/history/` (latest `2026-11-09_to_11-11_state_log.md`: onboarding chat and
 the corrections round).
 
@@ -15,7 +15,7 @@ the corrections round).
 | Onboarding redesign 2 (chat) | C1 to C10 done, reviewed, full suite 1279 passed; walked in part |
 | Monetization and sync decisions | Locked 2026-11-10 |
 | App Store Connect payments | Set up 2026-11-10/11 (below) |
-| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P6 done; P7 next |
+| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P7 done; P8 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 ## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
@@ -37,7 +37,7 @@ privacy and terms URLs, App Privacy.
 - `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
   decisions, this handoff). Nothing pushed this session. Untracked on purpose:
   `design/all-designs.html`, `design/figma-import/`.
-- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P6
+- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P7
   committed, nothing pushed.
 - Checks (2026-11-13): format and `analyze --fatal-infos` clean; each task's tests pass,
   last run (P6): `test/features/onboarding`, `test/features/plan`,
@@ -57,7 +57,8 @@ privacy and terms URLs, App Privacy.
   `exhale_v11.sqlite`); P3 `StoreRepository` over `StoreKitGateway`, test default store
   Lifetime; P4 `accessProvider`, 3 s startup read, refresh on resume; P5 routes and the access
   gate (`launch.dart`), placeholder Paywall and Locked pages; P6 welcome back (`RestartUnstartedPlan`,
-  `replaceAll`), the reveal's button opens the paywall unless entitled. Deviations are noted
+  `replaceAll`), the reveal's button opens the paywall unless entitled; P7 `daysToCover`, `PaywallCopy`,
+  `paywallContent`. Deviations are noted
   under each task in the plan.
 - Plugin facts (read from its source): updates arrive on `purchaseStream`, also after
   each purchase call; purchases are not finished natively. 10 s timeout on offers and
@@ -67,8 +68,8 @@ privacy and terms URLs, App Privacy.
 
 ## Next action
 
-Run Task P7 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
-plan's header and P7, the spec's §10.
+Run Task P8 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
+plan's header and P8, the spec's §10, `design/10._paywall/Paywall.html`.
 
 Open: `LegalLinks.privacy` URL and the App Store Terms link (before release).
 

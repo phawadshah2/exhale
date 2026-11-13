@@ -181,6 +181,13 @@ class Habit {
 
   bool get hasContainer => container != null;
 
+  /// What the money goes on, in the plural: the container ("pods") when
+  /// there is one, else [units].
+  String get spendNoun => switch (container) {
+    final container? => _pluralOf(container),
+    null => units,
+  };
+
   String unitsFor(int count) => count == 1 ? unit : units;
 
   @override
