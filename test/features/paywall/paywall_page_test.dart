@@ -463,7 +463,7 @@ void main() {
       ('a regular', 393.0, 852.0, const EdgeInsets.only(top: 59, bottom: 34)),
       ('the largest', 440.0, 956.0, const EdgeInsets.only(top: 62, bottom: 34)),
     ]) {
-      testWidgets('no price on $name iPhone fits with even gaps', (
+      testWidgets('no price on $name iPhone flows from the top', (
         tester,
       ) async {
         await seed(priceCents: null);
@@ -474,23 +474,23 @@ void main() {
           tester.clippedTexts(within: find.byKey(PaywallPage.pageKey)),
           isEmpty,
         );
-        final headline = tester.getRect(find.text(PaywallCopy.headlineTrial));
+        final title = find.text(PaywallCopy.headlineTrial);
+        expect(
+          tester.widget<Text>(title).style?.fontSize,
+          PaywallPage.headlineSize,
+        );
+        final headline = tester.getRect(title);
         final steps = tester.getRect(find.byKey(PaywallSteps.columnKey));
         final what = tester.getRect(find.byType(WhatYouGet));
         final plans = tester.getRect(find.byKey(PaywallPage.plansKey));
-        final gaps = [
-          steps.top - headline.bottom,
-          what.top - steps.bottom,
-          plans.top - what.bottom,
-        ];
-        for (final gap in gaps) {
-          expect(gap, moreOrLessEquals(gaps.first, epsilon: 0.5));
-          expect(gap, greaterThanOrEqualTo(PaywallPage.minGap - 0.5));
-        }
+        expect(steps.top - headline.bottom, PaywallPage.minGap);
+        expect(what.top - steps.bottom, PaywallPage.minGap + 4);
+        expect(plans.top - what.bottom, PaywallPage.minGap + 4);
+        // Spare height sits above the button, not between the blocks.
         final buttonTop = tester.getRect(button(PaywallCopy.startFreeWeek)).top;
         expect(
           buttonTop - plans.bottom,
-          lessThanOrEqualTo(AppSpacing.gutterSm + 0.5),
+          greaterThanOrEqualTo(AppSpacing.gutterSm),
         );
 
         await tester.disposeApp();

@@ -40,8 +40,12 @@ class PaywallPage extends ConsumerWidget {
   /// Under this body height the steps become the icon row.
   static const double compactHeight = 540;
 
-  /// The least space between blocks on a regular iPhone.
+  /// The space under the headline on a regular iPhone; the blocks below it
+  /// get 4 pt more.
   static const double minGap = AppSpacing.md;
+
+  /// The headline's size on a regular iPhone; small iPhones keep 24.
+  static const double headlineSize = 28;
 
   static const plansKey = Key('paywall-plans');
 
@@ -241,9 +245,9 @@ class _Body extends StatelessWidget {
     final gap = compact ? AppSpacing.gutterSm : PaywallPage.minGap;
     final stat = content.stat;
     final limit = startLimit;
-    // With no stat, the blocks spread evenly down the page so the plans stay
-    // just above the button with no hole above them.
-    final spread = !loading && !unreachable && stat == null;
+    // With no stat, the plans follow straight on and any spare height sits
+    // above the button.
+    final flow = !loading && !unreachable && stat == null;
     final middle = switch ((loading, unreachable, stat)) {
       (_, true, _) when limit != null => [
         WhatYouGet(startLimit: limit, compact: compact),
@@ -296,6 +300,7 @@ class _Body extends StatelessWidget {
             child: Text(
               content.headline,
               style: context.textTheme.headlineMedium?.copyWith(
+                fontSize: compact ? null : PaywallPage.headlineSize,
                 fontWeight: FontWeight.w800,
                 height: 1.15,
               ),
@@ -317,17 +322,19 @@ class _Body extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: spread
+      children: flow
           ? [
-              headline,
-              for (final (i, block) in middle.indexed)
-                Padding(
-                  padding: EdgeInsets.only(top: gap),
-                  child: StepReveal(index: 1 + i, child: block),
-                ),
-              Padding(
-                padding: EdgeInsets.only(top: gap),
-                child: plansColumn,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  headline,
+                  for (final (i, block) in middle.indexed) ...[
+                    SizedBox(height: i == 0 ? gap : gap + 4),
+                    StepReveal(index: 1 + i, child: block),
+                  ],
+                  SizedBox(height: gap + 4),
+                  plansColumn,
+                ],
               ),
             ]
           : [

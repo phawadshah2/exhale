@@ -182,9 +182,10 @@ Variants:
   three steps down the page when they fit (the icon row on a small iPhone), then "WHAT
   YOU GET" with three plain lines: "Go from {start limit} a day to 0", "Extra time when
   it gets hard", "Your data stays private" (two lines on a small iPhone, dropping the
-  middle one). Any spare height is shared out evenly between the headline, the steps,
-  "What you get" and the plan cards, so the cards stay just above the button with no
-  hole above them (Fawad, 2026-11-14; `design/10._paywall/NoPrice.html`, option B).
+  middle one). The blocks keep their normal gaps and the plan cards follow straight on;
+  any spare height sits above the button (Fawad, 2026-11-14, after
+  `design/10._paywall/NoPrice.html`). The headline is 28 pt on every paywall (24 on a
+  small iPhone).
 - **Trial already used** (`isIntroductoryOfferEligible(annual)` is false): no tag; the
   headline is "Quitting is hard. Starting isn't."; Annual's steps are "Today /
   Everything opens. {price} is charged.", "Each year / Renews at {price} until you
