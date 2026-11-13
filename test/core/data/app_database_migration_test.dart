@@ -14,7 +14,9 @@ import 'package:exhale/features/plan/data/repositories/local_plan_repository.dar
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/settings/data/datasources/settings_local_data_source.dart';
 import 'package:exhale/features/settings/data/repositories/local_settings_repository.dart';
+import 'package:exhale/features/settings/domain/entities/app_icon_choice.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
+import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
 import 'package:exhale/features/tracking/data/datasources/habit_log_local_data_source.dart';
 import 'package:exhale/features/tracking/data/repositories/local_habit_log_repository.dart';
 import 'package:exhale/features/tracking/domain/entities/trigger.dart';
@@ -761,6 +763,60 @@ void main() {
       expect(plan.startDay, LogicalDay(2026, 10, 20));
       expect(plan.holds, isEmpty);
       expect(await _rows(database, 'SELECT * FROM habit_prices'), hasLength(1));
+    });
+  });
+
+  group('upgrade from v11', () {
+    AppDatabase openV11() {
+      final dir = Directory.systemTemp.createTempSync('exhale_v11');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final file = File('test/fixtures/exhale_v11.sqlite')
+          .copySync('${dir.path}/exhale.sqlite');
+      driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+      final database = AppDatabase(NativeDatabase(file));
+      addTearDown(database.close);
+      return database;
+    }
+
+    test('ends on the latest version', () => _expectLatest(openV11()));
+
+    test('keeps every settings value; no access is cached', () async {
+      final database = openV11();
+
+      expect(
+        await _settings(database),
+        const AppSettings(
+          userName: 'Sam',
+          dayResetHour: 5,
+          themePreference: ThemePreference.dark,
+          accentIndex: 3,
+          appIcon: AppIconChoice.leaf,
+          currencySymbol: 'AED',
+          askForTrigger: false,
+          triggerPromptIntroSeen: true,
+          logHintSeen: true,
+          wakeMinute: 420,
+          bedMinute: 1380,
+        ),
+      );
+      expect(
+        await _rows(
+          database,
+          'SELECT access_state, access_plan, access_until FROM settings',
+        ),
+        [
+          {'access_state': null, 'access_plan': null, 'access_until': null},
+        ],
+      );
+    });
+
+    test('keeps the habit and its plan', () async {
+      final database = openV11();
+
+      final [habit] = await _activeHabits(database);
+      expect(habit.priceCents, 1500);
+      final [plan] = (await _history(database, 1)).plans;
+      expect(plan.startDay, LogicalDay(2026, 10, 20));
     });
   });
 

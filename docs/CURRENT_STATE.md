@@ -15,7 +15,7 @@ the corrections round).
 | Onboarding redesign 2 (chat) | C1 to C10 done, reviewed, full suite 1279 passed; walked in part |
 | Monetization and sync decisions | Locked 2026-11-10 |
 | App Store Connect payments | Set up 2026-11-10/11 (below) |
-| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 done, P2 next |
+| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1, P2 done; P3 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 ## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
@@ -40,9 +40,10 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
 - `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
   decisions, this handoff). Nothing pushed this session. Untracked on purpose:
   `design/all-designs.html`, `design/figma-import/`.
-- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs and P1; nothing
-  pushed.
-- Checks: full suite not run since the 1279 pass; P1's format, analyze and tests pass.
+- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 and P2;
+  nothing pushed.
+- Checks: full suite not run since the 1279 pass; P1 and P2's format, analyze and tests
+  pass (plus `test/features/settings`).
 
 ## Paywall
 
@@ -54,6 +55,9 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
 - Plan and its planning calls approved by Fawad (2026-11-13): Settings says "Paid until";
   walks use `--dart-define=FAKE_STORE=…` (debug only); schema v12 caches the last access.
 - P1 done (`Access`, `PlanKind`, `StoreTransaction`, `resolveAccess`; 14 tests pass).
+- P2 done: schema v12 (`access_state`, `access_plan`, `access_until` in settings),
+  `access_cache.dart`, fixture `test/fixtures/exhale_v11.sqlite`. The cache does not keep
+  the trial flag: an offline start in the trial shows a paid Annual until the store answers.
 - Unverified until the package is installed: how the plugin reports new transactions in
   StoreKit 2 mode (P3 reads its source first).
 - Not in this plan, and needed in the same release: the payment reminders spec (the
@@ -61,9 +65,9 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
 
 ## Next action
 
-Run Task P2 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
-plan's header and P2, the spec's §7. Task P3 needs his yes before
-`pub get` (`in_app_purchase`, `in_app_purchase_storekit`).
+Get Fawad's yes to add `in_app_purchase` and `in_app_purchase_storekit` and run
+`fvm flutter pub get`, then run Task P3 with the `execute-plan` skill (Sonnet 5.5 medium).
+Read: this file, the plan's header and P3, the spec's §7 and §13.
 
 Open: the privacy policy URL (`LegalLinks.privacy`, before release); the Terms link in the
 App Store description. Sync stays in the launch build; fallback (1.0.1) on Fawad's call.

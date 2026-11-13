@@ -27,7 +27,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? _createConnection());
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -60,6 +60,12 @@ class AppDatabase extends _$AppDatabase {
       if (from < 11) {
         await migrator.createTable(planHolds);
         await migrator.createTable(stageChecks);
+      }
+      // Older versions get these from the v8 settings rebuild.
+      if (from >= 8 && from < 12) {
+        await migrator.addColumn(settings, settings.accessState);
+        await migrator.addColumn(settings, settings.accessPlan);
+        await migrator.addColumn(settings, settings.accessUntil);
       }
       // drift writes the version only after the migration returns; writing it
       // here too keeps a kill in between from rerunning a finished step.
@@ -131,6 +137,9 @@ class AppDatabase extends _$AppDatabase {
           settings.logHintSeen,
           settings.wakeMinute,
           settings.bedMinute,
+          settings.accessState,
+          settings.accessPlan,
+          settings.accessUntil,
           if (from < 4) ...[
             settings.askForTrigger,
             settings.triggerPromptIntroSeen,
