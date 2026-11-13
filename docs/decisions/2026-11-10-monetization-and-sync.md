@@ -23,6 +23,13 @@ shown in the session of 2026-11-10 (not saved in `design/`).
   the device, offline. The privacy label stays "Data Not Collected".
 - Billing grace period on in App Store Connect: the app keeps working while Apple retries.
 
+Updated 2026-11-13 (Fawad): the paywall's layout and wording are now in
+`docs/superpowers/specs/2026-11-13-paywall-design.md` and `design/10._paywall/`. The trial
+is shown as three steps above the plans, not a timeline under the button; the money line
+is "{N} days of {pods} costs more than a year of Exhale"; Annual's line is "Your plan + a
+year at zero". The locked screen is Home behind a glass sheet. Prices, offers and the
+rules above are unchanged.
+
 ## Locked screen (trial or subscription ended)
 
 Shows the saved progress (days on plan, units avoided, money kept, stage), "See offers"
