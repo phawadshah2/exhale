@@ -40,6 +40,11 @@ class PaywallPage extends ConsumerWidget {
   /// Under this body height the steps become the icon row.
   static const double compactHeight = 540;
 
+  /// The least space between blocks on a regular iPhone.
+  static const double minGap = AppSpacing.md;
+
+  static const plansKey = Key('paywall-plans');
+
   Future<void> _buy(BuildContext context, WidgetRef ref) async {
     if (ref.read(paywallControllerProvider).busy) return;
     unawaited(HapticFeedback.mediumImpact());
@@ -141,6 +146,7 @@ class PaywallPage extends ConsumerWidget {
                   onPressed: canBuy ? () => _buy(context, ref) : null,
                 ),
                 below: const LegalLinksRow(),
+                belowIsLinks: true,
                 body: LayoutBuilder(
                   builder: (context, constraints) => _Body(
                     compact: constraints.minHeight < compactHeight,
@@ -232,9 +238,12 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gap = compact ? AppSpacing.gutterSm : AppSpacing.md;
+    final gap = compact ? AppSpacing.gutterSm : PaywallPage.minGap;
     final stat = content.stat;
     final limit = startLimit;
+    // With no stat, the blocks spread evenly down the page so the plans stay
+    // just above the button with no hole above them.
+    final spread = !loading && !unreachable && stat == null;
     final middle = switch ((loading, unreachable, stat)) {
       (_, true, _) when limit != null => [
         WhatYouGet(startLimit: limit, compact: compact),
@@ -249,7 +258,7 @@ class _Body extends StatelessWidget {
         PaywallSteps(steps: content.steps, row: compact),
       ],
       (_, _, null) => [
-        PaywallSteps(steps: content.steps, row: true),
+        PaywallSteps(steps: content.steps, row: compact),
         if (limit != null) WhatYouGet(startLimit: limit, compact: compact),
       ],
     };
@@ -277,44 +286,66 @@ class _Body extends StatelessWidget {
               ),
           ];
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final headline = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: compact ? AppSpacing.xs : AppSpacing.sm),
-            StepReveal(
-              child: Semantics(
-                header: true,
-                child: Text(
-                  content.headline,
-                  style: context.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    height: 1.15,
-                  ),
-                ),
+        SizedBox(height: compact ? AppSpacing.xs : AppSpacing.sm),
+        StepReveal(
+          child: Semantics(
+            header: true,
+            child: Text(
+              content.headline,
+              style: context.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                height: 1.15,
               ),
             ),
-            for (final (i, block) in middle.indexed) ...[
-              SizedBox(height: gap),
-              StepReveal(index: 1 + i, child: block),
-            ],
-          ],
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: gap + 4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: compact ? 8 : 10,
-            children: [
-              for (final (i, block) in plans.indexed)
-                StepReveal(index: 3 + i, child: block),
-            ],
           ),
         ),
       ],
+    );
+    final plansColumn = Column(
+      key: PaywallPage.plansKey,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: compact ? 8 : 10,
+      children: [
+        for (final (i, block) in plans.indexed)
+          StepReveal(index: 3 + i, child: block),
+      ],
+    );
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: spread
+          ? [
+              headline,
+              for (final (i, block) in middle.indexed)
+                Padding(
+                  padding: EdgeInsets.only(top: gap),
+                  child: StepReveal(index: 1 + i, child: block),
+                ),
+              Padding(
+                padding: EdgeInsets.only(top: gap),
+                child: plansColumn,
+              ),
+            ]
+          : [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  headline,
+                  for (final (i, block) in middle.indexed) ...[
+                    SizedBox(height: gap),
+                    StepReveal(index: 1 + i, child: block),
+                  ],
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: gap + 4),
+                child: plansColumn,
+              ),
+            ],
     );
   }
 }

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paywall, no price</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--page:#e9edf2;--ink:#161C25;--sub:#5b6573}
+  body{margin:0;padding:28px 16px 64px;background:var(--page);color:var(--ink);font-family:-apple-system,system-ui,sans-serif}
+  h1{text-align:center;margin:0 0 6px;font-size:24px}
+  .lead{max-width:860px;margin:0 auto 6px;text-align:center;color:var(--sub);line-height:1.5;font-size:14px}
+  .size{margin:34px auto 0;max-width:1400px}
+  .size h2{font-size:15px;margin:0 0 10px;text-align:center}
+  .row{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+  .col{display:flex;flex-direction:column;align-items:center}
+  .cap{font-weight:700;font-size:13px;margin-bottom:2px}
+  .why{font-size:11.5px;color:var(--sub);max-width:250px;text-align:center;min-height:30px;margin-bottom:8px;line-height:1.35}
+  .rec{background:#16a34a;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:7px;margin-left:5px;vertical-align:1px}
+  .bad{background:#dc2626}
+  .frame{zoom:.56;border-radius:56px;box-shadow:0 0 0 12px #111418,0 22px 50px rgba(0,0,0,.28);overflow:hidden;position:relative}
+  .frame.se{border-radius:28px}
+  .notes{max-width:860px;margin:40px auto 0;font-size:14px;line-height:1.6}
+  .notes li{margin-bottom:4px}
+
+  /* The phone, drawn in points at 1:1, then zoomed. Tokens follow the app. */
+  .ph{--bg:#F4F7FA;--card:#fff;--fg:#161C25;--mut:#5b6573;--faint:#8a94a2;--line:#E4E9EF;--em:#111418;--onem:#fff;
+    background:var(--bg);color:var(--fg);display:flex;flex-direction:column;box-sizing:border-box;position:relative;
+    font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+  .inset{flex:none;position:relative}
+  .clock{position:absolute;left:44px;bottom:14px;font-weight:700;font-size:17px}
+  .island{position:absolute;left:50%;transform:translateX(-50%);top:11px;width:126px;height:37px;border-radius:20px;background:#000}
+  .se .clock{left:18px;bottom:3px;font-size:14px}
+  .topbar{flex:none;height:44px;margin:12px 12px 0 20px;display:flex;align-items:center;justify-content:space-between}
+  .back{width:44px;height:44px;border-radius:22px;background:var(--card);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  .back svg{width:20px;height:20px;stroke:var(--fg);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .restore{font-weight:700;font-size:14px;color:var(--mut);padding:0 8px}
+  .body{flex:1;display:flex;flex-direction:column;padding:0 24px;min-height:0}
+  .h{font-family:Manrope,sans-serif;font-weight:800;font-size:24px;line-height:27.6px;letter-spacing:-.01em;margin-top:8px}
+  .icons{display:flex;position:relative;margin-top:16px}
+  .icons:before{content:"";position:absolute;top:17px;left:16.6%;right:16.6%;height:2px;background:var(--line)}
+  .icons div{flex:1;text-align:center;position:relative}
+  .dot{width:34px;height:34px;border-radius:17px;background:var(--em);display:flex;align-items:center;justify-content:center;margin:0 auto 7px}
+  .dot svg,.rail svg{width:17px;height:17px;fill:none;stroke:var(--onem);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .icons b{display:block;font-size:14px;font-weight:700;line-height:20px}
+  .icons span{font-size:12.5px;color:var(--mut);line-height:18px}
+  .steps{margin-top:16px}
+  .step{display:flex;gap:14px}
+  .rail{display:flex;flex-direction:column;align-items:center;flex:none}
+  .rail i{width:30px;height:30px;border-radius:15px;background:var(--em);display:flex;align-items:center;justify-content:center}
+  .rail span{width:2px;flex:1;min-height:10px;background:var(--faint);opacity:.5;margin:3px 0;border-radius:1px}
+  .step .tx{padding-bottom:12px}
+  .step b{display:block;font-size:15px;font-weight:700;line-height:20px;margin-top:5px}
+  .step .tx div{font-size:13.5px;color:var(--mut);line-height:19px}
+  .sec{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--mut);margin-top:20px}
+  .chk{display:flex;align-items:center;gap:11px;font-size:14.5px;margin-top:11px;line-height:20px}
+  .chk i{width:20px;height:20px;border-radius:10px;background:var(--em);display:flex;align-items:center;justify-content:center;flex:none}
+  .chk i svg{width:11px;height:11px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .chk em{font-style:normal;margin-left:auto;font-weight:800}
+  .cards{display:flex;flex-direction:column;gap:10px;padding-top:20px}
+  .card{background:var(--card);border-radius:18px;padding:12px 16px;display:flex;align-items:center;gap:12px;border:2px solid transparent;position:relative;min-height:36px}
+  .card.sel{border-color:var(--em)}
+  .radio{width:20px;height:20px;border-radius:10px;border:2px solid var(--faint);box-sizing:border-box;flex:none}
+  .sel .radio{border:6px solid var(--em)}
+  .card .n{font-weight:700;font-size:15.5px;line-height:21px}
+  .card .n small{display:block;font-weight:500;color:var(--mut);font-size:13px;line-height:18px}
+  .card .p{margin-left:auto;text-align:right;font-weight:800;font-size:15.5px;line-height:21px}
+  .card .p small{display:block;font-weight:500;color:var(--mut);font-size:13px;line-height:18px}
+  .tag{position:absolute;top:-11px;right:14px;background:var(--em);color:var(--onem);font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:7px}
+  .dock{flex:none;padding:12px 20px 0}
+  .btn{height:56px;border-radius:28px;background:var(--em);color:var(--onem);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+  .fine{height:14px;margin-top:8px;display:flex;justify-content:center;gap:18px;font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--faint);line-height:14px}
+  .links44{height:44px;margin-top:8px;display:flex;justify-content:center;align-items:center;font-size:10px;font-weight:600;color:var(--faint)}
+  .spring{flex:1 1 0;min-height:0}
+  .gapf{flex:1 1 0;min-height:16px}
+  /* The button's place on the chat, plan and welcome pages. */
+  .guide{position:absolute;left:0;right:0;border-top:2px dashed #e11d48;pointer-events:none}
+  .guide span{position:absolute;right:6px;top:-22px;background:#e11d48;color:#fff;font:700 12px/1 -apple-system,system-ui,sans-serif;padding:4px 6px;border-radius:5px}
+</style>
+</head>
+<body>
+<h1>Paywall, no price given</h1>
+<p class="lead">Drawn in points at 1:1 with the app's sizes, then scaled down. The dashed line is
+the top of the button on the chat, the plan reveal and the welcome. "Now" is the current
+build; A, B and C are the options. Every option puts the button on the line, and the
+links take the fine print's slot.</p>
+
+<div id="sizes"></div>
+
+<div class="notes">
+  <b>What changes in every option</b>
+  <ul>
+    <li>The button sits exactly where it does on the chat, plan and welcome pages. "Terms"
+      and "Privacy" become one small line in the fine print's slot (14 pt tall, the same as
+      the reveal's fine print), each with a 44 pt invisible tap area. Today they are 44 pt
+      tall buttons, which lift the button 30 pt.</li>
+  </ul>
+  <b>The options for the empty space</b>
+  <ul>
+    <li><b>A. Flow from the top.</b> The cards follow "What you get" straight away, and the
+      spare space sits above the button. On the largest phones the gap moves rather than
+      goes away.</li>
+    <li><b>B. Steps down the page, spaced evenly</b> (recommended). When they fit, the three
+      steps run down the page with their sentences, as on the priced paywall you approved,
+      in place of the icon row. Any space left is shared out between the blocks. The cards
+      stay just above the button, and small iPhones keep the icon row.</li>
+    <li><b>C. Story in the middle.</b> The icon row and "What you get" are centred in the
+      space above the cards, so the gap is split above and below them.</li>
+  </ul>
+</div>
+
+<script>
+const I = {
+  back:'<path d="M15 5l-7 7 7 7"/>',
+  open:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 7.6-1.7"/>',
+  bell:'<path d="M6.5 16v-5a5.5 5.5 0 0 1 11 0v5l1.5 2h-14z"/><path d="M10.2 20.5a2 2 0 0 0 3.6 0"/>',
+  card:'<rect x="4" y="6" width="16" height="12" rx="2"/><path d="M4 10h16M7.5 14.5h3"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+};
+const svg = (k) => `<svg viewBox="0 0 24 24">${I[k]}</svg>`;
+
+const SIZES = [
+  {name:'Largest iPhone (440 × 956), what your simulator shows', w:440, h:956, top:62, bottom:34, se:false},
+  {name:'Regular iPhone (393 × 852)', w:393, h:852, top:59, bottom:34, se:false},
+  {name:'Smallest iPhone (375 × 667)', w:375, h:667, top:20, bottom:0, se:true},
+];
+
+const headline = '<div class="h">Quitting is hard. Trying Exhale is free.</div>';
+const iconRow = `<div class="icons">
+  <div><i class="dot">${svg('open')}</i><b>Today</b><span>Full access</span></div>
+  <div><i class="dot">${svg('bell')}</i><b>Day 5</b><span>We remind you</span></div>
+  <div><i class="dot">${svg('card')}</i><b>Day 7</b><span>Year starts</span></div></div>`;
+const steps = `<div class="steps">
+  ${[['open','Today','Everything opens. Your plan starts.'],
+     ['bell','Day 5','We remind you, before any charge.'],
+     ['card','Day 7','Your year starts: $34.99.']].map(([k,t,b],i,a)=>`
+  <div class="step"><div class="rail"><i>${svg(k)}</i>${i<a.length-1?'<span></span>':''}</div>
+  <div class="tx"><b>${t}</b><div>${b}</div></div></div>`).join('')}</div>`;
+const what = (compact, plain = false) => plain
+  ? `<div class="sec">WHAT YOU GET</div>
+  <div class="chk"><i>${svg('check')}</i>Go from 12 a day to 0</div>
+  ${compact?'':`<div class="chk"><i>${svg('check')}</i>Extra time when it gets hard</div>`}
+  <div class="chk"><i>${svg('check')}</i>Your data stays private</div>`
+  : `<div class="sec">WHAT YOU GET</div>
+  <div class="chk"><i>${svg('check')}</i>A taper from 12 a day<em>to 0</em></div>
+  ${compact?'':`<div class="chk"><i>${svg('check')}</i>More time on a hard stage<em>7 days</em></div>`}
+  <div class="chk"><i>${svg('check')}</i>Data that leaves your phone<em>Zero</em></div>`;
+const cards = `<div class="cards">
+  <div class="card sel"><span class="tag">7 DAYS FREE</span><span class="radio"></span>
+    <div class="n">Annual<small>Your plan + a year at zero</small></div><div class="p">$34.99<small>per year</small></div></div>
+  <div class="card"><span class="radio"></span>
+    <div class="n">Monthly<small>No trial. Cancel any time.</small></div><div class="p">$7.99<small>per month</small></div></div>
+  <div class="card"><span class="radio"></span>
+    <div class="n">Lifetime<small>Yours for good. No renewals.</small></div><div class="p">$59.99<small>once</small></div></div></div>`;
+
+// Each option returns the body's inner HTML for a size.
+const OPTIONS = [
+  {id:'now', cap:'Now', badge:'<span class="rec bad">build</span>',
+   why:'The cards are pushed to the button, leaving a hole; the 44 pt links lift the button.',
+   body:(s)=>`<div>${headline}${iconRow}${what(false)}</div><div class="spring"></div>${cards}`,
+   links44:true},
+  {id:'a', cap:'A. Flow from the top', why:'Cards follow straight on; the spare space sits above the button.',
+   body:(s)=>`${headline}${iconRow}${what(s.se)}${cards}<div class="spring"></div>`},
+  {id:'b', cap:'B. Steps down the page', badge:'<span class="rec">recommended</span>',
+   why:'The full steps when they fit, as on the priced paywall; what is left is shared out.',
+   body:(s)=> s.se
+     ? `${headline}<div class="gapf"></div>${iconRow}<div class="gapf"></div>${what(true, true)}<div class="gapf"></div>${cards}`
+     : `${headline}<div class="gapf"></div>${steps}<div class="gapf"></div>${what(false, true)}<div class="gapf"></div>${cards}`},
+  {id:'c', cap:'C. Story in the middle', why:'Icon row and "What you get" centred above the cards.',
+   body:(s)=>`${headline}<div class="spring"></div><div>${iconRow}${what(s.se)}</div><div class="spring"></div>${cards}`},
+];
+
+function phone(s, o){
+  const fine = o.links44
+    ? '<div class="links44">Terms</div>'
+    : '<div class="fine"><span>Terms</span><span>Privacy</span></div>';
+  // Chat, plan and welcome: button bottom = height − bottom inset − 8 − 14.
+  const guideTop = s.h - s.bottom - 14 - 8 - 56;
+  return `<div class="frame${s.se?' se':''}">
+    <div class="ph${s.se?' se':''}" style="width:${s.w}px;height:${s.h}px">
+      <div class="inset" style="height:${s.top}px"><span class="clock">9:41</span>${s.se?'':'<span class="island"></span>'}</div>
+      <div class="topbar"><span class="back">${svg('back')}</span><span class="restore">Restore</span></div>
+      <div class="body">${o.body(s)}</div>
+      <div class="dock" style="padding-bottom:${s.bottom}px"><div class="btn">Start my free week</div>${fine}</div>
+      <div class="guide" style="top:${guideTop}px"><span>chat · plan · welcome</span></div>
+    </div></div>`;
+}
+
+document.getElementById('sizes').innerHTML = SIZES.map(s=>`
+  <section class="size"><h2>${s.name}</h2><div class="row">
+  ${OPTIONS.map(o=>`<div class="col"><div class="cap">${o.cap}${o.badge||''}</div>
+    <div class="why">${o.why}</div>${phone(s,o)}</div>`).join('')}
+  </div></section>`).join('');
+</script>
+</body>
+</html>

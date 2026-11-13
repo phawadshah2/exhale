@@ -54,12 +54,9 @@ abstract final class PaywallCopy {
   static const statLabel = 'FROM YOUR ANSWERS';
 
   static const whatYouGet = 'WHAT YOU GET';
-  static String taper(int startLimit) => 'A taper from $startLimit a day';
-  static const taperValue = 'to 0';
-  static const moreTime = 'More time on a hard stage';
-  static const moreTimeValue = '7 days';
-  static const dataLeaves = 'Data that leaves your phone';
-  static const dataLeavesValue = 'Zero';
+  static String taper(int startLimit) => 'Go from $startLimit a day to 0';
+  static const moreTime = 'Extra time when it gets hard';
+  static const dataPrivate = 'Your data stays private';
 
   static const annual = 'Annual';
   static const annualLine = 'Your plan + a year at zero';

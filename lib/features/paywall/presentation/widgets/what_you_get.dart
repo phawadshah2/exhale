@@ -3,7 +3,8 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/paywall/presentation/paywall_copy.dart';
 import 'package:flutter/material.dart';
 
-/// "WHAT YOU GET": lines that need no price. [compact] drops the middle one.
+/// "WHAT YOU GET": plain lines that need no price. [compact] drops the
+/// middle one.
 class WhatYouGet extends StatelessWidget {
   const WhatYouGet({required this.startLimit, this.compact = false, super.key});
 
@@ -15,9 +16,9 @@ class WhatYouGet extends StatelessWidget {
     final colors = context.colors;
     final text = context.textTheme;
     final lines = [
-      (PaywallCopy.taper(startLimit), PaywallCopy.taperValue),
-      if (!compact) (PaywallCopy.moreTime, PaywallCopy.moreTimeValue),
-      (PaywallCopy.dataLeaves, PaywallCopy.dataLeavesValue),
+      PaywallCopy.taper(startLimit),
+      if (!compact) PaywallCopy.moreTime,
+      PaywallCopy.dataPrivate,
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -34,7 +35,7 @@ class WhatYouGet extends StatelessWidget {
             ),
           ),
         ),
-        for (final (label, value) in lines)
+        for (final label in lines)
           MergeSemantics(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,10 +56,6 @@ class WhatYouGet extends StatelessWidget {
                   ),
                 ),
                 Expanded(child: Text(label, style: text.bodyMedium)),
-                Text(
-                  value,
-                  style: text.bodyMedium?.copyWith(fontWeight: FontWeight.w800),
-                ),
               ],
             ),
           ),

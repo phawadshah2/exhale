@@ -5,6 +5,7 @@ import 'package:exhale/core/domain/error/failure.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
+import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/paywall/data/fake/fake_store_repository.dart';
@@ -16,6 +17,7 @@ import 'package:exhale/features/paywall/presentation/pages/paywall_page.dart';
 import 'package:exhale/features/paywall/presentation/paywall_copy.dart';
 import 'package:exhale/features/paywall/presentation/widgets/paywall_steps.dart';
 import 'package:exhale/features/paywall/presentation/widgets/plan_card.dart';
+import 'package:exhale/features/paywall/presentation/widgets/what_you_get.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/tracking/domain/repositories/habit_log_repository.dart';
 import 'package:flutter/material.dart';
@@ -189,16 +191,22 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('no price: what you get, no stat', (tester) async {
+  testWidgets('no price: steps down the page, plain lines, no stat', (
+    tester,
+  ) async {
     await seed(priceCents: null);
     await open(tester);
 
     expect(find.text(PaywallCopy.whatYouGet), findsOneWidget);
-    expect(find.text(PaywallCopy.taper(12)), findsOneWidget);
-    expect(find.text(PaywallCopy.moreTime), findsOneWidget);
-    expect(find.text(PaywallCopy.dataLeaves), findsOneWidget);
+    expect(find.text('Go from 12 a day to 0'), findsOneWidget);
+    expect(find.text('Extra time when it gets hard'), findsOneWidget);
+    expect(find.text('Your data stays private'), findsOneWidget);
+    for (final tail in ['to 0', '7 days', 'Zero']) {
+      expect(find.text(tail), findsNothing);
+    }
     expect(find.text(PaywallCopy.statLabel), findsNothing);
-    expect(find.byKey(PaywallSteps.rowKey), findsOneWidget);
+    expect(find.byKey(PaywallSteps.columnKey), findsOneWidget);
+    expect(find.byKey(PaywallSteps.rowKey), findsNothing);
 
     await tester.disposeApp();
   });
@@ -375,6 +383,29 @@ void main() {
   group('fit', () {
     setUp(loadAppFonts);
 
+    testWidgets('the button sits where the reveal has its button', (
+      tester,
+    ) async {
+      await seed(withLog: false);
+      reduceMotion(tester);
+      tester.view.padding = const FakeViewPadding(top: 59 * 3, bottom: 34 * 3);
+      await tester.pumpAppPastSplash(width: 393, height: 852);
+      final reveal = tester.getRect(planButton().hitTestable());
+      expect(reveal.bottom, 852 - 34 - 8 - 14);
+
+      await tester.tap(planButton().hitTestable());
+      await settle(tester);
+
+      final paywall = tester.getRect(button(PaywallCopy.startFreeWeek));
+      expect(paywall.top, reveal.top);
+      expect(paywall.bottom, reveal.bottom);
+      final terms = find.widgetWithText(TextButton, PaywallCopy.terms);
+      expect(tester.getSize(terms).height, greaterThanOrEqualTo(44));
+      expect(tester.getRect(terms).bottom, lessThanOrEqualTo(852));
+
+      await tester.disposeApp();
+    });
+
     testWidgets('nothing scrolls on a regular iPhone', (tester) async {
       await seed();
       await open(tester);
@@ -422,10 +453,49 @@ void main() {
       );
 
       expect(pageScroll(tester).maxScrollExtent, 0);
+      expect(find.byKey(PaywallSteps.rowKey), findsOneWidget);
       expect(find.text(PaywallCopy.moreTime), findsNothing);
 
       await tester.disposeApp();
     });
+
+    for (final (name, width, height, insets) in [
+      ('a regular', 393.0, 852.0, const EdgeInsets.only(top: 59, bottom: 34)),
+      ('the largest', 440.0, 956.0, const EdgeInsets.only(top: 62, bottom: 34)),
+    ]) {
+      testWidgets('no price on $name iPhone fits with even gaps', (
+        tester,
+      ) async {
+        await seed(priceCents: null);
+        await open(tester, width: width, height: height, insets: insets);
+
+        expect(pageScroll(tester).maxScrollExtent, 0);
+        expect(
+          tester.clippedTexts(within: find.byKey(PaywallPage.pageKey)),
+          isEmpty,
+        );
+        final headline = tester.getRect(find.text(PaywallCopy.headlineTrial));
+        final steps = tester.getRect(find.byKey(PaywallSteps.columnKey));
+        final what = tester.getRect(find.byType(WhatYouGet));
+        final plans = tester.getRect(find.byKey(PaywallPage.plansKey));
+        final gaps = [
+          steps.top - headline.bottom,
+          what.top - steps.bottom,
+          plans.top - what.bottom,
+        ];
+        for (final gap in gaps) {
+          expect(gap, moreOrLessEquals(gaps.first, epsilon: 0.5));
+          expect(gap, greaterThanOrEqualTo(PaywallPage.minGap - 0.5));
+        }
+        final buttonTop = tester.getRect(button(PaywallCopy.startFreeWeek)).top;
+        expect(
+          buttonTop - plans.bottom,
+          lessThanOrEqualTo(AppSpacing.gutterSm + 0.5),
+        );
+
+        await tester.disposeApp();
+      });
+    }
 
     testWidgets('at 200% text the page scrolls and the button stays', (
       tester,

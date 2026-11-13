@@ -157,7 +157,9 @@ scrolling at the standard text size. Top to bottom on a regular iPhone:
      sits on the card's top edge at the right, above the price.
    - Monthly: "No trial. Cancel any time.", "{price}" / "per month".
    - Lifetime: "Yours for good. No renewals.", "{price}" / "once".
-6. The button, then "Terms" and "Privacy".
+6. The button, then "Terms" and "Privacy". The button sits exactly where it does on the
+   chat, the plan reveal and the welcome: the links take the fine print's place, and
+   their 44 pt tap targets reach into the bottom inset (Fawad, 2026-11-14).
 
 What follows the selected plan (the plan cards themselves never change):
 
@@ -177,9 +179,12 @@ Variants:
   *(Builder's call: the height at which it switches; the design switches for 375 × 667.)*
 - **No stat available** (the habit has no price, the user skipped it, the price's
   currency differs from the App Store's, or N is longer than the offer's period): the
-  icon row, then "WHAT YOU GET" with three lines that need no price: "A taper from
-  {start limit} a day … to 0", "More time on a hard stage … 7 days", "Data that leaves
-  your phone … Zero" (two lines on a small iPhone, dropping the middle one).
+  three steps down the page when they fit (the icon row on a small iPhone), then "WHAT
+  YOU GET" with three plain lines: "Go from {start limit} a day to 0", "Extra time when
+  it gets hard", "Your data stays private" (two lines on a small iPhone, dropping the
+  middle one). Any spare height is shared out evenly between the headline, the steps,
+  "What you get" and the plan cards, so the cards stay just above the button with no
+  hole above them (Fawad, 2026-11-14; `design/10._paywall/NoPrice.html`, option B).
 - **Trial already used** (`isIntroductoryOfferEligible(annual)` is false): no tag; the
   headline is "Quitting is hard. Starting isn't."; Annual's steps are "Today /
   Everything opens. {price} is charged.", "Each year / Renews at {price} until you
