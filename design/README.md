@@ -17,6 +17,7 @@ out all three, then delete `figma-import/`.
 | Plan details: explored | `8._plan_edit_logs/` | same |
 | Edit plan and Logs: explored | `8._plan_edit_logs/` | same |
 | Next-log timer | `9._next_log_timer/` | https://claude.ai/artifact/NBe5B8VGM6iMXDaiuysb88 |
+| Paywall, welcome back, locked screen (not in Figma) | `10._paywall/` | – |
 | Home, Details and Logs; History charts; Logging, habits and plan; States | `6._home_details_logs/` | https://claude.ai/artifact/Es7ju6TWmMj5pkNon4tbHu |
 | Earliest screens and onboarding | `1._` to `5._`, `7._onboarding/` | none |
 

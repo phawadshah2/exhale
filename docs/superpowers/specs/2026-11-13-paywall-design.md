@@ -120,12 +120,22 @@ date", the "Go steady · zero by 8 Jan" button, the fine print. The plan is re-d
 start today, keeping the start limit and the plan length, because no day was tracked.
 The button saves any change (replacing the unpaid plan, no confirmation) and opens the
 paywall. There is no separate "Start a new plan" button, and no way back into the chat
-from this screen (it opens on its own, not after the chat).
+from this screen (it opens on its own, not after the chat). Design:
+`design/10._paywall/WelcomeBack.html`.
+
+## Colours (all screens here)
+
+No colour is hard-coded. Every fill uses the theme's emphasis colour, as onboarding, the
+welcome chat and the plan reveal already do. On a new install that is the default Ink
+accent (ink fill and white text in light mode, paper fill and ink text in dark). The
+welcome back and the paywall are always Ink in practice, since the accent can only be
+changed in Settings after paying. The locked screen and Settings follow the user's
+chosen accent, as Home does.
 
 ## 10. The paywall
 
-Mockup: `.superpowers/brainstorm/` (paywall-v1, approved by Fawad 2026-11-13). Top to
-bottom:
+Design: `design/10._paywall/Paywall.html` (trial) and `LockedSettingsStates.html` (no
+trial, offline), agreed by Fawad 2026-11-13. Top to bottom:
 
 1. Back chevron (to the reveal, to change the pace), shown only when the paywall was
    opened from the reveal or the locked screen. No close button.
@@ -155,7 +165,9 @@ Rules:
   reaches the selected offer's price (Monthly: one month's price). Hidden when the habit
   has no price, or N is over 365.
 - Products not loaded (offline first launch, StoreKit error): the offers area shows
-  "Couldn't reach the App Store" with Try again; the button is disabled.
+  "Couldn't reach the App Store", "Check your connection. Your plan is saved on this
+  phone." and Try again; the button stays in place, disabled, so nothing jumps when the
+  offers load.
 - Purchase results: success → access refreshes → Home (the plan's start is today; an
   Entitled user's plan is not re-dated). User cancelled → stays, silent. Pending (Ask to
   Buy) → a snackbar "Waiting for approval"; access updates via the listener later.
@@ -166,19 +178,29 @@ Rules:
 
 ## 11. Locked screen (Lapsed)
 
-From the decisions record: the saved progress (days on plan, units avoided, money kept,
-the stage reached), "See offers" (opens the paywall; trial hidden if not eligible) and
-"Restore purchases". Reuses the existing stats (`HomeStats`, the plan totals) and card
-styles. On payment everything returns as it was: the plan keeps its dates, nothing is
-re-dated. *(Builder's call: the exact layout, following Home's stats cards.)*
+Design: `design/10._paywall/LockedSettingsStates.html`, agreed by Fawad 2026-11-13.
+
+- Headline "Your progress is saved"; under it "Your {Annual / Monthly / Lifetime} plan
+  ended on {date}. Everything below comes back the moment you do."
+- Home's stat tiles, two by two: On plan ("21 Days", "Of 56"), Avoided ("94 puffs",
+  "vs 12/day baseline"), Money saved ("$38.40", "Since Day 1"; "Add a price" is not
+  tappable here), Stage ("5 of 12", "7 a day"). Values from the existing `HomeStats` and
+  plan providers.
+- At the bottom: "See offers" (the emphasis button; opens the paywall with a back chevron;
+  trial hidden if not eligible) and "Restore purchases" (a text button).
+- No tab bar, no log button. On payment everything returns as it was: the plan keeps its
+  dates, nothing is re-dated.
 
 The change-habit flow (`ChangeHabitPage`) is only reachable while Entitled and never
 shows the paywall.
 
 ## 12. Settings
 
-A "Subscription" section: the current plan ("Annual · renews 3 Dec", "Lifetime"), Manage
-subscription (`showManageSubscriptions()`, hidden for Lifetime) and Restore purchases.
+Design: `design/10._paywall/LockedSettingsStates.html`. A "Subscription" `SectionCard`
+between Appearance and the trigger tile, three rows: the current plan ("Annual" with
+"Renews 3 Dec"; in the trial "Free until 20 Nov"; "Lifetime" with "Yours for good"),
+Manage subscription › (`showManageSubscriptions()`, hidden for Lifetime) and Restore
+purchases.
 The later "Your data" section from the decisions record will absorb Restore.
 
 ## 13. Architecture
