@@ -2,6 +2,8 @@
 
 Date: 2026-11-13. Branch `feat/paywall` (off `feat/onboarding-chat-prototype`).
 Product decisions: `docs/decisions/2026-11-10-monetization-and-sync.md` (locked by Fawad).
+Research behind the paywall's content: `docs/research/2026-11-13-paywall-research.md`.
+Designs: `design/10._paywall/` (agreed by Fawad, 2026-11-13).
 
 ## 1. Intent
 
@@ -26,7 +28,8 @@ SDK, so the privacy label stays "Data Not Collected".
 
 - Payment notifications (trial day 5, renewal reminder, quit date, subscription ended)
   and the card-failed banner. They need a local notifications dependency and renewal
-  details; they get their own spec after this one.
+  details; they get their own spec after this one. The paywall promises the day-5
+  reminder, so that spec must ship in the same release as this one.
 - iCloud sync, Export/Import, the second-phone "Welcome back / Use my plan" flow that
   needs iCloud, Stay at zero.
 - Win-back and promotional offers, offer codes.
@@ -35,8 +38,10 @@ SDK, so the privacy label stays "Data Not Collected".
 
 - No data leaves the phone. No analytics, no receipt validation server, no account.
 - No free tier and no "close" on the paywall.
-- No dark patterns: real prices from StoreKit, the trial timeline states the charge day
-  and amount, Restore, Terms and Privacy always visible.
+- No dark patterns: real prices from StoreKit, the steps state the charge day and
+  amount, Restore, Terms and Privacy always visible.
+- No invented proof: no testimonials, ratings or user statistics. Every figure on the
+  paywall comes from the user's own answers or the App Store price.
 - Logs and plans are never deleted or changed by losing access.
 
 ## 5. Constraints
@@ -134,69 +139,102 @@ chosen accent, as Home does.
 
 ## 10. The paywall
 
-Design: `design/10._paywall/Paywall.html` (trial) and `LockedSettingsStates.html` (no
-trial, offline), agreed by Fawad 2026-11-13. Top to bottom:
+Design: `design/10._paywall/Paywall.html` (every state, to scale, live). One screen, no
+scrolling at the standard text size. Top to bottom on a regular iPhone:
 
 1. Back chevron (to the reveal, to change the pace), shown only when the paywall was
-   opened from the reveal or the locked screen. No close button.
-2. Headline "Your plan is ready, Fawad" ("Your plan is ready" with no name), then the plan
-   line: "12 a day → 0 by 14 Jan. Unlock it to start today."
-3. Money card: "Exhale pays for itself in N days", from what the user stops spending.
-4. Three offer cards, Annual selected by default:
-   - Annual: tag "7 days free", the yearly price, "Your plan, plus a year at zero ·
-     {monthly equivalent}/mo".
-   - Monthly: the monthly price, "Cancel any time".
-   - Lifetime: the price, "Pay once, keep it for good".
-5. The button: "Start my free week" (Annual with trial), "Subscribe" (Annual without
-   trial, Monthly), "Buy once" (Lifetime).
-6. Under the button, only for Annual with the trial: the timeline "Today · Everything
-   open", "Day 5 · We remind you", "Day 7 · {price} charged".
-7. Restore purchases · Terms · Privacy.
+   opened from the reveal or the locked screen, and "Restore" at the top right. No close
+   button.
+2. Headline: "Quitting is hard. Trying Exhale is free."
+3. Stat card: "{N} days" and "of {pods} costs more than a year of Exhale.", with the
+   small label "FROM YOUR ANSWERS".
+4. Three steps down the page, each a small filled icon joined by a visible line:
+   "Today / Everything opens. Your plan starts.", "Day 5 / We remind you, before any
+   charge.", "Day 7 / Your year starts: {annual price}."
+5. Three plan cards, full width, stacked, Annual selected by default. Each has a radio
+   dot, the name with one line under it, and the price with its period under it:
+   - Annual: "Your plan + a year at zero", "{price}" / "per year". The "7 DAYS FREE" tag
+     sits on the card's top edge at the right, above the price.
+   - Monthly: "No trial. Cancel any time.", "{price}" / "per month".
+   - Lifetime: "Yours for good. No renewals.", "{price}" / "once".
+6. The button, then "Terms" and "Privacy".
+
+What follows the selected plan (the plan cards themselves never change):
+
+| | Annual (trial) | Monthly | Lifetime |
+|---|---|---|---|
+| Stat card | N days … "a year of Exhale" | N days … "a month of Exhale" | N days … "Exhale for good" |
+| Step 1 | Today: Everything opens. Your plan starts. | Today: Everything opens. {price} is charged. | Today: Everything opens. {price}, once. |
+| Step 2 | Day 5: We remind you, before any charge. | Each month: Renews at {price} until you cancel. | After that: Nothing more to pay. No renewals. |
+| Step 3 | Day 7: Your year starts: {price}. | Any time: Cancel in Settings, keep the month. | For good: Staying at zero is included. |
+| Button | Start my free week | Subscribe | Buy once |
+
+Variants:
+
+- **Small iPhones** (not enough height for the steps down the page): the three steps
+  become one row of three icons with a word under each ("Today / Full access", "Day 5 /
+  We remind you", "Day 7 / Year starts"; the Monthly and Lifetime rows as in the design).
+  *(Builder's call: the height at which it switches; the design switches for 375 × 667.)*
+- **No stat available** (the habit has no price, the user skipped it, the price's
+  currency differs from the App Store's, or N is longer than the offer's period): the
+  icon row, then "WHAT YOU GET" with three lines that need no price: "A taper from
+  {start limit} a day … to 0", "More time on a hard stage … 7 days", "Data that leaves
+  your phone … Zero" (two lines on a small iPhone, dropping the middle one).
+- **Trial already used** (`isIntroductoryOfferEligible(annual)` is false): no tag; the
+  headline is "Quitting is hard. Starting isn't."; Annual's steps are "Today /
+  Everything opens. {price} is charged.", "Each year / Renews at {price} until you
+  cancel.", "Any time / Cancel in Settings, keep the year."; the button is "Subscribe".
+- **App Store unreachable** (products not loaded): the headline, the "What you get"
+  lines, then in place of the plan cards a card "Couldn't reach the App Store / Check
+  your connection. Your plan is saved on this phone." with "Try again"; the button reads
+  "Continue" and is disabled.
+- **Larger accessibility text**: the page scrolls and the button stays pinned at the
+  bottom. At the standard size nothing scrolls on any iPhone iOS 26 runs on.
 
 Rules:
 
-- Prices are StoreKit's localized `displayPrice`; the monthly equivalent is computed from
-  the Annual price in the same currency. Nothing is hard-coded. The App Store Connect
-  prices are the source.
-- Trial eligibility from `isIntroductoryOfferEligible(annual)`. Not eligible (this Apple
-  account used it): no tag, no timeline, button "Subscribe".
-- "Pays for itself": the first day d where the money kept by the plan (units avoided
-  versus the start limit, times the unit price, summed day by day along the taper)
-  reaches the selected offer's price (Monthly: one month's price). Hidden when the habit
-  has no price, or N is over 365.
-- Products not loaded (offline first launch, StoreKit error): the offers area shows
-  "Couldn't reach the App Store", "Check your connection. Your plan is saved on this
-  phone." and Try again; the button stays in place, disabled, so nothing jumps when the
-  offers load.
+- Prices are StoreKit's localized `displayPrice`. Nothing is hard-coded; App Store
+  Connect is the source. The billed amount is the largest price on the screen (Apple's
+  rule), so no per-month breakdown of Annual is shown.
+- The stat: daily spend = start limit × the unit price from onboarding. N = the offer's
+  price ÷ daily spend, rounded up, at least 1 ("1 day", "4 days"). It is shown only when
+  the user's currency matches the storefront's currency and N is within the offer's
+  period (365 days for Annual and Lifetime, 30 for Monthly). "{pods}" is the habit's
+  container or unit word in the plural. *(Builder's call: the word per habit, from the
+  existing habit copy.)*
 - Purchase results: success → access refreshes → Home (the plan's start is today; an
   Entitled user's plan is not re-dated). User cancelled → stays, silent. Pending (Ask to
   Buy) → a snackbar "Waiting for approval"; access updates via the listener later.
   Failed → snackbar with a plain message.
 - Restore: `sync()` (may ask for the Apple ID password), then re-check access. Entitled →
   Home. Nothing found → snackbar "No purchases found for this Apple ID".
-- Terms: Apple's standard EULA URL. Privacy: Fawad's privacy policy URL (open item, §14).
+- Terms: Apple's standard EULA URL (also added to the App Store description). Privacy:
+  Fawad's privacy policy URL (open item, §14).
+- Motion: the existing `StepReveal` entrance for each block; nothing decorative. Reduce
+  Motion: everything just appears.
 
 ## 11. Locked screen (Lapsed)
 
-Design: `design/10._paywall/LockedSettingsStates.html`, agreed by Fawad 2026-11-13.
+Design: `design/10._paywall/LockedSettings.html`.
 
-- Headline "Your progress is saved"; under it "Your {Annual / Monthly / Lifetime} plan
-  ended on {date}. Everything below comes back the moment you do."
-- Home's stat tiles, two by two: On plan ("21 Days", "Of 56"), Avoided ("94 puffs",
-  "vs 12/day baseline"), Money saved ("$38.40", "Since Day 1"; "Add a price" is not
-  tappable here), Stage ("5 of 12", "7 a day"). Values from the existing `HomeStats` and
-  plan providers.
-- At the bottom: "See offers" (the emphasis button; opens the paywall with a back chevron;
-  trial hidden if not eligible) and "Restore purchases" (a text button).
-- No tab bar, no log button. On payment everything returns as it was: the plan keeps its
-  dates, nothing is re-dated.
+- The user's real Home behind a glass sheet: blurred, dimmed, not tappable, with no tab
+  bar and no log button. The sheet cannot be dismissed.
+- The sheet: "Your progress is saved"; "Your {Annual / Monthly / Lifetime} plan ended on
+  {date}. Everything here comes back the moment you do."; one line of progress, "{n}
+  days on plan · {n} {units} avoided" and "{money} saved · stage {i} of {n}" (the money
+  part is left out with no price), from the existing `HomeStats` and plan providers;
+  "See offers" (the emphasis button; opens the paywall with a back chevron); "Restore
+  purchases" (a text button).
+- Reduce Transparency: the sheet is opaque and Home is only dimmed.
+- On payment the sheet goes and Home is exactly as it was: the plan keeps its dates,
+  nothing is re-dated.
 
 The change-habit flow (`ChangeHabitPage`) is only reachable while Entitled and never
 shows the paywall.
 
 ## 12. Settings
 
-Design: `design/10._paywall/LockedSettingsStates.html`. A "Subscription" `SectionCard`
+Design: `design/10._paywall/LockedSettings.html`. A "Subscription" `SectionCard`
 between Appearance and the trigger tile, three rows: the current plan ("Annual" with
 "Renews 3 Dec"; in the trial "Free until 20 Nov"; "Lifetime" with "Yours for good"),
 Manage subscription › (`showManageSubscriptions()`, hidden for Lifetime) and Restore
@@ -219,10 +257,12 @@ The later "Your data" section from the decisions record will absorb Restore.
 ## 14. Open items for Fawad (not blocking the plan)
 
 - Privacy policy URL (also needed for App Store submission).
-- Copy review of the paywall lines above.
+- The Terms link in the App Store description (Apple's standard licence has no field for
+  it).
 
 ## 15. Left to the builder
 
-The paywall's spacing and motion within the onboarding style (`StepReveal`, the chevron
-button), accessibility labels for the offers (VoiceOver reads name, price, trial), the
-cached-access storage, the exact error messages.
+Exact spacing within the onboarding style, accessibility labels for the plan cards
+(VoiceOver reads the name, its line, the price and period, "7 days free", selected), the
+Cupertino icons for the steps, the height at which the steps become the icon row, the
+habit word in the stat, the cached-access storage, the exact error messages.
