@@ -245,9 +245,6 @@ class _Body extends StatelessWidget {
     final gap = compact ? AppSpacing.gutterSm : PaywallPage.minGap;
     final stat = content.stat;
     final limit = startLimit;
-    // With no stat, the plans follow straight on and any spare height sits
-    // above the button.
-    final flow = !loading && !unreachable && stat == null;
     final middle = switch ((loading, unreachable, stat)) {
       (_, true, _) when limit != null => [
         WhatYouGet(startLimit: limit, compact: compact),
@@ -319,40 +316,18 @@ class _Body extends StatelessWidget {
       ],
     );
 
+    // The plans follow straight on; any spare height sits above the button.
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: flow
-          ? [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  headline,
-                  for (final (i, block) in middle.indexed) ...[
-                    SizedBox(height: i == 0 ? gap : gap + 4),
-                    StepReveal(index: 1 + i, child: block),
-                  ],
-                  SizedBox(height: gap + 4),
-                  plansColumn,
-                ],
-              ),
-            ]
-          : [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  headline,
-                  for (final (i, block) in middle.indexed) ...[
-                    SizedBox(height: gap),
-                    StepReveal(index: 1 + i, child: block),
-                  ],
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: gap + 4),
-                child: plansColumn,
-              ),
-            ],
+      children: [
+        headline,
+        for (final (i, block) in middle.indexed) ...[
+          SizedBox(height: i == 0 ? gap : gap + 4),
+          StepReveal(index: 1 + i, child: block),
+        ],
+        SizedBox(height: gap + 4),
+        plansColumn,
+      ],
     );
   }
 }

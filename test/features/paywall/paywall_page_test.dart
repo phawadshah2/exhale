@@ -220,6 +220,12 @@ void main() {
     expect(find.text(PaywallCopy.unreachableTitle), findsOneWidget);
     expect(find.text(PaywallCopy.whatYouGet), findsOneWidget);
     expect(card(PlanKind.annual), findsNothing);
+    // The card follows straight on; spare height sits above the button.
+    expect(
+      tester.getRect(find.byKey(PaywallPage.plansKey)).top -
+          tester.getRect(find.byType(WhatYouGet)).bottom,
+      PaywallPage.minGap + 4,
+    );
     final continueButton = tester.widget<FilledButton>(
       find.widgetWithText(FilledButton, PaywallCopy.continueLabel),
     );
@@ -455,6 +461,25 @@ void main() {
       expect(pageScroll(tester).maxScrollExtent, 0);
       expect(find.byKey(PaywallSteps.rowKey), findsOneWidget);
       expect(find.text(PaywallCopy.moreTime), findsNothing);
+
+      await tester.disposeApp();
+    });
+
+    testWidgets('with a stat on the largest iPhone the plans follow on', (
+      tester,
+    ) async {
+      await seed();
+      await open(
+        tester,
+        width: 440,
+        height: 956,
+        insets: const EdgeInsets.only(top: 62, bottom: 34),
+      );
+
+      expect(pageScroll(tester).maxScrollExtent, 0);
+      final steps = tester.getRect(find.byKey(PaywallSteps.columnKey));
+      final plans = tester.getRect(find.byKey(PaywallPage.plansKey));
+      expect(plans.top - steps.bottom, PaywallPage.minGap + 4);
 
       await tester.disposeApp();
     });

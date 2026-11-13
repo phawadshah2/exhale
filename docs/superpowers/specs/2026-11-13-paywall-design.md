@@ -184,8 +184,8 @@ Variants:
   it gets hard", "Your data stays private" (two lines on a small iPhone, dropping the
   middle one). The blocks keep their normal gaps and the plan cards follow straight on;
   any spare height sits above the button (Fawad, 2026-11-14, after
-  `design/10._paywall/NoPrice.html`). The headline is 28 pt on every paywall (24 on a
-  small iPhone).
+  `design/10._paywall/NoPrice.html`). Every paywall state (with a stat, without, App
+  Store unreachable) flows this way. The headline is 28 pt (24 on a small iPhone).
 - **Trial already used** (`isIntroductoryOfferEligible(annual)` is false): no tag; the
   headline is "Quitting is hard. Starting isn't."; Annual's steps are "Today /
   Everything opens. {price} is charged.", "Each year / Renews at {price} until you
