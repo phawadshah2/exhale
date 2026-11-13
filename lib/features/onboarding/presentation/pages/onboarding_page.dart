@@ -112,7 +112,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       });
     final steps = _steps;
     final index = steps.indexOf(_current);
-    final header = _canLeave || _current == OnboardingStep.deal;
+    // The welcome back opens on its own, so it has nowhere to go back to.
+    final resuming = ref.read(onboardingFormProvider).isResuming;
+    final dealBack = _current == OnboardingStep.deal && !resuming;
+    final header = _canLeave || dealBack;
 
     return OnboardingScope(
       next: _next,
@@ -138,7 +141,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     onBack: _back,
                   ),
                 )
-              else if (_current == OnboardingStep.deal)
+              else if (dealBack)
                 SafeArea(
                   bottom: false,
                   child: Align(

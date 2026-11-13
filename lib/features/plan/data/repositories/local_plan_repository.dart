@@ -29,6 +29,13 @@ class LocalPlanRepository implements PlanRepository {
         () => _localDataSource.replaceFrom(plan.toCompanion(habitId)),
       );
 
+  @override
+  Future<Result<void>> replaceAll(int habitId, ReductionPlan plan) =>
+      guardStorage(
+        _source,
+        () => _localDataSource.replaceAll(plan.toCompanion(habitId)),
+      );
+
   PlanHistory? _toHistory(List<PlanRecord> rows) =>
       rows.isEmpty ? null : PlanHistory(rows.map((row) => row.toEntity()));
 }

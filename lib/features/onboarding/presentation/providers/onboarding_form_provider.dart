@@ -10,9 +10,11 @@ import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/validation/habit_validation.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
+import 'package:exhale/features/onboarding/presentation/onboarding_pace.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
+import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/currency_choices.dart';
 import 'package:exhale/features/settings/domain/entities/day_window.dart';
@@ -29,6 +31,14 @@ final replacedHabitProvider = Provider<TrackedHabit?>(
   (ref) => null,
   dependencies: const [],
 );
+
+/// A saved plan never paid for and never logged, shown again from today;
+/// null otherwise. Overridden by a nested scope in `WelcomeBackPage`.
+final resumedPlanProvider =
+    Provider<({TrackedHabit habit, ReductionPlan plan})?>(
+      (ref) => null,
+      dependencies: const [],
+    );
 
 /// Quick quit-date choices, in chip order. While one is selected the quit
 /// date follows the daily amount (for [suggested]).
@@ -62,6 +72,7 @@ class OnboardingFormState {
     required this.unitsPerContainer,
     required this.currency,
     this.replaced,
+    this.isResuming = false,
     this.quitPreset = QuitPreset.suggested,
     this.ownQuitDay,
     this.pricedPerUnit = false,
@@ -114,6 +125,36 @@ class OnboardingFormState {
     );
   }
 
+  /// [habit]'s saved [plan] again, from today: the same start limit and
+  /// length. No preset, so the saved pace stays open; a length that is no
+  /// pace's shows as the user's own date.
+  factory OnboardingFormState.resuming(
+    LogicalDay today,
+    AppSettings settings,
+    TrackedHabit habit,
+    ReductionPlan plan,
+  ) {
+    final quitDay = today.addDays(plan.totalDays);
+    final isPace = OnboardingPace.all.any((p) => p.days == plan.totalDays);
+    final window = settings.dayWindow;
+    return OnboardingFormState(
+      isResuming: true,
+      habitKind: habit.habit.kind,
+      customName: habit.habit.kind == HabitKind.custom ? habit.habit.name : '',
+      customUnit: habit.habit.kind == HabitKind.custom ? habit.habit.unit : '',
+      startDay: today,
+      startLimit: plan.startLimit,
+      unitsPerContainer: habit.unitsPerContainer,
+      quitDay: quitDay,
+      quitPreset: null,
+      ownQuitDay: isPace ? null : quitDay,
+      currency: settings.currencySymbol,
+      userName: settings.userName ?? '',
+      wakeMinute: window?.wakeMinute ?? DayWindow.defaultWake,
+      bedMinute: window?.bedMinute ?? DayWindow.defaultBed,
+    );
+  }
+
   static const HabitKind defaultHabit = HabitKind.vaping;
 
   /// Dots shown before each dot stands for more than one unit.
@@ -121,6 +162,9 @@ class OnboardingFormState {
 
   /// The habit this form takes the place of; null on a first run.
   final TrackedHabit? replaced;
+
+  /// The welcome back: the plan step alone, for a saved plan.
+  final bool isResuming;
 
   final LogicalDay startDay;
   final LogicalDay quitDay;
@@ -164,7 +208,9 @@ class OnboardingFormState {
   /// A first run is the welcome, the chat and the plan. Changing the habit
   /// keeps the habit, amount and cost steps (cost only for habits that track
   /// it) before the plan.
-  List<OnboardingStep> get steps => isChangingHabit
+  List<OnboardingStep> get steps => isResuming
+      ? const [OnboardingStep.deal]
+      : isChangingHabit
       ? [
           OnboardingStep.habit,
           OnboardingStep.amount,
@@ -273,6 +319,7 @@ class OnboardingFormState {
     String? Function()? errorMessage,
   }) => OnboardingFormState(
     replaced: replaced,
+    isResuming: isResuming,
     startDay: startDay,
     quitDay: quitDay ?? this.quitDay,
     quitPreset: quitPreset != null ? quitPreset() : this.quitPreset,
@@ -296,22 +343,33 @@ class OnboardingFormState {
 final NotifierProvider<OnboardingFormController, OnboardingFormState>
 onboardingFormProvider = NotifierProvider.autoDispose(
   OnboardingFormController.new,
-  dependencies: [replacedHabitProvider],
+  dependencies: [replacedHabitProvider, resumedPlanProvider],
 );
 
 class OnboardingFormController extends Notifier<OnboardingFormState> {
   @override
-  OnboardingFormState build() => switch (ref.read(replacedHabitProvider)) {
-    null => OnboardingFormState.initial(
-      ref.read(todayProvider),
-      CurrencyChoices.forRegion(ref.read(deviceRegionProvider)),
-    ),
-    final replaced => OnboardingFormState.changing(
-      ref.read(todayProvider),
-      ref.read(currentSettingsProvider),
-      replaced,
-    ),
-  };
+  OnboardingFormState build() {
+    final today = ref.read(todayProvider);
+    if (ref.read(resumedPlanProvider) case (:final habit, :final plan)) {
+      return OnboardingFormState.resuming(
+        today,
+        ref.read(currentSettingsProvider),
+        habit,
+        plan,
+      );
+    }
+    return switch (ref.read(replacedHabitProvider)) {
+      null => OnboardingFormState.initial(
+        today,
+        CurrencyChoices.forRegion(ref.read(deviceRegionProvider)),
+      ),
+      final replaced => OnboardingFormState.changing(
+        today,
+        ref.read(currentSettingsProvider),
+        replaced,
+      ),
+    };
+  }
 
   /// Earliest quit day; there is no latest.
   LogicalDay get earliestQuitDay =>
@@ -404,14 +462,22 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
 
     final replaced = form.replaced;
     if (replaced == null) {
-      // A second submit (onboarding reached again) must not add a second
-      // habit.
+      // A second submit (back from the paywall, or the welcome back) must
+      // not add a second habit; an unlogged plan takes the new dates.
       final existing = await ref.read(habitRepositoryProvider).getActive();
       if (!ref.mounted) return false;
       if (existing case FailureResult(:final failure)) {
         return _fail(failureMessage(failure));
       }
-      if (existing case Success(value: [_, ...])) {
+      if (existing case Success(value: [final habit, ...])) {
+        final restarted = await ref.read(restartUnstartedPlanProvider)((
+          habitId: habit.id,
+          draft: form.draft,
+        ));
+        if (!ref.mounted) return false;
+        if (restarted case FailureResult(:final failure)) {
+          return _fail(failureMessage(failure));
+        }
         state = state.copyWith(isSubmitting: false);
         return true;
       }

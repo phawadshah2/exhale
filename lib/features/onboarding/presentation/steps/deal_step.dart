@@ -15,6 +15,8 @@ import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.da
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/chevron_button.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
+import 'package:exhale/features/paywall/domain/entities/access.dart';
+import 'package:exhale/features/paywall/presentation/providers/paywall_providers.dart';
 import 'package:exhale/features/plan/domain/entities/reduction_plan.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -100,7 +102,14 @@ class _DealStepState extends ConsumerState<DealStep> {
       if (!confirmed || !mounted) return;
     }
     final saved = await ref.read(onboardingFormProvider.notifier).submit();
-    if (saved && mounted) context.go(AppRoutes.home);
+    if (!saved || !mounted) return;
+    // A paid user goes straight in; otherwise the paywall comes over the
+    // plan, so its back returns here.
+    if (form.isChangingHabit || ref.read(accessProvider) is Entitled) {
+      context.go(AppRoutes.home);
+    } else {
+      unawaited(context.push(AppRoutes.paywall));
+    }
   }
 
   @override
@@ -165,7 +174,9 @@ class _DealStepState extends ConsumerState<DealStep> {
           const SizedBox(height: AppSpacing.md),
           StepReveal(
             child: Text(
-              OnboardingCopy.dealEyebrow(form.startLimit),
+              form.isResuming
+                  ? OnboardingCopy.welcomeBackEyebrow(form.userName)
+                  : OnboardingCopy.dealEyebrow(form.startLimit),
               style: text.titleSmall?.copyWith(color: colors.onSurfaceVariant),
             ),
           ),
@@ -173,7 +184,9 @@ class _DealStepState extends ConsumerState<DealStep> {
           StepReveal(
             index: 1,
             child: Text(
-              OnboardingCopy.dealHeadline,
+              form.isResuming
+                  ? OnboardingCopy.welcomeBackHeadline
+                  : OnboardingCopy.dealHeadline,
               style: text.headlineMedium?.copyWith(
                 fontWeight: FontWeight.w800,
                 height: 1.15,

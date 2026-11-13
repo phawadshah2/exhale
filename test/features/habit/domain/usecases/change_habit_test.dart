@@ -182,6 +182,10 @@ class _FailingPlans implements PlanRepository {
 
   @override
   Stream<PlanHistory?> watchHistory(int habitId) => Stream.value(null);
+
+  @override
+  Future<Result<void>> replaceAll(int habitId, ReductionPlan plan) async =>
+      const FailureResult<void>(StorageFailure());
 }
 
 class _FailingArchive implements HabitRepository {

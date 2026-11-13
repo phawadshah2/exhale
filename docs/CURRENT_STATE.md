@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-13 (paywall P1 to P5 committed; P6 next).
+Updated 2026-11-13 (paywall P1 to P6 committed; P7 next).
 Earlier: `docs/history/` (latest `2026-11-09_to_11-11_state_log.md`: onboarding chat and
 the corrections round).
 
@@ -15,7 +15,7 @@ the corrections round).
 | Onboarding redesign 2 (chat) | C1 to C10 done, reviewed, full suite 1279 passed; walked in part |
 | Monetization and sync decisions | Locked 2026-11-10 |
 | App Store Connect payments | Set up 2026-11-10/11 (below) |
-| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P5 done; P6 next |
+| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P6 done; P7 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 ## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
@@ -37,11 +37,11 @@ privacy and terms URLs, App Privacy.
 - `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
   decisions, this handoff). Nothing pushed this session. Untracked on purpose:
   `design/all-designs.html`, `design/figma-import/`.
-- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P5
+- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P6
   committed, nothing pushed.
 - Checks (2026-11-13): format and `analyze --fatal-infos` clean; each task's tests pass,
-  last run 184 passed (`test/app`, `test/features/paywall`, `test/features/tracking`),
-  plus splash (P5). Full suite: not run
+  last run (P6): `test/features/onboarding`, `test/features/plan`,
+  `test/features/habit`, `test/app` all pass. Full suite: not run
   since the 1279 pass (due at the milestone end).
 
 ## Paywall
@@ -56,7 +56,8 @@ privacy and terms URLs, App Privacy.
 - Done: P1 `resolveAccess`; P2 schema v12 access cache (no trial flag cached; fixture
   `exhale_v11.sqlite`); P3 `StoreRepository` over `StoreKitGateway`, test default store
   Lifetime; P4 `accessProvider`, 3 s startup read, refresh on resume; P5 routes and the access
-  gate (`launch.dart`), placeholder Paywall, Locked and WelcomeBack pages. Deviations are noted
+  gate (`launch.dart`), placeholder Paywall and Locked pages; P6 welcome back (`RestartUnstartedPlan`,
+  `replaceAll`), the reveal's button opens the paywall unless entitled. Deviations are noted
   under each task in the plan.
 - Plugin facts (read from its source): updates arrive on `purchaseStream`, also after
   each purchase call; purchases are not finished natively. 10 s timeout on offers and
@@ -66,8 +67,8 @@ privacy and terms URLs, App Privacy.
 
 ## Next action
 
-Run Task P6 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
-plan's header and P6, the spec's §9. `WelcomeBackPage` is a keyed placeholder from P5.
+Run Task P7 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
+plan's header and P7, the spec's §10.
 
 Open: `LegalLinks.privacy` URL and the App Store Terms link (before release).
 

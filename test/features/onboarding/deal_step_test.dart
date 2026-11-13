@@ -1,3 +1,5 @@
+import 'package:exhale/app/app.dart';
+import 'package:exhale/app/router/app_router.dart';
 import 'package:exhale/core/data/storage_guard.dart';
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
@@ -12,6 +14,8 @@ import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/deal_step.dart';
+import 'package:exhale/features/paywall/data/fake/fake_store_repository.dart';
+import 'package:exhale/features/paywall/presentation/pages/paywall_page.dart';
 import 'package:exhale/features/plan/domain/entities/plan_history.dart';
 import 'package:exhale/features/plan/domain/repositories/plan_repository.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
@@ -402,6 +406,56 @@ void main() {
     });
 
     await tester.disposeApp();
+  });
+
+  group('unpaid', () {
+    setUp(() async {
+      await InjectionContainer.reset();
+      await setUpTestDependencies(
+        FixedClock(DateTime(2026, 10, 20, 9)),
+        store: FakeStoreRepository(),
+      );
+    });
+
+    testWidgets('the button saves, then opens the paywall', (tester) async {
+      await pumpAppToPlan(tester);
+
+      await save(tester);
+
+      expect(find.byKey(PaywallPage.pageKey), findsOneWidget);
+      expect(find.byType(HomePage), findsNothing);
+
+      await tester.disposeApp();
+    });
+
+    testWidgets('back from the paywall, another pace saves over the plan', (
+      tester,
+    ) async {
+      await pumpAppToPlan(tester);
+      await save(tester);
+      ProviderScope.containerOf(tester.element(find.byType(ExhaleApp)))
+          .read(routerProvider)
+          .pop();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Brisk'));
+      await tester.pumpAndSettle();
+      await save(tester);
+
+      expect(find.byKey(PaywallPage.pageKey), findsOneWidget);
+      await tester.runAsync(() async {
+        final habits =
+            await sl<HabitRepository>().getActive()
+                as Success<List<TrackedHabit>>;
+        expect(habits.value, hasLength(1));
+        final history = await sl<PlanRepository>().getHistory(
+          habits.value.single.id,
+        ) as Success<PlanHistory?>;
+        expect(history.value!.plans.single.quitDay, today.addDays(28));
+      });
+
+      await tester.disposeApp();
+    });
   });
 }
 

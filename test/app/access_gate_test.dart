@@ -23,6 +23,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/fixed_clock.dart';
+import '../helpers/onboarding.dart';
 import '../helpers/pump_app.dart';
 
 void main() {
@@ -85,6 +86,8 @@ void main() {
     tester,
   ) async {
     await seed(startDay: LogicalDay(2026, 11, 1));
+    // The plan step's button loops while animations are on.
+    reduceMotion(tester);
 
     await tester.pumpAppPastSplash(height: 2400);
 
