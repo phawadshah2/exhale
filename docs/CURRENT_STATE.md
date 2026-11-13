@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-13 (handoff: paywall designed, specified and planned; no code yet).
+Updated 2026-11-13 (handoff: paywall P1 to P4 committed, last `77277d5`; P5 next).
 Earlier: `docs/history/` (latest `2026-11-09_to_11-11_state_log.md`: onboarding chat and
 the corrections round).
 
@@ -25,15 +25,11 @@ plan reveal; Annual (7-day trial, default), Monthly, Lifetime; nothing free afte
 trial; StoreKit 2 via `in_app_purchase` 3.3.1 and `in_app_purchase_storekit` 0.4.17
 (added with Fawad's yes, 2026-11-13).
 
-App Store Connect: agreements, bank (AED), W-8BEN and Certificate of Foreign Status Active;
-Small Business Program applied, awaiting email. Draft products: group `Exhale` with Annual
-`com.phawadshah.exhale.annual` (level 1, US$34.99, 7-day free intro offer) and Monthly
-`com.phawadshah.exhale.monthly` (level 2, US$7.99); non-consumable Lifetime
-`com.phawadshah.exhale.lifetime` (US$59.99). Grace period 16 days, paid-to-paid. Sandbox
-tester (UAE) listed; web verification failed, check sign-in on device.
-
-Before submission: group display name (save hung), review screenshots for the three
-products, Family Sharing decision (irreversible), privacy policy and terms URLs, App Privacy.
+App Store Connect: agreements, bank, tax Active; Small Business Program awaiting email.
+Products: Annual US$34.99 (7-day free intro), Monthly US$7.99 (group `Exhale`), Lifetime
+US$59.99; grace 16 days. Sandbox tester (UAE): check sign-in on device. Before
+submission: group display name, review screenshots, Family Sharing (irreversible),
+privacy and terms URLs, App Privacy.
 
 ## Repo
 
@@ -41,10 +37,11 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
 - `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
   decisions, this handoff). Nothing pushed this session. Untracked on purpose:
   `design/all-designs.html`, `design/figma-import/`.
-- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P4;
-  nothing pushed.
-- Checks: full suite not run since the 1279 pass; P1 to P4's format, analyze and tests
-  pass (plus `test/features/settings`, `test/app`, the splash test).
+- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P4
+  committed (last `77277d5`), tree clean, nothing pushed.
+- Checks (2026-11-13): format and `analyze --fatal-infos` clean; each task's tests pass,
+  last run 94 passed (`test/app`, splash, `test/features/paywall`). Full suite: not run
+  since the 1279 pass (due at the milestone end).
 
 ## Paywall
 
@@ -55,19 +52,13 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
   welcome back (the reveal with two lines changed), the locked screen (Home behind glass).
 - Plan and its planning calls approved by Fawad (2026-11-13): Settings says "Paid until";
   walks use `--dart-define=FAKE_STORE=…` (debug only); schema v12 caches the last access.
-- P1 done (`Access`, `PlanKind`, `StoreTransaction`, `resolveAccess`; 14 tests pass).
-- P2 done: schema v12 (`access_state`, `access_plan`, `access_until` in settings),
-  `access_cache.dart`, fixture `test/fixtures/exhale_v11.sqlite`. The cache does not keep
-  the trial flag: an offline start in the trial shows a paid Annual until the store answers.
-- P3 done: `StoreRepository` over a `StoreKitGateway` (the only plugin import),
-  `FakeStoreRepository` (test default: Lifetime), `StoreFailure`. Read from the plugin's
-  source: updates come through `InAppPurchase.instance.purchaseStream` (also fires after
-  every purchase call); purchases are not finished natively, and an unfinished one blocks
-  buying that product again. The 10 s timeout covers offers and access only.
-- P4 done: `accessProvider` (`AccessController`), `initialAccessProvider` (throws unless
-  `startupOverrides()` overrides it), `offersProvider` (no auto-retry). Startup waits 3 s
-  for the store, then uses the cache; `ExhaleApp` refreshes on resume. Nothing gates on
-  access yet (P5).
+- Done: P1 `resolveAccess`; P2 schema v12 access cache (no trial flag cached; fixture
+  `exhale_v11.sqlite`); P3 `StoreRepository` over `StoreKitGateway`, test default store
+  Lifetime; P4 `accessProvider`, 3 s startup read, refresh on resume. Deviations are noted
+  under each task in the plan.
+- Plugin facts (read from its source): updates arrive on `purchaseStream`, also after
+  each purchase call; purchases are not finished natively. 10 s timeout on offers and
+  access only. `offersProvider` has no auto-retry. Nothing gates on access yet.
 - Not in this plan, and needed in the same release: the payment reminders spec (the
   paywall promises the day-5 reminder).
 
@@ -77,8 +68,7 @@ Run Task P5 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, 
 plan's header and P5, the spec's §8. Widget tests that pump `ExhaleApp` without
 `startupOverrides()` (`splash_page_test.dart`) will need it once the router reads access.
 
-Open: the privacy policy URL (`LegalLinks.privacy`, before release); the Terms link in the
-App Store description. Sync stays in the launch build; fallback (1.0.1) on Fawad's call.
+Open: `LegalLinks.privacy` URL and the App Store Terms link (before release).
 
 ## Still open from earlier
 
@@ -87,5 +77,4 @@ App Store description. Sync stays in the launch build; fallback (1.0.1) on Fawad
 - Push, merge both branches to `main` (PRs from compare links), real iPhone pass.
 - Chat spec items waiting on Fawad: answer-fixing rule, tagline drafts, Other habit and
   price fields, the day's answer bubble.
-- iPhone review: Home card and ring taps, "Add a price" scroll, Edit plan spacing and text
-  jump, status bar glass unseen on device, accents and long plans unseen.
+- iPhone review list: Home taps, "Add a price" scroll, Edit plan spacing, status bar glass.
