@@ -236,9 +236,11 @@ shows the paywall.
 
 Design: `design/10._paywall/LockedSettings.html`. A "Subscription" `SectionCard`
 between Appearance and the trigger tile, three rows: the current plan ("Annual" with
-"Renews 3 Dec"; in the trial "Free until 20 Nov"; "Lifetime" with "Yours for good"),
+"Paid until 3 Dec"; in the trial "Free until 20 Nov"; "Lifetime" with "Yours for good"),
 Manage subscription › (`showManageSubscriptions()`, hidden for Lifetime) and Restore
 purchases.
+"Paid until", not "Renews": the StoreKit wrappers do not say whether a subscription will
+renew, so the card states only what is known.
 The later "Your data" section from the decisions record will absorb Restore.
 
 ## 13. Architecture
@@ -252,7 +254,9 @@ The later "Your data" section from the decisions record will absorb Restore.
   `offersProvider`, `PaywallPage`, `LockedPage`, the `DealStep` welcome-back wording.
 - Tests use a `FakeStoreRepository`. An Xcode StoreKit configuration file
   (`ios/Runner/Exhale.storekit`, mirroring the three products) is set on the Runner scheme
-  so the simulator walk can buy, restore and expire without a sandbox account.
+  for runs started from Xcode. A plain Flutter run does not apply it, so simulator walks
+  use a debug-only `--dart-define=FAKE_STORE=neverPaid|lapsed|entitled|offline`, which
+  registers the fake store. It is ignored in release builds.
 
 ## 14. Open items for Fawad (not blocking the plan)
 

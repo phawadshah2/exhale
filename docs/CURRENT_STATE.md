@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-11 (handoff after locking monetization and setting up App Store Connect).
+Updated 2026-11-13 (paywall researched, designed, specified and planned; no code yet).
 Earlier: `docs/history/` (latest `2026-11-09_to_11-11_state_log.md`: onboarding chat and
 the corrections round).
 
@@ -15,6 +15,7 @@ the corrections round).
 | Onboarding redesign 2 (chat) | C1 to C10 done, reviewed, full suite 1279 passed; walked in part |
 | Monetization and sync decisions | Locked 2026-11-10 |
 | App Store Connect payments | Set up 2026-11-10/11 (below) |
+| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P11 not started |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 ## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
@@ -39,15 +40,26 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
 - `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
   decisions, this handoff). Nothing pushed this session. Untracked on purpose:
   `design/all-designs.html`, `design/figma-import/`.
+- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs only, nothing pushed.
 - Checks: none run since the 1279-pass suite (docs-only work since).
+
+## Paywall
+
+- Spec `docs/superpowers/specs/2026-11-13-paywall-design.md`, plan
+  `docs/superpowers/plans/2026-11-13-paywall.md` (P1 to P11), designs
+  `design/10._paywall/`, research `docs/research/2026-11-13-paywall-research.md`.
+- Agreed with Fawad: the paywall (stat card, three steps, three plan cards, no scroll), the
+  welcome back (the reveal with two lines changed), the locked screen (Home behind glass).
+- Not in this plan, and needed in the same release: the payment reminders spec (the
+  paywall promises the day-5 reminder).
 
 ## Next action
 
-Write the paywall spec in `docs/superpowers/specs/` with the brainstorming skill (Opus 5.5
-high), then its plan. Read first: this file, the decisions record, `CLAUDE.md`.
+Run Task P1 of the paywall plan with the `execute-plan` skill (Sonnet 5.5 medium). Task P3
+needs Fawad's yes before `pub get` (`in_app_purchase`, `in_app_purchase_storekit`).
 
-Open questions: should the paywall branch off `feat/onboarding-chat-prototype` or wait for
-the merge to `main`? Sync stays in the launch build; fallback (sync in 1.0.1) only on
+Open: the privacy policy URL (`LegalLinks.privacy`, before release); the Terms link in the
+App Store description. Sync stays in the launch build; fallback (sync in 1.0.1) only on
 Fawad's call.
 
 ## Still open from earlier
