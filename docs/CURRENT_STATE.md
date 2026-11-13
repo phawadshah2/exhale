@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-13 (paywall P1 to P7 committed; P8 next).
+Updated 2026-11-13 (handoff: paywall P1 to P7 committed, last `7457329`; P8 next).
 Earlier: `docs/history/` (latest `2026-11-09_to_11-11_state_log.md`: onboarding chat and
 the corrections round).
 
@@ -20,10 +20,9 @@ the corrections round).
 
 ## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
 
-Decisions: `docs/decisions/2026-11-10-monetization-and-sync.md`. Hard paywall after the
-plan reveal; Annual (7-day trial, default), Monthly, Lifetime; nothing free after the
-trial; StoreKit 2 via `in_app_purchase` 3.3.1 and `in_app_purchase_storekit` 0.4.17
-(added with Fawad's yes, 2026-11-13).
+Decisions: `docs/decisions/2026-11-10-monetization-and-sync.md`. Hard paywall; Annual
+(7-day trial, default), Monthly, Lifetime; StoreKit 2 via `in_app_purchase` 3.3.1 and
+`in_app_purchase_storekit` 0.4.17.
 
 App Store Connect: agreements, bank, tax Active; Small Business Program awaiting email.
 Products: Annual US$34.99 (7-day free intro), Monthly US$7.99 (group `Exhale`), Lifetime
@@ -39,39 +38,37 @@ privacy and terms URLs, App Privacy.
   `design/all-designs.html`, `design/figma-import/`.
 - `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P7
   committed, nothing pushed.
-- Checks (2026-11-13): format and `analyze --fatal-infos` clean; each task's tests pass,
-  last run (P6): `test/features/onboarding`, `test/features/plan`,
-  `test/features/habit`, `test/app` all pass. Full suite: not run
-  since the 1279 pass (due at the milestone end).
+- Checks (2026-11-13, after P7): format and `analyze --fatal-infos` clean; P7's 13 tests
+  pass; after P6 `test/features/{onboarding,plan,habit}` and `test/app` passed. Full
+  suite: not run since the 1279 pass (due at the milestone end).
 
 ## Paywall
 
 - Spec `docs/superpowers/specs/2026-11-13-paywall-design.md`, plan
   `docs/superpowers/plans/2026-11-13-paywall.md` (P1 to P11), designs
   `design/10._paywall/`, research `docs/research/2026-11-13-paywall-research.md`.
-- Agreed with Fawad: the paywall (stat card, three steps, three plan cards, no scroll), the
-  welcome back (the reveal with two lines changed), the locked screen (Home behind glass).
-- Plan and its planning calls approved by Fawad (2026-11-13): Settings says "Paid until";
-  walks use `--dart-define=FAKE_STORE=…` (debug only); schema v12 caches the last access.
-- Done: P1 `resolveAccess`; P2 schema v12 access cache (no trial flag cached; fixture
-  `exhale_v11.sqlite`); P3 `StoreRepository` over `StoreKitGateway`, test default store
-  Lifetime; P4 `accessProvider`, 3 s startup read, refresh on resume; P5 routes and the access
-  gate (`launch.dart`), placeholder Paywall and Locked pages; P6 welcome back (`RestartUnstartedPlan`,
-  `replaceAll`), the reveal's button opens the paywall unless entitled; P7 `daysToCover`, `PaywallCopy`,
-  `paywallContent`. Deviations are noted
-  under each task in the plan.
-- Plugin facts (read from its source): updates arrive on `purchaseStream`, also after
-  each purchase call; purchases are not finished natively. 10 s timeout on offers and
-  access only. `offersProvider` has no auto-retry.
+- Agreed with Fawad (2026-11-13): the designs, the plan, Settings' "Paid until", walks
+  with `--dart-define=FAKE_STORE=…` (debug only).
+- Done (deviations noted under each task in the plan): P1 `resolveAccess`; P2 schema v12
+  access cache; P3 `StoreRepository` over `StoreKitGateway` (test default: Lifetime); P4
+  `accessProvider`, 3 s startup read, refresh on resume; P5 `launch.dart` (splash and
+  redirect), keyed placeholder `PaywallPage`/`LockedPage`; P6 welcome back
+  (`RestartUnstartedPlan`, `replaceAll`), the reveal pushes the paywall unless entitled;
+  P7 `daysToCover`, `PaywallCopy`, `paywallContent` (`PaywallStep.rowTitle` added).
+- Plugin: updates arrive on `purchaseStream` (also after each purchase call), purchases
+  are not finished natively; 10 s timeout on offers and access; `offersProvider` no retry.
 - Not in this plan, and needed in the same release: the payment reminders spec (the
   paywall promises the day-5 reminder).
 
 ## Next action
 
 Run Task P8 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
-plan's header and P8, the spec's §10, `design/10._paywall/Paywall.html`.
+plan's header and P8, the spec's §10, `design/10._paywall/Paywall.html`. P8 fills the
+placeholder `paywall_page.dart`; keep `PaywallPage.pageKey` (P5/P6 tests find it). The
+paywall is pushed over the reveal, so its back chevron pops.
 
-Open: `LegalLinks.privacy` URL and the App Store Terms link (before release).
+Open: `LegalLinks.privacy` URL and the App Store Terms link (before release). Walk: the
+welcome back has no header; check it clears the status bar.
 
 ## Still open from earlier
 
