@@ -45,14 +45,23 @@ class SubscriptionCard extends ConsumerWidget {
       child: Column(
         children: [
           if (entitled != null)
+            // The date drops under the plan when large text leaves no room
+            // beside it.
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: Text(_name(entitled.plan)),
-              trailing: Text(
-                _dateLine(entitled),
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: context.colors.onSurfaceVariant,
-                ),
+              title: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 12,
+                children: [
+                  Text(_name(entitled.plan)),
+                  Text(
+                    _dateLine(entitled),
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: context.colors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
             ),
           if (entitled?.plan != PlanKind.lifetime)
