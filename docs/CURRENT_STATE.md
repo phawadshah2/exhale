@@ -15,7 +15,7 @@ the corrections round).
 | Onboarding redesign 2 (chat) | C1 to C10 done, reviewed, full suite 1279 passed; walked in part |
 | Monetization and sync decisions | Locked 2026-11-10 |
 | App Store Connect payments | Set up 2026-11-10/11 (below) |
-| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P11 not started |
+| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 done, P2 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 ## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
@@ -40,9 +40,9 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
 - `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
   decisions, this handoff). Nothing pushed this session. Untracked on purpose:
   `design/all-designs.html`, `design/figma-import/`.
-- `feat/paywall` (off `feat/onboarding-chat-prototype`): 6 commits, docs and designs only
-  (last `fb07adf`), nothing pushed, tree clean.
-- Checks: not run since the 1279-pass suite (no code has changed since).
+- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs and P1; nothing
+  pushed.
+- Checks: full suite not run since the 1279 pass; P1's format, analyze and tests pass.
 
 ## Paywall
 
@@ -51,10 +51,9 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
   `design/10._paywall/`, research `docs/research/2026-11-13-paywall-research.md`.
 - Agreed with Fawad: the paywall (stat card, three steps, three plan cards, no scroll), the
   welcome back (the reveal with two lines changed), the locked screen (Home behind glass).
-- Spec approved by Fawad ("write the plan"). The plan is written but he has not yet said
-  it captures what he wants: confirm before P1.
-- Planning calls to check with him: Settings says "Paid until", not "Renews"; walks use
-  `--dart-define=FAKE_STORE=…` (debug only); schema v12 caches the last access.
+- Plan and its planning calls approved by Fawad (2026-11-13): Settings says "Paid until";
+  walks use `--dart-define=FAKE_STORE=…` (debug only); schema v12 caches the last access.
+- P1 done (`Access`, `PlanKind`, `StoreTransaction`, `resolveAccess`; 14 tests pass).
 - Unverified until the package is installed: how the plugin reports new transactions in
   StoreKit 2 mode (P3 reads its source first).
 - Not in this plan, and needed in the same release: the payment reminders spec (the
@@ -62,8 +61,8 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
 
 ## Next action
 
-Get Fawad's yes on the plan, then run Task P1 with the `execute-plan` skill (Sonnet 5.5
-medium). Read: this file, the plan, the spec's §7 to §8. Task P3 needs his yes before
+Run Task P2 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
+plan's header and P2, the spec's §7. Task P3 needs his yes before
 `pub get` (`in_app_purchase`, `in_app_purchase_storekit`).
 
 Open: the privacy policy URL (`LegalLinks.privacy`, before release); the Terms link in the
