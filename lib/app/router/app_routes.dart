@@ -14,4 +14,7 @@ abstract final class AppRoutes {
   static String changeHabitFor(int habitId) => '/change-habit/$habitId';
   static const logs = '/logs';
   static const settings = '/settings';
+  static const paywall = '/paywall';
+  static const locked = '/locked';
+  static const welcomeBack = '/welcome-back';
 }

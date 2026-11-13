@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:exhale/app/router/app_routes.dart';
+import 'package:exhale/app/router/launch.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/widgets/load_failure.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/splash_scene.dart';
+import 'package:exhale/features/paywall/presentation/providers/paywall_providers.dart';
+import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -34,7 +37,8 @@ class _SplashPageState extends ConsumerState<SplashPage>
     duration: SplashPage.introDuration,
   );
 
-  String? _destination;
+  /// Whether the saved habit has logs; null until a saved habit is read.
+  bool? _hasLogs;
   Timer? _leave;
   bool _talking = false;
   bool _introFinished = false;
@@ -62,9 +66,17 @@ class _SplashPageState extends ConsumerState<SplashPage>
   Future<void> _resolveDestination() async {
     final habits = await ref.read(habitRepositoryProvider).getActive();
     switch (habits) {
-      case Success(value: [_, ...]):
-        _destination = AppRoutes.home;
-        _maybeNavigate();
+      case Success(value: [final habit, ...]):
+        final logs = await ref
+            .read(habitLogRepositoryProvider)
+            .hasLogs(habit.id);
+        switch (logs) {
+          case Success(:final value):
+            _hasLogs = value;
+            _maybeNavigate();
+          case FailureResult():
+            if (mounted) setState(() => _readFailed = true);
+        }
       case Success():
         _startTalking();
       // A returning user must not land in onboarding as if their data had gone.
@@ -119,13 +131,20 @@ class _SplashPageState extends ConsumerState<SplashPage>
     _maybeNavigate();
   }
 
+  /// Access is read as the splash leaves, so a change during the intro
+  /// counts.
   void _maybeNavigate() {
-    final destination = _destination;
-    if (!mounted || _navigated || !_introFinished || destination == null) {
+    final hasLogs = _hasLogs;
+    if (!mounted || _navigated || !_introFinished || hasLogs == null) {
       return;
     }
     _navigated = true;
-    context.go(destination);
+    final launch = resolveLaunch(
+      hasPlan: true,
+      hasLogs: hasLogs,
+      access: ref.read(accessProvider),
+    );
+    context.go(launch.route);
   }
 
   void _replay() {

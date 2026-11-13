@@ -81,6 +81,12 @@ class LocalHabitLogRepository implements HabitLogRepository {
       .map((row) => row?.toEntity());
 
   @override
+  Future<Result<bool>> hasLogs(int habitId) => guardStorage(
+    _source,
+    () async => await _localDataSource.getLatest(habitId: habitId) != null,
+  );
+
+  @override
   Stream<List<HabitLog>> watchRecent({required int limit}) =>
       _localDataSource.watchRecent(limit: limit).map(_toEntities);
 

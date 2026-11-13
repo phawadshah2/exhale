@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-13 (handoff: paywall P1 to P4 committed, last `77277d5`; P5 next).
+Updated 2026-11-13 (paywall P1 to P5 committed; P6 next).
 Earlier: `docs/history/` (latest `2026-11-09_to_11-11_state_log.md`: onboarding chat and
 the corrections round).
 
@@ -15,7 +15,7 @@ the corrections round).
 | Onboarding redesign 2 (chat) | C1 to C10 done, reviewed, full suite 1279 passed; walked in part |
 | Monetization and sync decisions | Locked 2026-11-10 |
 | App Store Connect payments | Set up 2026-11-10/11 (below) |
-| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P4 done; P5 next |
+| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P5 done; P6 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 ## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
@@ -37,10 +37,11 @@ privacy and terms URLs, App Privacy.
 - `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
   decisions, this handoff). Nothing pushed this session. Untracked on purpose:
   `design/all-designs.html`, `design/figma-import/`.
-- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P4
-  committed (last `77277d5`), tree clean, nothing pushed.
+- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P5
+  committed, nothing pushed.
 - Checks (2026-11-13): format and `analyze --fatal-infos` clean; each task's tests pass,
-  last run 94 passed (`test/app`, splash, `test/features/paywall`). Full suite: not run
+  last run 184 passed (`test/app`, `test/features/paywall`, `test/features/tracking`),
+  plus splash (P5). Full suite: not run
   since the 1279 pass (due at the milestone end).
 
 ## Paywall
@@ -54,19 +55,19 @@ privacy and terms URLs, App Privacy.
   walks use `--dart-define=FAKE_STORE=…` (debug only); schema v12 caches the last access.
 - Done: P1 `resolveAccess`; P2 schema v12 access cache (no trial flag cached; fixture
   `exhale_v11.sqlite`); P3 `StoreRepository` over `StoreKitGateway`, test default store
-  Lifetime; P4 `accessProvider`, 3 s startup read, refresh on resume. Deviations are noted
+  Lifetime; P4 `accessProvider`, 3 s startup read, refresh on resume; P5 routes and the access
+  gate (`launch.dart`), placeholder Paywall, Locked and WelcomeBack pages. Deviations are noted
   under each task in the plan.
 - Plugin facts (read from its source): updates arrive on `purchaseStream`, also after
   each purchase call; purchases are not finished natively. 10 s timeout on offers and
-  access only. `offersProvider` has no auto-retry. Nothing gates on access yet.
+  access only. `offersProvider` has no auto-retry.
 - Not in this plan, and needed in the same release: the payment reminders spec (the
   paywall promises the day-5 reminder).
 
 ## Next action
 
-Run Task P5 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
-plan's header and P5, the spec's §8. Widget tests that pump `ExhaleApp` without
-`startupOverrides()` (`splash_page_test.dart`) will need it once the router reads access.
+Run Task P6 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
+plan's header and P6, the spec's §9. `WelcomeBackPage` is a keyed placeholder from P5.
 
 Open: `LegalLinks.privacy` URL and the App Store Terms link (before release).
 

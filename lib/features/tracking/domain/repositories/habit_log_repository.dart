@@ -31,6 +31,9 @@ abstract interface class HabitLogRepository {
 
   Stream<HabitLog?> watchLatest({int? habitId});
 
+  /// Whether [habitId] has any log at all.
+  Future<Result<bool>> hasLogs(int habitId);
+
   /// The newest [limit] logs of every active habit, newest first.
   Stream<List<HabitLog>> watchRecent({required int limit});
 }
