@@ -19,6 +19,8 @@ abstract final class AppIcons {
   static const IconData savings = CupertinoIcons.money_dollar_circle;
   static const IconData avoided = CupertinoIcons.leaf_arrow_circlepath;
   static const IconData sparkles = CupertinoIcons.sparkles;
+  static const IconData pause = CupertinoIcons.pause_fill;
+  static const IconData lock = CupertinoIcons.lock_fill;
 
   // Actions
   static const IconData add = CupertinoIcons.plus;
@@ -29,6 +31,7 @@ abstract final class AppIcons {
   static const IconData check = CupertinoIcons.checkmark;
   static const IconData checkCircle = CupertinoIcons.checkmark_circle_fill;
   static const IconData forward = CupertinoIcons.arrow_right;
+  static const IconData send = CupertinoIcons.arrow_up;
   static const IconData flag = CupertinoIcons.flag_fill;
   static const IconData back = CupertinoIcons.chevron_left;
   static const IconData chevronRight = CupertinoIcons.chevron_right;

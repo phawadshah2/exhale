@@ -4,7 +4,6 @@ import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/amount_step.dart';
-import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/amount_ruler.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/dots_grid.dart';
 import 'package:exhale/features/plan/domain/validation/plan_validation.dart';
@@ -20,15 +19,10 @@ void main() {
   tearDown(InjectionContainer.reset);
 
   Future<void> toSmokingAmount(WidgetTester tester) async {
-    await pumpOnboarding(tester);
-    await tester.pump();
-    await tester.tap(find.byType(WelcomeStep));
-    await tester.pump();
-    await tester.tap(find.text(OnboardingCopy.welcomeButton));
-    await tester.pumpAndSettle();
+    await pumpChangeHabit(tester);
     await tester.tap(find.text(Habit.smoking.name));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(OnboardingCopy.continueButton).last);
+    await tester.tap(find.text(OnboardingCopy.continueButton).hitTestable());
     await tester.pumpAndSettle();
   }
 
@@ -58,7 +52,7 @@ void main() {
   testWidgets('smoking starts at 9, respectable', (tester) async {
     await toSmokingAmount(tester);
 
-    expect(find.text('3/6'), findsOneWidget);
+    expect(find.text('2/4'), findsOneWidget);
     expect(find.text(OnboardingCopy.amountPrompt), findsOneWidget);
     expect(find.text(OnboardingCopy.amountTitle('cigarettes')), findsOneWidget);
     expect(inStep(find.text('9')), findsOneWidget);
@@ -108,7 +102,7 @@ void main() {
     await tester.drag(find.byType(AmountRuler), const Offset(120, 0));
     await tester.pumpAndSettle();
     expect(startLimit(tester), lessThan(9));
-    expect(find.text('3/6'), findsOneWidget);
+    expect(find.text('2/4'), findsOneWidget);
 
     await tester.disposeApp();
   });

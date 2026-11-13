@@ -21,7 +21,7 @@ import 'package:exhale/features/tracking/presentation/providers/tracking_provide
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum OnboardingStep { welcome, habit, amount, cost, day, deal }
+enum OnboardingStep { welcome, chat, habit, amount, cost, deal }
 
 /// The habit this form takes the place of; null on a first run. Overridden by
 /// a nested scope in `ChangeHabitPage`.
@@ -63,9 +63,12 @@ class OnboardingFormState {
     required this.currency,
     this.replaced,
     this.quitPreset = QuitPreset.suggested,
+    this.ownQuitDay,
+    this.pricedPerUnit = false,
     this.habitKind = defaultHabit,
     this.customName = '',
     this.customUnit = '',
+    this.userName = '',
     this.priceText = '',
     this.wakeMinute = DayWindow.defaultWake,
     this.bedMinute = DayWindow.defaultBed,
@@ -125,9 +128,20 @@ class OnboardingFormState {
   /// Null once the user picks a date on the wheel.
   final QuitPreset? quitPreset;
 
+  /// A date picked on the plan screen that is no pace's; its card stays
+  /// after another pace is chosen.
+  final LogicalDay? ownQuitDay;
+
+  /// The price is for one unit, though the habit comes in a container (the
+  /// chat asks what one drink costs). It saves as the preset's container.
+  final bool pricedPerUnit;
+
   final HabitKind habitKind;
   final String customName;
   final String customUnit;
+
+  /// What the user told the chat to call them; empty when they declined.
+  final String userName;
   final int startLimit;
   final String priceText;
   final int unitsPerContainer;
@@ -147,15 +161,17 @@ class OnboardingFormState {
   bool isTracked(HabitKind kind) =>
       kind != HabitKind.custom && replaced?.habit.kind == kind;
 
-  /// Cost is skipped for habits that do not track it. Changing the habit also
-  /// skips Welcome and Your day.
-  List<OnboardingStep> get steps => [
-    for (final step in OnboardingStep.values)
-      if ((step != OnboardingStep.cost || habit.tracksCost) &&
-          (!isChangingHabit ||
-              (step != OnboardingStep.welcome && step != OnboardingStep.day)))
-        step,
-  ];
+  /// A first run is the welcome, the chat and the plan. Changing the habit
+  /// keeps the habit, amount and cost steps (cost only for habits that track
+  /// it) before the plan.
+  List<OnboardingStep> get steps => isChangingHabit
+      ? [
+          OnboardingStep.habit,
+          OnboardingStep.amount,
+          if (habit.tracksCost) OnboardingStep.cost,
+          OnboardingStep.deal,
+        ]
+      : [OnboardingStep.welcome, OnboardingStep.chat, OnboardingStep.deal];
 
   int get total => steps.length;
 
@@ -180,7 +196,23 @@ class OnboardingFormState {
   double? get unitPriceCents {
     final price = priceCents;
     if (price == null) return null;
-    return habit.hasContainer ? price / unitsPerContainer : price.toDouble();
+    return habit.hasContainer && !pricedPerUnit
+        ? price / unitsPerContainer
+        : price.toDouble();
+  }
+
+  /// The price and container size to save: a unit price becomes the
+  /// preset's container, so Edit plan reads it as that container.
+  ({int? priceCents, int unitsPerContainer}) get savedPrice {
+    final price = priceCents;
+    if (price == null || !pricedPerUnit || !habit.hasContainer) {
+      return (priceCents: price, unitsPerContainer: unitsPerContainer);
+    }
+    final units = habit.defaultUnitsPerContainer;
+    final container = price * units;
+    return container > HabitValidation.maxPriceCents
+        ? (priceCents: price, unitsPerContainer: 1)
+        : (priceCents: container, unitsPerContainer: units);
   }
 
   int? get monthlyCostCents => _costOver(30);
@@ -225,9 +257,12 @@ class OnboardingFormState {
   OnboardingFormState copyWith({
     LogicalDay? quitDay,
     QuitPreset? Function()? quitPreset,
+    LogicalDay? ownQuitDay,
+    bool? pricedPerUnit,
     HabitKind? habitKind,
     String? customName,
     String? customUnit,
+    String? userName,
     int? startLimit,
     String? priceText,
     int? unitsPerContainer,
@@ -241,9 +276,12 @@ class OnboardingFormState {
     startDay: startDay,
     quitDay: quitDay ?? this.quitDay,
     quitPreset: quitPreset != null ? quitPreset() : this.quitPreset,
+    ownQuitDay: ownQuitDay ?? this.ownQuitDay,
+    pricedPerUnit: pricedPerUnit ?? this.pricedPerUnit,
     habitKind: habitKind ?? this.habitKind,
     customName: customName ?? this.customName,
     customUnit: customUnit ?? this.customUnit,
+    userName: userName ?? this.userName,
     startLimit: startLimit ?? this.startLimit,
     priceText: priceText ?? this.priceText,
     unitsPerContainer: unitsPerContainer ?? this.unitsPerContainer,
@@ -297,6 +335,8 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
 
   void setCustomUnit(String text) => state = state.copyWith(customUnit: text);
 
+  void setUserName(String text) => state = state.copyWith(userName: text);
+
   void setStartLimit(int value) {
     final startLimit = value.clamp(
       PlanValidation.minStartLimit,
@@ -322,6 +362,13 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
       errorMessage: () => null,
     );
   }
+
+  /// Remembers [day] as the user's own date on the plan screen.
+  void keepOwnQuitDay(LogicalDay day) =>
+      state = state.copyWith(ownQuitDay: day);
+
+  void setPricedPerUnit({required bool perUnit}) =>
+      state = state.copyWith(pricedPerUnit: perUnit);
 
   void setPriceText(String text) =>
       state = state.copyWith(priceText: text, errorMessage: () => null);
@@ -376,6 +423,7 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
               wakeMinute: () => form.wakeMinute,
               bedMinute: () => form.bedMinute,
               currencySymbol: form.currency,
+              userName: () => form.userName.isEmpty ? null : form.userName,
             ),
           );
       if (!ref.mounted) return false;
@@ -384,10 +432,11 @@ class OnboardingFormController extends Notifier<OnboardingFormState> {
       }
     }
 
+    final saved = form.savedPrice;
     final draft = HabitDraft(
       habit: form.habit,
-      priceCents: form.priceCents,
-      unitsPerContainer: form.unitsPerContainer,
+      priceCents: saved.priceCents,
+      unitsPerContainer: saved.unitsPerContainer,
     );
     final result = replaced == null
         ? await ref.read(startTrackingProvider)((

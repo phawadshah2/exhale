@@ -5,6 +5,7 @@ import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
+import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/typing_dots.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,13 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// Plays the slide into the welcome. Not `pumpAndSettle`: the welcome's
+  /// button keeps moving while animations are on.
+  Future<void> toWelcome(WidgetTester tester) async {
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpInSteps(const Duration(seconds: 1));
+  }
+
   void reduceMotion(WidgetTester tester) {
     tester.platformDispatcher.accessibilityFeaturesTestValue =
         const FakeAccessibilityFeatures(disableAnimations: true);
@@ -68,9 +76,9 @@ void main() {
       expect(find.byType(OnboardingPage), findsNothing);
 
       await tester.pump(const Duration(milliseconds: 50));
-      await leaveSplash(tester);
+      await toWelcome(tester);
       expect(find.byType(SplashPage), findsNothing);
-      expect(find.text('1/6'), findsOneWidget);
+      expect(find.byType(WelcomeStep), findsOneWidget);
 
       await tester.disposeApp();
     });
@@ -81,8 +89,8 @@ void main() {
 
       await tester.tap(find.byType(SplashPage));
       await tester.pump(firstLaunch);
-      await leaveSplash(tester);
-      expect(find.text('1/6'), findsOneWidget);
+      await toWelcome(tester);
+      expect(find.byType(WelcomeStep), findsOneWidget);
 
       await tester.disposeApp();
     });
@@ -96,8 +104,8 @@ void main() {
       expect(find.byType(TypingDots), findsNothing);
 
       await tester.pump(firstLaunch);
-      await leaveSplash(tester);
-      expect(find.text('1/6'), findsOneWidget);
+      await toWelcome(tester);
+      expect(find.byType(WelcomeStep), findsOneWidget);
 
       await tester.disposeApp();
     });

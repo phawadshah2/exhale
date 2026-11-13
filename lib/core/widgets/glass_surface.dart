@@ -26,6 +26,7 @@ class GlassSurface extends StatelessWidget {
     this.blur = 24,
     this.color,
     this.shadow = true,
+    this.opacity,
     super.key,
   });
 
@@ -38,6 +39,10 @@ class GlassSurface extends StatelessWidget {
   /// Base colour before translucency; defaults to an elevated surface.
   final Color? color;
   final bool shadow;
+
+  /// The fill's opacity while glass is on; defaults to 0.62 dark, 0.72
+  /// light.
+  final double? opacity;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +66,9 @@ class GlassSurface extends StatelessWidget {
     final base =
         color ??
         (isDark ? colors.surfaceContainerHigh : colors.surfaceContainerLowest);
-    final fill = glass ? base.withValues(alpha: isDark ? 0.62 : 0.72) : base;
+    final fill = glass
+        ? base.withValues(alpha: opacity ?? (isDark ? 0.62 : 0.72))
+        : base;
 
     Widget surface = DecoratedBox(
       decoration: ShapeDecoration(color: fill, shape: shape),

@@ -1,18 +1,20 @@
 import 'dart:async';
 
+import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/smooth_switcher.dart';
 import 'package:exhale/features/onboarding/presentation/providers/onboarding_form_provider.dart';
 import 'package:exhale/features/onboarding/presentation/steps/amount_step.dart';
+import 'package:exhale/features/onboarding/presentation/steps/chat_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/cost_step.dart';
-import 'package:exhale/features/onboarding/presentation/steps/day_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/deal_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/habit_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/exhale_bubble.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/onboarding_motion.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/onboarding_stepper.dart';
+import 'package:exhale/features/onboarding/presentation/widgets/round_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -85,6 +87,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   void _back() {
     final index = _steps.indexOf(_current);
     if (index <= 0 && !_canLeave) return;
+    // The chat has no way back to the welcome.
+    if (_current == OnboardingStep.chat) return;
     unawaited(HapticFeedback.selectionClick());
     if (index <= 0) {
       Navigator.of(context).pop();
@@ -108,44 +112,94 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       });
     final steps = _steps;
     final index = steps.indexOf(_current);
+    final header = _canLeave || _current == OnboardingStep.deal;
 
     return OnboardingScope(
       next: _next,
       back: _back,
       child: Scaffold(
+        // The chat lets the keyboard slide over its dock and pads its own
+        // list instead.
+        resizeToAvoidBottomInset: _current != OnboardingStep.chat,
+        // The chat runs under the status bar; every other step and the
+        // header keep clear of it. Each step keeps its button clear of the
+        // bottom inset itself, so the chat's dock can reach the edge.
         body: SafeArea(
+          top: false,
+          bottom: false,
           child: Column(
             children: [
-              OnboardingStepper(
-                index: index,
-                total: steps.length,
-                onBack: index > 0 || _canLeave ? _back : null,
-              ),
+              if (_canLeave)
+                SafeArea(
+                  bottom: false,
+                  child: OnboardingStepper(
+                    index: index,
+                    total: steps.length,
+                    onBack: _back,
+                  ),
+                )
+              else if (_current == OnboardingStep.deal)
+                SafeArea(
+                  bottom: false,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.pageMargin,
+                        AppSpacing.gutterSm,
+                        0,
+                        0,
+                      ),
+                      child: RoundIconButton(
+                        icon: AppIcons.back,
+                        label: 'Back',
+                        size: 44,
+                        onTap: _back,
+                      ),
+                    ),
+                  ),
+                ),
               Expanded(
-                child: GestureDetector(
-                  onHorizontalDragEnd: (details) {
-                    if ((details.primaryVelocity ?? 0) > _backFlingVelocity) {
-                      _back();
-                    }
-                  },
-                  child: PageView(
-                    controller: _pages,
-                    physics: const NeverScrollableScrollPhysics(),
-                    onPageChanged: (i) => setState(() => _current = steps[i]),
-                    children: [
-                      for (final step in steps)
-                        KeyedSubtree(
-                          key: ValueKey(step),
-                          child: switch (step) {
-                            OnboardingStep.welcome => const WelcomeStep(),
-                            OnboardingStep.habit => const HabitStep(),
-                            OnboardingStep.amount => const AmountStep(),
-                            OnboardingStep.cost => const CostStep(),
-                            OnboardingStep.day => const DayStep(),
-                            OnboardingStep.deal => const DealStep(),
-                          },
-                        ),
-                    ],
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: header,
+                  child: GestureDetector(
+                    onHorizontalDragEnd: (details) {
+                      if ((details.primaryVelocity ?? 0) > _backFlingVelocity) {
+                        _back();
+                      }
+                    },
+                    child: PageView(
+                      controller: _pages,
+                      physics: const NeverScrollableScrollPhysics(),
+                      onPageChanged: (i) => setState(() => _current = steps[i]),
+                      children: [
+                        for (final step in steps)
+                          // The chat stays alive off screen; its tickers
+                          // stop there.
+                          TickerMode(
+                            key: ValueKey(step),
+                            enabled:
+                                step != OnboardingStep.chat ||
+                                _current == OnboardingStep.chat,
+                            child: step == OnboardingStep.chat
+                                ? const ChatStep()
+                                : SafeArea(
+                                    bottom: false,
+                                    child: switch (step) {
+                                      OnboardingStep.welcome =>
+                                        const WelcomeStep(),
+                                      OnboardingStep.habit => const HabitStep(),
+                                      OnboardingStep.amount =>
+                                        const AmountStep(),
+                                      OnboardingStep.cost => const CostStep(),
+                                      OnboardingStep.deal => const DealStep(),
+                                      OnboardingStep.chat => const ChatStep(),
+                                    },
+                                  ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -159,22 +213,33 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
 /// A step's scrollable body above its pinned [button]. [body] gets at least
 /// the visible height, so a `Column` with `spaceBetween` puts its last
-/// child at the bottom. [below] (a link or fine print) sits in a slot of
-/// [belowHeight] under the button, so the button is at the same height on
-/// every step.
+/// child at the bottom. [below] (a link or fine print) sits [belowGap] under
+/// the button, and the button as low as the bottom inset allows, as in the
+/// chat's dock. [above] sits over the button and grows upwards, so the
+/// button stays where it is on every step.
 class OnboardingStepFrame extends StatelessWidget {
   const OnboardingStepFrame({
     required this.body,
     required this.button,
+    this.above,
     this.below,
     this.onTapBody,
     super.key,
   });
 
-  static const double belowHeight = 44;
+  static const double belowGap = AppSpacing.sm;
+
+  /// Around a step's button and what is below it, clear of the bottom inset.
+  static EdgeInsets dockPadding(BuildContext context) => EdgeInsets.fromLTRB(
+    AppSpacing.pageMargin,
+    AppSpacing.gutterSm,
+    AppSpacing.pageMargin,
+    MediaQuery.paddingOf(context).bottom,
+  );
 
   final Widget body;
   final Widget button;
+  final Widget? above;
   final Widget? below;
   final VoidCallback? onTapBody;
 
@@ -197,20 +262,17 @@ class OnboardingStepFrame extends StatelessWidget {
         ),
       ),
       Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.pageMargin,
-          AppSpacing.gutterSm,
-          AppSpacing.pageMargin,
-          AppSpacing.sm,
-        ),
+        padding: dockPadding(context),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ?above,
             SizedBox(width: double.infinity, child: button),
-            ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: belowHeight),
-              child: Align(alignment: Alignment.topCenter, child: below),
-            ),
+            if (below case final below?)
+              Padding(
+                padding: const EdgeInsets.only(top: belowGap),
+                child: below,
+              ),
           ],
         ),
       ),

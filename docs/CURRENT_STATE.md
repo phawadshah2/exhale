@@ -1,92 +1,75 @@
 # Current state
 
-Updated 2026-11-05. Earlier sessions: `docs/history/2026-10-16_to_11-03_state_log.md`.
+Updated 2026-11-09 (chat milestone end: review, fixes, full suite, walk). Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `…11-04_to_11-05…`.
 
 ## Where we are
 
 | Milestone | Status |
 |---|---|
-| M1 Habits foundation, M2 Dashboard and Logs, M3 Logging and editing, onboarding redesign | Done, merged |
-| M5 Release candidate | Done, merged to `main` (51e0bc6). Real iPhone pass still open |
-| M6 Plan details, Edit plan, Logs (Tasks 1 to 12) | Done on `feat/plan-and-stages`: reviewed, two simulator walks |
-| UI fixes from Fawad's review (Phase 4b, F1 to F4) | Done; seen in the simulator, light mode |
-| UI review round 2 (Logs, Plan, Home, transitions) | Done, committed (a947c2d) |
-| M7 Stage management (Tasks 13 to 20) | Done: reviewed, fixed, simulator walk 2026-11-04 |
-| Stage polish P1 to P4 (`docs/superpowers/plans/2026-11-04-stage-polish.md`) | Done, committed; seen in the simulator, approved by Fawad |
-| Green under the limit G1, trigger colours G2 (`docs/superpowers/plans/2026-11-04-green-under.md`) | Done, walked light and dark, approved; merged into `feat/plan-and-stages` |
+| M1 to M3, first onboarding redesign | Done, merged |
+| M5 Release candidate | Done, merged to `main` (51e0bc6) |
+| M6 Plan details, Edit plan, Logs; M7 Stage management; polish rounds | Done on `feat/plan-and-stages`, walked in the simulator |
+| TestFlight build 1.0.0 (1) | Installed by Fawad; runs fine on his iPhone (2026-11-06) |
+| Onboarding redesign 2 (chat) | C1 to C10 done; reviewed, fixed, full suite green, walked in part |
 | M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
-
-Plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md` (all tasks ticked). Spec for
-M7: `docs/superpowers/specs/2026-11-02-stage-management-design.md`.
 
 ## Repo
 
-- Branch `feat/plan-and-stages`, 91 commits ahead of `main`; `feat/green-under`
-  fast-forwarded into it. Fully pushed (6dcec71, 2026-11-05). No PR is open, and CI was not
-  read.
-- Checks at 7a80954: full suite 1211 passed, 0 failed (`build/test-report.json`); format
-  and `analyze --fatal-infos` clean.
+- `feat/plan-and-stages` pushed, not merged, no PR, CI not read. Last full suite at 7a80954:
+  1211 passed.
+- `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`), not pushed. Latest: C10
+  bf88e04, b54db14, milestone review fixes b8a3b01, then the walk's "1 stage" copy fix.
 - Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
 
-## M7 simulator walk (2026-11-04, `exhale` iOS 26.5)
+## Onboarding chat (current goal)
 
-`lib/main_seed.dart` (git-excluded) now takes `--dart-define=SEED_STAGE=hold|review|reassess`:
-12 a day with weekly drops, the latest stage ending yesterday. Uninstall the app between runs.
+Spec `docs/superpowers/specs/2026-11-08-onboarding-chat-design.md` (sections 9 and 10 hold
+every change Fawad asked for on 2026-11-08). Plan `docs/superpowers/plans/2026-11-08-onboarding-chat.md`,
+C1 to C10 ticked, "Then" open.
 
-- Hold, dark and light: "9 can wait.", 76 against 70, next drop Nov 11 (was today), quit
-  Jan 13 (was Jan 6). Keep moved today to 9 and stage 4; Got it kept 10 and stage 3.
-- Review, light and dark: card without a number (two limits in the 14 days); sheet tiles,
-  top 3 triggers, three choices with dates and change labels; Keep variant of button and
-  footer. "Shake on it again" started stage 1/10 at 10.
-- Reassess, dark and light: card, sheet, Still yours tiles, nicotine support line, Start
-  again from 12 (Jan 27, 3 weeks later). Keep my plan closed the card, plan unchanged.
+Done on 2026-11-08: C8 (main's welcome look; Sent → Read under the last excuse only;
+money card D, now vs plan; welcome word-by-word reveal, slowed); plan page
+(quit date right, Pick my own date above the button, C9 stage ring and day/week grid, Your
+date card); C10 (messages grow in, list follows the end per frame, keyboard slides over a
+fixed dock, avatars stay while Exhale types, tagline 8 pt under the button; a message
+keeps its state when its entrance ends).
 
-## Walk rulings (Fawad, 2026-11-05)
+Milestone review (2026-11-09, b8a3b01): a newest card answers while another is reopened
+(was dead); new Exhale messages announced to VoiceOver; money card uses the pace the plan
+opens on and whole units; grid keeps 7 columns for plans under 4 weeks; the own date lives
+in the form (`ownQuitDay`); the kept-alive chat mutes its tickers off screen.
 
-Plan `docs/superpowers/plans/2026-11-05-walk-rulings.md`, R1 to R3 done and committed, each
-with its tests, format and analyze clean. Spec 4, 5.2 and 5.3 updated. R1: the review's
-tiles, average, triggers and "Start from your real number" use the two failed weeks (the
-hold's window and the review's), not 14 days in a row. R2: hold card tiles stand out in
-light mode. R3: "0%" with no arrow vs baseline.
+Checks: full suite at b8a3b01 1273 passed (onboarding_chat 27, deal_step 12,
+onboarding_page 5, chat_step 21, chat_cards 13, accessibility 4, app_test 6). Analyze clean.
 
-Walked 2026-11-05 (`exhale` iOS 26.5): review seed, light and dark, 157 logged against 147,
-About 12, real number 12 a day (Jan 28); card without a number. Hold seed, light: tiles solid
-with an outline, 76 against 70 unchanged. Reassess seed: "0%" with the minus icon. Not seen:
-R2 and R3 in dark mode beyond the review sheet.
+Simulator walk (light, iPhone 17 Pro Max size): welcome, chat with the keyboard over the
+dock, reopen-then-answer, smoking (pack price and size, money card A$2,190 / A$280 /
+A$1,910), social media (no price), plan grid, a 1-day own date, the own-date card after
+Back. Not walked: dark mode, Reduce Transparency, text at 200%, a no-container priced
+habit, fixing every card. Log, once: chat Column overflow 29,310 px (`chat_step.dart:143`),
+likely a keyboard toggle in the simulator; not reproduced.
 
-## Stage polish and colours (2026-11-04)
+Decided (Claude, Fawad's go-ahead, 2026-11-09; spec section 11): drinks priced one at a
+time save as the preset container; short plans keep 7 grid columns; a double tap on "See my
+plan" already cannot save (the slide ignores touches; tested); selected card stays as the
+mockup; tagline gap 8 pt.
 
-- Stage polish walked and approved; the sheet fix was not seen (no card showed).
-- Under the limit is green (`success.solid`) through `LimitStatus.barColor` alone; Home's
-  today ring, all text and the week chart's line keep the accent.
-- Triggers use 9 fixed slots, 198° to 318° (`trigger_ui.dart`), distinct within each
-  habit. 331° looked crimson beside red, so the range stops at 318°.
+Test gotcha: an enabled `ChevronButton` loops, so welcome and plan tests turn on Reduce Motion (`reduceMotion` in `test/helpers/onboarding.dart`) or pump fixed time. A failing test there hangs past `--timeout`; run such files in the background.
 
-## TestFlight (2026-11-05)
-
-- Personal team `5W8A3P22WK` (was the office team), iPhone only, portrait,
-  `ITSAppUsesNonExemptEncryption` false (0854339, 4f45635). App record created in App
-  Store Connect.
-- `fvm flutter build ipa --release --build-name=1.0.0 --build-number=1` built
-  `build/ios/ipa/exhale.ipa` from `feat/plan-and-stages`, signed with a cloud-managed
-  Apple Distribution certificate (no local key to back up). Uploaded via Transporter
-  2026-11-05; processing and the internal testing group not yet confirmed.
-- Icon and launch image are Flutter placeholders: fine for internal testing, needed before
-  external testers or review. Each new upload needs a higher `--build-number`.
+Waiting on Fawad (marked in the spec): the answer-fixing rule (section 4, plus the price
+skip rule), the italic tagline drafts (section 5), the Other habit and price fields, and
+the day's answer bubble.
 
 ## Next action
 
-Fawad opens the PR to `main`:
-https://github.com/phawadshah2/exhale/compare/main...feat/plan-and-stages. Then read the
-"Analyze & test" check and fix anything it reports. After merge: the real iPhone pass
-(open checks below), including the M6 and M7 screens via `SEED_STAGE` and the colours. To
-continue, read only this file.
+Fawad: walk the rest (dark, Reduce Transparency, 200%, a priced drink in Edit plan).
+Then merge `feat/plan-and-stages` and this branch to `main` (PRs from compare links) and
+do the real iPhone pass.
 
-## Open checks
+## Open items from Fawad's iPhone review (2026-11-06)
 
-- Not seen: dark mode of the F1 to F4 screens, Reduce Transparency, text at 200% in the
-  simulator, a real iPhone (glass performance, chart scrolling with 90+ days, returning
-  from the background, the M6 and M7 screens), a long plan, Plan details at 200%.
-- Round 2 not seen in the simulator: range mode, the date wheel, tab fade, dark mode.
-- M7 not seen: Reduce Transparency, text at 200%, the alcohol line, a late-open hold card.
-- Colours walked only under Ink: Eucalyptus and Ocean accents not seen.
+- Home: tap the stage/plan card to open Plan; tap the ring to open that day's logs.
+- "Add a price" should scroll Plan to the price field; in Edit plan the keyboard hides it.
+- Edit plan: less space between pace and suggested date; text jumps start-then-centre.
+- Glassy status bar on scroll, app-wide.
+- Not seen: Reduce Transparency, text at 200%, Eucalyptus and Ocean accents, long plans.

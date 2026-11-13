@@ -135,24 +135,17 @@ void main() {
     expect(state().isSteep, isFalse);
   });
 
-  group('steps', () {
-    test('a habit with cost has six steps', () {
-      controller().selectHabit(HabitKind.smoking);
+  test('a first run is the welcome, the chat and the plan, for any habit', () {
+    for (final kind in [HabitKind.smoking, HabitKind.socialMedia]) {
+      controller().selectHabit(kind);
 
-      expect(state().steps, OnboardingStep.values);
-      expect(state().total, 6);
-      expect(state().stepLabel(OnboardingStep.welcome), '1/6');
-      expect(state().stepLabel(OnboardingStep.day), '5/6');
-    });
-
-    test('a habit without cost skips the cost step', () {
-      controller().selectHabit(HabitKind.socialMedia);
-
-      expect(state().steps, isNot(contains(OnboardingStep.cost)));
-      expect(state().total, 5);
-      expect(state().stepLabel(OnboardingStep.day), '4/5');
-      expect(state().stepLabel(OnboardingStep.deal), '5/5');
-    });
+      expect(state().steps, [
+        OnboardingStep.welcome,
+        OnboardingStep.chat,
+        OnboardingStep.deal,
+      ]);
+      expect(state().stepLabel(OnboardingStep.deal), '3/3');
+    }
   });
 
   test('one dot per unit up to 12, then each dot stands for more', () {
@@ -260,10 +253,8 @@ void main() {
   test(
     'submit saves the day and currency, then habit 1 and its plan',
     () async {
-      await sl<SettingsRepository>().save(
-        (await storedSettings()).copyWith(userName: () => 'Fawad'),
-      );
       controller()
+        ..setUserName('Fawad')
         ..setStartLimit(12)
         ..selectQuitPreset(QuitPreset.weeks8)
         ..setCurrency('€')

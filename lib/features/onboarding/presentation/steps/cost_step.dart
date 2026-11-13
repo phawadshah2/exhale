@@ -79,8 +79,8 @@ class _CostStepState extends ConsumerState<CostStep> {
         onPressed: _continue,
       ),
       below: CupertinoButton(
-        padding: const EdgeInsets.only(top: AppSpacing.sm),
-        minimumSize: const Size(44, OnboardingStepFrame.belowHeight),
+        padding: EdgeInsets.zero,
+        minimumSize: const Size(44, 44),
         onPressed: _skip,
         child: Text(
           OnboardingCopy.skipPrice,
@@ -240,12 +240,7 @@ class _CostStepState extends ConsumerState<CostStep> {
               ),
             ),
           ],
-          AnimatedSize(
-            duration: MediaQuery.disableAnimationsOf(context)
-                ? Duration.zero
-                : const Duration(milliseconds: 250),
-            curve: Curves.easeOutCubic,
-            alignment: Alignment.topCenter,
+          StepGrow(
             child: showTotals
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

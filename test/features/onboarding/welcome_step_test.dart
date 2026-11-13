@@ -1,7 +1,8 @@
 import 'package:exhale/core/di/injection_container.dart';
-import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
+import 'package:exhale/features/onboarding/presentation/steps/chat_step.dart';
 import 'package:exhale/features/onboarding/presentation/steps/welcome_step.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../helpers/fixed_clock.dart';
@@ -12,60 +13,58 @@ void main() {
   setUp(() => setUpTestDependencies(FixedClock(DateTime(2026, 10, 20, 9))));
   tearDown(InjectionContainer.reset);
 
-  void expectEndState() {
-    for (final line in [
-      ...OnboardingCopy.excuses,
-      ...OnboardingCopy.welcomeReplies,
-      OnboardingCopy.welcomeTitle,
-      OnboardingCopy.welcomeBody,
-      OnboardingCopy.welcomeButton,
-      OnboardingCopy.welcomeFinePrint,
-    ]) {
-      expect(find.text(line), findsOneWidget, reason: line);
-    }
-    expect(
-      find.text('You · Tonight 11:48 PM', findRichText: true),
-      findsOneWidget,
-    );
-    expect(find.text(OnboardingCopy.welcomeRead), findsOneWidget);
+  Future<void> pumpWelcome(WidgetTester tester) async {
+    reduceMotion(tester);
+    await pumpOnboarding(tester);
+    await tester.pumpAndSettle();
   }
 
-  testWidgets('plays the chat, then shows the headline', (tester) async {
-    await pumpOnboarding(tester);
-    await tester.pump();
-    expect(find.text(OnboardingCopy.welcomeTitle), findsNothing);
+  testWidgets('pitches the app with four rows and one button', (tester) async {
+    await pumpWelcome(tester);
 
-    await tester.pumpInSteps(WelcomeStep.duration);
-    await tester.pumpAndSettle();
-
-    expectEndState();
-    expect(find.text('1/6'), findsOneWidget);
-    expect(find.byIcon(AppIcons.back), findsNothing);
-
-    await tester.disposeApp();
-  });
-
-  testWidgets('a tap skips to the end', (tester) async {
-    await pumpOnboarding(tester);
-    await tester.pump();
-
-    await tester.tap(find.byType(WelcomeStep));
-    await tester.pump();
-
-    expectEndState();
+    expect(find.byType(WelcomeStep), findsOneWidget);
+    expect(find.text(OnboardingCopy.brand), findsOneWidget);
+    expect(labelled(OnboardingCopy.welcomeTitle), findsOneWidget);
+    expect(find.text(OnboardingCopy.welcomeNegotiating), findsOneWidget);
+    expect(find.text(OnboardingCopy.welcomeBody), findsOneWidget);
+    for (final (title, body) in OnboardingCopy.welcomeRows) {
+      expect(find.text(title), findsOneWidget);
+      expect(find.text(body), findsOneWidget);
+    }
+    expect(find.text(OnboardingCopy.welcomeButton), findsOneWidget);
+    expect(find.text(OnboardingCopy.welcomeFinePrint), findsOneWidget);
+    expect(labelled('Back'), findsNothing);
 
     await tester.disposeApp();
   });
 
-  testWidgets('with reduced motion it starts at the end', (tester) async {
-    tester.platformDispatcher.accessibilityFeaturesTestValue =
-        const FakeAccessibilityFeatures(disableAnimations: true);
-    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+  testWidgets('under Reduce Motion the strike is drawn at once', (
+    tester,
+  ) async {
+    await pumpWelcome(tester);
 
-    await pumpOnboarding(tester);
-    await tester.pump();
+    final struck = find
+        .ancestor(
+          of: find.text(OnboardingCopy.welcomeNegotiating),
+          matching: find.byType(Stack),
+        )
+        .first;
+    final strike = tester.widget<Transform>(
+      find.descendant(of: struck, matching: find.byType(Transform)),
+    );
+    expect(strike.transform.getRow(0).x, 1);
 
-    expectEndState();
+    await tester.disposeApp();
+  });
+
+  testWidgets("Let's talk opens the chat", (tester) async {
+    await pumpWelcome(tester);
+
+    await tester.tap(find.text(OnboardingCopy.welcomeButton));
+    await settleChat(tester);
+
+    expect(find.byType(ChatStep), findsOneWidget);
+    expect(find.byType(WelcomeStep), findsNothing);
 
     await tester.disposeApp();
   });

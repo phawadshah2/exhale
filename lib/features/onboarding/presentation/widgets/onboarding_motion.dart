@@ -35,12 +35,20 @@ class SelectionColors {
 
 /// Fades and lifts [child] in when its step appears. Children of one step
 /// come in one after another, ordered by [index], once the page has mostly
-/// slid in.
+/// slid in. A [delay] replaces the order's own, a [duration] the fade's.
 class StepReveal extends StatefulWidget {
-  const StepReveal({required this.child, this.index = 0, super.key});
+  const StepReveal({
+    required this.child,
+    this.index = 0,
+    this.delay,
+    this.duration,
+    super.key,
+  });
 
   final Widget child;
   final int index;
+  final Duration? delay;
+  final Duration? duration;
 
   static const Duration _lead = Duration(milliseconds: 160);
   static const Duration _stagger = Duration(milliseconds: 70);
@@ -59,8 +67,9 @@ class _StepRevealState extends State<StepReveal>
   void initState() {
     super.initState();
     final delay =
+        widget.delay ??
         StepReveal._lead + StepReveal._stagger * widget.index.clamp(0, 8);
-    final total = delay + StepReveal._each;
+    final total = delay + (widget.duration ?? StepReveal._each);
     _controller = AnimationController(vsync: this, duration: total);
     _progress = CurvedAnimation(
       parent: _controller,
@@ -132,6 +141,25 @@ class _PressScaleState extends State<PressScale> {
       child: widget.child,
     ),
   );
+}
+
+/// Animates a change in [child]'s height, except under Reduce Motion, where
+/// a zero-length [AnimatedSize] would lay itself out again mid-layout.
+class StepGrow extends StatelessWidget {
+  const StepGrow({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.topCenter,
+      child: child,
+    );
+  }
 }
 
 /// [value] as text that rolls up when it grows and down when it shrinks.
