@@ -15,7 +15,7 @@ the corrections round).
 | Onboarding redesign 2 (chat) | C1 to C10 done, reviewed, full suite 1279 passed; walked in part |
 | Monetization and sync decisions | Locked 2026-11-10 |
 | App Store Connect payments | Set up 2026-11-10/11 (below) |
-| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P3 done; P4 next |
+| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P4 done; P5 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 ## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
@@ -41,10 +41,10 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
 - `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
   decisions, this handoff). Nothing pushed this session. Untracked on purpose:
   `design/all-designs.html`, `design/figma-import/`.
-- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P3;
+- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P4;
   nothing pushed.
-- Checks: full suite not run since the 1279 pass; P1 to P3's format, analyze and tests
-  pass (plus `test/features/settings`).
+- Checks: full suite not run since the 1279 pass; P1 to P4's format, analyze and tests
+  pass (plus `test/features/settings`, `test/app`, the splash test).
 
 ## Paywall
 
@@ -64,13 +64,18 @@ products, Family Sharing decision (irreversible), privacy policy and terms URLs,
   source: updates come through `InAppPurchase.instance.purchaseStream` (also fires after
   every purchase call); purchases are not finished natively, and an unfinished one blocks
   buying that product again. The 10 s timeout covers offers and access only.
+- P4 done: `accessProvider` (`AccessController`), `initialAccessProvider` (throws unless
+  `startupOverrides()` overrides it), `offersProvider` (no auto-retry). Startup waits 3 s
+  for the store, then uses the cache; `ExhaleApp` refreshes on resume. Nothing gates on
+  access yet (P5).
 - Not in this plan, and needed in the same release: the payment reminders spec (the
   paywall promises the day-5 reminder).
 
 ## Next action
 
-Run Task P4 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
-plan's header and P4, the spec's §7.
+Run Task P5 with the `execute-plan` skill (Sonnet 5.5 medium). Read: this file, the
+plan's header and P5, the spec's §8. Widget tests that pump `ExhaleApp` without
+`startupOverrides()` (`splash_page_test.dart`) will need it once the router reads access.
 
 Open: the privacy policy URL (`LegalLinks.privacy`, before release); the Terms link in the
 App Store description. Sync stays in the launch build; fallback (1.0.1) on Fawad's call.
