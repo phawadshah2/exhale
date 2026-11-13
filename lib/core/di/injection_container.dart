@@ -3,11 +3,13 @@ import 'package:exhale/core/data/local/database/drift_transaction_runner.dart';
 import 'package:exhale/core/domain/time/clock.dart';
 import 'package:exhale/core/domain/transaction/transaction_runner.dart';
 import 'package:exhale/features/habit/habit_injection.dart';
+import 'package:exhale/features/paywall/data/fake/debug_store.dart';
 import 'package:exhale/features/paywall/domain/repositories/store_repository.dart';
 import 'package:exhale/features/paywall/paywall_injection.dart';
 import 'package:exhale/features/plan/plan_injection.dart';
 import 'package:exhale/features/settings/settings_injection.dart';
 import 'package:exhale/features/tracking/tracking_injection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 
 /// Service locator for data sources, repositories, use cases and services.
@@ -15,7 +17,8 @@ import 'package:get_it/get_it.dart';
 final GetIt sl = GetIt.instance;
 
 abstract final class InjectionContainer {
-  /// [database], [clock] and [store] are overridable for tests.
+  /// [database], [clock] and [store] are overridable for tests. A debug
+  /// build takes its store from `--dart-define=FAKE_STORE=…` when given.
   static Future<void> setupDependencies({
     AppDatabase? database,
     Clock clock = const Clock(),
@@ -34,7 +37,14 @@ abstract final class InjectionContainer {
     initPlanDependencies(sl);
     initTrackingDependencies(sl);
     initSettingsDependencies(sl);
-    initPaywallDependencies(sl, store);
+    initPaywallDependencies(
+      sl,
+      store ??
+          debugStore(
+            const String.fromEnvironment('FAKE_STORE'),
+            debug: kDebugMode,
+          ),
+    );
   }
 
   static Future<void> reset() => sl.reset();

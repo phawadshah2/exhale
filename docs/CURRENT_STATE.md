@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-13 (paywall P1 to P10 committed; P11 next).
+Updated 2026-11-13 (paywall P1 to P11 committed; milestone end next).
 Earlier: `docs/history/` (latest `2026-11-09_to_11-11_state_log.md`: onboarding chat and
 the corrections round).
 
@@ -15,7 +15,7 @@ the corrections round).
 | Onboarding redesign 2 (chat) | C1 to C10 done, reviewed, full suite 1279 passed; walked in part |
 | Monetization and sync decisions | Locked 2026-11-10 |
 | App Store Connect payments | Set up 2026-11-10/11 (below) |
-| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P10 done; P11 next |
+| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P11 done; milestone end next |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 ## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
@@ -36,10 +36,10 @@ privacy and terms URLs, App Privacy.
 - `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
   decisions, this handoff). Nothing pushed this session. Untracked on purpose:
   `design/all-designs.html`, `design/figma-import/`.
-- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P10
+- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P11
   committed, nothing pushed.
-- Checks (2026-11-13, after P10): format, `analyze --fatal-infos` clean; paywall and
-  settings tests pass (147); `test/app` after P9. Full suite: not run since 1279 (due).
+- Checks (2026-11-13, after P11): format, `analyze --fatal-infos` clean; paywall and
+  settings tests pass (147 after P10); `test/app`. Full suite: not run since 1279 (due).
 
 ## Paywall
 
@@ -55,7 +55,7 @@ privacy and terms URLs, App Privacy.
   (`RestartUnstartedPlan`, `replaceAll`), the reveal pushes the paywall unless entitled;
   P7 `daysToCover`, `PaywallCopy`, `paywallContent` (`PaywallStep.rowTitle` added); P8
   the paywall screen (icon row under 540 pt of body; `NativeUi.openUrl`); P9 locked; P10
-  Settings' Subscription card.
+  Settings' Subscription card; P11 `FAKE_STORE` (`debugStore`), `Exhale.storekit`.
 - Plugin: updates arrive on `purchaseStream` (also after each purchase call), purchases
   are not finished natively; 10 s timeout on offers and access; `offersProvider` no retry.
 - Not in this plan, and needed in the same release: the payment reminders spec (the
@@ -63,11 +63,12 @@ privacy and terms URLs, App Privacy.
 
 ## Next action
 
-Run Task P11 (a store for simulator walks) with `execute-plan` (Sonnet 5.5 medium), then
-the milestone end (CLAUDE.md workflow 4). Read: this file, the plan's header and P11.
-Open: `LegalLinks.privacy` URL, App Store Terms link (before release). Walk: welcome back
-clears the status bar; the paywall at 393 × 852 and 375 × 667, the locked sheet, dark,
-200% text, Reduce Transparency (fit is tested with the app fonts, not yet seen).
+Milestone end (plan's last section, CLAUDE.md workflow 4), in a fresh session at Opus 5.5
+high: the independent review against the spec and Review focus, fix its findings; the
+full suite; then builds and the walk with `--dart-define=FAKE_STORE=…`; check the
+`.storekit` in Xcode (Edit Scheme → Options); update `CLAUDE.md` (v12, paywall, gate).
+Walk also: welcome back clears the status bar; paywall at 375 × 667. Open: privacy URL,
+Terms link in the App Store description (before release).
 
 ## Still open from earlier
 
