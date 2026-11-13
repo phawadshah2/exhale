@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/presentation/providers/clock_providers.dart';
@@ -32,7 +34,13 @@ class AccessController extends Notifier<Access> {
         .changes
         .listen((_) => refresh());
     ref.onDispose(subscription.cancel);
-    return ref.watch(initialAccessProvider);
+    final initial = ref.watch(initialAccessProvider);
+    // The store did not answer at startup and nothing was cached: ask again
+    // rather than wait for a resume.
+    if (initial is AccessUnknown) {
+      unawaited(Future.microtask(() => ref.mounted ? refresh() : null));
+    }
+    return initial;
   }
 
   /// Asks the store again. A known answer replaces the state and the cache;

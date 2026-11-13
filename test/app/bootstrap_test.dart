@@ -9,6 +9,7 @@ import 'package:exhale/features/paywall/domain/entities/plan_kind.dart';
 import 'package:exhale/features/paywall/presentation/providers/paywall_providers.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
+import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -86,5 +87,33 @@ void main() {
     await sl<SettingsRepository>().save(_cachedLifetime);
 
     expect(_initialAccess(await startupOverrides()), const NeverPaid());
+  });
+
+  test('a store answer is cached at startup', () async {
+    await setUpTestDependencies(clock, store: FakeStoreRepository.entitled());
+
+    final overrides = await startupOverrides();
+
+    final saved =
+        (await sl<SettingsRepository>().get() as Success<AppSettings>).value;
+    expect(saved.accessState, 'entitled');
+    expect(saved.accessPlan, 'lifetime');
+    final container = ProviderContainer(overrides: overrides);
+    addTearDown(container.dispose);
+    expect(container.read(initialSettingsProvider).accessState, 'entitled');
+  });
+
+  test('a store failure leaves the cache as it was', () async {
+    await setUpTestDependencies(
+      clock,
+      store: FakeStoreRepository(offline: true),
+    );
+    await sl<SettingsRepository>().save(_cachedLifetime);
+
+    await startupOverrides();
+
+    final saved =
+        (await sl<SettingsRepository>().get() as Success<AppSettings>).value;
+    expect(saved, _cachedLifetime);
   });
 }

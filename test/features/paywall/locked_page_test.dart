@@ -84,8 +84,14 @@ void main() {
   Future<void> open(
     WidgetTester tester, {
     List<Override> overrides = const [],
+    double width = 390,
+    double height = 844,
   }) async {
-    await tester.pumpAppPastSplash(overrides: overrides);
+    await tester.pumpAppPastSplash(
+      overrides: overrides,
+      width: width,
+      height: height,
+    );
     await settle(tester);
     expect(find.byKey(LockedPage.pageKey), findsOneWidget);
   }
@@ -278,6 +284,26 @@ void main() {
       find.descendant(of: locked, matching: find.byType(BackdropFilter)),
       findsNothing,
     );
+
+    await tester.disposeApp();
+  });
+
+  testWidgets('at 200% text on a small phone the sheet scrolls to Restore', (
+    tester,
+  ) async {
+    await seed();
+    await open(tester, width: 375, height: 667);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpAndSettle();
+
+    final restore = find.text(PaywallCopy.restorePurchases);
+    await tester.ensureVisible(restore);
+    await tester.pumpAndSettle();
+    final rect = tester.getRect(restore);
+    expect(rect.top, greaterThan(0));
+    expect(rect.bottom, lessThanOrEqualTo(667));
+    expect(find.text(PaywallCopy.lockedTitle), findsOneWidget);
 
     await tester.disposeApp();
   });

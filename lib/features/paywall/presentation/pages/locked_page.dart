@@ -47,14 +47,15 @@ class LockedPage extends ConsumerWidget {
         fit: StackFit.expand,
         children: [
           IgnorePointer(child: ExcludeSemantics(child: home)),
+          // Large text can make the sheet taller than the screen; it then
+          // scrolls inside the glass.
           const Align(
             alignment: Alignment.bottomCenter,
             child: SafeArea(
-              top: false,
               minimum: EdgeInsets.all(AppSpacing.sm),
               child: GlassSurface(
                 radius: 30,
-                child: Padding(
+                child: SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(20, 22, 20, 10),
                   child: _Sheet(),
                 ),

@@ -20,22 +20,25 @@ const Duration startupStoreTimeout = Duration(seconds: 3);
 Future<List<Override>> startupOverrides({
   Duration storeTimeout = startupStoreTimeout,
 }) async {
-  final settings = switch (await sl<SettingsRepository>().get()) {
+  final repository = sl<SettingsRepository>();
+  var settings = switch (await repository.get()) {
     Success(:final value) => value,
     FailureResult() => const AppSettings(),
   };
-  final live = await sl<StoreRepository>().currentAccess().timeout(
+  final live = switch (await sl<StoreRepository>().currentAccess().timeout(
     storeTimeout,
     onTimeout: () => const FailureResult(StoreFailure()),
-  );
-  final access = effectiveAccess(
-    switch (live) {
-      Success(:final value) => value,
-      FailureResult() => const AccessUnknown(),
-    },
-    settings,
-    sl<Clock>().now(),
-  );
+  )) {
+    Success(:final value) => value,
+    FailureResult() => const AccessUnknown(),
+  };
+  // Cached now, so a later offline start knows about a purchase made
+  // elsewhere.
+  final cached = withCachedAccess(settings, live);
+  if (cached != settings && await repository.save(cached) is Success) {
+    settings = cached;
+  }
+  final access = effectiveAccess(live, settings, sl<Clock>().now());
   return [
     initialSettingsProvider.overrideWithValue(settings),
     initialAccessProvider.overrideWithValue(access),

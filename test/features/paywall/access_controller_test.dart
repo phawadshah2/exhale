@@ -49,6 +49,36 @@ void main() {
     expect(container(initial: lifetime).read(accessProvider), lifetime);
   });
 
+  test('an unknown access at startup asks the store again', () async {
+    store.access = const Entitled(
+      plan: PlanKind.lifetime,
+      expiresAt: null,
+      inTrial: false,
+    );
+    final scope = container(initial: const AccessUnknown());
+
+    expect(scope.read(accessProvider), const AccessUnknown());
+    await pumpEventQueue();
+
+    expect(
+      scope.read(accessProvider),
+      const Entitled(plan: PlanKind.lifetime, expiresAt: null, inTrial: false),
+    );
+    expect((await savedSettings()).accessState, 'entitled');
+  });
+
+  test('a known access at startup does not ask the store again', () async {
+    store.access = const Entitled(
+      plan: PlanKind.lifetime,
+      expiresAt: null,
+      inTrial: false,
+    );
+    final scope = container();
+    await pumpEventQueue();
+
+    expect(scope.read(accessProvider), const NeverPaid());
+  });
+
   test('a store change is followed, and the access is cached', () async {
     final scope = container();
     final expires = now.add(const Duration(days: 30));

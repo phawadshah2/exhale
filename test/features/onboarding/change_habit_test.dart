@@ -282,8 +282,9 @@ void main() {
         bedMinute: () => 1320,
       ),
     );
-    final before = await settings(tester);
     await openChangeHabit(tester);
+    // Read after launch: startup caches the store's access in settings.
+    final before = await settings(tester);
     expect(form(tester, HabitStep).currency, 'CHF');
     expect(form(tester, HabitStep).wakeMinute, 480);
     expect(form(tester, HabitStep).bedMinute, 1320);
