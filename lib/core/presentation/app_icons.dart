@@ -82,4 +82,13 @@ abstract final class AppIcons {
 
   // Reason
   static const IconData heart = CupertinoIcons.heart_fill;
+
+  // Paywall steps
+  static const IconData stepOpen = CupertinoIcons.lock_open_fill;
+  static const IconData stepRemind = CupertinoIcons.bell_fill;
+  static const IconData stepCharge = CupertinoIcons.creditcard_fill;
+  static const IconData stepRenew = CupertinoIcons.arrow_2_circlepath;
+  static const IconData stepCancel = CupertinoIcons.xmark;
+  static const IconData stepDone = CupertinoIcons.checkmark_alt;
+  static const IconData stepForGood = CupertinoIcons.infinite;
 }

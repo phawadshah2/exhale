@@ -68,10 +68,11 @@ extension PumpApp on WidgetTester {
   /// [height] is in logical pixels; tall views avoid lazy list disposal.
   Future<void> pumpAppPastSplash({
     double height = 844,
+    double width = 390,
     List<Override> overrides = const [],
   }) async {
     view
-      ..physicalSize = Size(1170, height * 3)
+      ..physicalSize = Size(width * 3, height * 3)
       ..devicePixelRatio = 3;
     addTearDown(view.reset);
     mockPackageInfo();

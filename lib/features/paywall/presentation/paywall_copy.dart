@@ -47,4 +47,41 @@ abstract final class PaywallCopy {
   static const startFreeWeek = 'Start my free week';
   static const subscribe = 'Subscribe';
   static const buyOnce = 'Buy once';
+  static const continueLabel = 'Continue';
+
+  static const back = 'Back';
+  static const restore = 'Restore';
+  static const statLabel = 'FROM YOUR ANSWERS';
+
+  static const whatYouGet = 'WHAT YOU GET';
+  static String taper(int startLimit) => 'A taper from $startLimit a day';
+  static const taperValue = 'to 0';
+  static const moreTime = 'More time on a hard stage';
+  static const moreTimeValue = '7 days';
+  static const dataLeaves = 'Data that leaves your phone';
+  static const dataLeavesValue = 'Zero';
+
+  static const annual = 'Annual';
+  static const annualLine = 'Your plan + a year at zero';
+  static const perYear = 'per year';
+  static const monthlyName = 'Monthly';
+  static const monthlyLine = 'No trial. Cancel any time.';
+  static const perMonth = 'per month';
+  static const lifetime = 'Lifetime';
+  static const lifetimeLine = 'Yours for good. No renewals.';
+  static const once = 'once';
+  static const trialTag = '7 DAYS FREE';
+  static const trialSpoken = '7 days free';
+
+  static const unreachableTitle = "Couldn't reach the App Store";
+  static const unreachableBody =
+      'Check your connection. Your plan is saved on this phone.';
+  static const tryAgain = 'Try again';
+
+  static const waitingApproval = 'Waiting for approval';
+  static const purchaseFailed = "The purchase didn't go through. Try again.";
+  static const noPurchases = 'No purchases found for this Apple ID';
+
+  static const terms = 'Terms';
+  static const privacy = 'Privacy';
 }
