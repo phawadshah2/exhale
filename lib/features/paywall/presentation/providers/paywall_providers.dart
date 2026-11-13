@@ -143,15 +143,17 @@ class PaywallController extends Notifier<PaywallState> {
     }
   }
 
-  /// Restores purchases and re-checks access; true when it is now entitled.
+  /// Restores purchases and re-checks access; true when it is now entitled,
+  /// false when the store could not restore.
   Future<bool> restore() async {
     if (state.busy) return false;
     state = state.copyWith(busy: true);
     final link = ref.keepAlive();
     try {
-      if (await ref.read(storeRepositoryProvider).restore() is Success) {
-        await ref.read(accessProvider.notifier).refresh();
+      if (await ref.read(storeRepositoryProvider).restore() is! Success) {
+        return false;
       }
+      await ref.read(accessProvider.notifier).refresh();
       return ref.read(accessProvider) is Entitled;
     } finally {
       state = state.copyWith(busy: false);

@@ -99,4 +99,11 @@ abstract final class PaywallCopy {
   static String stageOf(int stage, int count) => 'stage $stage of $count';
   static const seeOffers = 'See offers';
   static const restorePurchases = 'Restore purchases';
+
+  static const subscriptionTitle = 'Subscription';
+  static String paidUntil(String date) => 'Paid until $date';
+  static String freeUntil(String date) => 'Free until $date';
+  static const yoursForGood = 'Yours for good';
+  static const manageSubscription = 'Manage subscription';
+  static const purchasesRestored = 'Purchases restored';
 }
