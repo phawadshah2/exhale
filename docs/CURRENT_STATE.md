@@ -38,8 +38,8 @@ privacy and terms URLs, App Privacy.
   `design/all-designs.html`, `design/figma-import/`.
 - `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P11
   committed, nothing pushed.
-- Checks (2026-11-13, after P11): format, `analyze --fatal-infos` clean; paywall and
-  settings tests pass (147 after P10); `test/app`. Full suite: not run since 1279 (due).
+- Checks (2026-11-13): format, `analyze --fatal-infos` clean after P11; passing:
+  paywall + settings (147, P10), `test/app` (P9), P11 + bootstrap (10). Full suite: due.
 
 ## Paywall
 
@@ -58,8 +58,8 @@ privacy and terms URLs, App Privacy.
   Settings' Subscription card; P11 `FAKE_STORE` (`debugStore`), `Exhale.storekit`.
 - Plugin: updates arrive on `purchaseStream` (also after each purchase call), purchases
   are not finished natively; 10 s timeout on offers and access; `offersProvider` no retry.
-- Not in this plan, and needed in the same release: the payment reminders spec (the
-  paywall promises the day-5 reminder).
+- For Fawad to confirm: "Purchases restored" (new, Settings); dates read "Dec 3"; Restore
+  offline says "No purchases found". Needed same release: payment reminders spec (day 5).
 
 ## Next action
 
@@ -67,8 +67,8 @@ Milestone end (plan's last section, CLAUDE.md workflow 4), in a fresh session at
 high: the independent review against the spec and Review focus, fix its findings; the
 full suite; then builds and the walk with `--dart-define=FAKE_STORE=…`; check the
 `.storekit` in Xcode (Edit Scheme → Options); update `CLAUDE.md` (v12, paywall, gate).
-Walk also: welcome back clears the status bar; paywall at 375 × 667. Open: privacy URL,
-Terms link in the App Store description (before release).
+Read: this file, the plan's header, Review focus and Milestone end, spec §7 to §12. Walk
+also: welcome back clears the status bar; paywall at 375 × 667. Open: privacy URL.
 
 ## Still open from earlier
 
