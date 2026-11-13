@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-13 (paywall P1 to P8 committed; P9 next).
+Updated 2026-11-13 (paywall P1 to P9 committed; P10 next).
 Earlier: `docs/history/` (latest `2026-11-09_to_11-11_state_log.md`: onboarding chat and
 the corrections round).
 
@@ -15,7 +15,7 @@ the corrections round).
 | Onboarding redesign 2 (chat) | C1 to C10 done, reviewed, full suite 1279 passed; walked in part |
 | Monetization and sync decisions | Locked 2026-11-10 |
 | App Store Connect payments | Set up 2026-11-10/11 (below) |
-| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P8 done; P9 next |
+| Paywall | Research, designs, spec and plan done on `feat/paywall` (2026-11-13); P1 to P9 done; P10 next |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 ## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
@@ -36,10 +36,10 @@ privacy and terms URLs, App Privacy.
 - `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
   decisions, this handoff). Nothing pushed this session. Untracked on purpose:
   `design/all-designs.html`, `design/figma-import/`.
-- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P8
+- `feat/paywall` (off `feat/onboarding-chat-prototype`): docs, designs, P1 to P9
   committed, nothing pushed.
-- Checks (2026-11-13, after P8): format and `analyze --fatal-infos` clean;
-  `test/features/paywall`, `access_gate`, `welcome_back` and `deal_step` tests pass (118);
+- Checks (2026-11-13, after P9): format and `analyze --fatal-infos` clean;
+  `test/features/paywall` and `test/app` pass (146); after P8 `welcome_back`, `deal_step`;
   after P6 `test/features/{onboarding,plan,habit}` and `test/app` passed. Full
   suite: not run since the 1279 pass (due at the milestone end).
 
@@ -56,7 +56,7 @@ privacy and terms URLs, App Privacy.
   redirect), keyed placeholder `PaywallPage`/`LockedPage`; P6 welcome back
   (`RestartUnstartedPlan`, `replaceAll`), the reveal pushes the paywall unless entitled;
   P7 `daysToCover`, `PaywallCopy`, `paywallContent` (`PaywallStep.rowTitle` added); P8
-  the paywall screen (icon row under 540 pt of body; `NativeUi.openUrl`).
+  the paywall screen (icon row under 540 pt of body; `NativeUi.openUrl`); P9 locked.
 - Plugin: updates arrive on `purchaseStream` (also after each purchase call), purchases
   are not finished natively; 10 s timeout on offers and access; `offersProvider` no retry.
 - Not in this plan, and needed in the same release: the payment reminders spec (the
@@ -64,11 +64,11 @@ privacy and terms URLs, App Privacy.
 
 ## Next action
 
-Run Task P9 (locked screen) with `execute-plan` (Sonnet 5.5 medium). Read: this file, the
-plan's header and P9, spec §11, `design/10._paywall/LockedSettings.html`. Keep
-`LockedPage.pageKey`. Open: `LegalLinks.privacy` URL, App Store Terms link (before
-release). Walk: welcome back clears the status bar; the paywall at 393 × 852 and 375 × 667,
-dark, 200% text (fit is tested with the app fonts, not yet seen).
+Run Task P10 (subscription in Settings) with `execute-plan` (Sonnet 5.5 medium). Read:
+this file, the plan's header and P10, spec §12, `design/10._paywall/LockedSettings.html`.
+Open: `LegalLinks.privacy` URL, App Store Terms link (before release). Walk: welcome back
+clears the status bar; the paywall at 393 × 852 and 375 × 667, the locked sheet, dark,
+200% text, Reduce Transparency (fit is tested with the app fonts, not yet seen).
 
 ## Still open from earlier
 

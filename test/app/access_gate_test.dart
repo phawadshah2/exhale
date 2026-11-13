@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:exhale/app/app.dart';
 import 'package:exhale/app/router/app_router.dart';
 import 'package:exhale/app/router/app_routes.dart';
+import 'package:exhale/app/shell/app_shell.dart';
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
@@ -119,7 +120,8 @@ void main() {
     await settle(tester);
 
     expect(find.byKey(LockedPage.pageKey), findsOneWidget);
-    expect(find.byType(HomePage), findsNothing);
+    // Home stays behind the sheet; the shell around it is gone.
+    expect(find.byType(AppShell), findsNothing);
 
     await tester.disposeApp();
   });

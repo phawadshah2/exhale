@@ -84,4 +84,19 @@ abstract final class PaywallCopy {
 
   static const terms = 'Terms';
   static const privacy = 'Privacy';
+
+  static const lockedTitle = 'Your progress is saved';
+  static const _comesBack = 'Everything here comes back the moment you do.';
+  static String lockedEnded(String plan, String date) =>
+      'Your $plan plan ended on $date. $_comesBack';
+  static String lockedHasEnded(String plan) =>
+      'Your $plan plan has ended. $_comesBack';
+  static const lockedPlanEnded = 'Your plan has ended. $_comesBack';
+  static String daysOnPlan(int days) =>
+      days == 1 ? '1 day on plan' : '$days days on plan';
+  static String avoided(String count, String units) => '$count $units avoided';
+  static String saved(String money) => '$money saved';
+  static String stageOf(int stage, int count) => 'stage $stage of $count';
+  static const seeOffers = 'See offers';
+  static const restorePurchases = 'Restore purchases';
 }
