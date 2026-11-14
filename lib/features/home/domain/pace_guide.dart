@@ -91,6 +91,32 @@ class PaceGuide {
 class NextLogTimer {
   const NextLogTimer({required this.guide, required this.now});
 
+  /// The countdown on [day] from its [logs] (oldest first); null before the
+  /// day's first log, with no [window], or when there is nothing to pace.
+  /// [countToday] defaults to the number of [logs].
+  static NextLogTimer? at({
+    required DateTime now,
+    required LogicalDay day,
+    required DayBoundary boundary,
+    required DayWindow? window,
+    required int limit,
+    required List<DateTime> logs,
+    int? countToday,
+  }) {
+    if (window == null || logs.isEmpty) return null;
+    final guide = PaceGuide.compute(
+      now: now,
+      day: day,
+      boundary: boundary,
+      window: window,
+      limit: limit,
+      countToday: countToday ?? logs.length,
+      lastLogToday: logs.last,
+      earlierLogsToday: logs.sublist(0, logs.length - 1),
+    );
+    return guide == null ? null : NextLogTimer(guide: guide, now: now);
+  }
+
   final PaceGuide guide;
   final DateTime now;
 

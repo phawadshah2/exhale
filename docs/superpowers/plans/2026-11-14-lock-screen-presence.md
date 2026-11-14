@@ -294,17 +294,25 @@ Done 2026-11-14. The 53 new lines are drafts for Fawad's review at the milestone
 - Produces: `final presenceSyncProvider` (kept alive by the shell) that drains, then
   writes the snapshot, then shows or ends the activity; `ActivityContent?
   activityFor({NextLogTimer? timer, required bool entitled, required bool enabled, ...})`.
+- As built: the sync is kept alive by `ExhaleApp` (`listenManual`), not the shell, so a
+  lapsed user on the locked screen still gets a locked snapshot. Each run reads
+  storage (not providers) after draining, so the snapshot already holds drained logs.
+  The countdown comes from the new `NextLogTimer.at` (shared with
+  `nextLogTimerProvider`). A new countdown (`next` changed) takes a new line pair;
+  the first sync with no countdown always ends (an activity Log one started while the
+  app was closed). Deep links map in the router's `redirect` (`deepLinkRoute`); Logs'
+  Back goes Home when there is nothing to pop. Line pairs live in memory only.
 
-- [ ] **Step 1:** Tests with the fake: `startup drains then writes a snapshot`;
+- [x] **Step 1:** Tests with the fake: `startup drains then writes a snapshot`;
   `a log writes a snapshot and shows the activity with a new line pair`;
   `the first log of the day starts it, none before`; `at the limit ends it`;
   `the switch off ends it and never shows it`; `losingAccessEndsActivityAndLocksSnapshot`;
   `queueChangeWhileOpenDrainsThenWritesSnapshot`; `resume past staleAt ends it`;
   `the day reset ends it and writes a snapshot`.
-- [ ] **Step 2:** Run with `--timeout 60s`. Expected: FAIL.
-- [ ] **Step 3:** Implement. Writes are serialised (one in flight, the latest wins).
-- [ ] **Step 4:** Run, plus `test/app/` and `test/features/home/`. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(presence): keep widgets and the Live Activity in sync`.
+- [x] **Step 2:** Run with `--timeout 60s`. Expected: FAIL.
+- [x] **Step 3:** Implement. Writes are serialised (one in flight, the latest wins).
+- [x] **Step 4:** Run, plus `test/app/` and `test/features/home/`. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(presence): keep widgets and the Live Activity in sync`.
 
 ### Task 9: Swift core
 

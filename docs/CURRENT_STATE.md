@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-14 (Lock Screen presence, Task 7 done). Earlier: `docs/history/` (latest
+Updated 2026-11-14 (Lock Screen presence, Task 8 done). Earlier: `docs/history/` (latest
 `2026-11-13_paywall_build_state.md`).
 
 ## Where we are
@@ -9,7 +9,7 @@ Updated 2026-11-14 (Lock Screen presence, Task 7 done). Earlier: `docs/history/`
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
 | Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), not pushed |
-| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 7 of 15 done |
+| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 8 of 15 done |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
@@ -38,6 +38,7 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   UTC ISO 8601 times; no `count` on future days.
 - Task 7: `PresenceRepository` (channel; tests get `FakePresenceRepository` via
   `setUpTestDependencies`), `DrainExternalLogs` (dedupes by external id).
+- Task 8: `presenceSyncProvider` (kept by `ExhaleApp`), `exhale://home|logs/week` links.
 
 ## Checks
 
@@ -45,17 +46,16 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   Full suite not run.
 - Task 1: `fvm flutter build ios --simulator --debug` built, extension embedded.
   No Dart changes, so no Dart checks.
-- Tasks 3 to 7: format and `analyze --fatal-infos` clean each time. Task 3 test 15/15;
+- Tasks 3 to 8: format and `analyze --fatal-infos` clean each time. Task 3 test 15/15;
   Task 4 migration + log repository tests 64/64; Task 5 test + `test/features/home/`
   274/274; Task 6 test 11/11;
-  Task 7 presence + `test/app` 76/76. Full suite not run (milestone end).
+  Task 7 presence + `test/app` 76/76; Task 8 presence, app, Home 360/360. Full suite not run (milestone end).
 
 ## Next action
 
-Task 8, keeping Swift in sync (Opus 5.5 high: concurrency, Review Focus 4 and 5), via
-the `execute-plan` skill. Read: the plan's header and Task 8, and the spec's "Data
-shared with Swift". Fawad's iPhone
-(`00008150-0008556E3A80401C`) runs release builds over the cable, Developer Mode on.
+Task 9, the Swift core (Sonnet 5.5 medium), via the `execute-plan` skill. Read: the
+plan's header and Task 9. Xcode test runs need Fawad's approval, one command each.
+Fawad's iPhone (`00008150-0008556E3A80401C`) runs release builds over the cable.
 
 ## Repo
 
