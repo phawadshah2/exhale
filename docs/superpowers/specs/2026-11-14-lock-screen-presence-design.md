@@ -137,7 +137,7 @@ App Group `group.com.phawadshah.exhale`. Two JSON files, each written atomically
 **`snapshot.json`**, written by the app after startup, every log or edit, a plan or
 settings change, and the day reset:
 
-- `version`, `writtenAt`, `access` (Entitled or not; see Open questions).
+- `version`, `writtenAt`, `entitled` (the last known access is Entitled).
 - Day settings: reset hour, wake minute, awake minutes (or none).
 - The habit: name, kind, the reason (or none), the free-day wording.
 - Daily limits from 62 days back to 62 days ahead (holds already applied), the stage
@@ -194,12 +194,11 @@ Exhale to update" and Log one opens the app.
 - Writing the ~60 lines of encouragement (Fawad reviews them).
 - Icons: SF Symbols matching `AppIcons`.
 
-## Open questions for Fawad
+## Decided by Fawad (2026-11-14)
 
-1. **Minimum iOS.** The app targets iOS 15. Live Activities need 16.1, buttons in widgets
-   need 17, Control Center controls need 18. Recommended: raise the minimum to iOS 17
-   (one code path for widgets and Log one; controls guarded for 18). Or keep 15 and hide
-   each piece on older systems.
-2. **Without access.** When the last known access is not Entitled (never paid, or
-   lapsed): recommended that widgets show "Exhale is locked" and Log one opens the app,
-   so the hard paywall holds. Or let widgets and Log one keep working.
+1. **Minimum iOS 17** (was 15) for the app and the extension. Control Center and Lock
+   Screen controls are guarded for iOS 18.
+2. **Without access** (the snapshot's last known access is not Entitled: never paid or
+   lapsed): every widget shows "Exhale is locked" with the app's lock look and opens the
+   app; Log one writes nothing and opens the app; no Live Activity starts. The hard
+   paywall holds outside the app too.
