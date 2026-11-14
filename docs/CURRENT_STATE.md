@@ -28,6 +28,17 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 - Task 1 (commit `d8cb4ed`): `ExhaleWidgetsExtension` target, App Group on both targets,
   iOS 17 everywhere, `NSSupportsLiveActivities`, embed phase before Thin Binary. Portal
   steps done by Fawad. `ios/Shared` not made yet (see the plan's Task 1 note).
+- Task 2 spike (`835449a`): yes, Log one starts a Live Activity with the app terminated
+  (iPhone, iOS 27.2, via Shortcuts). The Action Button never reached the intent; recheck
+  it in the device walk. Spike code was `22710db` (branch deleted; the plan notes how
+  `ios/Shared` was wired, with `LogOneIntent.swift` excluded from the extension).
+- Task 3 (`e0c12a1`): `test/fixtures/pace_cases.json`, 14 cases from `PaceGuide`; Swift
+  compares within 1 ms (microsecond truncation).
+- Task 4 (`3bb43b2`): schema v13, unique `habit_logs.external_id`,
+  `settings.show_live_activity`; new fixture `exhale_v12.sqlite`; v7 and older get the
+  columns in the v8 rebuilds.
+- Task 5 (`daef015`): `encouragementLines` (60, 53 are drafts for Fawad's review at the
+  walk), `pickLinePair`; `QuoteCard.quotes` reads the list.
 
 ## Checks
 
@@ -35,15 +46,15 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   Full suite not run.
 - Task 1: `fvm flutter build ios --simulator --debug` built, extension embedded.
   No Dart changes, so no Dart checks.
+- Tasks 3 to 5: format and `analyze --fatal-infos` clean each time. Task 3 test 15/15;
+  Task 4 migration + log repository tests 64/64; Task 5 test + `test/features/home/`
+  274/274. Full suite not run (milestone end).
 
 ## Next action
 
-Task 6, the snapshot (Sonnet 5.5 medium). Done so far: Task 3 countdown cases, Task 4
-schema v13, Task 5 lines of encouragement (53 new drafts in
-`lib/features/presence/domain/encouragement.dart`, Fawad reviews them at the walk).
-Spike (Task 2): Log one starts a Live Activity with the app terminated (iOS 27.2, from
-Shortcuts); recheck the Action Button in the device walk. Fawad's iPhone runs release
-builds over the cable.
+Task 6, the snapshot (Sonnet 5.5 medium), via the `execute-plan` skill. Read: the plan's
+header and Task 6, and the spec section Task 6 names. Fawad's iPhone
+(`00008150-0008556E3A80401C`) runs release builds over the cable, Developer Mode on.
 
 ## Repo
 
