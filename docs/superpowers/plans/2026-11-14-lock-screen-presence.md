@@ -183,16 +183,19 @@ version below 13.
   `typedef LinePair = ({String counting, String waiting})`;
   `LinePair pickLinePair(Random random, {LinePair? last})`.
 
-- [ ] **Step 1:** Tests: `has 60 distinct lines of at most 40 characters`;
+- [x] **Step 1:** Tests: `has 60 distinct lines of at most 40 characters`;
   `starts with the Home quotes` (the 7, in order);
   `a pair has two different lines`; `never repeats the last pair's lines` (1,000 seeded
   picks); `no line says "you can"` (case-insensitive).
-- [ ] **Step 2:** Run. Expected: FAIL (no file).
-- [ ] **Step 3:** Write the list (draft 53 new lines in the Home quotes' voice; Fawad
+- [x] **Step 2:** Run. Expected: FAIL (no file).
+- [x] **Step 3:** Write the list (draft 53 new lines in the Home quotes' voice; Fawad
   reviews them at the milestone walk) and `pickLinePair`. `QuoteCard.quotes` becomes
   `encouragementLines.take(7)`.
-- [ ] **Step 4:** Run the new test and `test/features/home/`. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(presence): lines of encouragement`.
+- [x] **Step 4:** Run the new test and `test/features/home/`. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(presence): lines of encouragement`.
+
+Done 2026-11-14. The 53 new lines are drafts for Fawad's review at the milestone walk.
+`QuoteCard.quotes` is a `static final List<String>` (a `take` is not const).
 
 ### Task 6: The snapshot
 
