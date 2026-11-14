@@ -10,7 +10,7 @@ class QuoteCard extends StatelessWidget {
 
   final int dayNumber;
 
-  static final List<String> quotes =encouragementLines.take(7).toList();
+  static final List<String> quotes = encouragementLines.take(7).toList();
 
   @override
   Widget build(BuildContext context) {

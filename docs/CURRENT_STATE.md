@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-14 (Lock Screen presence, Task 5 done). Earlier: `docs/history/` (latest
+Updated 2026-11-14 (Lock Screen presence, Task 6 done). Earlier: `docs/history/` (latest
 `2026-11-13_paywall_build_state.md`).
 
 ## Where we are
@@ -9,7 +9,7 @@ Updated 2026-11-14 (Lock Screen presence, Task 5 done). Earlier: `docs/history/`
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
 | Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), not pushed |
-| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 5 of 15 done |
+| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 6 of 15 done |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
@@ -32,13 +32,13 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   (iPhone, iOS 27.2, via Shortcuts). The Action Button never reached the intent; recheck
   it in the device walk. Spike code was `22710db` (branch deleted; the plan notes how
   `ios/Shared` was wired, with `LogOneIntent.swift` excluded from the extension).
-- Task 3 (`e0c12a1`): `test/fixtures/pace_cases.json`, 14 cases from `PaceGuide`; Swift
-  compares within 1 ms (microsecond truncation).
-- Task 4 (`3bb43b2`): schema v13, unique `habit_logs.external_id`,
-  `settings.show_live_activity`; new fixture `exhale_v12.sqlite`; v7 and older get the
-  columns in the v8 rebuilds.
+- Task 3 (`e0c12a1`): `test/fixtures/pace_cases.json`, 14 `PaceGuide` cases; Swift ±1 ms.
+- Task 4 (`3bb43b2`): schema v13 (`habit_logs.external_id`, `show_live_activity`);
+  fixture `exhale_v12.sqlite`; v7 and older get the columns in the v8 rebuilds.
 - Task 5 (`daef015`): `encouragementLines` (60, 53 are drafts for Fawad's review at the
   walk), `pickLinePair`; `QuoteCard.quotes` reads the list.
+- Task 6: `PresenceSnapshot.build` takes `TrackedHabit`, no holds list (plans carry them);
+  UTC ISO 8601 times; no `count` on future days.
 
 ## Checks
 
@@ -46,14 +46,15 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   Full suite not run.
 - Task 1: `fvm flutter build ios --simulator --debug` built, extension embedded.
   No Dart changes, so no Dart checks.
-- Tasks 3 to 5: format and `analyze --fatal-infos` clean each time. Task 3 test 15/15;
+- Tasks 3 to 6: format and `analyze --fatal-infos` clean each time. Task 3 test 15/15;
   Task 4 migration + log repository tests 64/64; Task 5 test + `test/features/home/`
-  274/274. Full suite not run (milestone end).
+  274/274; Task 6 test 11/11. Full suite not run (milestone end).
 
 ## Next action
 
-Task 6, the snapshot (Sonnet 5.5 medium), via the `execute-plan` skill. Read: the plan's
-header and Task 6, and the spec section Task 6 names. Fawad's iPhone
+Task 7, channel, repository and draining the queue (Sonnet 5.5 medium), via the
+`execute-plan` skill. Read: the plan's header and Task 7, and the spec's "Data shared
+with Swift". Fawad's iPhone
 (`00008150-0008556E3A80401C`) runs release builds over the cable, Developer Mode on.
 
 ## Repo

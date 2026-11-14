@@ -204,26 +204,29 @@ Done 2026-11-14. The 53 new lines are drafts for Fawad's review at the milestone
 - Test: `test/features/presence/domain/presence_snapshot_test.dart`
 
 **Interfaces:**
-- Consumes: `PlanHistory` and plan holds (limit and stage for a day, the quit day as
-  shifted), `AppSettings`, `Habit`, `LinePair`.
+- Consumes: `PlanHistory` (its plans carry their holds: limit and stage for a day, the
+  quit day as shifted), `AppSettings`, `TrackedHabit` (for the reason), `LinePair`.
 - Produces: `class PresenceSnapshot` with `Map<String, Object?> toJson()`, built by
   `factory PresenceSnapshot.build({required DateTime now, required LogicalDay today,
-  required AppSettings settings, required Habit habit, required PlanHistory history,
-  required List<PlanHold> holds, required Map<LogicalDay, int> counts,
+  required AppSettings settings, required TrackedHabit habit, required PlanHistory history,
+  required Map<LogicalDay, int> counts,
   required List<DateTime> todayLogs, required bool entitled, required LinePair lastPair})`.
   JSON keys: `version` (1), `writtenAt`, `entitled`, `resetHour`, `wakeMinute`,
   `awakeMinutes`, `habit {name, kind, reason, freeDayTitle}`, `quitDay`,
   `days: [{day, limit, stage, stageCount, count?}]` from today − 62 to today + 62,
-  `todayLogs`, `showLiveActivity`, `lines`, `lastPair {counting, waiting}`.
+  `todayLogs`, `showLiveActivity`, `lines`, `lastPair {counting, waiting}`. Times
+  (`writtenAt`, `todayLogs`) are UTC ISO 8601; `count` is absent on future days.
+  (Changed 2026-11-14 with Fawad: a separate holds list would apply holds twice, and the
+  reason lives on `TrackedHabit`.)
 
-- [ ] **Step 1:** Tests: `covers 62 days each side of today`; `past days carry their own
+- [x] **Step 1:** Tests: `covers 62 days each side of today`; `past days carry their own
   plan's limit` (a replan mid-range); `a hold shifts later limits and the quit day`;
   `counts only on past days and today`; `no window writes null wake and awake`;
   `not entitled writes entitled false`; `toJson round-trips through jsonDecode`.
-- [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Implement with the existing plan services (no new limit maths).
-- [ ] **Step 4:** Run. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(presence): the snapshot for widgets`.
+- [x] **Step 2:** Run. Expected: FAIL.
+- [x] **Step 3:** Implement with the existing plan services (no new limit maths).
+- [x] **Step 4:** Run. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(presence): the snapshot for widgets`.
 
 ### Task 7: Channel, repository and draining the queue
 
