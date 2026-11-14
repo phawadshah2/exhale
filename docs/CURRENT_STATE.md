@@ -33,16 +33,21 @@ Launch still needs: Export/Import, iCloud sync (CloudKit), Stay at zero
 
 ## Repo
 
-- `feat/paywall` (off `feat/onboarding-chat-prototype`), last commit after `8947eed`.
-  Nothing pushed this session. Untracked on purpose: `design/all-designs.html`,
+- Stacked: `main` ⊂ `feat/plan-and-stages` (96 commits) ⊂ `feat/onboarding-chat-prototype`
+  (+29) ⊂ `feat/paywall` (+28, last `bf7ed68`). Pushed (checked 2026-11-14 against the
+  local remote refs): `feat/paywall` and `feat/onboarding-chat-prototype` match origin;
+  `feat/plan-and-stages` is 1 ahead (`0b621fd`, docs only, already inside the onboarding
+  branch on origin). Untracked on purpose: `design/all-designs.html`,
   `design/figma-import/`.
+- Read to continue: this file, `CLAUDE.md` (Status, Git). Nothing else is needed for the
+  merge.
 - `stash@{0}` (splash hack) unused this session.
 
 ## Next action
 
-Push the three branches and merge them into `main` in order (plan-and-stages, then
-onboarding-chat-prototype, then paywall), each through a PR from a compare link; Fawad
-pushes or asks for the commands. Then the real iPhone pass, including a sandbox purchase,
+Push `feat/plan-and-stages` (1 commit), then merge the three into `main` in order
+(plan-and-stages, then onboarding-chat-prototype, then paywall), each through a PR from a
+compare link once the previous one is merged; Fawad pushes or asks for the commands. Then the real iPhone pass, including a sandbox purchase,
 restore and expiry.
 
 ## Open
