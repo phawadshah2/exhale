@@ -27,7 +27,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? _createConnection());
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -67,6 +67,12 @@ class AppDatabase extends _$AppDatabase {
         await migrator.addColumn(settings, settings.accessPlan);
         await migrator.addColumn(settings, settings.accessUntil);
       }
+      // Older versions get these from the v8 rebuilds.
+      if (from >= 8 && from < 13) {
+        await migrator.addColumn(habitLogs, habitLogs.externalId);
+        await migrator.addColumn(settings, settings.showLiveActivity);
+      }
+      if (from < 13) await migrator.create(idxHabitLogsExternalId);
       // drift writes the version only after the migration returns; writing it
       // here too keeps a kill in between from rerunning a finished step.
       await customStatement('PRAGMA user_version = $to');
@@ -127,6 +133,7 @@ class AppDatabase extends _$AppDatabase {
         // v7 stamped every log with its column default, so its habit_kind
         // says nothing; all logs belong to habit 1.
         columnTransformer: {habitLogs.habitId: const Constant(1)},
+        newColumns: [habitLogs.externalId],
       ),
     );
     await migrator.create(idxHabitLogsHabitIdLoggedAt);
@@ -140,6 +147,7 @@ class AppDatabase extends _$AppDatabase {
           settings.accessState,
           settings.accessPlan,
           settings.accessUntil,
+          settings.showLiveActivity,
           if (from < 4) ...[
             settings.askForTrigger,
             settings.triggerPromptIntroSeen,

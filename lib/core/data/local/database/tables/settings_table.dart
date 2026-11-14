@@ -38,6 +38,9 @@ class Settings extends Table {
   DateTimeColumn get accessUntil =>
       dateTime().named('access_until').nullable()();
 
+  BoolColumn get showLiveActivity =>
+      boolean().named('show_live_activity').withDefault(const Constant(true))();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

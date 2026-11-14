@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:exhale/core/data/local/database/app_database.dart';
 import 'package:exhale/core/data/storage_guard.dart';
 import 'package:exhale/core/domain/error/failure.dart';
@@ -20,6 +21,7 @@ class LocalHabitLogRepository implements HabitLogRepository {
     required DateTime loggedAt,
     Trigger? trigger,
     String? note,
+    String? externalId,
   }) => guardStorage(_source, () async {
     final row = await _localDataSource.insertLog(
       habitLogCompanion(
@@ -27,10 +29,14 @@ class LocalHabitLogRepository implements HabitLogRepository {
         loggedAt: loggedAt,
         trigger: trigger,
         note: note,
-      ),
+      ).copyWith(externalId: Value(externalId)),
     );
     return row.toEntity();
   });
+
+  @override
+  Future<Result<Set<String>>> storedExternalIds(Iterable<String> ids) =>
+      guardStorage(_source, () => _localDataSource.storedExternalIds(ids));
 
   @override
   Future<Result<void>> updateLog(HabitLog log) async {

@@ -22,6 +22,7 @@ extension SettingsRowMapper on SettingsRow {
     accessState: accessState,
     accessPlan: accessPlan,
     accessUntil: accessUntil,
+    showLiveActivity: showLiveActivity,
   );
 }
 
@@ -42,5 +43,6 @@ extension AppSettingsMapper on AppSettings {
     accessState: Value(accessState),
     accessPlan: Value(accessPlan),
     accessUntil: Value(accessUntil),
+    showLiveActivity: Value(showLiveActivity),
   );
 }

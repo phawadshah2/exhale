@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-14 (Lock Screen presence, Task 3 done). Earlier: `docs/history/` (latest
+Updated 2026-11-14 (Lock Screen presence, Task 4 done). Earlier: `docs/history/` (latest
 `2026-11-13_paywall_build_state.md`).
 
 ## Where we are
@@ -9,7 +9,7 @@ Updated 2026-11-14 (Lock Screen presence, Task 3 done). Earlier: `docs/history/`
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
 | Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), not pushed |
-| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 3 of 15 done |
+| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 4 of 15 done |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
@@ -38,10 +38,11 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 
 ## Next action
 
-Task 4, schema v13, external ids and the Live Activity switch (Sonnet 5.5 medium). Task 3
-(`test/fixtures/pace_cases.json`, 14 cases) is done. Spike (Task 2): Log one starts a Live
-Activity with the app terminated (iOS 27.2, from Shortcuts); the Action Button is
-rechecked in the device walk. Fawad's iPhone runs release builds over the cable.
+Task 5, lines of encouragement (Sonnet 5.5 medium): `lib/features/presence/domain/
+encouragement.dart`, read by Home's quote card; Fawad reviews the ~60 lines. Done so far:
+Task 3 countdown cases, Task 4 schema v13. Spike (Task 2): Log one starts a Live Activity
+with the app terminated (iOS 27.2, from Shortcuts); recheck the Action Button in the
+device walk. Fawad's iPhone runs release builds over the cable.
 
 ## Repo
 

@@ -9,7 +9,11 @@ abstract interface class HabitLogRepository {
     required DateTime loggedAt,
     Trigger? trigger,
     String? note,
+    String? externalId,
   });
+
+  /// Which of [ids] are already stored as a log's external id.
+  Future<Result<Set<String>>> storedExternalIds(Iterable<String> ids);
 
   Future<Result<void>> updateLog(HabitLog log);
 

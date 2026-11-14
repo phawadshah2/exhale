@@ -85,9 +85,10 @@ This section overrides the global approval rules for this project only.
   Features: habit, home, logs, onboarding, paywall, plan, settings, tracking.
 - State: Riverpod 3 with hand-written providers. No riverpod_generator. Providers read
   repositories and use cases from `sl`.
-- Storage: drift, fully offline, schema v12 (`habits`; plans and logs keyed by
+- Storage: drift, fully offline, schema v13 (`habits`; plans and logs keyed by
   `habit_id`; v9 wake and bed times; v10 `habit_prices`; v11 `plan_holds` and
-  `stage_checks`; v12 the cached access in settings). Repositories return `Result` and
+  `stage_checks`; v12 the cached access in settings; v13 logs' unique
+  `external_id` and `show_live_activity`). Repositories return `Result` and
   wrap storage calls in `guardStorage`.
 - Paywall (spec `2026-11-13-paywall-design.md`): StoreKit 2 behind `StoreRepository`;
   `Access` is Entitled, NeverPaid, Lapsed or Unknown. Startup reads it (3 s, then the

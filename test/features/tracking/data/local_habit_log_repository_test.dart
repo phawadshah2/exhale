@@ -53,6 +53,43 @@ void main() {
     expect(log.note, 'Morning coffee');
   });
 
+  group('external ids', () {
+    Future<Result<HabitLog>> addWithId(String id) => repository.addLog(
+      habitId: vaping,
+      loggedAt: DateTime(2026, 10, 16, 8),
+      externalId: id,
+    );
+
+    test('addLog stores the external id', () async {
+      expect(await addWithId('a1'), isA<Success<HabitLog>>());
+
+      final stored = await repository.storedExternalIds(['a1']);
+      expect((stored as Success<Set<String>>).value, {'a1'});
+    });
+
+    test('storedExternalIds returns only stored ones', () async {
+      await addWithId('a1');
+      await addWithId('a2');
+      await add(DateTime(2026, 10, 16, 9));
+
+      final stored = await repository.storedExternalIds(['a2', 'b1', 'a1']);
+      expect((stored as Success<Set<String>>).value, {'a1', 'a2'});
+    });
+
+    test('a second log with the same external id fails', () async {
+      await addWithId('a1');
+
+      final second = await addWithId('a1');
+      expect(second, isA<FailureResult<HabitLog>>());
+      final logs = await repository.getLogs(
+        habitId: vaping,
+        from: DateTime(2026, 10, 16),
+        to: DateTime(2026, 10, 17),
+      );
+      expect((logs as Success<List<HabitLog>>).value, hasLength(1));
+    });
+  });
+
   test('watchLogs returns the half-open range in time order', () async {
     final from = DateTime(2026, 10, 16, 4);
     final to = DateTime(2026, 10, 17, 4);

@@ -8,6 +8,16 @@ class HabitLogLocalDataSource {
   Future<HabitLogRow> insertLog(HabitLogsCompanion log) =>
       _database.into(_database.habitLogs).insertReturning(log);
 
+  Future<Set<String>> storedExternalIds(Iterable<String> ids) async {
+    final externalId = _database.habitLogs.externalId;
+    final rows =
+        await (_database.selectOnly(_database.habitLogs)
+              ..addColumns([externalId])
+              ..where(externalId.isIn(ids)))
+            .get();
+    return {for (final row in rows) row.read(externalId)!};
+  }
+
   Future<int> updateLog(int id, HabitLogsCompanion log) => (_database.update(
     _database.habitLogs,
   )..where((row) => row.id.equals(id))).write(log);

@@ -152,16 +152,23 @@ existing `pace_guide_test.dart` asserts. Durations truncate to whole microsecond
   `HabitLogRepository.addLog({..., String? externalId})`;
   `Future<Result<Set<String>>> storedExternalIds(Iterable<String> ids)`.
 
-- [ ] **Step 1:** Migration tests: from v12 `adds external_id and show_live_activity`
+- [x] **Step 1:** Migration tests: from v12 `adds external_id and show_live_activity`
   (columns exist, old logs null, setting true); `ends on the latest version` covers v13.
   Repository tests: `addLog stores the external id`; `storedExternalIds returns only stored ones`;
   `a second log with the same external id fails` (a `Failure`, not a throw).
-- [ ] **Step 2:** Run both files with `--timeout 60s`. Expected: FAIL (no column).
-- [ ] **Step 3:** Add the columns, the `from < 13` step (`addColumn` both, create the
+- [x] **Step 2:** Run both files with `--timeout 60s`. Expected: FAIL (no column).
+- [x] **Step 3:** Add the columns, the `from < 13` step (`addColumn` both, create the
   index), `schemaVersion => 13`, the repository parameter and query; run
   `fvm dart run build_runner build -d`.
-- [ ] **Step 4:** Run both test files. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(tracking): schema v13 with external log ids`.
+- [x] **Step 4:** Run both test files. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(tracking): schema v13 with external log ids`.
+
+Done 2026-11-14. As built: the repository tests live in
+`test/features/tracking/data/local_habit_log_repository_test.dart` (the existing file); a
+v12 fixture `test/fixtures/exhale_v12.sqlite` (the v11 data plus a log and a cached
+access) backs the upgrade test. v7 and older get both columns from the v8 table rebuilds
+(`newColumns`), so `addColumn` runs only from v8 to v12; the index is created for every
+version below 13.
 
 ### Task 5: Lines of encouragement
 

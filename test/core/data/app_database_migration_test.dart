@@ -820,6 +820,41 @@ void main() {
     });
   });
 
+  group('upgrade from v12', () {
+    AppDatabase openV12() {
+      final dir = Directory.systemTemp.createTempSync('exhale_v12');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final file = File('test/fixtures/exhale_v12.sqlite')
+          .copySync('${dir.path}/exhale.sqlite');
+      driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+      final database = AppDatabase(NativeDatabase(file));
+      addTearDown(database.close);
+      return database;
+    }
+
+    test('ends on the latest version', () => _expectLatest(openV12()));
+
+    test('adds external_id and show_live_activity', () async {
+      final database = openV12();
+
+      expect(await _rows(database, 'SELECT external_id FROM habit_logs'), [
+        {'external_id': null},
+      ]);
+      expect(
+        await _rows(
+          database,
+          "SELECT name FROM sqlite_master WHERE type = 'index' "
+          "AND name = 'idx_habit_logs_external_id'",
+        ),
+        hasLength(1),
+      );
+      final settings = await _settings(database);
+      expect(settings.showLiveActivity, isTrue);
+      expect(settings.accessState, 'entitled');
+      expect(settings.userName, 'Sam');
+    });
+  });
+
   test('a plan without a settings row becomes a smoking habit 1', () async {
     final database = _open(_createV7Schema);
     addTearDown(database.close);
