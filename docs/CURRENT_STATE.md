@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-14 (Lock Screen presence, Task 6 done). Earlier: `docs/history/` (latest
+Updated 2026-11-14 (Lock Screen presence, Task 7 done). Earlier: `docs/history/` (latest
 `2026-11-13_paywall_build_state.md`).
 
 ## Where we are
@@ -9,7 +9,7 @@ Updated 2026-11-14 (Lock Screen presence, Task 6 done). Earlier: `docs/history/`
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
 | Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), not pushed |
-| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 6 of 15 done |
+| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 7 of 15 done |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
@@ -25,13 +25,10 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 - Decided: queue + snapshot in the App Group (no DB move, no packages); minimum iOS 17;
   without access widgets lock and Log one opens the app; Live Activity goes quiet 15 min
   past due and keeps the Island; widgets 1 to 5, rings in design D (`Rings-v4.html`).
-- Task 1 (commit `d8cb4ed`): `ExhaleWidgetsExtension` target, App Group on both targets,
-  iOS 17 everywhere, `NSSupportsLiveActivities`, embed phase before Thin Binary. Portal
-  steps done by Fawad. `ios/Shared` not made yet (see the plan's Task 1 note).
-- Task 2 spike (`835449a`): yes, Log one starts a Live Activity with the app terminated
-  (iPhone, iOS 27.2, via Shortcuts). The Action Button never reached the intent; recheck
-  it in the device walk. Spike code was `22710db` (branch deleted; the plan notes how
-  `ios/Shared` was wired, with `LogOneIntent.swift` excluded from the extension).
+- Task 1 (`d8cb4ed`): extension target, App Group, iOS 17, `NSSupportsLiveActivities`;
+  `ios/Shared` not made yet (plan's Task 1 note).
+- Task 2 spike (`835449a`): Log one starts a Live Activity with the app terminated (via
+  Shortcuts); the Action Button never reached the intent, recheck at the device walk.
 - Task 3 (`e0c12a1`): `test/fixtures/pace_cases.json`, 14 `PaceGuide` cases; Swift ±1 ms.
 - Task 4 (`3bb43b2`): schema v13 (`habit_logs.external_id`, `show_live_activity`);
   fixture `exhale_v12.sqlite`; v7 and older get the columns in the v8 rebuilds.
@@ -39,6 +36,8 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   walk), `pickLinePair`; `QuoteCard.quotes` reads the list.
 - Task 6: `PresenceSnapshot.build` takes `TrackedHabit`, no holds list (plans carry them);
   UTC ISO 8601 times; no `count` on future days.
+- Task 7: `PresenceRepository` (channel; tests get `FakePresenceRepository` via
+  `setUpTestDependencies`), `DrainExternalLogs` (dedupes by external id).
 
 ## Checks
 
@@ -46,15 +45,16 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   Full suite not run.
 - Task 1: `fvm flutter build ios --simulator --debug` built, extension embedded.
   No Dart changes, so no Dart checks.
-- Tasks 3 to 6: format and `analyze --fatal-infos` clean each time. Task 3 test 15/15;
+- Tasks 3 to 7: format and `analyze --fatal-infos` clean each time. Task 3 test 15/15;
   Task 4 migration + log repository tests 64/64; Task 5 test + `test/features/home/`
-  274/274; Task 6 test 11/11. Full suite not run (milestone end).
+  274/274; Task 6 test 11/11;
+  Task 7 presence + `test/app` 76/76. Full suite not run (milestone end).
 
 ## Next action
 
-Task 7, channel, repository and draining the queue (Sonnet 5.5 medium), via the
-`execute-plan` skill. Read: the plan's header and Task 7, and the spec's "Data shared
-with Swift". Fawad's iPhone
+Task 8, keeping Swift in sync (Opus 5.5 high: concurrency, Review Focus 4 and 5), via
+the `execute-plan` skill. Read: the plan's header and Task 8, and the spec's "Data
+shared with Swift". Fawad's iPhone
 (`00008150-0008556E3A80401C`) runs release builds over the cable, Developer Mode on.
 
 ## Repo

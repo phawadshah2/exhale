@@ -258,17 +258,22 @@ Done 2026-11-14. The 53 new lines are drafts for Fawad's review at the milestone
     `readQueue() -> String json`, `removeFromQueue(List<String> ids)`,
     `showActivity(String json)`, `endActivity()`; Swift calls `queueChanged` on the
     channel.
+  - As built: `readQueue` returning null or empty reads as an empty queue; any channel
+    exception is a `StorageFailure`; `ActivityContent` JSON keys are `next`,
+    `gapSeconds`, `count`, `limit`, `daysToGo`, `countingLine`, `waitingLine`,
+    `staleAt` (times UTC ISO 8601). The spec's `startOrUpdateActivity` / `drainQueue`
+    names are superseded by these. `setupDependencies` takes `presence:`.
 
-- [ ] **Step 1:** Drain tests with an in-memory database and the fake: `inserts each
+- [x] **Step 1:** Drain tests with an in-memory database and the fake: `inserts each
   queued log at its time with no trigger`; `drainingTwiceInsertsOnce`;
   `aStoredIdIsRemovedNotReinserted`; `removes exactly the drained ids` (an id appended
   during the drain stays); `a failed insert removes nothing`.
   Channel tests with a mocked `MethodChannel`: method names and arguments as above.
-- [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Implement; register in `presence_injection.dart` (repository as the
+- [x] **Step 2:** Run. Expected: FAIL.
+- [x] **Step 3:** Implement; register in `presence_injection.dart` (repository as the
   channel one; tests override with the fake in `setUpTestDependencies`).
-- [ ] **Step 4:** Run. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(presence): queue drain and the presence channel`.
+- [x] **Step 4:** Run. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(presence): queue drain and the presence channel`.
 
 ### Task 8: Keeping Swift in sync
 
