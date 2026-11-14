@@ -314,6 +314,70 @@ void main() {
     await tester.disposeApp();
   });
 
+  group("tapping the timer opens today's logs", () {
+    testWidgets('from the ring', (tester) async {
+      await setWindow();
+      await logAt(await startPlan(), DateTime(2026, 10, 29, 8));
+      await tester.pumpAppPastSplash(height: 2400);
+
+      await tester.tap(find.text('until your next'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('The evidence.'), findsOneWidget);
+      expect(find.text('Today · Thu, Oct 29'), findsOneWidget);
+      await tester.disposeApp();
+    });
+
+    testWidgets('from the + chip', (tester) async {
+      await setWindow();
+      await logAt(await startPlan(), DateTime(2026, 10, 29, 8));
+      await tester.pumpAppPastSplash(height: 2400);
+
+      await tester.tap(find.byKey(const Key('next-log-chip')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('The evidence.'), findsOneWidget);
+      expect(find.text('Today · Thu, Oct 29'), findsOneWidget);
+      await tester.disposeApp();
+    });
+
+    testWidgets('the chip is at least 44 pt tall to touch', (tester) async {
+      await setWindow();
+      await logAt(await startPlan(), DateTime(2026, 10, 29, 8));
+      await tester.pumpAppPastSplash(height: 2400);
+
+      final target = find.ancestor(
+        of: find.byKey(const Key('next-log-chip')),
+        matching: find.byType(GestureDetector),
+      );
+      expect(tester.getSize(target.first).height, greaterThanOrEqualTo(44));
+      await tester.disposeApp();
+    });
+
+    testWidgets('both are buttons to VoiceOver', (tester) async {
+      final handle = tester.ensureSemantics();
+      await setWindow();
+      await logAt(await startPlan(), DateTime(2026, 10, 29, 8));
+      await tester.pumpAppPastSplash(height: 2400);
+
+      for (final label in [
+        'Next one on schedule in 1 h 13 min. 1 of 8 today, 7 left.',
+        'Next one on schedule in 1 h 13 min',
+      ]) {
+        expect(
+          tester.getSemantics(find.bySemanticsLabel(label)),
+          isSemantics(
+            isButton: true,
+            hasTapAction: true,
+            onTapHint: "Open today's logs",
+          ),
+        );
+      }
+      handle.dispose();
+      await tester.disposeApp();
+    });
+  });
+
   testWidgets('the ring and + describe the timer to VoiceOver', (tester) async {
     final handle = tester.ensureSemantics();
     await setWindow();

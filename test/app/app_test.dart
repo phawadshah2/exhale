@@ -4,7 +4,6 @@ import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/theme/app_palette.dart';
 import 'package:exhale/core/theme/app_theme.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
-import 'package:exhale/features/onboarding/presentation/providers/onboarding_chat.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
@@ -50,9 +49,9 @@ void main() {
     await tester.tap(planButton().hitTestable());
     await tester.pumpAndSettle();
 
-    // Onboarding saved the day window, so Home opens on the timer.
-    final limit = ChatHabit.of(HabitKind.vaping).typical;
-    expect(find.text('0 of $limit · $limit left'), findsOneWidget);
+    // Onboarding saved the day window; the timer waits for the first log.
+    expect(find.byKey(const Key('day-count')), findsOneWidget);
+    expect(find.text('until your next'), findsNothing);
 
     await tester.disposeApp();
   });

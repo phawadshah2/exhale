@@ -81,7 +81,17 @@ class AppShell extends ConsumerWidget {
           // Lets pages scroll behind the floating bar; Scaffold reports the
           // bar's height as bottom padding to the body.
           extendBody: true,
-          body: navigationShell,
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              navigationShell,
+              // Where the badge put it: over the + button, clear of its ring.
+              const NextLogChip(
+                right: AppSpacing.pageMargin,
+                aboveBar: -FloatingTabBar.topGap + NextLogBadge.ringInset * 2,
+              ),
+            ],
+          ),
           bottomNavigationBar: FloatingTabBar(
             tabs: _tabs,
             currentIndex: navigationShell.currentIndex,
@@ -136,6 +146,9 @@ class FloatingTabBar extends StatelessWidget {
   static const double height = 60;
   static const double _inset = 5;
 
+  /// Above the bar's capsule, inside the height it reports to the body.
+  static const double topGap = 8;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -145,7 +158,7 @@ class FloatingTabBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.pageMargin,
-          8,
+          topGap,
           AppSpacing.pageMargin,
           0,
         ),

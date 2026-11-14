@@ -337,6 +337,13 @@ class _DayRing extends ConsumerWidget {
                   key: const ValueKey('timer'),
                   timer: timer,
                   progress: progress,
+                  onTap: () {
+                    unawaited(HapticFeedback.selectionClick());
+                    openLogs(
+                      context,
+                      LogsQuery(habitId: habitId, from: day, to: day),
+                    );
+                  },
                 )
               : SizedBox.square(
                   key: const ValueKey('count'),
@@ -529,10 +536,18 @@ class _Details extends StatelessWidget {
 /// The countdown to the next log, inside its own thin ring; the day's count
 /// drops to a small line.
 class _TimerCentre extends StatelessWidget {
-  const _TimerCentre({required this.timer, required this.progress, super.key});
+  const _TimerCentre({
+    required this.timer,
+    required this.progress,
+    required this.onTap,
+    super.key,
+  });
 
   final NextLogTimer timer;
   final DailyProgress progress;
+
+  /// Opens today's logs.
+  final VoidCallback onTap;
 
   static const double _ringSize = 164;
   static const double _contentSize = 148;
@@ -547,50 +562,61 @@ class _TimerCentre extends StatelessWidget {
 
     return Semantics(
       label: '$spoken $count today, ${progress.remaining} left.',
+      button: true,
+      onTapHint: "Open today's logs",
+      onTap: onTap,
       excludeSemantics: true,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          DrainingRing(
-            fraction: timer.fraction,
-            restartKey: timer.guide.next,
-            size: _ringSize,
-            strokeWidth: 4,
-            color: colors.onSurface,
-            track: colors.surfaceContainerHigh,
-          ),
-          SizedBox.square(
-            dimension: _contentSize,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 2,
-                children: [
-                  Text(
-                    AppFormat.timer(timer.left),
-                    style: text.displayLarge?.copyWith(
-                      fontSize: 34,
-                      height: 1.15,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: _content(text, colors, count),
+      ),
+    );
+  }
+
+  Widget _content(TextTheme text, ColorScheme colors, String count) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        DrainingRing(
+          fraction: timer.fraction,
+          restartKey: timer.guide.next,
+          size: _ringSize,
+          strokeWidth: 4,
+          color: colors.onSurface,
+          track: colors.surfaceContainerHigh,
+        ),
+        SizedBox.square(
+          dimension: _contentSize,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 2,
+              children: [
+                Text(
+                  AppFormat.timer(timer.left),
+                  style: text.displayLarge?.copyWith(
+                    fontSize: 34,
+                    height: 1.15,
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
-                  Text(
-                    'until your next',
-                    style: text.labelLarge?.copyWith(color: colors.primary),
+                ),
+                Text(
+                  'until your next',
+                  style: text.labelLarge?.copyWith(color: colors.primary),
+                ),
+                Text(
+                  '$count · ${progress.remaining} left',
+                  style: text.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
                   ),
-                  Text(
-                    '$count · ${progress.remaining} left',
-                    style: text.bodySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

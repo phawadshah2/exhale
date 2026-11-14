@@ -24,8 +24,13 @@ today. Yesterday's logs never count.
 The timer in Home's ring opens Logs for today (`LogsQuery(habitId, from: today, to:
 today)`, as the Today's logs card does), with a selection haptic. The chip above the +
 button does the same; its draining ring stays non-interactive so the + keeps its taps.
-Both are buttons to VoiceOver ("Opens today's logs"); the chip's target is at least
-44 pt tall.
+Both are buttons to VoiceOver (hint "Open today's logs"); the chip's target is at least
+44 pt, reaching up and left so the chip itself does not move.
+
+The chip painted outside the tab bar's bounds, where Flutter does not deliver touches,
+so it moves out of the bar: `NextLogChip` is a `Positioned` child of a `Stack` over the
+shell's body, placed by the bar height the body reports, at the same spot as before.
+`NextLogBadge` keeps only the ring.
 
 ## Approaches
 
