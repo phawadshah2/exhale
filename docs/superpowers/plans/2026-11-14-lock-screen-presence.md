@@ -94,17 +94,22 @@ with Xcode closed).
 
 Throwaway, on branch `spike/log-one-activity` off this branch. Not merged.
 
-- [ ] **Step 1:** In `ios/Shared/LogOneIntent.swift`, an `AppIntent & LiveActivityIntent`
+- [x] **Step 1:** In `ios/Shared/LogOneIntent.swift`, an `AppIntent & LiveActivityIntent`
   named `LogOneIntent` whose `perform()` calls `Activity<CountdownAttributes>.request`
   with a fixed 1-hour countdown; an `AppShortcutsProvider` with "Log one in ${applicationName}".
   `CountdownAttributes` with a `ContentState { next: Date }` and a one-line view.
-- [ ] **Step 2:** Ask Fawad, run on his iPhone (`fvm flutter run --release -d <his
+- [x] **Step 2:** Ask Fawad, run on his iPhone (`fvm flutter run --release -d <his
   device>`), assign the shortcut to the Action Button, force-quit the app, press it.
-- [ ] **Step 3:** Record in the spec's "Order of work" item 1 whether the activity
+- [x] **Step 3:** Record in the spec's "Order of work" item 1 whether the activity
   appeared (and on which iOS). If not, Task 12's intent only updates a running activity and
   Task 13 notes it.
-- [ ] **Step 4:** Commit the spec note on this branch: `docs: record the Live Activity
+- [x] **Step 4:** Commit the spec note on this branch: `docs: record the Live Activity
   spike result`. Delete the spike branch.
+
+Done 2026-11-14: yes, Log one starts a new Live Activity with the app terminated (iOS
+27.2, from Shortcuts). Spike code was commit `22710db` on the deleted spike branch: it had
+`ios/Shared` as a synchronized folder in both targets, with `LogOneIntent.swift` excluded
+from the extension (`Activity.request` is app-only).
 
 ### Task 3: Shared countdown cases
 

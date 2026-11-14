@@ -178,6 +178,11 @@ Exhale to update" and Log one opens the app.
    Button with the app closed start a new Live Activity? The answer decides whether Log
    one starts the activity or only updates a running one (if not, the first log of a
    session made outside the app shows on widgets only).
+   **Result (2026-11-14, iPhone, iOS 27.2): yes.** A `LiveActivityIntent` run from
+   Shortcuts started a new activity both with the app open and after a force-quit
+   (`Activity.request` succeeded, activities enabled). Log one starts the activity. The
+   Action Button did not run the first build's intent; check it again in the real-device
+   walk.
 2. App Group, the extension target, the channel, the snapshot writer, queue drain and
    `external_id` (v13).
 3. Lock Screen and Home Screen widgets.

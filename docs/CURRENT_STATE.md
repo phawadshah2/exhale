@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-14 (Lock Screen presence, Task 1 done). Earlier: `docs/history/` (latest
+Updated 2026-11-14 (Lock Screen presence, Task 2 done). Earlier: `docs/history/` (latest
 `2026-11-13_paywall_build_state.md`).
 
 ## Where we are
@@ -9,7 +9,7 @@ Updated 2026-11-14 (Lock Screen presence, Task 1 done). Earlier: `docs/history/`
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
 | Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), not pushed |
-| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Task 1 of 15 done |
+| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 and 2 of 15 done |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
@@ -38,9 +38,10 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 
 ## Next action
 
-Task 2, the spike (Sonnet 5.5 medium): on `spike/log-one-activity`, can Log one from the
-Action Button start a Live Activity with the app closed? Needs Fawad's iPhone and a
-release run (ask first). Read: the plan's header and Task 2, the spec's Order of work.
+Task 3, shared countdown cases (Sonnet 5.5 medium): `test/fixtures/pace_cases.json` and
+its test. Spike (Task 2) answered yes: Log one starts a Live Activity with the app
+terminated (iOS 27.2, from Shortcuts); the Action Button is rechecked in the device walk.
+Fawad's iPhone runs release builds over the cable (Developer Mode on).
 
 ## Repo
 
@@ -54,6 +55,9 @@ release run (ask first). Read: the plan's header and Task 2, the spec's Order of
 
 - For Fawad: privacy policy URL; Terms link; `.storekit` check; submission items (group
   display name, review screenshots, Family Sharing, App Privacy).
+- Paywall follow-ups (Fawad, 2026-11-14): show something when a purchase succeeds;
+  Settings' Restore purchases has no loading state (the row only greys out while busy,
+  then a snackbar) and shows even when entitled (decide whether to hide it then).
 - Paywall review notes not fixed: sandbox Annual reads as a trial; Lifetime over Annual
   hides Manage; refunded "ended on" uses expiry; a resubmitted first run saves only the plan.
 - Splash overflows at 200% on 375 × 667; paywall button 22 pt high there.
