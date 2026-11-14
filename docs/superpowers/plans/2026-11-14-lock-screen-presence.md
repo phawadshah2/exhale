@@ -68,19 +68,27 @@ WidgetKit, ActivityKit and App Intents, XCTest.
 - Produces: targets `Runner` and `ExhaleWidgets` both with the App Group; `ios/Shared`
   compiled into both.
 
-- [ ] **Step 1 (Fawad):** Apple Developer portal: register App Group
+- [x] **Step 1 (Fawad):** Apple Developer portal: register App Group
   `group.com.phawadshah.exhale`; enable it on `com.phawadshah.exhale`; register
   `com.phawadshah.exhale.ExhaleWidgets` with the same group.
-- [ ] **Step 2 (Fawad, Xcode):** File > New > Target > Widget Extension named
+- [x] **Step 2 (Fawad, Xcode):** File > New > Target > Widget Extension named
   `ExhaleWidgets`, "Include Live Activity" and "Include Control" ticked, embedded in
   Runner. Signing & Capabilities: add App Groups with the group on Runner and
   ExhaleWidgets. Add Runner's Info.plist key `NSSupportsLiveActivities = YES`.
-- [ ] **Step 3:** Set `IPHONEOS_DEPLOYMENT_TARGET = 17.0` for every configuration of
+- [x] **Step 3:** Set `IPHONEOS_DEPLOYMENT_TARGET = 17.0` for every configuration of
   Runner, RunnerTests and ExhaleWidgets; delete the template's sample widget, Live
   Activity and control bodies, leaving an empty `@main ExhaleWidgetsBundle`.
-- [ ] **Step 4:** Ask Fawad, then run `fvm flutter build ios --simulator --debug`.
+- [x] **Step 4:** Ask Fawad, then run `fvm flutter build ios --simulator --debug`.
   Expected: `✓ Built build/ios/iphonesimulator/Runner.app`.
-- [ ] **Step 5:** Commit: `build(ios): add the widget extension, App Group and iOS 17`.
+- [x] **Step 5:** Commit: `build(ios): add the widget extension, App Group and iOS 17`.
+
+Done 2026-11-14. As built: the target is `ExhaleWidgetsExtension` (folder
+`ios/ExhaleWidgets`, an Xcode 16 synchronized folder), entitlements at
+`ios/ExhaleWidgetsExtension.entitlements`; the bundle holds an `EmptyWidgetConfiguration`
+placeholder; "Embed Foundation Extensions" moved before "Thin Binary" (the Flutter build
+cycle). `ios/Shared` is not made yet: the first task that adds a shared Swift file creates
+it as a synchronized folder in both targets (in Xcode, by Fawad, or in the project file
+with Xcode closed).
 
 ### Task 2: Spike, Live Activity from Log one with the app closed
 
