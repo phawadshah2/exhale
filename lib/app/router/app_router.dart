@@ -1,4 +1,5 @@
 import 'package:exhale/app/router/app_routes.dart';
+import 'package:exhale/app/router/launch.dart';
 import 'package:exhale/app/shell/app_shell.dart';
 import 'package:exhale/app/shell/branch_fade.dart';
 import 'package:exhale/app/shell/page_visits.dart';
@@ -10,6 +11,10 @@ import 'package:exhale/features/logs/presentation/pages/logs_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/change_habit_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
+import 'package:exhale/features/onboarding/presentation/pages/welcome_back_page.dart';
+import 'package:exhale/features/paywall/presentation/pages/locked_page.dart';
+import 'package:exhale/features/paywall/presentation/pages/paywall_page.dart';
+import 'package:exhale/features/paywall/presentation/providers/paywall_providers.dart';
 import 'package:exhale/features/plan/presentation/pages/edit_plan_page.dart';
 import 'package:exhale/features/plan/presentation/pages/plan_details_page.dart';
 import 'package:exhale/features/settings/presentation/pages/settings_page.dart';
@@ -18,9 +23,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
+  // Access or habits changing re-runs the redirect, so a lapse found on a
+  // resume or a store update takes effect wherever the user is.
+  final gate = ValueNotifier(0);
+  ref
+    ..listen(accessProvider, (_, _) => gate.value++)
+    ..listen(activeHabitsProvider, (_, _) => gate.value++);
   final router = GoRouter(
     initialLocation: AppRoutes.splash,
     observers: [shellRouteObserver],
+    refreshListenable: gate,
+    redirect: (context, state) => accessRedirect(
+      state.uri.path,
+      ref.read(accessProvider),
+      hasHabit: ref.read(activeHabitsProvider).value?.isNotEmpty ?? false,
+    ),
     routes: [
       GoRoute(
         path: AppRoutes.splash,
@@ -43,6 +60,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             child: child,
           ),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.welcomeBack,
+        builder: (context, state) => const WelcomeBackPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.paywall,
+        builder: (context, state) => const PaywallPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.locked,
+        builder: (context, state) => const LockedPage(),
       ),
       GoRoute(
         path: AppRoutes.habit,
@@ -107,6 +136,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
-  ref.onDispose(router.dispose);
+  ref
+    ..onDispose(router.dispose)
+    ..onDispose(gate.dispose);
   return router;
 });

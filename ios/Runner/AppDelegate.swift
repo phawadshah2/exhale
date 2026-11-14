@@ -48,6 +48,8 @@ final class NativeUiPlugin: NSObject, FlutterPlugin {
       result(UIAccessibility.isReduceTransparencyEnabled)
     case "showAlert":
       showAlert(call.arguments as? [String: Any] ?? [:], result: result)
+    case "openUrl":
+      openUrl(call.arguments as? [String: Any] ?? [:], result: result)
     default:
       result(FlutterMethodNotImplemented)
     }
@@ -58,6 +60,14 @@ final class NativeUiPlugin: NSObject, FlutterPlugin {
       "reduceTransparencyChanged",
       arguments: UIAccessibility.isReduceTransparencyEnabled
     )
+  }
+
+  private func openUrl(_ args: [String: Any], result: @escaping FlutterResult) {
+    guard let text = args["url"] as? String, let url = URL(string: text) else {
+      result(FlutterError(code: "bad_url", message: "Not a URL", details: nil))
+      return
+    }
+    UIApplication.shared.open(url) { _ in result(nil) }
   }
 
   /// Returns the index of the tapped action.

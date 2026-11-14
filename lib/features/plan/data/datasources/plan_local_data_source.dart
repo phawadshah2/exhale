@@ -75,4 +75,28 @@ class PlanLocalDataSource {
       await _database.into(_database.plans).insert(plan);
     });
   }
+
+  /// Deletes every plan of the habit, with its holds and checks, then inserts
+  /// [plan].
+  Future<void> replaceAll(PlansCompanion plan) {
+    final habitId = plan.habitId.value;
+    const dropped = 'plan_id IN (SELECT id FROM plans WHERE habit_id = ?)';
+    final variables = [Variable.withInt(habitId)];
+    return _database.transaction(() async {
+      await _database.customUpdate(
+        'DELETE FROM plan_holds WHERE $dropped',
+        variables: variables,
+        updates: {_database.planHolds},
+      );
+      await _database.customUpdate(
+        'DELETE FROM stage_checks WHERE $dropped',
+        variables: variables,
+        updates: {_database.stageChecks},
+      );
+      await (_database.delete(
+        _database.plans,
+      )..where((row) => row.habitId.equals(habitId))).go();
+      await _database.into(_database.plans).insert(plan);
+    });
+  }
 }

@@ -275,6 +275,9 @@ abstract final class OnboardingCopy {
   static const dealButton = 'Shake on it';
   static String dealEyebrow(int amount) => '$amount today. Three ways to zero.';
   static const dealHeadline = 'How fast do you want to go?';
+  static String welcomeBackEyebrow(String name) =>
+      name.isEmpty ? 'Welcome back.' : 'Welcome back, $name.';
+  static const welcomeBackHeadline = "Your plan's still here.";
   static const suggested = 'SUGGESTED';
   static String weeks(int n) => '$n weeks';
   static String dealGo(String? pace, String date) =>

@@ -15,17 +15,16 @@ plan; don't ask him to re-explain them. Read the linked docs when a task touches
 Progress and the single next action live in `docs/CURRENT_STATE.md`. Read it first; update
 it when a task or milestone finishes. Older session logs are in `docs/history/`.
 
-- Active plan: `docs/superpowers/plans/2026-11-02-plan-and-stages.md` on branch
-  `feat/plan-and-stages`. M6 (Plan details, Edit plan, Logs) and M7 (stage management)
-  are done: reviewed and walked in the simulator. Next: merge to `main`, then the real
-  iPhone pass.
+- Unmerged, in order: `feat/plan-and-stages` (M6, M7), `feat/onboarding-chat-prototype`
+  (chat onboarding), `feat/paywall` (plan `docs/superpowers/plans/2026-11-13-paywall.md`,
+  milestone closed 2026-11-14). Next: push and merge them, then the real iPhone pass.
 - Specs: `docs/superpowers/specs/` (one per plan). Designs: `design/` (each folder has a
   README).
 - Launch scope (Fawad, 2026-10-31): the first release tracks one habit. Never offer a
   second habit in the launch build. Multi-habit Tasks 4.1 to 4.3 are parked, unmerged, on
   `feat/multi-habit`.
-- Launch also needs (2026-11-10): the paywall, Export/Import, iCloud sync (CloudKit, the
-  user's own iCloud), then Stay at zero. Details in `docs/decisions/`.
+- Launch also needs (2026-11-10): Export/Import, iCloud sync (CloudKit, the user's own
+  iCloud), then Stay at zero (the paywall is built). Details in `docs/decisions/`.
 - After launch: multiple habits (one subscription covers all), then reminders, widgets and
   the Live Activity, time-of-day insights, habit reordering.
 
@@ -83,12 +82,19 @@ This section overrides the global approval rules for this project only.
   `sl`, `InjectionContainer.setupDependencies()`), `domain` (`Result`/`Failure`, `Clock`,
   `LogicalDay`, `DayBoundary`), `presentation`, `theme`, `widgets`.
 - `lib/features/<feature>/{data,domain,presentation}`, each with a `*_injection.dart`.
-  Features: habit, home, logs, onboarding, plan, settings, tracking.
+  Features: habit, home, logs, onboarding, paywall, plan, settings, tracking.
 - State: Riverpod 3 with hand-written providers. No riverpod_generator. Providers read
   repositories and use cases from `sl`.
-- Storage: drift, fully offline, schema v11 (`habits`; plans and logs keyed by
+- Storage: drift, fully offline, schema v12 (`habits`; plans and logs keyed by
   `habit_id`; v9 wake and bed times; v10 `habit_prices`; v11 `plan_holds` and
-  `stage_checks`). Repositories return `Result` and wrap storage calls in `guardStorage`.
+  `stage_checks`; v12 the cached access in settings). Repositories return `Result` and
+  wrap storage calls in `guardStorage`.
+- Paywall (spec `2026-11-13-paywall-design.md`): StoreKit 2 behind `StoreRepository`;
+  `Access` is Entitled, NeverPaid, Lapsed or Unknown. Startup reads it (3 s, then the
+  settings cache, with a 16-day grace) into `accessProvider`, which refreshes on resume
+  and store updates. `resolveLaunch` picks the splash's next screen; the router's
+  `accessRedirect` sends in-app routes to the paywall (never paid) or the locked screen
+  (lapsed). Debug walks: `--dart-define=FAKE_STORE=neverPaid|lapsed|entitled|offline`.
 - Day logic: a logical day resets at a user-set hour (default 4 AM). Logs between
   midnight and the reset hour belong to the previous day.
 - Plan: `ReductionPlan(startDay, startLimit, quitDay)`; the limit on day d is

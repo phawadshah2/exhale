@@ -19,6 +19,9 @@ extension SettingsRowMapper on SettingsRow {
     logHintSeen: logHintSeen,
     wakeMinute: wakeMinute,
     bedMinute: bedMinute,
+    accessState: accessState,
+    accessPlan: accessPlan,
+    accessUntil: accessUntil,
   );
 }
 
@@ -36,5 +39,8 @@ extension AppSettingsMapper on AppSettings {
     logHintSeen: Value(logHintSeen),
     wakeMinute: Value(wakeMinute),
     bedMinute: Value(bedMinute),
+    accessState: Value(accessState),
+    accessPlan: Value(accessPlan),
+    accessUntil: Value(accessUntil),
   );
 }

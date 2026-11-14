@@ -1598,6 +1598,39 @@ class $SettingsTable extends Settings
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _accessStateMeta = const VerificationMeta(
+    'accessState',
+  );
+  @override
+  late final GeneratedColumn<String> accessState = GeneratedColumn<String>(
+    'access_state',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _accessPlanMeta = const VerificationMeta(
+    'accessPlan',
+  );
+  @override
+  late final GeneratedColumn<String> accessPlan = GeneratedColumn<String>(
+    'access_plan',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _accessUntilMeta = const VerificationMeta(
+    'accessUntil',
+  );
+  @override
+  late final GeneratedColumn<DateTime> accessUntil = GeneratedColumn<DateTime>(
+    'access_until',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1612,6 +1645,9 @@ class $SettingsTable extends Settings
     currencySymbol,
     wakeMinute,
     bedMinute,
+    accessState,
+    accessPlan,
+    accessUntil,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1715,6 +1751,30 @@ class $SettingsTable extends Settings
         bedMinute.isAcceptableOrUnknown(data['bed_minute']!, _bedMinuteMeta),
       );
     }
+    if (data.containsKey('access_state')) {
+      context.handle(
+        _accessStateMeta,
+        accessState.isAcceptableOrUnknown(
+          data['access_state']!,
+          _accessStateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('access_plan')) {
+      context.handle(
+        _accessPlanMeta,
+        accessPlan.isAcceptableOrUnknown(data['access_plan']!, _accessPlanMeta),
+      );
+    }
+    if (data.containsKey('access_until')) {
+      context.handle(
+        _accessUntilMeta,
+        accessUntil.isAcceptableOrUnknown(
+          data['access_until']!,
+          _accessUntilMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1772,6 +1832,18 @@ class $SettingsTable extends Settings
         DriftSqlType.int,
         data['${effectivePrefix}bed_minute'],
       ),
+      accessState: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}access_state'],
+      ),
+      accessPlan: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}access_plan'],
+      ),
+      accessUntil: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}access_until'],
+      ),
     );
   }
 
@@ -1798,6 +1870,13 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
   /// Wake and bed times in minutes after midnight; null until set.
   final int? wakeMinute;
   final int? bedMinute;
+
+  /// The last access the App Store reported, for starts when it cannot
+  /// answer: 'entitled', 'lapsed' or 'neverPaid', the plan's name and the
+  /// date it runs or ran until. Null until the store first answers.
+  final String? accessState;
+  final String? accessPlan;
+  final DateTime? accessUntil;
   const SettingsRow({
     required this.id,
     this.userName,
@@ -1811,6 +1890,9 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     required this.currencySymbol,
     this.wakeMinute,
     this.bedMinute,
+    this.accessState,
+    this.accessPlan,
+    this.accessUntil,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1832,6 +1914,15 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     }
     if (!nullToAbsent || bedMinute != null) {
       map['bed_minute'] = Variable<int>(bedMinute);
+    }
+    if (!nullToAbsent || accessState != null) {
+      map['access_state'] = Variable<String>(accessState);
+    }
+    if (!nullToAbsent || accessPlan != null) {
+      map['access_plan'] = Variable<String>(accessPlan);
+    }
+    if (!nullToAbsent || accessUntil != null) {
+      map['access_until'] = Variable<DateTime>(accessUntil);
     }
     return map;
   }
@@ -1856,6 +1947,15 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       bedMinute: bedMinute == null && nullToAbsent
           ? const Value.absent()
           : Value(bedMinute),
+      accessState: accessState == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accessState),
+      accessPlan: accessPlan == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accessPlan),
+      accessUntil: accessUntil == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accessUntil),
     );
   }
 
@@ -1879,6 +1979,9 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       currencySymbol: serializer.fromJson<String>(json['currencySymbol']),
       wakeMinute: serializer.fromJson<int?>(json['wakeMinute']),
       bedMinute: serializer.fromJson<int?>(json['bedMinute']),
+      accessState: serializer.fromJson<String?>(json['accessState']),
+      accessPlan: serializer.fromJson<String?>(json['accessPlan']),
+      accessUntil: serializer.fromJson<DateTime?>(json['accessUntil']),
     );
   }
   @override
@@ -1897,6 +2000,9 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       'currencySymbol': serializer.toJson<String>(currencySymbol),
       'wakeMinute': serializer.toJson<int?>(wakeMinute),
       'bedMinute': serializer.toJson<int?>(bedMinute),
+      'accessState': serializer.toJson<String?>(accessState),
+      'accessPlan': serializer.toJson<String?>(accessPlan),
+      'accessUntil': serializer.toJson<DateTime?>(accessUntil),
     };
   }
 
@@ -1913,6 +2019,9 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     String? currencySymbol,
     Value<int?> wakeMinute = const Value.absent(),
     Value<int?> bedMinute = const Value.absent(),
+    Value<String?> accessState = const Value.absent(),
+    Value<String?> accessPlan = const Value.absent(),
+    Value<DateTime?> accessUntil = const Value.absent(),
   }) => SettingsRow(
     id: id ?? this.id,
     userName: userName.present ? userName.value : this.userName,
@@ -1927,6 +2036,9 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     currencySymbol: currencySymbol ?? this.currencySymbol,
     wakeMinute: wakeMinute.present ? wakeMinute.value : this.wakeMinute,
     bedMinute: bedMinute.present ? bedMinute.value : this.bedMinute,
+    accessState: accessState.present ? accessState.value : this.accessState,
+    accessPlan: accessPlan.present ? accessPlan.value : this.accessPlan,
+    accessUntil: accessUntil.present ? accessUntil.value : this.accessUntil,
   );
   SettingsRow copyWithCompanion(SettingsCompanion data) {
     return SettingsRow(
@@ -1958,6 +2070,15 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           ? data.wakeMinute.value
           : this.wakeMinute,
       bedMinute: data.bedMinute.present ? data.bedMinute.value : this.bedMinute,
+      accessState: data.accessState.present
+          ? data.accessState.value
+          : this.accessState,
+      accessPlan: data.accessPlan.present
+          ? data.accessPlan.value
+          : this.accessPlan,
+      accessUntil: data.accessUntil.present
+          ? data.accessUntil.value
+          : this.accessUntil,
     );
   }
 
@@ -1975,7 +2096,10 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           ..write('logHintSeen: $logHintSeen, ')
           ..write('currencySymbol: $currencySymbol, ')
           ..write('wakeMinute: $wakeMinute, ')
-          ..write('bedMinute: $bedMinute')
+          ..write('bedMinute: $bedMinute, ')
+          ..write('accessState: $accessState, ')
+          ..write('accessPlan: $accessPlan, ')
+          ..write('accessUntil: $accessUntil')
           ..write(')'))
         .toString();
   }
@@ -1994,6 +2118,9 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     currencySymbol,
     wakeMinute,
     bedMinute,
+    accessState,
+    accessPlan,
+    accessUntil,
   );
   @override
   bool operator ==(Object other) =>
@@ -2010,7 +2137,10 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           other.logHintSeen == this.logHintSeen &&
           other.currencySymbol == this.currencySymbol &&
           other.wakeMinute == this.wakeMinute &&
-          other.bedMinute == this.bedMinute);
+          other.bedMinute == this.bedMinute &&
+          other.accessState == this.accessState &&
+          other.accessPlan == this.accessPlan &&
+          other.accessUntil == this.accessUntil);
 }
 
 class SettingsCompanion extends UpdateCompanion<SettingsRow> {
@@ -2026,6 +2156,9 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
   final Value<String> currencySymbol;
   final Value<int?> wakeMinute;
   final Value<int?> bedMinute;
+  final Value<String?> accessState;
+  final Value<String?> accessPlan;
+  final Value<DateTime?> accessUntil;
   const SettingsCompanion({
     this.id = const Value.absent(),
     this.userName = const Value.absent(),
@@ -2039,6 +2172,9 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.currencySymbol = const Value.absent(),
     this.wakeMinute = const Value.absent(),
     this.bedMinute = const Value.absent(),
+    this.accessState = const Value.absent(),
+    this.accessPlan = const Value.absent(),
+    this.accessUntil = const Value.absent(),
   });
   SettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -2053,6 +2189,9 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.currencySymbol = const Value.absent(),
     this.wakeMinute = const Value.absent(),
     this.bedMinute = const Value.absent(),
+    this.accessState = const Value.absent(),
+    this.accessPlan = const Value.absent(),
+    this.accessUntil = const Value.absent(),
   });
   static Insertable<SettingsRow> custom({
     Expression<int>? id,
@@ -2067,6 +2206,9 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Expression<String>? currencySymbol,
     Expression<int>? wakeMinute,
     Expression<int>? bedMinute,
+    Expression<String>? accessState,
+    Expression<String>? accessPlan,
+    Expression<DateTime>? accessUntil,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2082,6 +2224,9 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       if (currencySymbol != null) 'currency_symbol': currencySymbol,
       if (wakeMinute != null) 'wake_minute': wakeMinute,
       if (bedMinute != null) 'bed_minute': bedMinute,
+      if (accessState != null) 'access_state': accessState,
+      if (accessPlan != null) 'access_plan': accessPlan,
+      if (accessUntil != null) 'access_until': accessUntil,
     });
   }
 
@@ -2098,6 +2243,9 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Value<String>? currencySymbol,
     Value<int?>? wakeMinute,
     Value<int?>? bedMinute,
+    Value<String?>? accessState,
+    Value<String?>? accessPlan,
+    Value<DateTime?>? accessUntil,
   }) {
     return SettingsCompanion(
       id: id ?? this.id,
@@ -2113,6 +2261,9 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       currencySymbol: currencySymbol ?? this.currencySymbol,
       wakeMinute: wakeMinute ?? this.wakeMinute,
       bedMinute: bedMinute ?? this.bedMinute,
+      accessState: accessState ?? this.accessState,
+      accessPlan: accessPlan ?? this.accessPlan,
+      accessUntil: accessUntil ?? this.accessUntil,
     );
   }
 
@@ -2157,6 +2308,15 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     if (bedMinute.present) {
       map['bed_minute'] = Variable<int>(bedMinute.value);
     }
+    if (accessState.present) {
+      map['access_state'] = Variable<String>(accessState.value);
+    }
+    if (accessPlan.present) {
+      map['access_plan'] = Variable<String>(accessPlan.value);
+    }
+    if (accessUntil.present) {
+      map['access_until'] = Variable<DateTime>(accessUntil.value);
+    }
     return map;
   }
 
@@ -2174,7 +2334,10 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
           ..write('logHintSeen: $logHintSeen, ')
           ..write('currencySymbol: $currencySymbol, ')
           ..write('wakeMinute: $wakeMinute, ')
-          ..write('bedMinute: $bedMinute')
+          ..write('bedMinute: $bedMinute, ')
+          ..write('accessState: $accessState, ')
+          ..write('accessPlan: $accessPlan, ')
+          ..write('accessUntil: $accessUntil')
           ..write(')'))
         .toString();
   }
@@ -4763,6 +4926,9 @@ typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
   Value<String> currencySymbol,
   Value<int?> wakeMinute,
   Value<int?> bedMinute,
+  Value<String?> accessState,
+  Value<String?> accessPlan,
+  Value<DateTime?> accessUntil,
 });
 typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<int> id,
@@ -4777,6 +4943,9 @@ typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<String> currencySymbol,
   Value<int?> wakeMinute,
   Value<int?> bedMinute,
+  Value<String?> accessState,
+  Value<String?> accessPlan,
+  Value<DateTime?> accessUntil,
 });
 
 class $$SettingsTableFilterComposer
@@ -4845,6 +5014,21 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<int> get bedMinute => $composableBuilder(
     column: $table.bedMinute,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accessState => $composableBuilder(
+    column: $table.accessState,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accessPlan => $composableBuilder(
+    column: $table.accessPlan,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get accessUntil => $composableBuilder(
+    column: $table.accessUntil,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -4917,6 +5101,21 @@ class $$SettingsTableOrderingComposer
     column: $table.bedMinute,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get accessState => $composableBuilder(
+    column: $table.accessState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accessPlan => $composableBuilder(
+    column: $table.accessPlan,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get accessUntil => $composableBuilder(
+    column: $table.accessUntil,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableAnnotationComposer
@@ -4979,6 +5178,21 @@ class $$SettingsTableAnnotationComposer
 
   GeneratedColumn<int> get bedMinute =>
       $composableBuilder(column: $table.bedMinute, builder: (column) => column);
+
+  GeneratedColumn<String> get accessState => $composableBuilder(
+    column: $table.accessState,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get accessPlan => $composableBuilder(
+    column: $table.accessPlan,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get accessUntil => $composableBuilder(
+    column: $table.accessUntil,
+    builder: (column) => column,
+  );
 }
 
 class $$SettingsTableTableManager
@@ -5024,6 +5238,9 @@ class $$SettingsTableTableManager
                 Value<String> currencySymbol = const Value.absent(),
                 Value<int?> wakeMinute = const Value.absent(),
                 Value<int?> bedMinute = const Value.absent(),
+                Value<String?> accessState = const Value.absent(),
+                Value<String?> accessPlan = const Value.absent(),
+                Value<DateTime?> accessUntil = const Value.absent(),
               }) => SettingsCompanion(
                 id: id,
                 userName: userName,
@@ -5037,6 +5254,9 @@ class $$SettingsTableTableManager
                 currencySymbol: currencySymbol,
                 wakeMinute: wakeMinute,
                 bedMinute: bedMinute,
+                accessState: accessState,
+                accessPlan: accessPlan,
+                accessUntil: accessUntil,
               ),
           createCompanionCallback:
               ({
@@ -5052,6 +5272,9 @@ class $$SettingsTableTableManager
                 Value<String> currencySymbol = const Value.absent(),
                 Value<int?> wakeMinute = const Value.absent(),
                 Value<int?> bedMinute = const Value.absent(),
+                Value<String?> accessState = const Value.absent(),
+                Value<String?> accessPlan = const Value.absent(),
+                Value<DateTime?> accessUntil = const Value.absent(),
               }) => SettingsCompanion.insert(
                 id: id,
                 userName: userName,
@@ -5065,6 +5288,9 @@ class $$SettingsTableTableManager
                 currencySymbol: currencySymbol,
                 wakeMinute: wakeMinute,
                 bedMinute: bedMinute,
+                accessState: accessState,
+                accessPlan: accessPlan,
+                accessUntil: accessUntil,
               ),
           withReferenceMapper: (p0) => p0
               .map(

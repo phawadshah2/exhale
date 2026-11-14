@@ -12,4 +12,8 @@ abstract interface class PlanRepository {
   /// plans starting on or after that day are replaced; earlier ones are
   /// kept as history.
   Future<Result<void>> savePlan(int habitId, ReductionPlan plan);
+
+  /// Makes [plan] the only plan of [habitId], dropping its other plans with
+  /// their holds and checks.
+  Future<Result<void>> replaceAll(int habitId, ReductionPlan plan);
 }

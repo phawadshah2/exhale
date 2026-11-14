@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
@@ -112,7 +113,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       });
     final steps = _steps;
     final index = steps.indexOf(_current);
-    final header = _canLeave || _current == OnboardingStep.deal;
+    // The welcome back opens on its own, so it has nowhere to go back to.
+    final resuming = ref.read(onboardingFormProvider).isResuming;
+    final dealBack = _current == OnboardingStep.deal && !resuming;
+    final header = _canLeave || dealBack;
 
     return OnboardingScope(
       next: _next,
@@ -138,7 +142,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     onBack: _back,
                   ),
                 )
-              else if (_current == OnboardingStep.deal)
+              else if (dealBack)
                 SafeArea(
                   bottom: false,
                   child: Align(
@@ -216,18 +220,24 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 /// child at the bottom. [below] (a link or fine print) sits [belowGap] under
 /// the button, and the button as low as the bottom inset allows, as in the
 /// chat's dock. [above] sits over the button and grows upwards, so the
-/// button stays where it is on every step.
+/// button stays where it is on every step. With [belowIsLinks], [below] is a
+/// row of 44 pt links that takes one line of fine print's place and reaches
+/// into the bottom inset, so the button still sits where it does elsewhere.
 class OnboardingStepFrame extends StatelessWidget {
   const OnboardingStepFrame({
     required this.body,
     required this.button,
     this.above,
     this.below,
+    this.belowIsLinks = false,
     this.onTapBody,
     super.key,
   });
 
   static const double belowGap = AppSpacing.sm;
+
+  /// The height of a tappable link under the button.
+  static const double linkHeight = 44;
 
   /// Around a step's button and what is below it, clear of the bottom inset.
   static EdgeInsets dockPadding(BuildContext context) => EdgeInsets.fromLTRB(
@@ -241,7 +251,21 @@ class OnboardingStepFrame extends StatelessWidget {
   final Widget button;
   final Widget? above;
   final Widget? below;
+  final bool belowIsLinks;
   final VoidCallback? onTapBody;
+
+  /// The dock's padding when [below] is a row of links: a line of fine print
+  /// and its gap would sit where the links' top part does.
+  EdgeInsets _linksDockPadding(BuildContext context) {
+    final fine = context.textTheme.labelSmall;
+    final fineLine =
+        MediaQuery.textScalerOf(context).scale(fine?.fontSize ?? 10) *
+        (fine?.height ?? 1.4);
+    final inset = MediaQuery.paddingOf(context).bottom;
+    return dockPadding(
+      context,
+    ).copyWith(bottom: math.max(0, inset + belowGap + fineLine - linkHeight));
+  }
 
   @override
   Widget build(BuildContext context) => Column(
@@ -262,7 +286,9 @@ class OnboardingStepFrame extends StatelessWidget {
         ),
       ),
       Padding(
-        padding: dockPadding(context),
+        padding: belowIsLinks
+            ? _linksDockPadding(context)
+            : dockPadding(context),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -270,7 +296,7 @@ class OnboardingStepFrame extends StatelessWidget {
             SizedBox(width: double.infinity, child: button),
             if (below case final below?)
               Padding(
-                padding: const EdgeInsets.only(top: belowGap),
+                padding: EdgeInsets.only(top: belowIsLinks ? 0 : belowGap),
                 child: below,
               ),
           ],

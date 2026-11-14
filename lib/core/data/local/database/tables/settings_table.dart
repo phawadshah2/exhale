@@ -30,6 +30,14 @@ class Settings extends Table {
   IntColumn get wakeMinute => integer().named('wake_minute').nullable()();
   IntColumn get bedMinute => integer().named('bed_minute').nullable()();
 
+  /// The last access the App Store reported, for starts when it cannot
+  /// answer: 'entitled', 'lapsed' or 'neverPaid', the plan's name and the
+  /// date it runs or ran until. Null until the store first answers.
+  TextColumn get accessState => text().named('access_state').nullable()();
+  TextColumn get accessPlan => text().named('access_plan').nullable()();
+  DateTimeColumn get accessUntil =>
+      dateTime().named('access_until').nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

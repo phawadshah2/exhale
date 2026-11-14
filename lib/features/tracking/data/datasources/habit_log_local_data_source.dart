@@ -68,6 +68,9 @@ class HabitLogLocalDataSource {
   Stream<HabitLogRow?> watchLatest({int? habitId}) =>
       _newest(habitId, 1).watchSingleOrNull();
 
+  Future<HabitLogRow?> getLatest({int? habitId}) =>
+      _newest(habitId, 1).getSingleOrNull();
+
   Stream<List<HabitLogRow>> watchRecent({required int limit}) =>
       _newest(null, limit).watch();
 }

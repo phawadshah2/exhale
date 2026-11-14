@@ -7,6 +7,8 @@ import 'package:exhale/features/habit/domain/entities/habit_draft.dart';
 import 'package:exhale/features/habit/domain/entities/tracked_habit.dart';
 import 'package:exhale/features/habit/domain/usecases/start_tracking.dart';
 import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
+import 'package:exhale/features/paywall/data/fake/fake_store_repository.dart';
+import 'package:exhale/features/paywall/domain/repositories/store_repository.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
@@ -35,14 +37,17 @@ Future<int> seedHabit(
 
 /// Registers real dependencies on an in-memory database. The one-time "Hold +"
 /// hint is marked seen unless [logHintSeen] is false, so it does not cover
-/// the screen in tests that tap +.
+/// the screen in tests that tap +. [store] defaults to a Lifetime purchase so
+/// the app opens past the paywall.
 Future<void> setUpTestDependencies(
   FixedClock clock, {
   bool logHintSeen = true,
+  StoreRepository? store,
 }) async {
   await InjectionContainer.setupDependencies(
     database: createTestDatabase(),
     clock: clock,
+    store: store ?? FakeStoreRepository.entitled(),
   );
   if (!logHintSeen) return;
   final repository = sl<SettingsRepository>();
@@ -63,10 +68,11 @@ extension PumpApp on WidgetTester {
   /// [height] is in logical pixels; tall views avoid lazy list disposal.
   Future<void> pumpAppPastSplash({
     double height = 844,
+    double width = 390,
     List<Override> overrides = const [],
   }) async {
     view
-      ..physicalSize = Size(1170, height * 3)
+      ..physicalSize = Size(width * 3, height * 3)
       ..devicePixelRatio = 3;
     addTearDown(view.reset);
     mockPackageInfo();

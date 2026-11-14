@@ -1,17 +1,41 @@
+import 'dart:async';
+
 import 'package:exhale/app/router/app_router.dart';
 import 'package:exhale/core/platform/native_ui.dart';
 import 'package:exhale/core/theme/app_palette.dart';
 import 'package:exhale/core/theme/app_theme.dart';
 import 'package:exhale/core/widgets/glass_surface.dart';
+import 'package:exhale/features/paywall/presentation/providers/paywall_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ExhaleApp extends ConsumerWidget {
+class ExhaleApp extends ConsumerStatefulWidget {
   const ExhaleApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ExhaleApp> createState() => _ExhaleAppState();
+}
+
+class _ExhaleAppState extends ConsumerState<ExhaleApp> {
+  late final AppLifecycleListener _lifecycle;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycle = AppLifecycleListener(
+      onResume: () => unawaited(ref.read(accessProvider.notifier).refresh()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycle.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final accent = AppPalette.accentAt(
       ref.watch(currentSettingsProvider.select((s) => s.accentIndex)),
     ).color;

@@ -4,4 +4,5 @@ String failureMessage(Failure failure) => switch (failure) {
   ValidationFailure(:final message) => message,
   StorageFailure() => "Couldn't save that. Please try again.",
   NotFoundFailure() => 'That entry no longer exists.',
+  StoreFailure() => "Couldn't reach the App Store. Please try again.",
 };

@@ -6,6 +6,7 @@ import 'package:exhale/features/plan/domain/repositories/stage_check_repository.
 import 'package:exhale/features/plan/domain/usecases/answer_stage_check.dart';
 import 'package:exhale/features/plan/domain/usecases/answer_with_new_plan.dart';
 import 'package:exhale/features/plan/domain/usecases/keep_original_date.dart';
+import 'package:exhale/features/plan/domain/usecases/restart_unstarted_plan.dart';
 import 'package:exhale/features/plan/domain/usecases/run_stage_check.dart';
 import 'package:exhale/features/plan/domain/usecases/save_plan.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +17,10 @@ final planRepositoryProvider = Provider<PlanRepository>(
 );
 
 final savePlanProvider = Provider<SavePlan>((ref) => sl<SavePlan>());
+
+final restartUnstartedPlanProvider = Provider<RestartUnstartedPlan>(
+  (ref) => sl<RestartUnstartedPlan>(),
+);
 
 final answerStageCheckProvider = Provider<AnswerStageCheck>(
   (ref) => sl<AnswerStageCheck>(),

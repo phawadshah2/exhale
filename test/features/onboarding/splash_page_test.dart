@@ -1,4 +1,5 @@
 import 'package:exhale/app/app.dart';
+import 'package:exhale/app/bootstrap.dart';
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/features/home/presentation/pages/home_page.dart';
@@ -40,7 +41,12 @@ void main() {
       ..physicalSize = const Size(1170, 2532)
       ..devicePixelRatio = 3;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(const ProviderScope(child: ExhaleApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: await startupOverrides(),
+        child: const ExhaleApp(),
+      ),
+    );
   }
 
   Future<void> leaveSplash(WidgetTester tester) async {

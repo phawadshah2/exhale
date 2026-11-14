@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exhale: paywall</title>
+<style>body{margin:0;padding:24px 16px 48px;background:#e9edf2;font-family:-apple-system,system-ui,sans-serif;color:#161C25}h2{text-align:center;margin:0 0 4px}.subtitle{text-align:center;color:#5b6573;margin:0 auto 8px;max-width:760px;line-height:1.4}</style></head><body>
+<style>
+  .phones{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;align-items:flex-start;margin-top:14px}
+  .col{padding:10px}
+  .cap{font-size:12.5px;font-weight:700;text-align:center;margin-bottom:2px}
+  .why{font-size:11.5px;opacity:.7;text-align:center;max-width:264px;margin:0 auto 10px;line-height:1.35;min-height:16px}
+  .phone{--bg:#F4F7FA;--card:#fff;--fg:#161C25;--mut:#5b6573;--faint:#8a94a2;--line:#E4E9EF;--em:#111418;--onem:#fff;
+    width:264px;height:572px;overflow:hidden;border-radius:40px;background:var(--bg);color:var(--fg);padding:12px 15px 22px;box-shadow:0 0 0 9px #111418,0 16px 36px rgba(0,0,0,.3);font-family:-apple-system,system-ui,sans-serif;display:flex;flex-direction:column;box-sizing:border-box;font-size:13px;position:relative}
+  .phone.small{width:252px;height:448px;border-radius:22px;padding:6px 14px 10px}
+  .sb{display:flex;justify-content:space-between;font-size:11px;font-weight:600;padding:2px 8px 8px}
+  .small .sb{font-size:9.5px;padding:0 4px 5px}
+  .top{display:flex;justify-content:space-between;align-items:center}
+  .back{width:28px;height:28px;border-radius:14px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .small .back{width:24px;height:24px}
+  .rest{font-size:10.5px;font-weight:700;color:var(--mut)}
+  .h1{font-size:22px;line-height:1.1;font-weight:800;letter-spacing:-.01em;margin:7px 0 4px}
+  .small .h1{font-size:19px;margin:6px 0 2px}
+  .sp{flex:1}
+  .btn{background:var(--em);color:var(--onem);border-radius:24px;text-align:center;padding:12px;font-weight:800;font-size:14px;margin:11px 0 5px}
+  .small .btn{padding:10px;font-size:13px;margin:6px 0 3px}
+  .foot{display:flex;justify-content:center;gap:10px;font-size:9.5px;color:var(--faint);margin-top:2px}
+  .sec{font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--mut);margin:10px 0 2px}
+  .small .sec{margin:7px 0 1px}
+  .stat{background:var(--card);border-radius:12px;padding:8px 11px;display:flex;gap:10px;align-items:center;margin:7px 0 12px}
+  .small .stat{padding:6px 10px;margin:5px 0 2px}
+  .stat .n{font-size:20px;font-weight:800;min-width:62px;letter-spacing:-.02em}
+  .small .stat .n{font-size:17px;min-width:54px}
+  .stat .t{font-size:10.5px;line-height:1.3}
+  .stat .t small{display:block;color:var(--faint);font-size:8px;letter-spacing:.07em;font-weight:700;margin-top:1px}
+  .small .stat .t small{display:none}
+  .tlv{display:flex;gap:11px}
+  .tlv .rail{display:flex;flex-direction:column;align-items:center}
+  .tlv .rail i{width:20px;height:20px;border-radius:10px;background:var(--em);display:flex;align-items:center;justify-content:center;flex:none}
+  .phone svg{width:11px;height:11px;fill:none;stroke:var(--onem);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .tlv .rail span{width:2px;flex:1;background:var(--faint);opacity:.55;min-height:10px;margin:3px 0;border-radius:1px}
+  .tlv .tx{padding:0 0 9px;font-size:12px;line-height:1.25}
+  .tlv .tx div{color:var(--mut);font-size:10.5px}
+  .tli{display:flex;justify-content:space-between;position:relative;margin:8px 0 0;font-size:10px;color:var(--mut)}
+  .tli:before{content:"";position:absolute;top:12px;left:16%;right:16%;height:2px;background:var(--line)}
+  .tli div{text-align:center;position:relative;width:33.3%;line-height:1.25}
+  .tli i{display:flex;width:26px;height:26px;border-radius:13px;background:var(--em);margin:0 auto 3px;align-items:center;justify-content:center}
+  .tli b{color:var(--fg);display:block;font-size:11px}
+  .small .tli{font-size:9.5px;margin-top:6px}
+  .small .tli b{font-size:10.5px}
+  .chk{display:flex;gap:8px;font-size:11.5px;margin:6px 0;align-items:flex-start;line-height:1.3}
+  .small .chk{font-size:11px;margin:4px 0}
+  .chk b{width:15px;height:15px;border-radius:8px;background:var(--em);color:var(--onem);font-size:8.5px;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px}
+  .chk span{margin-left:auto;font-weight:800;white-space:nowrap;padding-left:6px}
+  /* horizontal plan cards */
+  .row{background:var(--card);border-radius:13px;padding:7px 11px;margin-top:6px;display:flex;align-items:center;gap:8px;border:2px solid transparent;position:relative}
+  .row:first-of-type{margin-top:11px}
+  .small .row{padding:5px 10px;margin-top:4px;border-radius:11px}
+  .small .row:first-of-type{margin-top:8px}
+  .small .row{gap:6px}
+  .small .row .n small,.small .row .p small{font-size:9px}
+  .live .row{cursor:pointer}
+  .row.sel{border-color:var(--em)}
+  .row .d{width:14px;height:14px;border-radius:7px;border:2px solid var(--faint);box-sizing:border-box;flex:none}
+  .row.sel .d{border:4.5px solid var(--em)}
+  .row .n{font-weight:700;font-size:12.5px;line-height:1.25}
+  .row .n small{display:block;font-weight:500;color:var(--mut);font-size:9.5px;white-space:nowrap}
+  .row .tg{position:absolute;top:-10px;right:9px;background:var(--em);color:var(--onem);font-size:8px;font-weight:800;padding:2px 7px;border-radius:5px;letter-spacing:.05em;white-space:nowrap}
+  .row .p{margin-left:auto;font-weight:800;font-size:13px;white-space:nowrap;text-align:right;line-height:1.25}
+  .row .p small{display:block;font-weight:500;color:var(--mut);font-size:9.5px}
+  .try{background:#3B82F6;color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:8px;margin-left:6px}
+  .fit{font-size:11px;text-align:center;margin-top:16px;opacity:.75}
+  .note{max-width:900px;margin:22px auto 0;font-size:13.5px;line-height:1.55}
+  .note li{margin-bottom:3px}
+  .err{background:var(--card);border-radius:13px;padding:16px 14px;text-align:center;margin-top:11px}
+  .err b{display:block;font-size:13px;margin-bottom:3px}
+  .err span{font-size:10.5px;color:var(--mut);line-height:1.35;display:block}
+  .err em{display:inline-block;font-style:normal;margin-top:10px;background:var(--line);font-weight:700;font-size:11.5px;padding:7px 16px;border-radius:16px}
+  .btn.off{opacity:.35}
+</style>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+  <g id="i-open"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 7.6-1.7"/></g>
+  <g id="i-bell"><path d="M6.5 16v-5a5.5 5.5 0 0 1 11 0v5l1.5 2h-14z"/><path d="M10.2 20.5a2 2 0 0 0 3.6 0"/></g>
+  <g id="i-card"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10.5h18"/></g>
+  <g id="i-loop"><path d="M19 8a8 8 0 0 0-14-1.5"/><path d="M5 3v4h4"/><path d="M5 16a8 8 0 0 0 14 1.5"/><path d="M19 21v-4h-4"/></g>
+  <g id="i-x"><circle cx="12" cy="12" r="8.5"/><path d="M9 9l6 6M15 9l-6 6"/></g>
+  <g id="i-check"><path d="M5 12.5l4.5 4.5L19 7.5"/></g>
+  <g id="i-inf"><path d="M12 12c-2-3-3.500-4-5.500-4a4 4 0 0 0 0 8c2 0 3.500-1 5.500-4zm0 0c2 3 3.500 4 5.500 4a4 4 0 0 0 0-8c-2 0-3.500 1-5.500 4z"/></g>
+</defs></svg>
+
+<h2>Paywall</h2>
+<p class="subtitle">Agreed with Fawad, 2026-11-13. Drawn to scale with real safe areas: a regular iPhone (393 × 852) and the smallest iOS 26 runs on (375 × 667). Light mode, Ink accent. Phones marked "tap a plan" are live.</p>
+
+<div class="phones" id="out"></div>
+<div class="fit" id="fit"></div>
+
+<div class="note"><b>Rules</b>
+<ul>
+  <li>The stat card, the three steps and the button follow the selected plan. The plan cards do not change.</li>
+  <li>Regular iPhones show the steps down the page; small iPhones show them as a row of icons.</li>
+  <li>No price given (or the price's currency differs from the App Store's): the icon row and "What you get" replace the stat card and the steps.</li>
+  <li>Trial already used: no "7 days free" tag, Annual's steps become charge / renewal / cancel, the headline becomes "Quitting is hard. Starting isn't."</li>
+  <li>App Store unreachable: the plan cards are replaced by the message and Try again; the button is disabled.</li>
+  <li>Nothing scrolls at the standard text size. With larger accessibility text the page scrolls and the button stays pinned.</li>
+  <li>Icons are stand-ins for Cupertino icons through <code>AppIcons</code>. "pods" follows the habit.</li>
+</ul></div>
+
+<script>
+(function(){
+  const ic=n=>'<svg viewBox="0 0 24 24"><use href="#i-'+n+'"/></svg>';
+  const P={
+    annual:{stat:['4 days','of pods costs more than a year of Exhale.'],
+      steps:[['open','Today','Everything opens. Your plan starts.'],['bell','Day 5','We remind you, before any charge.'],['card','Day 7','Your year starts: $34.99.']],
+      row:[['open','Today','Full access'],['bell','Day 5','We remind you'],['card','Day 7','Year starts']],btn:'Start my free week'},
+    annualNoTrial:{stat:['4 days','of pods costs more than a year of Exhale.'],
+      steps:[['open','Today','Everything opens. $34.99 is charged.'],['loop','Each year','Renews at $34.99 until you cancel.'],['x','Any time','Cancel in Settings, keep the year.']],
+      row:[['open','Today','Full access'],['loop','Yearly','Renews'],['x','Any time','Cancel']],btn:'Subscribe'},
+    monthly:{stat:['1 day','of pods costs more than a month of Exhale.'],
+      steps:[['open','Today','Everything opens. $7.99 is charged.'],['loop','Each month','Renews at $7.99 until you cancel.'],['x','Any time','Cancel in Settings, keep the month.']],
+      row:[['open','Today','Full access'],['loop','Monthly','Renews'],['x','Any time','Cancel']],btn:'Subscribe'},
+    lifetime:{stat:['7 days','of pods costs more than Exhale for good.'],
+      steps:[['open','Today','Everything opens. $59.99, once.'],['check','After that','Nothing more to pay. No renewals.'],['inf','For good','Staying at zero is included.']],
+      row:[['open','Today','Full access'],['check','After','Nothing to pay'],['inf','For good','Yours']],btn:'Buy once'}
+  };
+  function phone(plan,o){
+    const p=P[plan==='annual'&&!o.trial?'annualNoTrial':plan];
+    const row=(k,name,why,price,per,tag)=>'<div class="row'+(plan===k?' sel':'')+'" data-plan="'+k+'"><span class="d"></span><span class="n">'+name+'<small>'+why+'</small></span>'+(tag?'<span class="tg">7 DAYS FREE</span>':'')+'<span class="p">'+price+'<small>'+per+'</small></span></div>';
+    const icons='<div class="tli">'+p.row.map(s=>'<div><i>'+ic(s[0])+'</i><b>'+s[1]+'</b>'+s[2]+'</div>').join('')+'</div>';
+    const stat='<div class="stat"><div class="n">'+p.stat[0]+'</div><div class="t">'+p.stat[1]+'<small>FROM YOUR ANSWERS</small></div></div>';
+    const get=(o.small?'<div style="height:8px"></div>':'<div class="sec">WHAT YOU GET</div>')+
+        '<div class="chk"><b>✓</b>A taper from 12 a day<span>to 0</span></div>'+
+        (o.small?'':'<div class="chk"><b>✓</b>More time on a hard stage<span>7 days</span></div>')+
+        '<div class="chk"><b>✓</b>Data that leaves your phone<span>Zero</span></div>';
+    let mid;
+    if(o.offline) mid=get;
+    else if(o.priced && !o.small) mid=stat+p.steps.map((s,i)=>'<div class="tlv"><div class="rail"><i>'+ic(s[0])+'</i>'+(i<2?'<span></span>':'')+'</div><div class="tx"><b>'+s[1]+'</b><div>'+s[2]+'</div></div></div>').join('');
+    else if(o.priced) mid=stat+icons;
+    else mid=icons+get;
+    const plans=o.offline
+      ? '<div class="err"><b>Couldn\'t reach the App Store</b><span>Check your connection. Your plan is saved on this phone.</span><em>Try again</em></div>'
+      : row('annual','Annual','Your plan + a year at zero','$34.99','per year',o.trial)+row('monthly','Monthly','No trial. Cancel any time.','$7.99','per month')+row('lifetime','Lifetime','Yours for good. No renewals.','$59.99','once');
+    return '<div class="phone'+(o.live?' live':'')+(o.small?' small':'')+'" data-o=\''+JSON.stringify(o)+'\'>'+
+      '<div class="sb"><span>9:41</span><span>●●● ▮</span></div>'+
+      '<div class="top"><div class="back">‹</div><span class="rest">Restore</span></div>'+
+      '<div class="h1">'+(o.trial?'Quitting is hard. Trying Exhale is free.':'Quitting is hard. Starting isn\'t.')+'</div>'+mid+
+      '<div class="sp"></div>'+plans+
+      '<div class="btn'+(o.offline?' off':'')+'">'+(o.offline?'Continue':p.btn)+'</div>'+
+      '<div class="foot"><span>Terms</span><span>Privacy</span></div></div>';
+  }
+  const T='<span class="try">TAP A PLAN</span>';
+  const cols=[
+    ['With the free week'+T,'Regular iPhone',{priced:true,live:true,small:false,trial:true}],
+    ['No price given'+T,'Regular iPhone',{priced:false,live:true,small:false,trial:true}],
+    ['Trial already used'+T,'Regular iPhone',{priced:true,live:true,small:false,trial:false}],
+    ['App Store unreachable','Regular iPhone',{priced:true,live:false,small:false,trial:true,offline:true}],
+    ['Small iPhone'+T,'375 × 667, with a price',{priced:true,live:true,small:true,trial:true}],
+    ['Small iPhone, no price','375 × 667',{priced:false,live:false,small:true,trial:true}]
+  ];
+  const out=document.getElementById('out');
+  out.innerHTML=cols.map(c=>'<div class="col"><div class="cap">'+c[0]+'</div><div class="why">'+c[1]+'</div><div class="slot">'+phone('annual',c[2])+'</div></div>').join('');
+  function check(){
+    const r=[...document.querySelectorAll('.phone')].map(ph=>{
+      const last=ph.lastElementChild.getBoundingClientRect().bottom, box=ph.getBoundingClientRect();
+      return Math.round(box.bottom-parseFloat(getComputedStyle(ph).paddingBottom)-last);
+    });
+    window.__fit=r;
+    document.getElementById('fit').textContent=r.every(x=>x>=0)?'Measured in the browser: nothing overflows on any phone, whichever plan is selected.':'Overflow: '+r.join(', ');
+  }
+  check();
+  out.addEventListener('click',e=>{
+    const t=e.target.closest('.live .row'); if(!t) return;
+    const ph=t.closest('.phone'); ph.parentNode.innerHTML=phone(t.dataset.plan,JSON.parse(ph.dataset.o)); check();
+  });
+})();
+</script>
+</body></html>

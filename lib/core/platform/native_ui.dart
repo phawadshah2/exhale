@@ -52,6 +52,18 @@ class NativeUi {
     }
   }
 
+  /// Opens [url] in Safari; does nothing where it cannot.
+  Future<void> openUrl(String url) async {
+    if (!isAvailable) return;
+    try {
+      await _channel.invokeMethod<void>('openUrl', {'url': url});
+    } on MissingPluginException {
+      return;
+    } on PlatformException {
+      return;
+    }
+  }
+
   /// The iOS Reduce Transparency setting; false where unknown.
   Future<bool> reduceTransparency() async {
     if (!isAvailable) return false;

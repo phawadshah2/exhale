@@ -14,3 +14,8 @@ final class StorageFailure extends Failure {
 final class NotFoundFailure extends Failure {
   const NotFoundFailure();
 }
+
+/// The App Store did not answer, or answered with an error.
+final class StoreFailure extends Failure {
+  const StoreFailure();
+}

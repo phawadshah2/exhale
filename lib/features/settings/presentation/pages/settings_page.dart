@@ -3,6 +3,7 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/widgets/scroll_reveal.dart';
 import 'package:exhale/core/widgets/section_card.dart';
 import 'package:exhale/core/widgets/status_bar_glass.dart';
+import 'package:exhale/features/paywall/presentation/widgets/subscription_card.dart';
 import 'package:exhale/features/settings/presentation/widgets/accent_picker.dart';
 import 'package:exhale/features/settings/presentation/widgets/theme_preference_control.dart';
 import 'package:exhale/features/settings/presentation/widgets/trigger_prompt_tile.dart';
@@ -43,8 +44,10 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.md),
+            const ScrollReveal(index: 2, child: SubscriptionCard()),
+            const SizedBox(height: AppSpacing.md),
             const ScrollReveal(
-              index: 2,
+              index: 3,
               child: Card(
                 clipBehavior: Clip.antiAlias,
                 child: TriggerPromptTile(),
@@ -52,7 +55,7 @@ class SettingsPage extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             const ScrollReveal(
-              index: 3,
+              index: 4,
               child: Card(clipBehavior: Clip.antiAlias, child: YourDayTile()),
             ),
           ],

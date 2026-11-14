@@ -19,6 +19,9 @@ class AppSettings {
     this.logHintSeen = false,
     this.wakeMinute,
     this.bedMinute,
+    this.accessState,
+    this.accessPlan,
+    this.accessUntil,
   });
 
   static const String defaultCurrencySymbol = r'$';
@@ -43,6 +46,12 @@ class AppSettings {
   final int? wakeMinute;
   final int? bedMinute;
 
+  /// The last access the App Store reported ('entitled', 'lapsed' or
+  /// 'neverPaid'), its plan's name and end date; null until it first answers.
+  final String? accessState;
+  final String? accessPlan;
+  final DateTime? accessUntil;
+
   DayBoundary get dayBoundary => DayBoundary(resetHour: dayResetHour);
 
   /// Null unless both times are set.
@@ -66,6 +75,9 @@ class AppSettings {
     bool? logHintSeen,
     int? Function()? wakeMinute,
     int? Function()? bedMinute,
+    String? Function()? accessState,
+    String? Function()? accessPlan,
+    DateTime? Function()? accessUntil,
   }) => AppSettings(
     userName: userName != null ? userName() : this.userName,
     dayResetHour: dayResetHour ?? this.dayResetHour,
@@ -79,6 +91,9 @@ class AppSettings {
     logHintSeen: logHintSeen ?? this.logHintSeen,
     wakeMinute: wakeMinute != null ? wakeMinute() : this.wakeMinute,
     bedMinute: bedMinute != null ? bedMinute() : this.bedMinute,
+    accessState: accessState != null ? accessState() : this.accessState,
+    accessPlan: accessPlan != null ? accessPlan() : this.accessPlan,
+    accessUntil: accessUntil != null ? accessUntil() : this.accessUntil,
   );
 
   @override
@@ -94,7 +109,10 @@ class AppSettings {
       other.triggerPromptIntroSeen == triggerPromptIntroSeen &&
       other.logHintSeen == logHintSeen &&
       other.wakeMinute == wakeMinute &&
-      other.bedMinute == bedMinute;
+      other.bedMinute == bedMinute &&
+      other.accessState == accessState &&
+      other.accessPlan == accessPlan &&
+      other.accessUntil == accessUntil;
 
   @override
   int get hashCode => Object.hash(
@@ -109,5 +127,8 @@ class AppSettings {
     logHintSeen,
     wakeMinute,
     bedMinute,
+    accessState,
+    accessPlan,
+    accessUntil,
   );
 }
