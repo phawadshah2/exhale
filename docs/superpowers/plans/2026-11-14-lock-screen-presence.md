@@ -122,14 +122,18 @@ from the extension (`Activity.request` is app-only).
   `{name, now, day, resetHour, wakeMinute, awakeMinutes, limit, countToday, logs: [ISO], expect: null | {next, gap, pace, bed}}`
   (times ISO 8601 local without zone, durations in seconds). Read by Task 9's XCTest.
 
-- [ ] **Step 1:** Write 14 cases: each test in `pace_guide_test.dart` (wake split, mid-day,
+- [x] **Step 1:** Write 14 cases: each test in `pace_guide_test.dart` (wake split, mid-day,
   carry, first log fresh, stacking, past bed, before wake, log before wake, at limit,
   limit 0) plus a reset at 4 AM with a log at 2 AM, and a window running past midnight.
-- [ ] **Step 2:** Test `every case matches PaceGuide.compute`: loads the file, calls
+- [x] **Step 2:** Test `every case matches PaceGuide.compute`: loads the file, calls
   `PaceGuide.compute` per case, expects `null` or the four values.
-- [ ] **Step 3:** Run `fvm flutter test test/features/home/domain/pace_cases_test.dart`.
+- [x] **Step 3:** Run `fvm flutter test test/features/home/domain/pace_cases_test.dart`.
   Expected: all pass (the file is written to match; a failure means a wrong case).
-- [ ] **Step 4:** Commit: `test(home): shared countdown cases for the Swift port`.
+- [x] **Step 4:** Commit: `test(home): shared countdown cases for the Swift port`.
+
+Done 2026-11-14. Expected values come from `PaceGuide.compute` and match every value the
+existing `pace_guide_test.dart` asserts. Durations truncate to whole microseconds in Dart
+(16 h / 7 is 8228.571428 s), so Task 9's XCTest compares within 1 ms.
 
 ### Task 4: Schema v13, external ids and the Live Activity switch
 
