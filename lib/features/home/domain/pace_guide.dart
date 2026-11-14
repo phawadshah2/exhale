@@ -54,14 +54,16 @@ class PaceGuide {
 
     // Replayed from the day's logs, so it holds still until the next one and
     // an undone or added log corrects it. Time left on the timer when a log
-    // comes carries into the next gap.
+    // comes carries into the next gap; the first log has no timer before it.
     final logs = [...earlierLogsToday, ?lastLogToday];
     var count = countToday - logs.length;
     var anchor = wake;
     var due = wake.add(gap(wake, count));
-    for (final log in logs) {
+    for (final (index, log) in logs.indexed) {
       count++;
-      final left = log.isBefore(wake) ? Duration.zero : due.difference(log);
+      final left = index == 0 || log.isBefore(wake)
+          ? Duration.zero
+          : due.difference(log);
       anchor = _latest(log, wake);
       due = anchor.add(gap(anchor, count));
       if (left > Duration.zero) due = due.add(left);

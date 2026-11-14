@@ -51,16 +51,12 @@ void main() {
       expect(guide.next, DateTime(2026, 10, 29, 11, 30));
     });
 
-    test('the first log of the day counts down from wake too', () {
+    test('the first log of the day starts a fresh gap', () {
       final at = DateTime(2026, 10, 29, 9);
       final guide = compute(now: at, countToday: 1, lastLogToday: at)!;
 
-      // 30 min were left of the 2 h from wake; 14.5 h over 7 is the new gap.
-      expect(
-        guide.gap,
-        const Duration(hours: 14, minutes: 30) ~/ 7 +
-            const Duration(minutes: 30),
-      );
+      // No timer ran before it, so nothing carries: 14.5 h over 7.
+      expect(guide.gap, const Duration(hours: 14, minutes: 30) ~/ 7);
     });
 
     test('waiting past zero earns no credit', () {

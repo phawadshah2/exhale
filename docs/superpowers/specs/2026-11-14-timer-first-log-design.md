@@ -13,9 +13,11 @@ logs. So before the first log:
 - No draining ring or chip around the + button.
 - The Logs rail shows no "next" mark.
 
-From the first log on, nothing changes: the gap is replayed from the day's logs as now
-(`PaceGuide` is untouched). A log before wake starts it too; the timer still waits for
-wake as today. Yesterday's logs never count.
+From the first log on, the gap is replayed from the day's logs as now, with one change
+in `PaceGuide`: the first log carries nothing. Before, it carried what was left of the
+unseen countdown from wake (a log at 8:00 got an extra 1:30). Later logs still carry
+what was left. A log before wake starts it too; the timer still waits for wake as
+today. Yesterday's logs never count.
 
 ## 2. Tapping the timer opens today's logs
 
@@ -29,7 +31,7 @@ Both are buttons to VoiceOver ("Opens today's logs"); the chip's target is at le
 
 - Chosen: gate in the provider. One line, and every reader (ring, badge, rail, pace line)
   follows.
-- Gate in `PaceGuide.compute`: would also drop the pace for callers that want it, and
-  the domain test fixtures assume wake anchoring.
+- Gate in `PaceGuide.compute`: would also drop the pace for callers that want it. Only
+  the first log's carry changes there.
 - A `started` flag on `NextLogTimer`: three call sites to update for no gain, since the
   pace line already gives way to the first-day note when there are no logs.
