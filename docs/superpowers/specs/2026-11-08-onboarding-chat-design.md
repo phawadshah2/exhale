@@ -205,10 +205,10 @@ Copied from the welcome chat on `main` (`welcome_step.dart`, `you_bubble.dart`,
   once; under Reduce Motion it just appears. The opening excuses come 600 ms apart.
 - **Opening**: "You · 9:42 AM" (the current time) centred above the excuses ("You"
   semibold).
-- **Status** (Fawad, 2026-11-08): no time or ticks in bubbles. Under the last of the three
-  excuses only, right aligned and faint: "Sent 9:42 AM", then "Read 9:42 AM" 1.6 s after
-  the last lands. Answers show no status; Exhale replies 1.9 s after one. Reduce Motion goes
-  straight to read.
+- **Status** (Fawad, 2026-11-08; extended 2026-11-09): no time or ticks in bubbles. Under the newest
+  message of the user's only, right aligned and faint: "Sent 9:42 AM", then "Read 9:42 AM". For
+  the excuses it reads 1.6 s after the last lands; for an answer when Exhale's reply starts, 1.9 s
+  later. The line moves to each new answer. Reduce Motion goes straight to read.
 - **Money card** (Fawad, 2026-11-08, mockup D): "YOUR NEXT 12 MONTHS" on Exhale's bubble
   colours. "As it is" with the year in danger and a full danger bar; "With the plan" (the
   suggested pace's daily limits over 365 days) with a grey bar at its share; "You keep $X."

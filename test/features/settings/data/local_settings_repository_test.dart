@@ -33,7 +33,7 @@ void main() {
     const settings = AppSettings(
       userName: 'Fawad',
       dayResetHour: 5,
-      themePreference: ThemePreference.light,
+      themePreference: ThemePreference.dark,
       accentIndex: 1,
       appIcon: AppIconChoice.ember,
       currencySymbol: 'AED',
@@ -102,7 +102,7 @@ void main() {
 
     final settings = valueOf(await repository.get());
 
-    expect(settings.themePreference, ThemePreference.system);
+    expect(settings.themePreference, ThemePreference.light);
     expect(settings.appIcon, AppIconChoice.breath);
   });
 }

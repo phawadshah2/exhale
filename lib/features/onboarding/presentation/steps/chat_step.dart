@@ -91,6 +91,9 @@ class _ChatStepState extends ConsumerState<ChatStep>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scroll.hasClients) return;
       final position = _scroll.position;
+      // A finger on the list wins: otherwise a growing message pulls it back
+      // to the end every frame and the chat cannot be scrolled up.
+      if (position.isScrollingNotifier.value) return;
       if (position.pixels != position.maxScrollExtent) {
         position.jumpTo(position.maxScrollExtent);
       }
@@ -344,17 +347,16 @@ class _Messages extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = chat.items;
-    ChatText? lastExcuse;
+    // Like Messages, only the newest message of the user's shows its status.
+    ChatText? lastMine;
     for (final item in items) {
-      if (item is ChatText && item.mine && item.answers == null) {
-        lastExcuse = item;
-      }
+      if (item is ChatText && item.mine) lastMine = item;
     }
     return ListView(
       controller: controller,
       padding: EdgeInsets.fromLTRB(16, top + 12, 16, 12),
       children: [
-        for (var i = 0; i < items.length; i++) _row(items, i, lastExcuse),
+        for (var i = 0; i < items.length; i++) _row(items, i, lastMine),
         if (chat.typing)
           ChatRow(
             mine: false,
@@ -375,7 +377,7 @@ class _Messages extends StatelessWidget {
 
   /// One item; the first carries who sent the excuses and when, and the
   /// last excuse carries their status.
-  Widget _row(List<ChatItem> items, int i, ChatText? lastExcuse) {
+  Widget _row(List<ChatItem> items, int i, ChatText? lastMine) {
     final item = items[i];
     final exhale = _isExhale(item);
     final previous = i > 0 ? items[i - 1] : null;
@@ -408,7 +410,7 @@ class _Messages extends StatelessWidget {
         MoneyCard() => MoneyCardView(card: item, continued: continued),
       },
     );
-    if (previous == null || item == lastExcuse) {
+    if (previous == null || item == lastMine) {
       row = Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -417,8 +419,7 @@ class _Messages extends StatelessWidget {
             const SizedBox(height: ChatRow.sideGap),
           ],
           row,
-          if (lastExcuse != null && item == lastExcuse)
-            ChatStatus(item: lastExcuse),
+          if (lastMine != null && item == lastMine) ChatStatus(item: lastMine),
         ],
       );
     }

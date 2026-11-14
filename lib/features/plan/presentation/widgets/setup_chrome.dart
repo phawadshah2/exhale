@@ -5,6 +5,7 @@ import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/primary_button.dart';
 import 'package:exhale/core/widgets/scroll_reveal.dart';
+import 'package:exhale/core/widgets/status_bar_glass.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -45,16 +46,19 @@ class _SetupScaffoldState extends State<SetupScaffold> {
             behavior: HitTestBehavior.translucent,
             excludeFromSemantics: true,
             onTap: () => FocusScope.of(context).unfocus(),
-            child: ListView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: AppSpacing.page.copyWith(
-                top: insets.top + AppSpacing.md,
-                bottom: math.max(keyboard + AppSpacing.lg, _footerHeight),
+            child: StatusBarGlass(
+              child: ListView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: AppSpacing.page.copyWith(
+                  top: insets.top + AppSpacing.md,
+                  bottom: math.max(keyboard + AppSpacing.lg, _footerHeight),
+                ),
+                children: [
+                  for (final (i, child) in widget.children.indexed)
+                    ScrollReveal(index: i, child: child),
+                ],
               ),
-              children: [
-                for (final (i, child) in widget.children.indexed)
-                  ScrollReveal(index: i, child: child),
-              ],
             ),
           ),
           Positioned(

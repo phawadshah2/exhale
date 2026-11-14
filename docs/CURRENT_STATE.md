@@ -1,6 +1,8 @@
 # Current state
 
-Updated 2026-11-09 (chat milestone end: review, fixes, full suite, walk). Earlier: `docs/history/2026-10-16_to_11-03_state_log.md`, `…11-04_to_11-05…`.
+Updated 2026-11-11 (handoff after locking monetization and setting up App Store Connect).
+Earlier: `docs/history/` (latest `2026-11-09_to_11-11_state_log.md`: onboarding chat and
+the corrections round).
 
 ## Where we are
 
@@ -8,68 +10,52 @@ Updated 2026-11-09 (chat milestone end: review, fixes, full suite, walk). Earlie
 |---|---|
 | M1 to M3, first onboarding redesign | Done, merged |
 | M5 Release candidate | Done, merged to `main` (51e0bc6) |
-| M6 Plan details, Edit plan, Logs; M7 Stage management; polish rounds | Done on `feat/plan-and-stages`, walked in the simulator |
-| TestFlight build 1.0.0 (1) | Installed by Fawad; runs fine on his iPhone (2026-11-06) |
-| Onboarding redesign 2 (chat) | C1 to C10 done; reviewed, fixed, full suite green, walked in part |
-| M4 Multiple habits | Parked on `feat/multi-habit` for a later release |
+| M6, M7 (plan, logs, stages), polish rounds | Done on `feat/plan-and-stages`, walked in the simulator |
+| TestFlight build 1.0.0 (1) | Runs fine on Fawad's iPhone (2026-11-06) |
+| Onboarding redesign 2 (chat) | C1 to C10 done, reviewed, full suite 1279 passed; walked in part |
+| Monetization and sync decisions | Locked 2026-11-10 |
+| App Store Connect payments | Set up 2026-11-10/11 (below) |
+| M4 Multiple habits | Parked on `feat/multi-habit` |
+
+## Current goal: paywall (then iCloud sync, Export/Import, Stay at zero)
+
+Decisions: `docs/decisions/2026-11-10-monetization-and-sync.md`. Hard paywall after the
+plan reveal; Annual (7-day trial, default), Monthly, Lifetime; nothing free after the
+trial; StoreKit 2 via `in_app_purchase` (dependency change: ask Fawad before `pub get`).
+
+App Store Connect: agreements, bank (AED), W-8BEN and Certificate of Foreign Status Active;
+Small Business Program applied, awaiting email. Draft products: group `Exhale` with Annual
+`com.phawadshah.exhale.annual` (level 1, US$34.99, 7-day free intro offer) and Monthly
+`com.phawadshah.exhale.monthly` (level 2, US$7.99); non-consumable Lifetime
+`com.phawadshah.exhale.lifetime` (US$59.99). Grace period 16 days, paid-to-paid. Sandbox
+tester (UAE) listed; web verification failed, check sign-in on device.
+
+Before submission: group display name (save hung), review screenshots for the three
+products, Family Sharing decision (irreversible), privacy policy and terms URLs, App Privacy.
 
 ## Repo
 
-- `feat/plan-and-stages` pushed, not merged, no PR, CI not read. Last full suite at 7a80954:
-  1211 passed.
-- `feat/onboarding-chat-prototype` (off `feat/plan-and-stages`), not pushed. Latest: C10
-  bf88e04, b54db14, milestone review fixes b8a3b01, then the walk's "1 stage" copy fix.
-- Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
-
-## Onboarding chat (current goal)
-
-Spec `docs/superpowers/specs/2026-11-08-onboarding-chat-design.md` (sections 9 and 10 hold
-every change Fawad asked for on 2026-11-08). Plan `docs/superpowers/plans/2026-11-08-onboarding-chat.md`,
-C1 to C10 ticked, "Then" open.
-
-Done on 2026-11-08: C8 (main's welcome look; Sent → Read under the last excuse only;
-money card D, now vs plan; welcome word-by-word reveal, slowed); plan page
-(quit date right, Pick my own date above the button, C9 stage ring and day/week grid, Your
-date card); C10 (messages grow in, list follows the end per frame, keyboard slides over a
-fixed dock, avatars stay while Exhale types, tagline 8 pt under the button; a message
-keeps its state when its entrance ends).
-
-Milestone review (2026-11-09, b8a3b01): a newest card answers while another is reopened
-(was dead); new Exhale messages announced to VoiceOver; money card uses the pace the plan
-opens on and whole units; grid keeps 7 columns for plans under 4 weeks; the own date lives
-in the form (`ownQuitDay`); the kept-alive chat mutes its tickers off screen.
-
-Checks: full suite at b8a3b01 1273 passed (onboarding_chat 27, deal_step 12,
-onboarding_page 5, chat_step 21, chat_cards 13, accessibility 4, app_test 6). Analyze clean.
-
-Simulator walk (light, iPhone 17 Pro Max size): welcome, chat with the keyboard over the
-dock, reopen-then-answer, smoking (pack price and size, money card A$2,190 / A$280 /
-A$1,910), social media (no price), plan grid, a 1-day own date, the own-date card after
-Back. Not walked: dark mode, Reduce Transparency, text at 200%, a no-container priced
-habit, fixing every card. Log, once: chat Column overflow 29,310 px (`chat_step.dart:143`),
-likely a keyboard toggle in the simulator; not reproduced.
-
-Decided (Claude, Fawad's go-ahead, 2026-11-09; spec section 11): drinks priced one at a
-time save as the preset container; short plans keep 7 grid columns; a double tap on "See my
-plan" already cannot save (the slide ignores touches; tested); selected card stays as the
-mockup; tagline gap 8 pt.
-
-Test gotcha: an enabled `ChevronButton` loops, so welcome and plan tests turn on Reduce Motion (`reduceMotion` in `test/helpers/onboarding.dart`) or pump fixed time. A failing test there hangs past `--timeout`; run such files in the background.
-
-Waiting on Fawad (marked in the spec): the answer-fixing rule (section 4, plus the price
-skip rule), the italic tagline drafts (section 5), the Other habit and price fields, and
-the day's answer bubble.
+- `feat/plan-and-stages` pushed, not merged, no PR, CI not read.
+- `feat/onboarding-chat-prototype`: local ahead of origin (corrections round, docs,
+  decisions, this handoff). Nothing pushed this session. Untracked on purpose:
+  `design/all-designs.html`, `design/figma-import/`.
+- Checks: none run since the 1279-pass suite (docs-only work since).
 
 ## Next action
 
-Fawad: walk the rest (dark, Reduce Transparency, 200%, a priced drink in Edit plan).
-Then merge `feat/plan-and-stages` and this branch to `main` (PRs from compare links) and
-do the real iPhone pass.
+Write the paywall spec in `docs/superpowers/specs/` with the brainstorming skill (Opus 5.5
+high), then its plan. Read first: this file, the decisions record, `CLAUDE.md`.
 
-## Open items from Fawad's iPhone review (2026-11-06)
+Open questions: should the paywall branch off `feat/onboarding-chat-prototype` or wait for
+the merge to `main`? Sync stays in the launch build; fallback (sync in 1.0.1) only on
+Fawad's call.
 
-- Home: tap the stage/plan card to open Plan; tap the ring to open that day's logs.
-- "Add a price" should scroll Plan to the price field; in Edit plan the keyboard hides it.
-- Edit plan: less space between pace and suggested date; text jumps start-then-centre.
-- Glassy status bar on scroll, app-wide.
-- Not seen: Reduce Transparency, text at 200%, Eucalyptus and Ocean accents, long plans.
+## Still open from earlier
+
+- Walk: dark, Reduce Transparency, 200%, a priced drink in Edit plan (`stash@{0}` conflicts
+  in `splash_page.dart`: keep upstream's switch, send `Success()` to `_startTalking()`).
+- Push, merge both branches to `main` (PRs from compare links), real iPhone pass.
+- Chat spec items waiting on Fawad: answer-fixing rule, tagline drafts, Other habit and
+  price fields, the day's answer bubble.
+- iPhone review: Home card and ring taps, "Add a price" scroll, Edit plan spacing and text
+  jump, status bar glass unseen on device, accents and long plans unseen.

@@ -1,5 +1,7 @@
 import 'package:exhale/core/di/injection_container.dart';
+import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/onboarding/presentation/onboarding_copy.dart';
+import 'package:exhale/features/onboarding/presentation/providers/onboarding_chat.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/chat_widgets.dart';
 import 'package:exhale/features/onboarding/presentation/widgets/currency_chip.dart';
 import 'package:exhale/features/settings/domain/entities/currency_choices.dart';
@@ -84,32 +86,42 @@ void main() {
   });
 
   group('habit card', () {
-    testWidgets('shows every habit in three rows', (tester) async {
+    testWidgets('shows every habit, wrapping to fit the width', (tester) async {
       await pumpOnboardingChat(tester);
       await answerName(tester);
 
       expect(labelled(OnboardingCopy.cardHabit), findsOneWidget);
       double row(String label) => tester.getCenter(find.text(label)).dy;
-      // Each row starts below the last; the wide test font wraps a row
-      // the way large text does.
+      final labels = [
+        for (final habit in ChatHabit.all)
+          if (habit.kind == HabitKind.custom)
+            OnboardingCopy.other
+          else
+            Habit.preset(habit.kind).name,
+      ];
+      for (final label in labels) {
+        expect(find.text(label), findsOneWidget);
+      }
+      // Pills flow in order, left to right, and wrap when a row is full.
+      for (var i = 1; i < labels.length; i++) {
+        final previous = labels[i - 1];
+        final label = labels[i];
+        final sameRow = row(label) == row(previous);
+        if (sameRow) {
+          expect(
+            tester.getTopLeft(find.text(label)).dx,
+            greaterThan(tester.getTopLeft(find.text(previous)).dx),
+          );
+        } else {
+          expect(row(label), greaterThan(row(previous)));
+          expect(
+            tester.getTopLeft(find.text(label)).dx,
+            lessThanOrEqualTo(tester.getTopLeft(find.text(previous)).dx),
+          );
+        }
+      }
       expect(row('Smoking'), row('Vaping'));
-      expect(row('Caffeine'), greaterThan(row('Nicotine pouches')));
-      expect(row('Junk food'), greaterThan(row('Alcohol')));
-      expect(row(OnboardingCopy.other), greaterThan(row('Alcohol')));
-      expect(
-        tester.getTopLeft(find.text('Caffeine')).dx,
-        tester.getTopLeft(find.text('Vaping')).dx,
-      );
-      expect(
-        tester.getTopLeft(find.text('Junk food')).dx,
-        tester.getTopLeft(find.text('Vaping')).dx,
-      );
-      expect(
-        tester.getSize(find.text('Vaping')).height,
-        lessThan(
-          tester.getSize(find.textContaining(OnboardingCopy.askWho)).height,
-        ),
-      );
+      expect(row(OnboardingCopy.other), greaterThan(row('Vaping')));
 
       await tester.disposeApp();
     });

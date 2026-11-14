@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/formatting/app_format.dart';
+import 'package:exhale/core/theme/app_motion.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
@@ -134,7 +135,7 @@ class StageRow extends ConsumerStatefulWidget {
 }
 
 class _StageRowState extends ConsumerState<StageRow> {
-  static const Duration _openDuration = Duration(milliseconds: 250);
+  static const Duration _openDuration = AppMotion.swap;
 
   bool _open = false;
 
@@ -207,7 +208,7 @@ class _StageRowState extends ConsumerState<StageRow> {
         ),
         AnimatedSize(
           duration: duration,
-          curve: Curves.easeInOutCubic,
+          curve: AppMotion.swapCurve,
           alignment: Alignment.topCenter,
           child: _open
               ? _StagePanel(

@@ -9,6 +9,7 @@ import 'package:exhale/core/widgets/app_snack_bar.dart';
 import 'package:exhale/core/widgets/circle_icon_button.dart';
 import 'package:exhale/core/widgets/load_failure.dart';
 import 'package:exhale/core/widgets/scroll_reveal.dart';
+import 'package:exhale/core/widgets/status_bar_glass.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
 import 'package:exhale/features/logs/domain/logs_selection.dart';
 import 'package:exhale/features/logs/presentation/logs_query.dart';
@@ -119,108 +120,112 @@ class _LogsPageState extends ConsumerState<LogsPage> {
                 ref.watch(planHistoryProvider(habitId)).failedToLoad));
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: AppSpacing.page.copyWith(top: insets.top + AppSpacing.sm),
-            sliver: SliverToBoxAdapter(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleIconButton(
-                    tooltip: 'Back',
-                    icon: AppIcons.back,
-                    onPressed: () => context.pop(),
-                  ),
-                  CircleIconButton(
-                    tooltip: 'Add a missed log',
-                    icon: AppIcons.add,
-                    onPressed: habitId == null
-                        ? null
-                        : () => showLogEditorSheet(
-                            context,
-                            habitId: habitId,
-                            day: _selection.selected,
-                          ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (failed)
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: LoadFailure(
-                message: "Couldn't load your logs.",
-                onRetry: () {
-                  ref.invalidate(activeHabitsProvider);
-                  if (habitId == null) return;
-                  ref
-                    ..invalidate(
-                      logsInRangeProvider((habitId: habitId, range: range)),
-                    )
-                    ..invalidate(planHistoryProvider(habitId));
-                },
-              ),
-            )
-          else if (shown == null || habitId == null)
-            const SliverFillRemaining(
-              hasScrollBody: false,
-              child: Center(child: CircularProgressIndicator.adaptive()),
-            )
-          else
+      body: StatusBarGlass(
+        child: CustomScrollView(
+          slivers: [
             SliverPadding(
               padding: AppSpacing.page.copyWith(
-                top: AppSpacing.md,
-                bottom: insets.bottom + AppSpacing.xl,
+                top: insets.top + AppSpacing.sm,
               ),
-              sliver: SliverList.list(
-                children: [
-                  const ScrollReveal(child: _Header()),
-                  const SizedBox(height: AppSpacing.md),
-                  ScrollReveal(
-                    index: 1,
-                    child: LogsCalendarCard(
-                      selection: shown.selection,
-                      view: shown.view,
-                      today: today,
-                      earliest: earliest,
-                      onChanged: _change,
+              sliver: SliverToBoxAdapter(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CircleIconButton(
+                      tooltip: 'Back',
+                      icon: AppIcons.back,
+                      onPressed: () => context.pop(),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  ScrollReveal(
-                    index: 2,
-                    child: LogsTriggerCard(
-                      selection: shown.selection,
-                      view: shown.view,
-                      today: today,
-                      onTrigger: (trigger) =>
-                          _change(shown.selection.toggleTrigger(trigger)),
+                    CircleIconButton(
+                      tooltip: 'Add a missed log',
+                      icon: AppIcons.add,
+                      onPressed: habitId == null
+                          ? null
+                          : () => showLogEditorSheet(
+                              context,
+                              habitId: habitId,
+                              day: _selection.selected,
+                            ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  ScrollReveal(
-                    index: 3,
-                    child: LogsRailCard(
-                      habitId: habitId,
-                      selection: shown.selection,
-                      view: shown.view,
-                      today: today,
-                      onEdit: (log) => showLogEditorSheet(
-                        context,
-                        habitId: habitId,
-                        day: shown.selection.selected,
-                        log: log,
-                      ),
-                      onDelete: (log) => _delete(habitId, log),
-                      onSelect: (day) => _change(shown.selection.select(day)),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-        ],
+            if (failed)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: LoadFailure(
+                  message: "Couldn't load your logs.",
+                  onRetry: () {
+                    ref.invalidate(activeHabitsProvider);
+                    if (habitId == null) return;
+                    ref
+                      ..invalidate(
+                        logsInRangeProvider((habitId: habitId, range: range)),
+                      )
+                      ..invalidate(planHistoryProvider(habitId));
+                  },
+                ),
+              )
+            else if (shown == null || habitId == null)
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: CircularProgressIndicator.adaptive()),
+              )
+            else
+              SliverPadding(
+                padding: AppSpacing.page.copyWith(
+                  top: AppSpacing.md,
+                  bottom: insets.bottom + AppSpacing.xl,
+                ),
+                sliver: SliverList.list(
+                  children: [
+                    const ScrollReveal(child: _Header()),
+                    const SizedBox(height: AppSpacing.md),
+                    ScrollReveal(
+                      index: 1,
+                      child: LogsCalendarCard(
+                        selection: shown.selection,
+                        view: shown.view,
+                        today: today,
+                        earliest: earliest,
+                        onChanged: _change,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    ScrollReveal(
+                      index: 2,
+                      child: LogsTriggerCard(
+                        selection: shown.selection,
+                        view: shown.view,
+                        today: today,
+                        onTrigger: (trigger) =>
+                            _change(shown.selection.toggleTrigger(trigger)),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    ScrollReveal(
+                      index: 3,
+                      child: LogsRailCard(
+                        habitId: habitId,
+                        selection: shown.selection,
+                        view: shown.view,
+                        today: today,
+                        onEdit: (log) => showLogEditorSheet(
+                          context,
+                          habitId: habitId,
+                          day: shown.selection.selected,
+                          log: log,
+                        ),
+                        onDelete: (log) => _delete(habitId, log),
+                        onSelect: (day) => _change(shown.selection.select(day)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

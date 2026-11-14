@@ -1,10 +1,11 @@
 # Exhale
 
-Paid, offline iOS app for cutting a habit down to zero by a quit date. Marketing leads
+Offline iOS app for cutting a habit down to zero by a quit date. Marketing leads
 with vaping; every habit stays in the app. The user sets a starting daily limit and a quit
 date, the limit tapers evenly to 0, and each use is one tap (logging is always allowed,
-even over the limit). No profile data is collected. Monetization comes later (free core
-plus Pro).
+even over the limit). No profile data is collected. Monetization (locked 2026-11-10):
+free download, hard paywall after the plan reveal (Annual with a 7-day trial, Monthly,
+Lifetime); see `docs/decisions/2026-11-10-monetization-and-sync.md`.
 
 This is your project with Fawad (the owner). You know its architecture, decisions and
 plan; don't ask him to re-explain them. Read the linked docs when a task touches them.
@@ -23,8 +24,10 @@ it when a task or milestone finishes. Older session logs are in `docs/history/`.
 - Launch scope (Fawad, 2026-10-31): the first release tracks one habit. Never offer a
   second habit in the launch build. Multi-habit Tasks 4.1 to 4.3 are parked, unmerged, on
   `feat/multi-habit`.
-- After launch: multiple habits, then time-of-day insights, reminders, widgets and the
-  Live Activity, the Pro paywall, habit reordering, export.
+- Launch also needs (2026-11-10): the paywall, Export/Import, iCloud sync (CloudKit, the
+  user's own iCloud), then Stay at zero. Details in `docs/decisions/`.
+- After launch: multiple habits (one subscription covers all), then reminders, widgets and
+  the Live Activity, time-of-day insights, habit reordering.
 
 ## Workflow
 
