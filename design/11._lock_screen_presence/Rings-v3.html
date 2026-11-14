@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Widget rings v3</title>
+<style>
+  :root{--bg:#F4F7FA;--card:#fff;--em:#111418;--fg:#161C25;--mut:#5b6573;--faint:#8a94a2;
+    --line:#E4E9EF;--ok:#2E9E6A;--warn:#D9962B;--over:#D9534F}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  main{max-width:1180px;margin:0 auto;padding:32px 16px 80px}
+  h1{font-size:28px;margin:0 0 6px} h2{font-size:20px;margin:44px 0 4px}
+  .note{color:var(--mut);line-height:1.5;max-width:780px;margin:6px 0 0;font-size:14px}
+  .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 8px;margin-bottom:8px}
+  .home{background:linear-gradient(160deg,#cfd8e6,#e9eef5 55%,#f7f9fb);border-radius:28px;padding:22px;
+    display:flex;flex-wrap:wrap;gap:26px;margin-top:18px}
+  .pick{display:flex;flex-direction:column;max-width:338px}
+  .name{font-size:14px;font-weight:700;margin-top:10px}
+  .letter{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--em);color:#fff;
+    font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:6px}
+  .mut{color:var(--mut);font-size:12px;line-height:1.35}
+  .w{background:var(--card);border-radius:22px;box-shadow:0 2px 10px rgba(17,20,24,.08);padding:14px;position:relative;overflow:hidden}
+  .small{width:158px;height:158px}
+  .medium{width:338px;height:158px;display:flex;gap:12px}
+  .lbl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
+  .tnum{font-variant-numeric:tabular-nums}
+  .ringbox{position:relative;display:flex;align-items:center;justify-content:center}
+  .ringbox .c{position:absolute;text-align:center;line-height:1.1}
+  .c b{font-size:20px} .c span{display:block;font-size:10px;color:var(--mut);font-weight:600;margin-top:1px}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px 4px;font-size:9px;text-align:center}
+  .cal .h{color:var(--faint);font-weight:600}
+  .cal .d{height:16px;line-height:16px;border-radius:5px;font-weight:600;font-size:9.5px}
+  .cal .u{background:rgba(46,158,106,.18);color:#1f6e49}
+  .cal .a{background:rgba(217,150,43,.2);color:#8a5a10}
+  .cal .o{background:rgba(217,83,79,.18);color:#9c2f2b}
+  .cal .t{outline:1.5px solid var(--em);color:var(--fg)}
+  .cal .f{color:var(--faint)}
+  .pill{display:inline-block;font-size:10px;font-weight:700;border-radius:999px;padding:2px 7px;
+    background:rgba(46,158,106,.14);color:#1f6e49}
+  .glow{background:radial-gradient(90% 90% at 50% 45%,rgba(46,158,106,.16),rgba(46,158,106,0) 70%),var(--card)}
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">Design 11 · v3 · rings</span>
+  <h1>Something around the ring</h1>
+  <p class="note">Widgets 1 to 5 from v2 are the set. Here are four ways to give the ring in
+    widgets 1 and 4 more around it. Each letter is the same idea in both widgets. They can mix
+    (A with C, say). Same day: 4 of 8, next one at 10:13 AM, 41 days to go.</p>
+
+  <h2>Widget 1 · Today (small)</h2>
+  <div class="home" id="smalls"></div>
+
+  <h2>Widget 4 · Today and the month (medium)</h2>
+  <div class="home" id="mediums"></div>
+</main>
+<script>
+  const ok = 'var(--ok)', line = 'var(--line)';
+  // A full ring of radius r, with a fraction filled.
+  function arc(cx, r, w, frac, color, track = line, cap = 'round') {
+    const c = 2 * Math.PI * r;
+    return `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${track}" stroke-width="${w}"/>` +
+      `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${color}" stroke-width="${w}"
+        stroke-dasharray="${(c * frac).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 ${cx} ${cx})" stroke-linecap="${cap}"/>`;
+  }
+  // One segment per allowed use, the used ones filled.
+  function segments(cx, r, w, used, limit) {
+    // Round caps reach w/2 past each end, so the gap leaves room for both.
+    const gap = (w + 5) / r * 180 / Math.PI, out = [];
+    for (let i = 0; i < limit; i++) {
+      const a0 = -90 + i * 360 / limit + gap / 2, a1 = -90 + (i + 1) * 360 / limit - gap / 2;
+      const p = a => [cx + r * Math.cos(a * Math.PI / 180), cx + r * Math.sin(a * Math.PI / 180)];
+      const [x0, y0] = p(a0), [x1, y1] = p(a1);
+      out.push(`<path d="M${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}"
+        fill="none" stroke="${i < used ? ok : line}" stroke-width="${w}" stroke-linecap="round"/>`);
+    }
+    return out.join('');
+  }
+  // Tick marks for the waking hours, with a dot for each log.
+  function clockface(cx, r) {
+    const out = [];
+    for (let i = 0; i < 16; i++) {
+      const a = (-90 + i * 360 / 16) * Math.PI / 180;
+      const r0 = r - 3, r1 = r + 1;
+      out.push(`<line x1="${(cx + r0 * Math.cos(a)).toFixed(1)}" y1="${(cx + r0 * Math.sin(a)).toFixed(1)}"
+        x2="${(cx + r1 * Math.cos(a)).toFixed(1)}" y2="${(cx + r1 * Math.sin(a)).toFixed(1)}" stroke="#c9d1db" stroke-width="1.5"/>`);
+    }
+    // Logs at 0.6, 2.2, 4.1 and 5 hours after wake; now at 5.5 h.
+    [0.6, 2.2, 4.1, 5].forEach(h => {
+      const a = (-90 + h * 360 / 16) * Math.PI / 180;
+      out.push(`<circle cx="${(cx + (r + 5) * Math.cos(a)).toFixed(1)}" cy="${(cx + (r + 5) * Math.sin(a)).toFixed(1)}" r="2.6" fill="${ok}"/>`);
+    });
+    const n = (-90 + 5.5 * 360 / 16) * Math.PI / 180;
+    out.push(`<circle cx="${(cx + (r + 5) * Math.cos(n)).toFixed(1)}" cy="${(cx + (r + 5) * Math.sin(n)).toFixed(1)}" r="3.4" fill="none" stroke="#161C25" stroke-width="1.5"/>`);
+    return out.join('');
+  }
+
+  const variants = [
+    { k: 'A', name: 'Countdown ring around it',
+      why: 'A thin outer ring drains to the next one on schedule, as on Home. Only while the timer runs; the rest of the time it is the plain ring.',
+      ring: s => { const cx = s / 2; return `<svg width="${s}" height="${s}">${arc(cx, cx - 3, 3, .55, '#161C25', '#eef1f5')}${arc(cx, cx - 13, s > 90 ? 10 : 9, .5, ok)}</svg>`; },
+      center: '<b class="tnum">4/8</b><span class="tnum">1:12 to next</span>' },
+    { k: 'B', name: 'One segment per use',
+      why: 'The ring is cut into today\'s limit, 8 pieces; each log fills one. Easy to count at a glance, and tomorrow has one piece fewer.',
+      ring: s => { const cx = s / 2; return `<svg width="${s}" height="${s}">${segments(cx, cx - 8, s > 90 ? 10 : 9, 4, 8)}</svg>`; },
+      center: '<b class="tnum">4</b><span>left today</span>' },
+    { k: 'C', name: 'Your day around it',
+      why: 'Tick marks for the waking hours, a green dot for each log at the time it happened, and an outline for now. Shows the spacing, not just the count.',
+      ring: s => { const cx = s / 2; return `<svg width="${s}" height="${s}">${clockface(cx, cx - 9)}${arc(cx, cx - 19, s > 90 ? 9 : 8, .5, ok)}</svg>`; },
+      center: '<b class="tnum">4/8</b><span>today</span>' },
+    { k: 'D', name: 'Words around it',
+      why: 'The ring stays plain; the corners carry the stage, the next time and the days to go, with a soft green glow behind the ring.',
+      ring: s => { const cx = s / 2; return `<svg width="${s}" height="${s}">${arc(cx, cx - 6, s > 90 ? 10 : 9, .5, ok)}</svg>`; },
+      center: '<b class="tnum">4/8</b><span>today</span>', words: true },
+  ];
+
+  const smalls = document.getElementById('smalls');
+  const mediums = document.getElementById('mediums');
+
+  for (const v of variants) {
+    const small = v.words
+      ? `<div class="w small glow" style="padding:12px">
+           <div style="display:flex;justify-content:space-between;align-items:center"><span class="lbl">Today</span><span class="pill">Stage 3</span></div>
+           <div class="ringbox" style="margin-top:2px">${v.ring(84)}<div class="c">${v.center}</div></div>
+           <div style="display:flex;justify-content:space-between;margin-top:2px" class="mut tnum"><span>Next 10:13</span><span>41 days</span></div>
+         </div>`
+      : `<div class="w small" style="display:flex;flex-direction:column;align-items:center;padding:10px">
+           <div class="lbl" style="align-self:flex-start">Today</div>
+           <div class="ringbox" style="margin-top:2px">${v.ring(112)}<div class="c">${v.center}</div></div>
+         </div>`;
+    smalls.insertAdjacentHTML('beforeend',
+      `<div class="pick">${small}<div class="name"><span class="letter">${v.k}</span>${v.name}</div><div class="mut">${v.why}</div></div>`);
+
+    const left = v.words
+      ? `<div class="glow" style="width:122px;margin:-14px 0 -14px -14px;padding:12px 0 12px 14px;display:flex;flex-direction:column;justify-content:space-between">
+           <span class="pill" style="align-self:flex-start">Stage 3 of 6</span>
+           <div class="ringbox">${v.ring(88)}<div class="c">${v.center}</div></div>
+           <span class="mut tnum">Next 10:13 AM</span>
+         </div>`
+      : `<div class="ringbox" style="width:122px">${v.ring(122)}<div class="c">${v.center}</div></div>`;
+    mediums.insertAdjacentHTML('beforeend',
+      `<div class="pick"><div class="w medium">${left}
+         <div style="flex:1"><div style="display:flex;justify-content:space-between"><span class="lbl">October</span>
+           <span class="mut tnum" style="font-size:11px">23 of 28 under</span></div>
+           <div class="cal" style="margin-top:6px">${calendar()}</div></div></div>
+         <div class="name"><span class="letter">${v.k}</span>${v.name}</div></div>`);
+  }
+
+  function calendar() {
+    let h = 'MTWTFSS'.split('').map(d => `<div class="h">${d}</div>`).join('') + '<div></div>'.repeat(3);
+    const at = [6, 13, 19], over = [3, 20];
+    for (let d = 1; d <= 31; d++) {
+      const cls = d === 29 ? 't' : d > 29 ? 'f' : over.includes(d) ? 'o' : at.includes(d) ? 'a' : 'u';
+      h += `<div class="d ${cls}">${d}</div>`;
+    }
+    return h;
+  }
+</script>
+</body>
+</html>

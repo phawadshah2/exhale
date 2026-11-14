@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Widget rings v4</title>
+<style>
+  :root{--bg:#F4F7FA;--card:#fff;--em:#111418;--fg:#161C25;--mut:#5b6573;--faint:#8a94a2;
+    --line:#E4E9EF;--ok:#2E9E6A;--warn:#D9962B;--over:#D9534F}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  main{max-width:1180px;margin:0 auto;padding:32px 16px 80px}
+  h1{font-size:28px;margin:0 0 6px} h2{font-size:20px;margin:44px 0 4px}
+  .note{color:var(--mut);line-height:1.5;max-width:780px;margin:6px 0 0;font-size:14px}
+  .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 8px;margin-bottom:8px}
+  .home{background:linear-gradient(160deg,#cfd8e6,#e9eef5 55%,#f7f9fb);border-radius:28px;padding:22px;
+    display:flex;flex-wrap:wrap;gap:26px;margin-top:18px}
+  .pick{display:flex;flex-direction:column;max-width:338px}
+  .name{font-size:14px;font-weight:700;margin-top:10px}
+  .mut{color:var(--mut);font-size:12px;line-height:1.35}
+  .w .mut,.counter{white-space:nowrap}
+  .w{border-radius:22px;box-shadow:0 2px 10px rgba(17,20,24,.08);padding:12px;position:relative;overflow:hidden}
+  .small{width:158px;height:158px;display:flex;flex-direction:column}
+  .medium{width:338px;height:158px;display:flex;gap:12px;background:var(--card)}
+  .lbl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
+  .tnum{font-variant-numeric:tabular-nums}
+  .ringbox{position:relative;display:flex;align-items:center;justify-content:center}
+  .ringbox .c{position:absolute;text-align:center;line-height:1.1}
+  .c b{font-size:19px} .c span{display:block;font-size:10px;color:var(--mut);font-weight:600;margin-top:1px}
+  .pill{display:inline-block;font-size:10px;font-weight:700;border-radius:999px;padding:2px 7px}
+  .counter{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700}
+  .counter svg{flex:none}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px 4px;font-size:9px;text-align:center}
+  .cal .h{color:var(--faint);font-weight:600}
+  .cal .d{height:16px;line-height:16px;border-radius:5px;font-weight:600;font-size:9.5px}
+  .cal .u{background:rgba(46,158,106,.18);color:#1f6e49}
+  .cal .a{background:rgba(217,150,43,.2);color:#8a5a10}
+  .cal .o{background:rgba(217,83,79,.18);color:#9c2f2b}
+  .cal .t{outline:1.5px solid var(--em);color:var(--fg)}
+  .cal .f{color:var(--faint)}
+  .legend{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:600;color:var(--mut);white-space:nowrap}
+  .legend i{width:8px;height:8px;border-radius:2.5px;display:inline-block;margin-left:5px}
+  .legend i:first-child{margin-left:0}
+  .legend .u{background:#2E9E6A}.legend .a{background:#D9962B}.legend .o{background:#D9534F}
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">Design 11 · v4 · rings</span>
+  <h1>D, with the countdown ring and a counter</h1>
+  <p class="note">Fawad picked D for widgets 1 and 4. Added: the thin countdown ring around
+    the day's ring (drains to the next one on schedule, as on Home) and a small counter in
+    the bottom-left corner. The glow and the stage pill take the day's colour. Four states of
+    the same day, then the medium widget.</p>
+
+  <h2>Widget 1 · Today (small)</h2>
+  <div class="home" id="smalls"></div>
+
+  <h2>Widget 4 · Today and the month (medium)</h2>
+  <div class="home" id="mediums"></div>
+</main>
+<script>
+  const colour = { under: '#2E9E6A', at: '#D9962B', over: '#D9534F' };
+  const tint = { under: 'rgba(46,158,106,', at: 'rgba(217,150,43,', over: 'rgba(217,83,79,' };
+  const text = { under: '#1f6e49', at: '#8a5a10', over: '#9c2f2b' };
+
+  function arc(cx, r, w, frac, color, track) {
+    const c = 2 * Math.PI * r;
+    return `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${track}" stroke-width="${w}"/>` +
+      (frac > 0 ? `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${color}" stroke-width="${w}"
+        stroke-dasharray="${(c * Math.min(frac, 1)).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 ${cx} ${cx})" stroke-linecap="round"/>` : '');
+  }
+  function ring(s, st) {
+    const cx = s / 2;
+    const outer = st.timer == null ? '' : arc(cx, cx - 2, 2.5, st.timer, '#161C25', 'rgba(22,28,37,.08)');
+    return `<svg width="${s}" height="${s}">${outer}${arc(cx, cx - 11, 9, st.count / st.limit, colour[st.status], '#E4E9EF')}</svg>`;
+  }
+  const hourglass = c => `<svg width="11" height="12" viewBox="0 0 11 12"><path d="M1.5 1h8M1.5 11h8M2.5 1c0 3 3 3.5 3 5s-3 2-3 5M8.5 1c0 3-3 3.5-3 5s3 2 3 5" fill="none" stroke="${c}" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+  function counter(st) {
+    if (st.left) return `<span class="counter tnum">${hourglass('#161C25')}${st.left}</span>`;
+    return `<span class="mut">${st.foot}</span>`;
+  }
+
+  const states = [
+    { name: 'Counting', why: 'Outer ring drains with the counter: 1:12:52 left of a 2:12:51 gap.',
+      count: 4, limit: 8, status: 'under', timer: .55, left: '1:12:52', centre: 'today' },
+    { name: 'Before the first log', why: 'No countdown yet, so no outer ring; the corner says how many are left.',
+      count: 0, limit: 8, status: 'under', timer: null, foot: '8 left today', centre: 'today' },
+    { name: 'Past the time on schedule', why: 'Countdown done: the outer ring goes, and the counter counts the extra wait up (iOS ticks it).',
+      count: 4, limit: 8, status: 'under', timer: null, foot: 'Waited +0:17', centre: 'today' },
+    { name: 'At the limit', why: 'No countdown at the limit. Amber ring, glow and pill.',
+      count: 8, limit: 8, status: 'at', timer: null, foot: 'Limit reached', centre: 'today' },
+  ];
+
+  const smalls = document.getElementById('smalls');
+  const mediums = document.getElementById('mediums');
+  for (const st of states) {
+    const bg = `radial-gradient(90% 90% at 50% 48%,${tint[st.status]}.16),${tint[st.status]}0) 70%),#fff`;
+    const pill = `<span class="pill" style="background:${tint[st.status]}.14);color:${text[st.status]}">Stage 3</span>`;
+    smalls.insertAdjacentHTML('beforeend', `<div class="pick">
+      <div class="w small" style="background:${bg}">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span class="lbl">Today</span>${pill}</div>
+        <div class="ringbox" style="flex:1">${ring(88, st)}
+          <div class="c"><b class="tnum">${st.count}/${st.limit}</b><span>${st.centre}</span></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center">${counter(st)}<span class="mut tnum">41 days</span></div>
+      </div>
+      <div class="name">${st.name}</div><div class="mut">${st.why}</div></div>`);
+
+    mediums.insertAdjacentHTML('beforeend', `<div class="pick"><div class="w medium">
+      <div style="width:128px;margin:-12px 0 -12px -12px;padding:12px 0 12px 12px;background:${bg};display:flex;flex-direction:column">
+        <div>${pill.replace('Stage 3', 'Stage 3 of 6')}</div>
+        <div class="ringbox" style="flex:1">${ring(92, st)}
+          <div class="c"><b class="tnum">${st.count}/${st.limit}</b><span>${st.centre}</span></div></div>
+        <div>${counter(st)}</div>
+      </div>
+      <div style="flex:1"><div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="lbl">October</span>
+        <span class="legend"><i class="u"></i>Under<i class="a"></i>At<i class="o"></i>Over</span></div>
+        <div class="cal" style="margin-top:6px">${calendar(st.status)}</div></div>
+      </div><div class="name">${st.name}</div></div>`);
+  }
+
+  function calendar(today) {
+    let h = 'MTWTFSS'.split('').map(d => `<div class="h">${d}</div>`).join('') + '<div></div>'.repeat(3);
+    const at = [6, 13, 19], over = [3, 20];
+    for (let d = 1; d <= 31; d++) {
+      const cls = d === 29 ? 't' : d > 29 ? 'f' : over.includes(d) ? 'o' : at.includes(d) ? 'a' : 'u';
+      h += `<div class="d ${cls}">${d}</div>`;
+    }
+    return h;
+  }
+</script>
+</body>
+</html>

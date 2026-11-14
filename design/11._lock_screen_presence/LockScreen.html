@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lock Screen presence</title>
+<style>
+  :root{
+    --bg:#F4F7FA; --card:#fff; --em:#111418; --fg:#161C25; --mut:#5b6573;
+    --faint:#8a94a2; --line:#E4E9EF; --ok:#2E9E6A; --warn:#D9962B;
+    --glass:rgba(28,30,36,.62); --glassLine:rgba(255,255,255,.14);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font-family:-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  main{max-width:1180px;margin:0 auto;padding:32px 16px 80px}
+  h1{font-size:28px;margin:0 0 6px}
+  h2{font-size:20px;margin:48px 0 4px}
+  .lede{color:var(--mut);max-width:760px;line-height:1.5;margin:0}
+  .note{color:var(--mut);font-size:14px;line-height:1.5;max-width:760px;margin:6px 0 0}
+  .row{display:flex;flex-wrap:wrap;gap:28px;margin-top:20px;align-items:flex-start}
+  .cap{font-size:13px;color:var(--mut);margin-top:10px;max-width:300px;line-height:1.45}
+  .cap b{color:var(--fg)}
+  .tnum{font-variant-numeric:tabular-nums}
+
+  /* Phone */
+  .phone{width:300px;height:640px;border-radius:46px;padding:10px;background:#0b0c0f;
+    box-shadow:0 20px 50px rgba(17,20,24,.18)}
+  .screen{position:relative;width:100%;height:100%;border-radius:38px;overflow:hidden;
+    background:radial-gradient(120% 80% at 30% 10%,#3d4a63 0%,#1f2533 45%,#0e1118 100%);color:#fff}
+  .screen.home{background:linear-gradient(160deg,#cfd8e6,#e9eef5 55%,#f7f9fb)}
+  .island{position:absolute;top:10px;left:50%;transform:translateX(-50%);height:30px;
+    background:#000;border-radius:20px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 10px;min-width:100px;z-index:2}
+  .date{position:absolute;top:58px;width:100%;text-align:center;font-size:15px;font-weight:600;opacity:.9}
+  .clock{position:absolute;top:74px;width:100%;text-align:center;font-size:80px;font-weight:700;
+    letter-spacing:-2px;line-height:1}
+  .inline{position:absolute;top:40px;width:100%;text-align:center;font-size:13px;font-weight:600;opacity:.85}
+  .accs{position:absolute;top:170px;width:100%;display:flex;justify-content:center;gap:10px}
+  .lockbottom{position:absolute;bottom:20px;left:0;right:0;display:flex;justify-content:space-between;padding:0 34px}
+  .lockbtn{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.16);
+    display:flex;align-items:center;justify-content:center;font-size:18px}
+
+  /* Live Activity */
+  .la{position:absolute;left:12px;right:12px;bottom:92px;border-radius:24px;padding:14px 16px;
+    background:var(--glass);border:1px solid var(--glassLine);backdrop-filter:blur(18px)}
+  .la .top{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;opacity:.85}
+  .la .big{font-size:34px;font-weight:700;margin-top:6px;letter-spacing:-.5px}
+  .la .sub{font-size:13px;opacity:.8;margin-top:2px}
+  .bar{height:5px;border-radius:3px;background:rgba(255,255,255,.18);margin-top:12px;overflow:hidden}
+  .bar i{display:block;height:100%;background:#fff;border-radius:3px}
+  .la.stale .big{font-size:22px;margin-top:8px}
+  .la.stale .bar i{background:var(--ok)}
+  .logbtn{border:0;border-radius:14px;background:#fff;color:#111418;font-weight:700;font-size:13px;
+    padding:8px 12px}
+
+  /* Dynamic Island shapes, drawn larger */
+  .di{background:#000;color:#fff;border-radius:999px;display:flex;align-items:center;justify-content:space-between}
+  .di.compact{width:250px;height:38px;padding:0 14px}
+  .di.minimal{width:38px;height:38px;justify-content:center}
+  .di.expanded{width:340px;border-radius:44px;padding:18px 20px;display:block}
+  .di .t{font-weight:700;font-size:15px}
+  .camera{width:90px}
+
+  /* Accessory widgets */
+  .acc-circ{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.14);
+    display:flex;align-items:center;justify-content:center;position:relative}
+  .acc-rect{width:150px;height:56px;border-radius:14px;background:rgba(255,255,255,.14);padding:8px 10px;
+    font-size:12px;line-height:1.3}
+  .acc-rect b{font-size:14px;display:block}
+
+  /* Home Screen widgets */
+  .w{background:var(--card);border-radius:22px;box-shadow:0 2px 10px rgba(17,20,24,.08);padding:14px;color:var(--fg)}
+  .w.small{width:150px;height:150px}
+  .w.medium{width:320px;height:150px;display:flex;gap:14px;align-items:center}
+  .w .lbl{font-size:12px;font-weight:600;color:var(--mut)}
+  .w .num{font-size:30px;font-weight:700;letter-spacing:-.5px}
+  .w .small-t{font-size:12px;color:var(--mut)}
+  .plus{width:44px;height:44px;border-radius:50%;background:var(--em);color:#fff;font-size:24px;
+    display:flex;align-items:center;justify-content:center;font-weight:300}
+  .icons{display:grid;grid-template-columns:repeat(4,52px);gap:18px 16px;justify-content:center;padding-top:64px}
+  .icon{width:52px;height:52px;border-radius:13px;background:rgba(255,255,255,.7)}
+
+  /* Controls */
+  .cc{display:grid;grid-template-columns:repeat(4,58px);gap:12px;justify-content:center;padding-top:110px}
+  .tile{width:58px;height:58px;border-radius:16px;background:rgba(255,255,255,.16)}
+  .tile.on{background:#fff;color:#111418;display:flex;align-items:center;justify-content:center;
+    font-size:26px;font-weight:300}
+  .tile.wide{grid-column:span 2;width:auto}
+  .toast{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:250px;background:#000;
+    border-radius:26px;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:3}
+  .action{position:absolute;left:-14px;top:120px;width:6px;height:40px;border-radius:3px;background:#ff8a3d}
+  .phonewrap{position:relative}
+  .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 8px;margin-bottom:8px}
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">Design 11 · draft for Fawad</span>
+  <h1>Exhale on the Lock Screen</h1>
+  <p class="lede">Goal: every time the phone is picked up, Exhale is in view. The numbers are
+    today's count against today's limit, the countdown once the day's first log starts it,
+    and the days left to the quit date. Example day: limit 8, 4 logged, next one on
+    schedule at 10:13 AM, quit date in 41 days.</p>
+
+  <!-- 1. Live Activity -->
+  <h2>1 · Live Activity</h2>
+  <p class="note">Starts with each log and shows the countdown. iOS ticks the time itself.
+    Fifteen minutes after the time is up it goes quiet (green bar, no clock), and the next
+    log or an app open takes it away. iOS ends it after 8 hours anyway.</p>
+  <div class="row">
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="island"><span class="camera"></span></div>
+        <div class="date">Thursday, October 29</div>
+        <div class="clock">9:00</div>
+        <div class="la">
+          <div class="top"><span>Exhale</span><span class="tnum">4 of 8 today</span></div>
+          <div class="big tnum">1:12:52</div>
+          <div class="sub">until your next · on schedule at 10:13 AM</div>
+          <div class="bar"><i style="width:55%"></i></div>
+        </div>
+        <div class="lockbottom"><span class="lockbtn">🔦</span><span class="lockbtn">📷</span></div>
+      </div></div>
+      <p class="cap"><b>Counting.</b> Same words as the timer on Home. The bar drains like the ring.</p>
+    </div>
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="island"><span class="camera"></span></div>
+        <div class="date">Thursday, October 29</div>
+        <div class="clock">10:30</div>
+        <div class="la stale">
+          <div class="top"><span>Exhale</span><span class="tnum">4 of 8 today</span></div>
+          <div class="big">Every minute you wait counts.</div>
+          <div class="sub">4 left for today · 41 days to go</div>
+          <div class="bar"><i style="width:100%"></i></div>
+        </div>
+        <div class="lockbottom"><span class="lockbtn">🔦</span><span class="lockbtn">📷</span></div>
+      </div></div>
+      <p class="cap"><b>Quiet, from 15 min past due.</b> No "you can have one now". It praises
+        the wait instead.</p>
+    </div>
+  </div>
+
+  <!-- 2. Dynamic Island -->
+  <h2>2 · Dynamic Island</h2>
+  <p class="note">The same Live Activity in the Island, drawn twice the real size. Compact
+    when Exhale is the only activity, minimal when it shares the Island, expanded on a long
+    press.</p>
+  <div class="row" style="align-items:center">
+    <div>
+      <div class="di compact">
+        <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="8" fill="none" stroke="#333" stroke-width="3"/><circle cx="11" cy="11" r="8" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="27.6 50.3" transform="rotate(-90 11 11)" stroke-linecap="round"/></svg>
+        <span class="camera"></span>
+        <span class="t tnum">1:12</span>
+      </div>
+      <p class="cap"><b>Compact.</b> Draining ring left, time right.</p>
+    </div>
+    <div>
+      <div class="di minimal">
+        <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="8" fill="none" stroke="#333" stroke-width="3"/><circle cx="11" cy="11" r="8" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="27.6 50.3" transform="rotate(-90 11 11)" stroke-linecap="round"/></svg>
+      </div>
+      <p class="cap"><b>Minimal.</b> The ring only.</p>
+    </div>
+    <div>
+      <div class="di expanded">
+        <div style="display:flex;justify-content:space-between;font-size:13px;opacity:.8;font-weight:600">
+          <span>Exhale</span><span class="tnum">4 of 8 today</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px">
+          <div><div class="tnum" style="font-size:32px;font-weight:700">1:12:52</div>
+            <div style="font-size:13px;opacity:.75">until your next · 10:13 AM</div></div>
+          <button class="logbtn">+ Log one</button>
+        </div>
+      </div>
+      <p class="cap"><b>Expanded.</b> Long press. "+ Log one" logs without opening the app.</p>
+    </div>
+  </div>
+
+  <!-- 3. Lock Screen widgets -->
+  <h2>3 · Lock Screen widgets</h2>
+  <p class="note">Always there, also when no countdown runs. Three sizes; people pick which
+    to add. Before the day's first log they show the count and "8 left".</p>
+  <div class="row">
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="island"><span class="camera"></span></div>
+        <div class="inline">Exhale · 4 of 8 · 41 days to go</div>
+        <div class="date" style="top:58px">Thursday, October 29</div>
+        <div class="clock">9:00</div>
+        <div class="accs">
+          <div class="acc-circ">
+            <svg width="56" height="56" viewBox="0 0 56 56" style="position:absolute"><circle cx="28" cy="28" r="23" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="4"/><circle cx="28" cy="28" r="23" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="72.3 144.5" transform="rotate(-90 28 28)" stroke-linecap="round"/></svg>
+            <span class="tnum" style="font-weight:700;font-size:15px">4/8</span>
+          </div>
+          <div class="acc-rect"><b class="tnum">4 of 8 today</b>Next one at 10:13 AM<br>41 days to go</div>
+        </div>
+        <div class="lockbottom"><span class="lockbtn">🔦</span><span class="lockbtn">📷</span></div>
+      </div></div>
+      <p class="cap"><b>Inline</b> (above the clock), <b>circular</b> (today's ring) and
+        <b>rectangular</b>. They update on every log, from the app, Siri or a button.</p>
+    </div>
+  </div>
+
+  <!-- 4. Home Screen widgets -->
+  <h2>4 · Home Screen widgets</h2>
+  <p class="note">In the app's look. The + logs one without opening the app; tapping anywhere
+    else opens Home.</p>
+  <div class="row">
+    <div>
+      <div class="phone"><div class="screen home">
+        <div class="island"><span class="camera"></span></div>
+        <div style="display:flex;justify-content:center;gap:12px;padding:56px 12px 0">
+          <div class="w small">
+            <div class="lbl">Exhale</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+              <svg width="54" height="54" viewBox="0 0 54 54"><circle cx="27" cy="27" r="22" fill="none" stroke="var(--line)" stroke-width="6"/><circle cx="27" cy="27" r="22" fill="none" stroke="var(--ok)" stroke-width="6" stroke-dasharray="69.1 138.2" transform="rotate(-90 27 27)" stroke-linecap="round"/></svg>
+              <div><div class="num tnum" style="font-size:24px">4/8</div><div class="small-t">today</div></div>
+            </div>
+            <div class="small-t tnum" style="margin-top:10px">Next 10:13 AM</div>
+            <div class="small-t">41 days to go</div>
+          </div>
+          <div class="icons" style="padding:0;grid-template-columns:repeat(2,52px)">
+            <div class="icon"></div><div class="icon"></div><div class="icon"></div><div class="icon"></div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:center;padding:16px 12px 0">
+          <div class="w medium" style="width:270px">
+            <svg width="86" height="86" viewBox="0 0 86 86"><circle cx="43" cy="43" r="36" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="43" cy="43" r="36" fill="none" stroke="var(--ok)" stroke-width="8" stroke-dasharray="113 226" transform="rotate(-90 43 43)" stroke-linecap="round"/><text x="43" y="49" text-anchor="middle" font-size="18" font-weight="700" fill="#161C25">4/8</text></svg>
+            <div style="flex:1">
+              <div class="lbl">Until your next</div>
+              <div class="num tnum" style="font-size:24px">1:12:52</div>
+              <div class="small-t">41 days to go</div>
+            </div>
+            <div class="plus">+</div>
+          </div>
+        </div>
+        <div class="icons" style="padding-top:18px">
+          <div class="icon"></div><div class="icon"></div><div class="icon"></div><div class="icon"></div>
+        </div>
+      </div></div>
+      <p class="cap"><b>Small</b> (count, next time, days to go) and <b>medium</b>
+        (ring, live countdown, + to log). The ring is green under the limit, amber at it,
+        red over, as in the app.</p>
+    </div>
+  </div>
+
+  <!-- 5. Log one -->
+  <h2>5 · "Log one" without opening the app</h2>
+  <p class="note">One action, offered by iOS everywhere: Siri ("Log one in Exhale"),
+    Shortcuts, the Action Button, a Control Center button, a Lock Screen control and the
+    widget's +. It saves with no trigger and confirms in the Island. The log waits in a
+    queue, and the app adds it when it next opens.</p>
+  <div class="row">
+    <div>
+      <div class="phonewrap">
+        <span class="action" title="Action Button"></span>
+        <div class="phone"><div class="screen">
+          <div class="toast">
+            <span style="font-size:20px">✓</span>
+            <div style="font-size:13px;line-height:1.3"><b>Logged · 5 of 8 today</b><br>
+              <span style="opacity:.75">Next one on schedule at 12:21 PM</span></div>
+          </div>
+          <div class="date">Thursday, October 29</div>
+          <div class="clock">10:20</div>
+          <div class="la">
+            <div class="top"><span>Exhale</span><span class="tnum">5 of 8 today</span></div>
+            <div class="big tnum">2:00:59</div>
+            <div class="sub">until your next · on schedule at 12:21 PM</div>
+            <div class="bar"><i style="width:100%"></i></div>
+          </div>
+          <div class="lockbottom"><span class="lockbtn">🔦</span><span class="lockbtn" style="background:#fff;color:#111418;font-weight:300;font-size:24px">+</span></div>
+        </div></div>
+      </div>
+      <p class="cap"><b>Action Button pressed</b> (orange, left edge). The Island confirms,
+        and the Live Activity restarts. The camera control is swapped for a "+" Lock Screen
+        control here.</p>
+    </div>
+    <div>
+      <div class="phone"><div class="screen" style="background:linear-gradient(160deg,#2a3142,#141821)">
+        <div class="cc">
+          <div class="tile wide"></div><div class="tile"></div><div class="tile"></div>
+          <div class="tile"></div><div class="tile on">+</div><div class="tile"></div><div class="tile"></div>
+          <div class="tile wide"></div><div class="tile wide"></div>
+        </div>
+        <p style="text-align:center;font-size:12px;opacity:.75;margin-top:14px">Exhale · Log one</p>
+      </div></div>
+      <p class="cap"><b>Control Center.</b> For phones without an Action Button. Back Tap can
+        run the same action too.</p>
+    </div>
+  </div>
+
+  <h2>Not shown</h2>
+  <p class="note">At or over the limit there is no countdown, so no Live Activity; the widgets
+    show the count in amber or red. On quit day and after, the widgets show days at zero.
+    Siri's spoken reply is the same line as the Island toast.</p>
+</main>
+</body>
+</html>
