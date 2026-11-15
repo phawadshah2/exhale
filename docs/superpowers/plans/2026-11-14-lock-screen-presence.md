@@ -340,16 +340,25 @@ Done 2026-11-14. The 53 new lines are drafts for Fawad's review at the milestone
     (`next`, `gapStart`)?, `stage`, `stageCount`, `daysToGo`, `daysAtZero`,
     `month: [Date: Status]`, `week: [(day: Date, count: Int, limit: Int)]`, `reason`,
     `freeDayTitle`, `quitReached`.
+- As built: `ios/Shared` is a synchronized folder in Runner and the extension, and
+  `ios/RunnerTests` became a synchronized folder (project file edited with Xcode closed).
+  The parity test reads the fixture through `#filePath`, not as a bundle resource.
+  `AppGroup.swift` also holds `Day`, `DayBoundary` and an ISO 8601 reader for Dart's
+  six-digit fractions. `PresenceState.week` is `[WeekDay]` (Monday to Sunday);
+  `daysAtZero` counts the quit day as day 1. Known gap: between the app's snapshot
+  write and its queue removal, a drained log can count twice in widgets for a moment.
+  Green run 2026-11-15: 16 tests, `** TEST SUCCEEDED **` (two earlier runs failed on
+  test code only).
 
-- [ ] **Step 1:** Tests: `everyPaceCaseMatches` (all of Task 3); `queuedLogAddsToToday`;
+- [x] **Step 1:** Tests: `everyPaceCaseMatches` (all of Task 3); `queuedLogAddsToToday`;
   `queuedLogBeforeResetHourCountsYesterday`; `pastTheLastLimitDayIsStale`;
   `missingSnapshotIsStale`; `notEntitledIsLocked`; `quitDayShowsDaysAtZero`;
   `appendWhileReadingKeepsBoth` (QueueStore); `removeLeavesOtherIds`.
-- [ ] **Step 2:** Ask Fawad, run `xcodebuild test -workspace ios/Runner.xcworkspace
+- [x] **Step 2:** Ask Fawad, run `xcodebuild test -workspace ios/Runner.xcworkspace
   -scheme Runner -destination 'platform=iOS Simulator,name=iPhone 17'`. Expected: FAIL.
-- [ ] **Step 3:** Implement; `PaceGuide` mirrors the Dart replay line for line.
-- [ ] **Step 4:** Ask Fawad, run the same command. Expected: `** TEST SUCCEEDED **`.
-- [ ] **Step 5:** Commit: `feat(ios): presence core shared with the widgets`.
+- [x] **Step 3:** Implement; `PaceGuide` mirrors the Dart replay line for line.
+- [x] **Step 4:** Ask Fawad, run the same command. Expected: `** TEST SUCCEEDED **`.
+- [x] **Step 5:** Commit: `feat(ios): presence core shared with the widgets`.
 
 ### Task 10: The Swift side of the channel
 

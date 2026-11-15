@@ -11,7 +11,6 @@
 		180F04A030A8C85500DEF0CC /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 180F049F30A8C85500DEF0CC /* WidgetKit.framework */; };
 		180F04A230A8C85500DEF0CC /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 180F04A130A8C85500DEF0CC /* SwiftUI.framework */; };
 		180F04B330A8C85600DEF0CC /* ExhaleWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 180F049D30A8C85500DEF0CC /* ExhaleWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
@@ -70,7 +69,6 @@
 		180F04A130A8C85500DEF0CC /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		180F04BA30A8C8B100DEF0CC /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		180F04BB30A8C8E800DEF0CC /* ExhaleWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ExhaleWidgetsExtension.entitlements; sourceTree = "<group>"; };
-		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -99,6 +97,8 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		180F04A330A8C85500DEF0CC /* ExhaleWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (180F04B830A8C85600DEF0CC /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ExhaleWidgets; sourceTree = "<group>"; };
+		180F04C030A8D00000DEF0CC /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
+		180F04C130A8D00000DEF0CC /* RunnerTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = RunnerTests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,14 +131,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		331C8082294A63A400263BE5 /* RunnerTests */ = {
-			isa = PBXGroup;
-			children = (
-				331C807B294A618700263BE5 /* RunnerTests.swift */,
-			);
-			path = RunnerTests;
-			sourceTree = "<group>";
-		};
 		9740EEB11CF90186004384FC /* Flutter */ = {
 			isa = PBXGroup;
 			children = (
@@ -160,7 +152,8 @@
 				180F04A330A8C85500DEF0CC /* ExhaleWidgets */,
 				180F049E30A8C85500DEF0CC /* Frameworks */,
 				97C146EF1CF9000F007C117D /* Products */,
-				331C8082294A63A400263BE5 /* RunnerTests */,
+				180F04C130A8D00000DEF0CC /* RunnerTests */,
+				180F04C030A8D00000DEF0CC /* Shared */,
 			);
 			sourceTree = "<group>";
 		};
@@ -208,6 +201,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				180F04A330A8C85500DEF0CC /* ExhaleWidgets */,
+				180F04C030A8D00000DEF0CC /* Shared */,
 			);
 			name = ExhaleWidgetsExtension;
 			packageProductDependencies = (
@@ -227,6 +221,9 @@
 			);
 			dependencies = (
 				331C8086294A63A400263BE5 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				180F04C130A8D00000DEF0CC /* RunnerTests */,
 			);
 			name = RunnerTests;
 			productName = RunnerTests;
@@ -249,6 +246,9 @@
 			);
 			dependencies = (
 				180F04B230A8C85600DEF0CC /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				180F04C030A8D00000DEF0CC /* Shared */,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -379,7 +379,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

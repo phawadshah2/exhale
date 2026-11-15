@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-14 (Lock Screen presence, Task 8 done). Earlier: `docs/history/` (latest
+Updated 2026-11-15 (Lock Screen presence, Task 9 done). Earlier: `docs/history/` (latest
 `2026-11-13_paywall_build_state.md`).
 
 ## Where we are
@@ -9,7 +9,7 @@ Updated 2026-11-14 (Lock Screen presence, Task 8 done). Earlier: `docs/history/`
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
 | Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), not pushed |
-| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 8 of 15 done |
+| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 9 of 15 done |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
@@ -36,9 +36,9 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   walk), `pickLinePair`; `QuoteCard.quotes` reads the list.
 - Task 6: `PresenceSnapshot.build` takes `TrackedHabit`, no holds list (plans carry them);
   UTC ISO 8601 times; no `count` on future days.
-- Task 7: `PresenceRepository` (channel; tests get `FakePresenceRepository` via
-  `setUpTestDependencies`), `DrainExternalLogs` (dedupes by external id).
+- Task 7: `PresenceRepository` (tests get `FakePresenceRepository`), `DrainExternalLogs`.
 - Task 8: `presenceSyncProvider` (kept by `ExhaleApp`), `exhale://home|logs/week` links.
+- Task 9: `ios/Shared` (synced into Runner + extension), Swift core; XCTests 16/16.
 
 ## Checks
 
@@ -53,9 +53,9 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 
 ## Next action
 
-Task 9, the Swift core (Sonnet 5.5 medium), via the `execute-plan` skill. Read: the
-plan's header and Task 9. Xcode test runs need Fawad's approval, one command each.
-Fawad's iPhone (`00008150-0008556E3A80401C`) runs release builds over the cable.
+Task 10, the Swift side of the channel (Sonnet 5.5 medium), via `execute-plan`. Read: the
+plan's header and Task 10. Xcode test runs need Fawad's approval, one command each
+(simulator iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`; a run takes ~10 min).
 
 ## Repo
 
