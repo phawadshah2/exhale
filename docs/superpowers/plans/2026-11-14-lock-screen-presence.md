@@ -375,13 +375,22 @@ Done 2026-11-14. The 53 new lines are drafts for Fawad's review at the milestone
   `staleDate = staleAt`), reloads all widget timelines after each write, and observes the
   Darwin notification to call `queueChanged`.
 
-- [ ] **Step 1:** Tests: `writeSnapshotWritesTheFileAndReloads` (a reload spy);
+- As built: `PresencePlugin.swift` was added to the Runner group in the project file
+  (Runner is not a synchronized folder). `CountdownActivities` and `WidgetReloading` wrap
+  ActivityKit and WidgetCenter; `showActivity` updates the first running (active or
+  stale) activity and ends any extras. `removeFromQueue` reloads widgets too, which
+  shortens Task 9's double-count gap. Bad arguments are `bad_arguments` errors; other
+  failures are `presence`. Extra tests: `readQueueThenRemoveLeavesOtherIdsAndReloads`,
+  `unknownMethodIsNotImplemented`. Red run skipped (Fawad, 2026-11-15: compile-only
+  failure). Green run 2026-11-15: 21 tests, `** TEST SUCCEEDED **`.
+
+- [x] **Step 1:** Tests: `writeSnapshotWritesTheFileAndReloads` (a reload spy);
   `showActivityTwiceUpdatesTheSameActivity` (an activity spy); `endActivityEndsAll`.
-- [ ] **Step 2:** Ask Fawad, run the Task 9 command. Expected: FAIL.
-- [ ] **Step 3:** Implement behind small protocols for ActivityKit and WidgetCenter so
+- [x] **Step 2:** Ask Fawad, run the Task 9 command. Expected: FAIL.
+- [x] **Step 3:** Implement behind small protocols for ActivityKit and WidgetCenter so
   the tests use spies.
-- [ ] **Step 4:** Ask Fawad, run it. Expected: `** TEST SUCCEEDED **`.
-- [ ] **Step 5:** Commit: `feat(ios): presence channel and Live Activity control`.
+- [x] **Step 4:** Ask Fawad, run it. Expected: `** TEST SUCCEEDED **`.
+- [x] **Step 5:** Commit: `feat(ios): presence channel and Live Activity control`.
 
 ### Task 11: Widgets
 
