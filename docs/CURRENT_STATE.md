@@ -25,31 +25,28 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 - Decided: queue + snapshot in the App Group (no DB move, no packages); minimum iOS 17;
   without access widgets lock and Log one opens the app; Live Activity goes quiet 15 min
   past due and keeps the Island; widgets 1 to 5, rings in design D (`Rings-v4.html`).
-- Task 1 (`d8cb4ed`): extension target, App Group, iOS 17, `NSSupportsLiveActivities`;
-  `ios/Shared` not made yet (plan's Task 1 note).
+- Task 1 (`d8cb4ed`): extension target, App Group, iOS 17, `NSSupportsLiveActivities`.
 - Task 2 spike (`835449a`): Log one starts a Live Activity with the app terminated (via
   Shortcuts); the Action Button never reached the intent, recheck at the device walk.
 - Task 3 (`e0c12a1`): `test/fixtures/pace_cases.json`, 14 `PaceGuide` cases; Swift ±1 ms.
-- Task 4 (`3bb43b2`): schema v13 (`habit_logs.external_id`, `show_live_activity`);
-  fixture `exhale_v12.sqlite`; v7 and older get the columns in the v8 rebuilds.
-- Task 5 (`daef015`): `encouragementLines` (60, 53 are drafts for Fawad's review at the
-  walk), `pickLinePair`; `QuoteCard.quotes` reads the list.
-- Task 6: `PresenceSnapshot.build` takes `TrackedHabit`, no holds list (plans carry them);
+- Task 4 (`3bb43b2`): schema v13 (`external_id`, `show_live_activity`), fixture v12.
+- Task 5 (`daef015`): 60 `encouragementLines` (53 drafts for Fawad to review at the walk).
+- Task 6 (`143f4c0`): `PresenceSnapshot.build` takes `TrackedHabit`, no holds list (plans carry them);
   UTC ISO 8601 times; no `count` on future days.
-- Task 7: `PresenceRepository` (tests get `FakePresenceRepository`), `DrainExternalLogs`.
-- Task 8: `presenceSyncProvider` (kept by `ExhaleApp`), `exhale://home|logs/week` links.
-- Task 9: `ios/Shared` (synced into Runner + extension), Swift core; XCTests 16/16.
+- Task 7 (`654119b`): `PresenceRepository` (tests get `FakePresenceRepository`), `DrainExternalLogs`.
+- Task 8 (`95b9570`): `presenceSyncProvider` (kept by `ExhaleApp`), `exhale://` links.
+- Task 9 (`48747b9`): `ios/Shared` (synced into Runner + extension), Swift core.
+- Each task's as-built notes are under it in the plan.
 
 ## Checks
 
-- Timer branch: format and analyze clean; app, Home, Logs, onboarding tests 590 passed.
-  Full suite not run.
-- Task 1: `fvm flutter build ios --simulator --debug` built, extension embedded.
-  No Dart changes, so no Dart checks.
+- Timer branch: format, analyze clean; app, Home, Logs, onboarding 590 passed.
+- Task 1: simulator debug build OK, extension embedded (no Dart changes).
 - Tasks 3 to 8: format and `analyze --fatal-infos` clean each time. Task 3 test 15/15;
   Task 4 migration + log repository tests 64/64; Task 5 test + `test/features/home/`
-  274/274; Task 6 test 11/11;
-  Task 7 presence + `test/app` 76/76; Task 8 presence, app, Home 360/360. Full suite not run (milestone end).
+  274/274; Task 6 11/11; Task 7 presence + `test/app` 76/76; Task 8 presence, app,
+  Home 360/360. Full suite not run (milestone end).
+- Task 9: XCTests on iPhone 17 simulator, 16/16, `** TEST SUCCEEDED **` (2026-11-15).
 
 ## Next action
 
@@ -76,5 +73,8 @@ plan's header and Task 10. Xcode test runs need Fawad's approval, one command ea
   hides Manage; refunded "ended on" uses expiry; a resubmitted first run saves only the plan.
 - Splash overflows at 200% on 375 × 667; paywall button 22 pt high there.
 - Payment reminders spec (day 5) needed in the same release.
+- Presence: extension version 1.0 vs app 0.1.0 (Xcode warns; match before release); a
+  drained log can count twice in widgets between snapshot write and queue removal; at
+  the device walk check a cold start from a widget link and the Action Button.
 - Earlier walk items: Reduce Transparency, 200%, priced drink in Edit plan; chat spec
   items waiting on Fawad; iPhone review list.
