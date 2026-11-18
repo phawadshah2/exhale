@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The corner of widgets 1 and 4: the time left ticking, the wait counting
-/// up, what's left, or where the day stands.
+/// The line under the ring in widgets 1 and 4: the time left, the wait
+/// counting up, what's left today, or where the day stands.
 struct CornerCounter: View {
   let state: PresenceState
   let date: Date
@@ -10,13 +10,10 @@ struct CornerCounter: View {
     Group {
       switch state.corner(at: date) {
       case .counting(let next):
-        HStack(spacing: 4) {
-          Image(systemName: "hourglass")
-            .font(.system(size: 11, weight: .semibold))
-          Text(timerInterval: date...next, countsDown: true)
-            .monospacedDigit()
-        }
-        .font(.system(size: 12, weight: .bold))
+        Text(timerInterval: date...next, countsDown: true)
+          .font(.system(size: 13, weight: .bold))
+          .monospacedDigit()
+          .multilineTextAlignment(.center)
       case .waited(let since):
         (Text("Waited +") + Text(since, style: .timer))
           .monospacedDigit()

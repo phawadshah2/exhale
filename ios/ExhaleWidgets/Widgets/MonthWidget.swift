@@ -26,6 +26,7 @@ struct MonthView: View {
           TodayRing(state: state, date: entry.date, size: 92)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
           CornerCounter(state: state, date: entry.date)
+            .frame(maxWidth: .infinity)
         }
         .frame(width: 116)
         .accessibilityElement(children: .ignore)

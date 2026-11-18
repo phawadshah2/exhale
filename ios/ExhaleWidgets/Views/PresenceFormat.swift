@@ -73,12 +73,6 @@ extension PresenceState {
     return daysToGo == 1 ? "1 day to go" : "\(daysToGo) days to go"
   }
 
-  /// "41 days" in the corner of widget 1.
-  var daysShort: String {
-    if quitReached { return "Day \(daysAtZero) at zero" }
-    return daysToGo == 1 ? "1 day" : "\(daysToGo) days"
-  }
-
   /// Spoken like the Home ring.
   func spoken(at date: Date) -> String {
     let count = "\(count) of \(limit) today"

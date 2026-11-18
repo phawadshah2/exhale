@@ -59,8 +59,14 @@ final class PresenceProviderTests: XCTestCase {
       PresenceState.make(snapshot: snap, queue: [], now: now, calendar: calendar).timer?.next)
     let reset = at(15, 4)
 
+    let steps = stride(from: 300.0, to: next.timeIntervalSince(now), by: 300).map {
+      now.addingTimeInterval($0)
+    }
+    XCTAssertFalse(steps.isEmpty)
+
     let counting = timeline(snap, now: now)
-    XCTAssertEqual(counting.dates, [now, next, next.addingTimeInterval(15 * 60), reset])
+    XCTAssertEqual(
+      counting.dates, [now] + steps + [next, next.addingTimeInterval(15 * 60), reset])
     XCTAssertEqual(counting.reload, reset)
 
     let pastDue = next.addingTimeInterval(5 * 60)

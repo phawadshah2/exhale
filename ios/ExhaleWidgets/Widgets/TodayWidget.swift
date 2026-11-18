@@ -26,17 +26,10 @@ struct TodayView: View {
           Spacer(minLength: 4)
           StagePill(state: state)
         }
-        TodayRing(state: state, date: entry.date, size: 88)
+        TodayRing(state: state, date: entry.date, size: 92)
           .frame(maxHeight: .infinity)
-        HStack {
-          CornerCounter(state: state, date: entry.date)
-          Spacer(minLength: 4)
-          Text(state.daysShort)
-            .font(.system(size: 12, weight: .semibold))
-            .monospacedDigit()
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-        }
+        CornerCounter(state: state, date: entry.date)
+          .frame(maxWidth: .infinity)
       }
       .accessibilityElement(children: .ignore)
       .accessibilityLabel("\(state.spoken(at: entry.date)) \(state.daysLine).")

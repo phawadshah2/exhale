@@ -411,12 +411,14 @@ Done 2026-11-14. The 53 new lines are drafts for Fawad's review at the milestone
 - As built: the entry dates live in `ios/Shared/PresenceTimeline.swift` (RunnerTests
   can't import the extension); `PresenceProvider` wraps it and reads the snapshot and
   queue. Helpers: `Views/PresenceFormat.swift` (status colours light/dark, `CornerState`,
-  spoken labels, days lines). The countdown ring is the system circular
-  `ProgressView(timerInterval:)` (about 5 pt, so today's ring sits 14 pt inside it);
-  design's 2.5 pt ring isn't possible with a live drain. Widget 2 past the time shows
+  spoken labels, days lines). Widgets 1 and 4 (Fawad, 2026-11-18, like Home): a thin
+  2 pt countdown ring inside the day's ring, "4/8 today" in the middle, and under the
+  ring only the timer, centred (no days line). The ring is drawn, not the system
+  `ProgressView` (its stroke scales with its size), so the timeline adds an entry every
+  5 min while the timer runs (`PresenceTimeline.ringStep`). Widget 2 past the time shows
   "Waited" and the wait counting up; widget 3 with no reason shows the last counting
   line under "For today"; the + on widget 2 waits for Task 12. Red run skipped (Fawad,
-  2026-11-18: compile-only). Green run 2026-11-18: 24 tests, `** TEST SUCCEEDED **`.
+  2026-11-18: compile-only). Green runs 2026-11-18: 24 tests, `** TEST SUCCEEDED **`, before and after the ring change.
   Simulator 2026-11-18: all five Home Screen widgets render in the gallery, Today live
   with a debug snapshot (`counting`); the month key and ring fixes after that ran in a
   rebuilt app but weren't re-screenshotted. The light/dark/tinted × state matrix and the
