@@ -51,8 +51,9 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 
 ## Next action
 
-Task 14, the Settings switch (Sonnet 5.5 medium), via `execute-plan`. Xcode runs need
-Fawad's approval, one command each (iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`).
+Task 14, the Settings switch (Sonnet 5.5 medium), via `execute-plan`. Read: the plan's
+header and Task 14, then `settings_page.dart`. Xcode runs need Fawad's approval, one
+command each (iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`).
 
 ## Repo
 
