@@ -113,6 +113,45 @@ void main() {
     expect(find.text('1:00 AM'), findsOneWidget);
     await tester.disposeApp();
   });
+
+  group('Lock Screen switch', () {
+    const label = 'Show the countdown on the Lock Screen';
+    final lockScreenSwitch = find.widgetWithText(SwitchListTile, label);
+
+    Future<void> openTallSettings(WidgetTester tester) async {
+      await seedHabit(
+        PlanDraft(startDay: today, startLimit: 8, quitDay: today.addDays(56)),
+      );
+      await tester.pumpAppPastSplash(height: 2400);
+      await tester.tap(find.byTooltip('Settings'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('it reads "Show the countdown on the Lock Screen"', (
+      tester,
+    ) async {
+      await openTallSettings(tester);
+      expect(find.text(label), findsOneWidget);
+      await tester.disposeApp();
+    });
+
+    testWidgets('the Lock Screen switch is on by default', (tester) async {
+      await openTallSettings(tester);
+      expect(tester.widget<SwitchListTile>(lockScreenSwitch).value, isTrue);
+      await tester.disposeApp();
+    });
+
+    testWidgets('turning it off is stored', (tester) async {
+      await openTallSettings(tester);
+      await tester.scrollAndTap(lockScreenSwitch);
+      await tester.pumpAndSettle();
+
+      expect(tester.widget<SwitchListTile>(lockScreenSwitch).value, isFalse);
+      final stored = await tester.runAsync(sl<SettingsRepository>().get);
+      expect((stored! as Success<AppSettings>).value.showLiveActivity, isFalse);
+      await tester.disposeApp();
+    });
+  });
 }
 
 /// The real repository, except the first [save] fails as storage would.
