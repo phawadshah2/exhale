@@ -15,9 +15,11 @@ plan; don't ask him to re-explain them. Read the linked docs when a task touches
 Progress and the single next action live in `docs/CURRENT_STATE.md`. Read it first; update
 it when a task or milestone finishes. Older session logs are in `docs/history/`.
 
-- Unmerged, in order: `feat/plan-and-stages` (M6, M7), `feat/onboarding-chat-prototype`
-  (chat onboarding), `feat/paywall` (plan `docs/superpowers/plans/2026-11-13-paywall.md`,
-  milestone closed 2026-11-14). Next: push and merge them, then the real iPhone pass.
+- Unmerged, in order: `feat/timer-first-log`, then `feat/lock-screen` (Lock Screen
+  presence, stacked on it, milestone closed 2026-11-18). Next: push and merge them, then
+  the Settings redesign.
+- `FAKE_STORE` only works in debug builds; a lapsed or never-paid walk on the iPhone
+  needs `fvm flutter run` (debug) attached.
 - Specs: `docs/superpowers/specs/` (one per plan). Designs: `design/` (each folder has a
   README).
 - Launch scope (Fawad, 2026-10-31): the first release tracks one habit. Never offer a

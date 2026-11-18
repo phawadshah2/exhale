@@ -522,7 +522,15 @@ after Your day, `AppIcons.clock`, no subtitle. `presenceSyncProvider` already pa
 - [x] **Step 2:** Full suite: `fvm flutter test --reporter failures-only
   --file-reporter json:build/test-report.json`; report totals per task's files. Then the
   XCTest run.
-- [ ] **Step 3:** Device walk with Fawad: each widget, Siri, the Action Button, Control
+- [x] **Step 3:** Device walk with Fawad: each widget, Siri, the Action Button, Control
   Center, the Island, a lapsed walk (`--dart-define=FAKE_STORE=lapsed`), airplane mode.
-- [ ] **Step 4:** Update `docs/CURRENT_STATE.md`; commit
+- [x] **Step 4:** Update `docs/CURRENT_STATE.md`; commit
   `docs: close the Lock Screen presence milestone`.
+
+As built (2026-11-18): the simulator dropped injected taps, so the walk ran on Fawad's
+iPhone (iOS 27.2). Release build on his real Lifetime access: all passed except two,
+fixed: the expanded Island cropped at its corners (`3385ed8`, expanded content margins);
+at or over the limit the Home ring took no tap (`c413a8f`, the ring opens the day's logs
+in every state with a plan). `FAKE_STORE` only applies in debug builds, so the lapsed
+walk used a debug build with `flutter run` attached: locked screen, widgets "Exhale is
+locked", Log one opens the app and writes nothing, no Live Activity. All correct.
