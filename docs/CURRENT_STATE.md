@@ -31,9 +31,9 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   v13; 60 `encouragementLines` (53 drafts for Fawad to review at the walk).
 - Tasks 6 to 8 (`143f4c0`, `654119b`, `95b9570`): `PresenceSnapshot.build`,
   `PresenceRepository` + `DrainExternalLogs`, `presenceSyncProvider`, `exhale://` links.
-- Tasks 9 to 11 (`48747b9`, `af47f4e`, `e841c4d`): Swift core in `ios/Shared`;
-  `PresencePlugin` + `CountdownAttributes`; `PresenceTimeline`, the Lock Screen trio and
-  widgets 1 to 5 (widget 2's + comes with Task 12).
+- Tasks 9 to 11 (`48747b9`, `af47f4e`, `e841c4d`, `d91e33a`): Swift core in `ios/Shared`;
+  `PresencePlugin`; `PresenceTimeline`, Lock Screen trio, widgets 1 to 5 (2's + is Task
+  12). Fawad's ring: thin drawn countdown ring inside, timer alone under it (5 min steps).
 - Each task's as-built notes are under it in the plan.
 
 ## Checks
@@ -44,15 +44,14 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   274/274; Task 6 11/11; Task 7 presence + `test/app` 76/76; Task 8 presence, app,
   Home 360/360. Full suite not run (milestone end).
 - XCTests on the iPhone 17 simulator, `** TEST SUCCEEDED **` (2026-11-15): Task 9 16/16;
-  Task 10 21/21 (its red run skipped by Fawad); Task 11 24/24 (2026-11-18, red run skipped).
+  Task 10 21/21; Task 11 24/24 twice (2026-11-18, before and after the ring change).
 - Task 11 simulator: widgets render; the state × appearance matrix and Lock Screen trio
   wait for the Task 15 walk.
 
 ## Next action
 
 Task 12, Log one (Sonnet 5.5 medium), via `execute-plan`. Read: the plan's header and
-Task 12. Xcode test runs need Fawad's
-approval, one command each (simulator iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`;
+Task 12. Xcode test runs need Fawad's approval, one command each (simulator iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`;
 a run takes ~10 min).
 
 ## Repo
