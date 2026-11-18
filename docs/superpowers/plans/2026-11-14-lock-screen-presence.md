@@ -517,9 +517,9 @@ after Your day, `AppIcons.clock`, no subtitle. `presenceSyncProvider` already pa
 
 ### Task 15: Milestone close
 
-- [ ] **Step 1:** Independent review (Opus 5.5 high) against the spec and Review Focus;
+- [x] **Step 1:** Independent review (Opus 5.5 high) against the spec and Review Focus;
   fix findings.
-- [ ] **Step 2:** Full suite: `fvm flutter test --reporter failures-only
+- [x] **Step 2:** Full suite: `fvm flutter test --reporter failures-only
   --file-reporter json:build/test-report.json`; report totals per task's files. Then the
   XCTest run.
 - [ ] **Step 3:** Device walk with Fawad: each widget, Siri, the Action Button, Control

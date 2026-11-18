@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-18 (Lock Screen presence, Task 14 done). Older logs: `docs/history/`.
+Updated 2026-11-18 (Lock Screen presence, Task 15 Steps 1 and 2 done). Older logs: `docs/history/`.
 
 ## Where we are
 
@@ -53,10 +53,21 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 
 ## Next action
 
-Task 15, milestone close (Opus 5.5 high), via `execute-plan`: independent review against
-the spec and Review Focus, fix findings, full suite, then builds and the simulator walk
-without asking (CLAUDE.md step 4; iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`).
-Read the plan's header, Review Focus and Task 15.
+Task 15 Step 3, the walk with Fawad: each widget, Siri, the Action Button, Control
+Center, the Island, a lapsed walk (`FAKE_STORE=lapsed`), airplane mode; plus the Task 11
+state matrix and Task 13 screenshots. Then Step 4 (close the milestone). Steps 1 and 2
+done 2026-11-18:
+
+- Review: Review Focus 1 to 5 hold in the code; no blocking findings. Minor, not fixed:
+  opening the app re-picks the activity's lines (Dart doesn't know Swift's pair); two
+  Swift Log ones in a row both avoid the snapshot's `lastPair`, not the pair just shown;
+  `removeFromQueue` reloads widgets milliseconds before the new snapshot (could show one
+  fewer briefly).
+- Full suite 1510/1510. Task files: deep link 5, migration 49, pace cases 15, channel
+  repository 8, drain 7, encouragement 5, snapshot 11, sync 10, settings page 7, log
+  repository 15. XCTests `** TEST SUCCEEDED **` (count not captured).
+- Simulator walk: app runs entitled and Home renders, but injected input dropped again
+  (tap timeouts on the trigger sheet), so nothing past Home was walked.
 
 ## Repo
 
