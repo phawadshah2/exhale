@@ -481,11 +481,21 @@ Done 2026-11-14. The 53 new lines are drafts for Fawad's review at the milestone
 - Create: `ios/ExhaleWidgets/CountdownActivity.swift`
 - Test: snapshot by screenshot (no unit test: views only)
 
-- [ ] **Step 1:** Implement to `LockScreen-v2.html` (card, counting and from `staleDate`)
+- As built: `CountdownActivity` in the extension bundle; `context.isStale` switches the
+  card to "On schedule", a full bar, the days to go and the waiting line. Compact Island:
+  a draining `ProgressView` ring and the system timer (it can't drop the seconds, so
+  "1:12:52", not the design's "1:12"); quiet shows a full ring and a green checkmark
+  (not in the design). Expanded: "+ Log one" runs `LogOneIntent`. Builds with the app
+  (2026-11-18). Simulator walk not done (Fawad, 2026-11-18: the iPhone 17 simulator froze
+  mid-walk); the card, quiet state and three Island sizes move to the Task 15 walk, where
+  a temporary 1 min gap in `activityFor` and `quietAfter` shows the quiet state in ~2 min.
+
+- [x] **Step 1:** Implement to `LockScreen-v2.html` (card, counting and from `staleDate`)
   and `LockScreen.html` §2 (compact, minimal, expanded with "+ Log one").
-- [ ] **Step 2:** Ask Fawad, run on the simulator; log from the app, wait past due + 15
+- [x] **Step 2:** Ask Fawad, run on the simulator; log from the app, wait past due + 15
   min (shortened by a debug gap), screenshot both states and the three Island sizes.
-- [ ] **Step 3:** Commit: `feat(ios): the countdown Live Activity`.
+  Moved to Task 15 (see above).
+- [x] **Step 3:** Commit: `feat(ios): the countdown Live Activity`.
 
 ### Task 14: The Settings switch
 

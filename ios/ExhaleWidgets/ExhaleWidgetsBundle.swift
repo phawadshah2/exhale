@@ -12,6 +12,7 @@ struct ExhaleWidgetsBundle: WidgetBundle {
     WhyWidget()
     MonthWidget()
     WeekWidget()
+    CountdownActivity()
     if #available(iOS 18, *) {
       LogOneControl()
     }
