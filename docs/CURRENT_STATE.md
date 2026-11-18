@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-18 (Lock Screen presence, Task 12 done). Older logs: `docs/history/`.
+Updated 2026-11-18 (Lock Screen presence, Task 13 done). Older logs: `docs/history/`.
 
 ## Where we are
 
@@ -8,7 +8,7 @@ Updated 2026-11-18 (Lock Screen presence, Task 12 done). Older logs: `docs/histo
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
 | Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), not pushed |
-| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 12 of 15 done |
+| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 13 of 15 done |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
@@ -35,25 +35,24 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   `PresencePlugin`; `PresenceTimeline`, Lock Screen trio, widgets 1 to 5 (2's + is Task
   12). Fawad's ring: thin drawn countdown ring inside, timer alone under it (5 min steps).
 - Task 12 (`5692502`): `LogOneIntent` in both targets (`WIDGET_EXTENSION` hides app-only
-  parts), App Shortcut, iOS 18 control, widget 2's +; the Island's + is Task 13.
+  parts), App Shortcut, iOS 18 control, widget 2's +.
+- Task 13 (`852cf6d`): `CountdownActivity` (card, quiet state, Island); its screenshots
+  wait for the Task 15 walk (the simulator froze mid-walk).
 - Each task's as-built notes are under it in the plan.
 
 ## Checks
 
 - Timer branch: format, analyze clean; app, Home, Logs, onboarding 590 passed.
-- Tasks 3 to 8: format and `analyze --fatal-infos` clean each time. Task 3 test 15/15;
-  Task 4 migration + log repository tests 64/64; Task 5 test + `test/features/home/`
-  274/274; Task 6 11/11; Task 7 presence + `test/app` 76/76; Task 8 presence, app,
-  Home 360/360. Full suite not run (milestone end).
+- Tasks 3 to 8 (format, analyze clean): 15/15; 64/64; 274/274; 11/11; 76/76; 360/360
+  (each task's files, listed in the plan). Full suite not run (milestone end).
 - XCTests, iPhone 17 simulator, `** TEST SUCCEEDED **`: Task 9 16/16; Task 10 21/21;
   Task 11 24/24 twice (2026-11-18, around the ring change); Task 12 29/29 (2026-11-18).
 - Task 11 simulator: widgets render; state × appearance matrix and trio at Task 15.
 
 ## Next action
 
-Task 13, Live Activity and Island (Sonnet 5.5 medium), via `execute-plan`; its + reuses
-`LogOneButton`. Xcode runs need Fawad's approval, one command each (iPhone 17
-`8C3390A8-020F-41B0-9BB4-7798E769B720`, ~10 min).
+Task 14, the Settings switch (Sonnet 5.5 medium), via `execute-plan`. Xcode runs need
+Fawad's approval, one command each (iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`).
 
 ## Repo
 
@@ -77,4 +76,4 @@ Task 13, Live Activity and Island (Sonnet 5.5 medium), via `execute-plan`; its +
   drained log can count twice in widgets between snapshot write and queue removal; at
   the device walk check a cold start from a widget link and the Action Button.
 - Earlier walk items: Reduce Transparency, 200%, priced drink in Edit plan; chat spec,
-  iPhone review list.
+  iPhone review list. iPhone 17 sim froze 2026-11-18 (Flutter stopped redrawing).
