@@ -408,18 +408,32 @@ Done 2026-11-14. The 53 new lines are drafts for Fawad's review at the milestone
 - Produces: timeline entries at now, the next due time, due + 15 min and the next day
   reset; widget URLs `exhale://home` and `exhale://logs/week` (Task 8 adds the routes).
 
-- [ ] **Step 1:** Tests: `entriesAtDueStaleAndReset`; `noTimerHasNoDueEntries`;
+- As built: the entry dates live in `ios/Shared/PresenceTimeline.swift` (RunnerTests
+  can't import the extension); `PresenceProvider` wraps it and reads the snapshot and
+  queue. Helpers: `Views/PresenceFormat.swift` (status colours light/dark, `CornerState`,
+  spoken labels, days lines). The countdown ring is the system circular
+  `ProgressView(timerInterval:)` (about 5 pt, so today's ring sits 14 pt inside it);
+  design's 2.5 pt ring isn't possible with a live drain. Widget 2 past the time shows
+  "Waited" and the wait counting up; widget 3 with no reason shows the last counting
+  line under "For today"; the + on widget 2 waits for Task 12. Red run skipped (Fawad,
+  2026-11-18: compile-only). Green run 2026-11-18: 24 tests, `** TEST SUCCEEDED **`.
+  Simulator 2026-11-18: all five Home Screen widgets render in the gallery, Today live
+  with a debug snapshot (`counting`); the month key and ring fixes after that ran in a
+  rebuilt app but weren't re-screenshotted. The light/dark/tinted × state matrix and the
+  Lock Screen trio move to the Task 15 walk (Fawad, 2026-11-18).
+
+- [x] **Step 1:** Tests: `entriesAtDueStaleAndReset`; `noTimerHasNoDueEntries`;
   `lockedAndStaleHaveOneEntryUntilReset`.
-- [ ] **Step 2:** Ask Fawad, run the Task 9 command. Expected: FAIL.
-- [ ] **Step 3:** Implement the provider, then the views to the designs: widget 1 and the
+- [x] **Step 2:** Ask Fawad, run the Task 9 command. Expected: FAIL.
+- [x] **Step 3:** Implement the provider, then the views to the designs: widget 1 and the
   ring column of 4 from `Rings-v4.html` (all six states in the spec's table), 2, 3, 5 from
   `LockScreen-v2.html`, the key "Under / At / Over" on 4, the Lock Screen trio from
   `LockScreen.html`. Counters use `Text(timerInterval:)` and `Text(_, style: .timer)`.
   VoiceOver labels as on Home. Tinted and clear Home Screen styles use
   `widgetAccentable()` on the ring and bars.
-- [ ] **Step 4:** Ask Fawad, run the tests, then the simulator; screenshot every widget in
+- [x] **Step 4:** Ask Fawad, run the tests, then the simulator; screenshot every widget in
   light, dark and tinted, and every state via a debug snapshot.
-- [ ] **Step 5:** Commit: `feat(ios): Lock Screen and Home Screen widgets`.
+- [x] **Step 5:** Commit: `feat(ios): Lock Screen and Home Screen widgets`.
 
 ### Task 12: Log one
 

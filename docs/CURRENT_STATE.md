@@ -1,7 +1,6 @@
 # Current state
 
-Updated 2026-11-15 (Lock Screen presence, Task 10 done). Earlier: `docs/history/` (latest
-`2026-11-13_paywall_build_state.md`).
+Updated 2026-11-18 (Lock Screen presence, Task 11 done). Older logs: `docs/history/`.
 
 ## Where we are
 
@@ -9,7 +8,7 @@ Updated 2026-11-15 (Lock Screen presence, Task 10 done). Earlier: `docs/history/
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
 | Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), not pushed |
-| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 10 of 15 done |
+| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 11 of 15 done |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
@@ -25,9 +24,9 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 - Decided: queue + snapshot in the App Group (no DB move, no packages); minimum iOS 17;
   without access widgets lock and Log one opens the app; Live Activity goes quiet 15 min
   past due and keeps the Island; widgets 1 to 5, rings in design D (`Rings-v4.html`).
-- Task 1 (`d8cb4ed`): extension target, App Group, iOS 17, `NSSupportsLiveActivities`.
-- Task 2 spike (`835449a`): Log one starts a Live Activity with the app terminated (via
-  Shortcuts); the Action Button never reached the intent, recheck at the device walk.
+- Task 1 (`d8cb4ed`) the extension target and App Group. Task 2 spike (`835449a`): Log one
+  starts a Live Activity with the app terminated (via Shortcuts); the Action Button never
+  reached the intent, recheck at the device walk.
 - Tasks 3 to 5 (`e0c12a1`, `3bb43b2`, `daef015`): 14 pace cases (Swift ±1 ms); schema
   v13; 60 `encouragementLines` (53 drafts for Fawad to review at the walk).
 - Tasks 6 to 8 (`143f4c0`, `654119b`, `95b9570`): `PresenceSnapshot.build`,
@@ -35,6 +34,8 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 - Task 9 (`48747b9`): `ios/Shared` (synced into Runner + extension), Swift core.
 - Task 10 (`af47f4e`): `PresencePlugin` (Runner group, registered in `AppDelegate`),
   `CountdownAttributes` in `ios/Shared`; removing from the queue reloads widgets too.
+- Task 11 (widgets): `PresenceTimeline` in `ios/Shared`, the provider, Lock Screen trio
+  and widgets 1 to 5 (widget 2's + comes with Task 12).
 - Each task's as-built notes are under it in the plan.
 
 ## Checks
@@ -45,14 +46,17 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   Task 4 migration + log repository tests 64/64; Task 5 test + `test/features/home/`
   274/274; Task 6 11/11; Task 7 presence + `test/app` 76/76; Task 8 presence, app,
   Home 360/360. Full suite not run (milestone end).
-- Task 9: XCTests on iPhone 17 simulator, 16/16, `** TEST SUCCEEDED **` (2026-11-15).
-- Task 10: XCTests 21/21, `** TEST SUCCEEDED **` (2026-11-15); red run skipped by Fawad.
+- XCTests on the iPhone 17 simulator, `** TEST SUCCEEDED **` (2026-11-15): Task 9 16/16;
+  Task 10 21/21 (its red run skipped by Fawad); Task 11 24/24 (2026-11-18, red run skipped).
+- Task 11 simulator: five widgets render in the gallery, Today live from a debug
+  snapshot; the state × light/dark/tinted matrix and Lock Screen trio wait for Task 15.
 
 ## Next action
 
-Task 11, the widgets (Sonnet 5.5 medium), via `execute-plan`. Read: the plan's header,
-Task 11 and `design/11._lock_screen_presence/README.md`. Xcode test runs need Fawad's approval, one command each
-(simulator iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`; a run takes ~10 min).
+Task 12, Log one (Sonnet 5.5 medium), via `execute-plan`. Read: the plan's header and
+Task 12. Xcode test runs need Fawad's
+approval, one command each (simulator iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`;
+a run takes ~10 min).
 
 ## Repo
 
