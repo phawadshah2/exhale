@@ -12,5 +12,8 @@ struct ExhaleWidgetsBundle: WidgetBundle {
     WhyWidget()
     MonthWidget()
     WeekWidget()
+    if #available(iOS 18, *) {
+      LogOneControl()
+    }
   }
 }

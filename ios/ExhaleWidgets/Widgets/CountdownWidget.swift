@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftUI
 import WidgetKit
 
@@ -41,6 +42,7 @@ struct CountdownView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .accessibilityElement(children: .ignore)
       .accessibilityLabel(state.spoken(at: entry.date))
+      .overlay(alignment: .bottomTrailing) { LogOneButton() }
     }
     .widgetURL(PresenceFormat.homeURL)
     .containerBackground(for: .widget) { Color(light: 0xFFFFFF, dark: 0x161C25) }
@@ -89,6 +91,22 @@ struct CountdownView: View {
     default:
       FullBar(color: state.status.color, fraction: 1)
     }
+  }
+}
+
+/// The round + that runs Log one.
+struct LogOneButton: View {
+  var body: some View {
+    Button(intent: LogOneIntent()) {
+      Image(systemName: "plus")
+        .font(.system(size: 20, weight: .medium))
+        .foregroundStyle(Color(light: 0xFFFFFF, dark: 0x111418))
+        .frame(width: 40, height: 40)
+        .background(Circle().fill(Color(light: 0x111418, dark: 0xFFFFFF)))
+        .widgetAccentable()
+    }
+    .buttonStyle(.plain)
+    .accessibilityLabel("Log one")
   }
 }
 

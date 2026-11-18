@@ -19,6 +19,23 @@ protocol CountdownActivities {
   func end(id: String) async
 }
 
+extension CountdownActivities {
+  /// Updates the running activity, or starts one; extras are ended.
+  func show(_ state: CountdownAttributes.ContentState, staleDate: Date) async throws {
+    let running = runningIds
+    guard let current = running.first else {
+      try request(state, staleDate: staleDate)
+      return
+    }
+    await update(id: current, to: state, staleDate: staleDate)
+    for id in running.dropFirst() { await end(id: id) }
+  }
+
+  func endAll() async {
+    for id in runningIds { await end(id: id) }
+  }
+}
+
 struct SystemActivities: CountdownActivities {
   var runningIds: [String] { running.map(\.id) }
 
@@ -133,19 +150,12 @@ final class PresencePlugin: NSObject, FlutterPlugin {
     widgets.reloadAllTimelines()
   }
 
-  /// Updates the running activity, or starts one; extras are ended.
   private func showActivity(_ request: ActivityRequest) async throws {
-    let running = activities.runningIds
-    guard let current = running.first else {
-      try activities.request(request.state, staleDate: request.staleAt)
-      return
-    }
-    await activities.update(id: current, to: request.state, staleDate: request.staleAt)
-    for id in running.dropFirst() { await activities.end(id: id) }
+    try await activities.show(request.state, staleDate: request.staleAt)
   }
 
   private func endActivity() async {
-    for id in activities.runningIds { await activities.end(id: id) }
+    await activities.endAll()
   }
 
   private func observeQueue() {

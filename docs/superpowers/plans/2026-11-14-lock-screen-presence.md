@@ -452,15 +452,28 @@ Done 2026-11-14. The 53 new lines are drafts for Fawad's review at the milestone
   passed) that appends `{UUID, now}`, posts the Darwin notification, reloads widgets,
   starts or updates the activity, and replies with the spec's dialog.
 
-- [ ] **Step 1:** Tests: `appendsOneLogAndReplies` ("Logged · 5 of 8 today. Next one on
+- As built: the intent is in both targets (the widget + and the control need the type)
+  but always runs in the app's process; the extension gets the `WIDGET_EXTENSION`
+  compile flag (all three configs), which leaves out `LogOne`, `ExhaleShortcuts` and the
+  real `perform` (`Activity.request` is app-only). `LogOne` (testable core) appends,
+  posts the Darwin notification, reloads, then shows or ends the activity through
+  `CountdownActivities.show` / `endAll` (moved from `PresencePlugin`); an activity error
+  never fails the log. A new pair of lines avoids the snapshot's `lastPair`. Locked or
+  stale throws `needsToContinueInForegroundError` ("Exhale is locked." / "Open Exhale to
+  update.") via `ForegroundContinuableIntent`. The + on the expanded Island moves to
+  Task 13 (no Island view yet). Red run skipped (Fawad, 2026-11-18: compile-only). Green
+  run 2026-11-18: 29 tests, `** TEST SUCCEEDED **` (one earlier run failed to compile on
+  a missing `import AppIntents`).
+
+- [x] **Step 1:** Tests: `appendsOneLogAndReplies` ("Logged · 5 of 8 today. Next one on
   schedule at 12:21 PM."); `overTheLimitStillLogs` ("Logged · 9 of 8 today.");
   `pickNeverRepeatsLastPair` (LinePicker, as Task 5);
   `lockedWritesNothingAndOpensTheApp`; `staleWritesNothingAndOpensTheApp`.
-- [ ] **Step 2:** Ask Fawad, run the Task 9 command. Expected: FAIL.
-- [ ] **Step 3:** Implement; the control is `@available(iOS 18, *)`, title "Log one",
+- [x] **Step 2:** Ask Fawad, run the Task 9 command. Expected: FAIL.
+- [x] **Step 3:** Implement; the control is `@available(iOS 18, *)`, title "Log one",
   symbol `plus`.
-- [ ] **Step 4:** Ask Fawad, run the tests. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(ios): Log one from Siri, the Action Button and controls`.
+- [x] **Step 4:** Ask Fawad, run the tests. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(ios): Log one from Siri, the Action Button and controls`.
 
 ### Task 13: Live Activity and the Island
 
