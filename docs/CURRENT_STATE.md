@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-18 (Lock Screen presence, Task 13 done). Older logs: `docs/history/`.
+Updated 2026-11-18 (Lock Screen presence, Task 14 done). Older logs: `docs/history/`.
 
 ## Where we are
 
@@ -8,7 +8,7 @@ Updated 2026-11-18 (Lock Screen presence, Task 13 done). Older logs: `docs/histo
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
 | Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), not pushed |
-| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 13 of 15 done |
+| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 14 of 15 done |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
@@ -38,6 +38,8 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   parts), App Shortcut, iOS 18 control, widget 2's +.
 - Task 13 (`852cf6d`): `CountdownActivity` (card, quiet state, Island); its screenshots
   wait for the Task 15 walk (the simulator froze mid-walk).
+- Task 14: "Show the countdown on the Lock Screen" switch in Settings (own card after
+  Your day); settings page tests 7/7.
 - Each task's as-built notes are under it in the plan.
 
 ## Checks
@@ -51,9 +53,10 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 
 ## Next action
 
-Task 14, the Settings switch (Sonnet 5.5 medium), via `execute-plan`. Read: the plan's
-header and Task 14, then `settings_page.dart`. Xcode runs need Fawad's approval, one
-command each (iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`).
+Task 15, milestone close (Opus 5.5 high), via `execute-plan`: independent review against
+the spec and Review Focus, fix findings, full suite, then builds and the simulator walk
+without asking (CLAUDE.md step 4; iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`).
+Read the plan's header, Review Focus and Task 15.
 
 ## Repo
 

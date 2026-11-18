@@ -503,12 +503,17 @@ Done 2026-11-14. The 53 new lines are drafts for Fawad's review at the milestone
 - Modify: `lib/features/settings/presentation/pages/settings_page.dart`
 - Test: `test/features/settings/settings_page_test.dart`
 
-- [ ] **Step 1:** Tests: `the Lock Screen switch is on by default`; `turning it off is
+- [x] **Step 1:** Tests: `the Lock Screen switch is on by default`; `turning it off is
   stored`; `it reads "Show the countdown on the Lock Screen"`.
-- [ ] **Step 2:** Run with `--timeout 60s`. Expected: FAIL.
-- [ ] **Step 3:** Add a `CupertinoSwitch` row in the existing style; Task 8's sync reacts.
-- [ ] **Step 4:** Run. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(settings): switch for the Lock Screen countdown`.
+- [x] **Step 2:** Run with `--timeout 60s`. Expected: FAIL.
+- [x] **Step 3:** Add a `CupertinoSwitch` row in the existing style; Task 8's sync reacts.
+- [x] **Step 4:** Run. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(settings): switch for the Lock Screen countdown`.
+
+As built: a private `_LockScreenTile` in `settings_page.dart`, the same
+`SwitchListTile.adaptive` as `TriggerPromptTile` (Cupertino switch on iOS), own card
+after Your day, `AppIcons.clock`, no subtitle. `presenceSyncProvider` already passes
+`showLiveActivity` to the channel. Tests 7/7.
 
 ### Task 15: Milestone close
 
