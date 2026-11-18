@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-18 (Lock Screen presence, Task 11 done). Older logs: `docs/history/`.
+Updated 2026-11-18 (Lock Screen presence, Task 12 done). Older logs: `docs/history/`.
 
 ## Where we are
 
@@ -8,7 +8,7 @@ Updated 2026-11-18 (Lock Screen presence, Task 11 done). Older logs: `docs/histo
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
 | Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), not pushed |
-| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 11 of 15 done |
+| Lock Screen presence (project 1 of 4) | `feat/lock-screen`, stacked on the timer branch: spec, plan, designs, Tasks 1 to 12 of 15 done |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
@@ -34,6 +34,8 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
 - Tasks 9 to 11 (`48747b9`, `af47f4e`, `e841c4d`, `d91e33a`): Swift core in `ios/Shared`;
   `PresencePlugin`; `PresenceTimeline`, Lock Screen trio, widgets 1 to 5 (2's + is Task
   12). Fawad's ring: thin drawn countdown ring inside, timer alone under it (5 min steps).
+- Task 12 (`5692502`): `LogOneIntent` in both targets (`WIDGET_EXTENSION` hides app-only
+  parts), App Shortcut, iOS 18 control, widget 2's +; the Island's + is Task 13.
 - Each task's as-built notes are under it in the plan.
 
 ## Checks
@@ -43,16 +45,15 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   Task 4 migration + log repository tests 64/64; Task 5 test + `test/features/home/`
   274/274; Task 6 11/11; Task 7 presence + `test/app` 76/76; Task 8 presence, app,
   Home 360/360. Full suite not run (milestone end).
-- XCTests on the iPhone 17 simulator, `** TEST SUCCEEDED **` (2026-11-15): Task 9 16/16;
-  Task 10 21/21; Task 11 24/24 twice (2026-11-18, before and after the ring change).
-- Task 11 simulator: widgets render; the state × appearance matrix and Lock Screen trio
-  wait for the Task 15 walk.
+- XCTests, iPhone 17 simulator, `** TEST SUCCEEDED **`: Task 9 16/16; Task 10 21/21;
+  Task 11 24/24 twice (2026-11-18, around the ring change); Task 12 29/29 (2026-11-18).
+- Task 11 simulator: widgets render; state × appearance matrix and trio at Task 15.
 
 ## Next action
 
-Task 12, Log one (Sonnet 5.5 medium), via `execute-plan`. Read: the plan's header and
-Task 12. Xcode test runs need Fawad's approval, one command each (simulator iPhone 17 `8C3390A8-020F-41B0-9BB4-7798E769B720`;
-a run takes ~10 min).
+Task 13, Live Activity and Island (Sonnet 5.5 medium), via `execute-plan`; its + reuses
+`LogOneButton`. Xcode runs need Fawad's approval, one command each (iPhone 17
+`8C3390A8-020F-41B0-9BB4-7798E769B720`, ~10 min).
 
 ## Repo
 
