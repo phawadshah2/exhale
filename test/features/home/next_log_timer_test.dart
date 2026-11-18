@@ -378,6 +378,57 @@ void main() {
     });
   });
 
+  group("at or over the limit, tapping the ring opens today's logs", () {
+    Future<void> pumpWithLogs(WidgetTester tester, int logs) async {
+      await setWindow();
+      final habitId = await seedHabit(
+        PlanDraft(startDay: today, startLimit: 2, quitDay: today.addDays(56)),
+      );
+      for (var i = 0; i < logs; i++) {
+        await logAt(habitId, DateTime(2026, 10, 29, 8, i));
+      }
+      await tester.pumpAppPastSplash(height: 2400);
+    }
+
+    testWidgets('at the limit', (tester) async {
+      await pumpWithLogs(tester, 2);
+
+      await tester.tap(find.text('Limit reached'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('The evidence.'), findsOneWidget);
+      expect(find.text('Today · Thu, Oct 29'), findsOneWidget);
+      await tester.disposeApp();
+    });
+
+    testWidgets('over the limit', (tester) async {
+      await pumpWithLogs(tester, 3);
+
+      await tester.tap(find.text('1 over limit'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('The evidence.'), findsOneWidget);
+      expect(find.text('Today · Thu, Oct 29'), findsOneWidget);
+      await tester.disposeApp();
+    });
+
+    testWidgets('the ring is a button to VoiceOver', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpWithLogs(tester, 2);
+
+      expect(
+        tester.getSemantics(find.text('Limit reached')),
+        isSemantics(
+          isButton: true,
+          hasTapAction: true,
+          onTapHint: "Open today's logs",
+        ),
+      );
+      handle.dispose();
+      await tester.disposeApp();
+    });
+  });
+
   testWidgets('the ring and + describe the timer to VoiceOver', (tester) async {
     final handle = tester.ensureSemantics();
     await setWindow();

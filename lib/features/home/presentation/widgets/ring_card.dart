@@ -325,6 +325,24 @@ class _DayRing extends ConsumerWidget {
     final timer = isToday ? ref.watch(nextLogTimerProvider(habitId)) : null;
     final showsTimer =
         timer != null && !timer.isPast && !beforePlan && freeDays == 0;
+    void openDay() {
+      unawaited(HapticFeedback.selectionClick());
+      openLogs(context, LogsQuery(habitId: habitId, from: day, to: day));
+    }
+
+    final Widget count = SizedBox.square(
+      key: const ValueKey('count'),
+      dimension: _centreSize,
+      // Large text shrinks to stay inside the ring.
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: beforePlan
+            ? _BeforePlanCentre(count: progress.count)
+            : freeDays > 0
+            ? _FreeDaysCentre(days: freeDays, habit: habit)
+            : _RingCentre(progress: progress, habit: habit, isToday: isToday),
+      ),
+    );
     return Center(
       child: ProgressRing(
         progress: beforePlan ? null : progress,
@@ -337,29 +355,25 @@ class _DayRing extends ConsumerWidget {
                   key: const ValueKey('timer'),
                   timer: timer,
                   progress: progress,
-                  onTap: () {
-                    unawaited(HapticFeedback.selectionClick());
-                    openLogs(
-                      context,
-                      LogsQuery(habitId: habitId, from: day, to: day),
-                    );
-                  },
+                  onTap: openDay,
                 )
-              : SizedBox.square(
+              : beforePlan
+              ? count
+              // Every state with a plan opens the day's logs, at or over the
+              // limit included.
+              : Semantics(
                   key: const ValueKey('count'),
-                  dimension: _centreSize,
-                  // Large text shrinks to stay inside the ring.
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: beforePlan
-                        ? _BeforePlanCentre(count: progress.count)
-                        : freeDays > 0
-                        ? _FreeDaysCentre(days: freeDays, habit: habit)
-                        : _RingCentre(
-                            progress: progress,
-                            habit: habit,
-                            isToday: isToday,
-                          ),
+                  container: true,
+                  button: true,
+                  onTapHint: isToday
+                      ? "Open today's logs"
+                      : "Open this day's logs",
+                  onTap: openDay,
+                  child: GestureDetector(
+                    onTap: openDay,
+                    behavior: HitTestBehavior.opaque,
+                    excludeFromSemantics: true,
+                    child: count,
                   ),
                 ),
         ),
