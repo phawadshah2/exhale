@@ -37,12 +37,16 @@ struct CountdownActivity: Widget {
                 Text(timerInterval: state.gapStart...state.next, countsDown: true)
                   .font(.system(size: 32, weight: .bold))
                   .monospacedDigit()
+                  .lineLimit(1)
+                  .minimumScaleFactor(0.7)
                 Text("until your next · \(PresenceFormat.time(state.next))")
                   .font(.system(size: 13))
+                  .lineLimit(1)
+                  .minimumScaleFactor(0.8)
                   .opacity(0.75)
               }
             }
-            Spacer(minLength: 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
             Button(intent: LogOneIntent()) {
               Text("+ Log one")
                 .font(.system(size: 13, weight: .bold))
@@ -52,6 +56,7 @@ struct CountdownActivity: Widget {
                 .background(RoundedRectangle(cornerRadius: 14).fill(.white))
             }
             .buttonStyle(.plain)
+            .fixedSize()
           }
           .padding(.top, 4)
         }
@@ -74,6 +79,9 @@ struct CountdownActivity: Widget {
       }
       .widgetURL(PresenceFormat.homeURL)
       .keylineTint(PresenceState.Status.under.color)
+      // Keeps the expanded content clear of the Island's curved corners.
+      .contentMargins(.horizontal, 20, for: .expanded)
+      .contentMargins(.bottom, 14, for: .expanded)
     }
   }
 }
