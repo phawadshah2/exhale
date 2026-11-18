@@ -31,25 +31,22 @@ Launch still needs Export/Import, iCloud sync, Stay at zero.
   v13; 60 `encouragementLines` (53 drafts for Fawad to review at the walk).
 - Tasks 6 to 8 (`143f4c0`, `654119b`, `95b9570`): `PresenceSnapshot.build`,
   `PresenceRepository` + `DrainExternalLogs`, `presenceSyncProvider`, `exhale://` links.
-- Task 9 (`48747b9`): `ios/Shared` (synced into Runner + extension), Swift core.
-- Task 10 (`af47f4e`): `PresencePlugin` (Runner group, registered in `AppDelegate`),
-  `CountdownAttributes` in `ios/Shared`; removing from the queue reloads widgets too.
-- Task 11 (widgets): `PresenceTimeline` in `ios/Shared`, the provider, Lock Screen trio
-  and widgets 1 to 5 (widget 2's + comes with Task 12).
+- Tasks 9 to 11 (`48747b9`, `af47f4e`, `e841c4d`): Swift core in `ios/Shared`;
+  `PresencePlugin` + `CountdownAttributes`; `PresenceTimeline`, the Lock Screen trio and
+  widgets 1 to 5 (widget 2's + comes with Task 12).
 - Each task's as-built notes are under it in the plan.
 
 ## Checks
 
 - Timer branch: format, analyze clean; app, Home, Logs, onboarding 590 passed.
-- Task 1: simulator debug build OK, extension embedded (no Dart changes).
 - Tasks 3 to 8: format and `analyze --fatal-infos` clean each time. Task 3 test 15/15;
   Task 4 migration + log repository tests 64/64; Task 5 test + `test/features/home/`
   274/274; Task 6 11/11; Task 7 presence + `test/app` 76/76; Task 8 presence, app,
   Home 360/360. Full suite not run (milestone end).
 - XCTests on the iPhone 17 simulator, `** TEST SUCCEEDED **` (2026-11-15): Task 9 16/16;
   Task 10 21/21 (its red run skipped by Fawad); Task 11 24/24 (2026-11-18, red run skipped).
-- Task 11 simulator: five widgets render in the gallery, Today live from a debug
-  snapshot; the state × light/dark/tinted matrix and Lock Screen trio wait for Task 15.
+- Task 11 simulator: widgets render; the state × appearance matrix and Lock Screen trio
+  wait for the Task 15 walk.
 
 ## Next action
 
@@ -71,8 +68,7 @@ a run takes ~10 min).
 - For Fawad: privacy policy URL; Terms link; `.storekit` check; submission items (group
   display name, review screenshots, Family Sharing, App Privacy).
 - Paywall follow-ups (Fawad, 2026-11-14): show something when a purchase succeeds;
-  Settings' Restore purchases has no loading state (the row only greys out while busy,
-  then a snackbar) and shows even when entitled (decide whether to hide it then).
+  Settings' Restore purchases has no loading state and shows even when entitled.
 - Paywall review notes not fixed: sandbox Annual reads as a trial; Lifetime over Annual
   hides Manage; refunded "ended on" uses expiry; a resubmitted first run saves only the plan.
 - Splash overflows at 200% on 375 × 667; paywall button 22 pt high there.
@@ -80,5 +76,5 @@ a run takes ~10 min).
 - Presence: extension version 1.0 vs app 0.1.0 (Xcode warns; match before release); a
   drained log can count twice in widgets between snapshot write and queue removal; at
   the device walk check a cold start from a widget link and the Action Button.
-- Earlier walk items: Reduce Transparency, 200%, priced drink in Edit plan; chat spec
-  items waiting on Fawad; iPhone review list.
+- Earlier walk items: Reduce Transparency, 200%, priced drink in Edit plan; chat spec,
+  iPhone review list.
