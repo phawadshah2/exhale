@@ -204,7 +204,7 @@ Lifetime-plus-renewing state for the walk.
   and their text wraps; at the largest sizes the two tiles stack.
 - VoiceOver: each tile is one button ("Vaping plan, quit January 12, 54 days to go");
   switches announce their state.
-- No new dependency without Fawad's go-ahead (see Open below).
+- New dependencies: only `url_launcher` and `in_app_review` (decided below).
 - Existing settings keys and drift schema are unchanged (no migration).
 
 ## Testing
@@ -232,6 +232,8 @@ Lifetime-plus-renewing state for the walk.
 - The Subscription sheet with options per state, plus Redeem a code.
 - Friends and family get one-time Lifetime offer-code links, one per person, made in App
   Store Connect after launch.
+- Add `url_launcher` (Safari's in-app view, Mail) and `in_app_review` (review prompt)
+  rather than more Swift. Adding them still waits for Fawad's go-ahead at that task.
 
 ## Calls made in the brainstorm (Fawad can overrule)
 
@@ -244,12 +246,9 @@ Lifetime-plus-renewing state for the walk.
 
 To settle before the plan:
 
-1. **Dependencies.** Safari's in-app view, Mail and the review prompt need either
-   `url_launcher` and `in_app_review` (both widely used Flutter packages) or a few more
-   calls on the Swift method channel. Fawad's call.
-2. **Feedback address** for Send feedback.
-3. **Privacy policy and Terms URLs** (already open for the submission). Until they exist
-   the two rows are left out.
+1. **Feedback address** for Send feedback.
+2. **Privacy policy and Terms URLs** (already open for the submission). They live as
+   constants in one place; until they are set, the two rows are left out.
 
 Builder's calls made while writing (check while reading):
 
