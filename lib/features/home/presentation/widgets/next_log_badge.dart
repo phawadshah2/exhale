@@ -1,53 +1,117 @@
+import 'dart:async';
+
 import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/features/habit/presentation/providers/habit_providers.dart';
+import 'package:exhale/features/home/domain/pace_guide.dart';
 import 'package:exhale/features/home/presentation/providers/next_log_timer_provider.dart';
 import 'package:exhale/features/home/presentation/widgets/draining_ring.dart';
+import 'package:exhale/features/logs/presentation/logs_query.dart';
+import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Around the + button while the countdown runs: a draining ring and a chip in
-/// hours and minutes. Fills the button's bounds and paints outside them.
+/// The running countdown for the single habit, or null.
+NextLogTimer? _runningTimer(WidgetRef ref) {
+  final habitId = ref.watch(singleHabitIdProvider);
+  final timer = habitId == null
+      ? null
+      : ref.watch(nextLogTimerProvider(habitId));
+  return timer == null || timer.isPast ? null : timer;
+}
+
+/// Around the + button while the countdown runs: a draining ring. Fills the
+/// button's bounds and paints outside them; touches go to the button.
 class NextLogBadge extends ConsumerWidget {
   const NextLogBadge({required this.buttonSize, super.key});
 
   final double buttonSize;
 
-  static const double _ringInset = 6;
+  static const double ringInset = 6;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final habitId = ref.watch(singleHabitIdProvider);
-    final timer = habitId == null
-        ? null
-        : ref.watch(nextLogTimerProvider(habitId));
-    if (timer == null || timer.isPast) return const SizedBox.shrink();
+    final timer = _runningTimer(ref);
+    if (timer == null) return const SizedBox.shrink();
 
     final colors = context.colors;
-    final left = AppFormat.hoursMinutes(timer.left);
-    return Semantics(
-      container: true,
-      label: 'Next one on schedule in $left',
-      excludeSemantics: true,
-      child: IgnorePointer(
+    return IgnorePointer(
+      child: ExcludeSemantics(
         child: Stack(
           clipBehavior: Clip.none,
           children: [
             Positioned(
-              left: -_ringInset,
-              top: -_ringInset,
+              left: -ringInset,
+              top: -ringInset,
               child: DrainingRing(
                 fraction: timer.fraction,
                 restartKey: timer.guide.next,
-                size: buttonSize + _ringInset * 2,
+                size: buttonSize + ringInset * 2,
                 strokeWidth: 3,
                 color: colors.primary,
                 track: colors.surfaceContainerHighest,
               ),
             ),
-            Positioned(
-              right: 0,
-              bottom: buttonSize + _ringInset * 2,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Above the + button while the countdown runs: the time left in hours and
+/// minutes. Tapping it opens today's logs. A [Positioned] child of the shell's
+/// body stack, so it can take touches above the tab bar.
+class NextLogChip extends ConsumerWidget {
+  const NextLogChip({required this.right, required this.aboveBar, super.key});
+
+  /// From the screen's right edge to the + button's.
+  final double right;
+
+  /// From the tab bar's top to the chip's bottom.
+  final double aboveBar;
+
+  static const double _minTarget = 44;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final timer = _runningTimer(ref);
+    final habitId = ref.watch(singleHabitIdProvider);
+    if (timer == null || habitId == null) return const SizedBox.shrink();
+
+    final colors = context.colors;
+    final left = AppFormat.hoursMinutes(timer.left);
+    void open() {
+      unawaited(HapticFeedback.selectionClick());
+      final today = ref.read(todayProvider);
+      openLogs(context, LogsQuery(habitId: habitId, from: today, to: today));
+    }
+
+    return Positioned(
+      right: right,
+      bottom: MediaQuery.paddingOf(context).bottom + aboveBar,
+      child: Semantics(
+        container: true,
+        label: 'Next one on schedule in $left',
+        button: true,
+        onTapHint: "Open today's logs",
+        onTap: open,
+        excludeSemantics: true,
+        child: GestureDetector(
+          onTap: open,
+          behavior: HitTestBehavior.opaque,
+          // The chip is shorter than a touch target; the spare reaches up and
+          // left, so the chip stays where it was over the + button.
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              minWidth: _minTarget,
+              minHeight: _minTarget,
+            ),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              widthFactor: 1,
+              heightFactor: 1,
               child: DecoratedBox(
                 key: const Key('next-log-chip'),
                 decoration: ShapeDecoration(
@@ -76,7 +140,7 @@ class NextLogBadge extends ConsumerWidget {
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -5,8 +5,8 @@ import 'package:exhale/features/tracking/presentation/providers/tracking_provide
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 
-/// The countdown to the next log on schedule today; null when there is nothing
-/// to pace or the day window is not set.
+/// The countdown to the next log on schedule today; null before today's first
+/// log, when there is nothing to pace, or when the day window is not set.
 final ProviderFamily<NextLogTimer?, int> nextLogTimerProvider = Provider
     .autoDispose
     .family<NextLogTimer?, int>((ref, habitId) {
@@ -25,7 +25,8 @@ final ProviderFamily<NextLogTimer?, int> nextLogTimerProvider = Provider
       final logs = ref
           .watch(logsForDayProvider((habitId: habitId, day: today)))
           .value;
-      if (progress == null || logs == null) return null;
+      // The countdown waits for the day's first log.
+      if (progress == null || logs == null || logs.isEmpty) return null;
 
       final times = [for (final log in logs) log.loggedAt];
       final guide = PaceGuide.compute(
