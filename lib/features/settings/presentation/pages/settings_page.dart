@@ -8,6 +8,7 @@ import 'package:exhale/core/widgets/status_bar_glass.dart';
 import 'package:exhale/features/paywall/presentation/widgets/subscription_card.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/settings/presentation/widgets/accent_picker.dart';
+import 'package:exhale/features/settings/presentation/widgets/plan_section.dart';
 import 'package:exhale/features/settings/presentation/widgets/theme_preference_control.dart';
 import 'package:exhale/features/settings/presentation/widgets/trigger_prompt_tile.dart';
 import 'package:exhale/features/settings/presentation/widgets/your_day_sheet.dart';
@@ -35,6 +36,11 @@ class SettingsPage extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
             ),
+            const SizedBox(height: AppSpacing.md),
+            // Task 7 places these beside the subscription tile.
+            const PlanTile(),
+            const SizedBox(height: AppSpacing.md),
+            const PlanShortcuts(),
             const SizedBox(height: AppSpacing.md),
             const ScrollReveal(
               index: 1,

@@ -10,6 +10,7 @@ import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:exhale/features/settings/domain/usecases/save_settings.dart';
+import 'package:exhale/features/settings/presentation/widgets/your_day_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -26,7 +27,7 @@ void main() {
     await seedHabit(
       PlanDraft(startDay: today, startLimit: 8, quitDay: today.addDays(56)),
     );
-    await tester.pumpAppPastSplash();
+    await tester.pumpAppPastSplash(height: 2400);
     await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
   }
@@ -34,14 +35,18 @@ void main() {
   testWidgets('Your day shows Not set, then the saved times', (tester) async {
     await openSettings(tester);
     expect(find.text('Your day'), findsOneWidget);
-    expect(find.text('Not set'), findsOneWidget);
+    final dayNotSet = find.descendant(
+      of: find.byType(YourDayTile),
+      matching: find.text('Not set'),
+    );
+    expect(dayNotSet, findsOneWidget);
 
     await tester.scrollAndTap(find.text('Your day'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Not set'), findsNothing);
+    expect(dayNotSet, findsNothing);
     expect(find.text('7:30 AM – 11:30 PM'), findsOneWidget);
     await tester.disposeApp();
   });

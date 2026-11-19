@@ -5,7 +5,9 @@ abstract final class AppRoutes {
   static const habit = '/habit/:habitId';
   static const editPlan = '/habit/:habitId/plan';
 
-  static String editPlanFor(int habitId) => '/habit/$habitId/plan';
+  /// [focusPrice] opens the page scrolled to the price card.
+  static String editPlanFor(int habitId, {bool focusPrice = false}) =>
+      '/habit/$habitId/plan${focusPrice ? '?focus=price' : ''}';
   static const planDetails = '/habit/:habitId/stages';
 
   static String planDetailsFor(int habitId) => '/habit/$habitId/stages';

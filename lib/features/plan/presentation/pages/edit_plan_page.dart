@@ -36,9 +36,16 @@ import 'package:go_router/go_router.dart';
 /// date starts a new plan today; past days keep the limits they had. Changing
 /// only the price keeps the plan.
 class EditPlanPage extends ConsumerWidget {
-  const EditPlanPage({required this.habitId, super.key});
+  const EditPlanPage({
+    required this.habitId,
+    this.focusPrice = false,
+    super.key,
+  });
 
   final int habitId;
+
+  /// Scrolls the price card into view once the page is built.
+  final bool focusPrice;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -70,15 +77,24 @@ class EditPlanPage extends ConsumerWidget {
         ),
       );
     }
-    return _EditPlanForm(habitId: habitId, history: loaded);
+    return _EditPlanForm(
+      habitId: habitId,
+      history: loaded,
+      focusPrice: focusPrice,
+    );
   }
 }
 
 class _EditPlanForm extends ConsumerWidget {
-  const _EditPlanForm({required this.habitId, required this.history});
+  const _EditPlanForm({
+    required this.habitId,
+    required this.history,
+    required this.focusPrice,
+  });
 
   final int habitId;
   final PlanHistory history;
+  final bool focusPrice;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -216,19 +232,22 @@ class _EditPlanForm extends ConsumerWidget {
         ),
         if (habit.tracksCost) ...[
           const SizedBox(height: AppSpacing.md),
-          PriceCard(
-            habit: habit,
-            form: form,
-            currencySymbol: settings.currencySymbol,
-            baseline: history.plans.first.startLimit,
-            countsFromDayOne:
-                ref
-                    .watch(priceHistoryProvider(habitId))
-                    .value
-                    ?.isFirstPriceOn(form.today) ??
-                form.storedPriceCents == null,
-            onPriceChanged: controller.setPriceText,
-            onUnitsChanged: controller.setUnitsPerContainer,
+          _ScrollIntoView(
+            enabled: focusPrice,
+            child: PriceCard(
+              habit: habit,
+              form: form,
+              currencySymbol: settings.currencySymbol,
+              baseline: history.plans.first.startLimit,
+              countsFromDayOne:
+                  ref
+                      .watch(priceHistoryProvider(habitId))
+                      .value
+                      ?.isFirstPriceOn(form.today) ??
+                  form.storedPriceCents == null,
+              onPriceChanged: controller.setPriceText,
+              onUnitsChanged: controller.setUnitsPerContainer,
+            ),
           ),
         ],
         const SizedBox(height: AppSpacing.md),
@@ -272,6 +291,37 @@ class _EditPlanForm extends ConsumerWidget {
     );
     if (picked != null) controller.setQuitDay(LogicalDay.fromDate(picked));
   }
+}
+
+/// Scrolls [child] into view after the first frame when [enabled].
+class _ScrollIntoView extends StatefulWidget {
+  const _ScrollIntoView({required this.enabled, required this.child});
+
+  final bool enabled;
+  final Widget child;
+
+  @override
+  State<_ScrollIntoView> createState() => _ScrollIntoViewState();
+}
+
+class _ScrollIntoViewState extends State<_ScrollIntoView> {
+  @override
+  void initState() {
+    super.initState();
+    if (!widget.enabled) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Scrollable.ensureVisible(
+        context,
+        duration: AppMotion.swap,
+        curve: Curves.easeOutCubic,
+        alignment: 0.1,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 class _QuitDateButton extends StatelessWidget {

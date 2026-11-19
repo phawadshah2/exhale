@@ -218,16 +218,23 @@ against StoreKit (the milestone walk covers it).
     the current price as `PriceCard` formats it, or `'Not set'`; opens Edit plan with
     `focusPrice`), Change habit (`changeHabitFor`).
 
-- [ ] **Step 1:** Summary tests (habit vaping, start 2026-11-19, quit 2027-01-12):
+- [x] **Step 1:** Summary tests (habit vaping, start 2026-11-19, quit 2027-01-12):
   `54 days to go`; `1 day to go` on 2027-01-11; `quit day reached says Quit day`;
   `a plan starting tomorrow says Starts` (`'Starts Nov 20'`); `eyebrow names the habit`.
   Widget tests: `Edit plan shows today's limit`; `no price reads Not set`; `Price opens
   Edit plan at the price card`; `Change habit opens change habit`; `the tile opens plan
   details`; `rows are at least 44 tall`.
-- [ ] **Step 2:** Run both files with `--timeout 60s`. Expected: FAIL.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(settings): plan tile and shortcuts`.
+- [x] **Step 2:** Run both files with `--timeout 60s`. Expected: FAIL.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(settings): plan tile and shortcuts`.
+
+As built: `PlanSection` is split into `PlanTile` and `PlanShortcuts` (both read
+`singleHabitProvider`) so Task 7 can set the tile beside the subscription tile; both sit
+after the title in `SettingsPage` until then. Price shows only for habits that track cost;
+whole prices drop the cents (`$12 a pod`). `settings_copy.dart` is left to Task 7. The
+`settings_page_test` opens Settings at height 2400 and scopes its `Not set` to
+`YourDayTile`.
 
 ### Task 5: Subscription tile summary
 
