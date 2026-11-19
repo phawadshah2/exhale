@@ -400,9 +400,9 @@ entitlement is the router's existing `accessRedirect`.
 
 ### Task 9: Milestone close
 
-- [ ] **Step 1:** Independent review (Opus 5.5 high) against the spec and Review Focus;
+- [x] **Step 1:** Independent review (Opus 5.5 high) against the spec and Review Focus;
   fix findings.
-- [ ] **Step 2:** Full suite: `fvm flutter test --reporter failures-only
+- [x] **Step 2:** Full suite: `fvm flutter test --reporter failures-only
   --file-reporter json:build/test-report.json`; report totals per task's files.
 - [ ] **Step 3:** Walk on Fawad's iPhone (debug, `fvm flutter run`) with
   `FAKE_STORE=entitled`, `trial`, `monthly`, `lifetimeRenewing`, `offline`: light and
