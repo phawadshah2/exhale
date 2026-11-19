@@ -74,11 +74,19 @@ a big value and a small line. Each tile is one button with one semantic label.
 | Access | Eyebrow | Value | Line |
 |---|---|---|---|
 | Entitled, in trial | "Free week" | "N days left" | "Annual from Nov 21" |
+| Entitled, trial cancelled | "Free week" | "N days left" | "Free week ends Nov 21" |
 | Entitled, Annual / Monthly | "Annual" / "Monthly" | "Active" | "Renews Dec 3" |
+| Entitled, Annual / Monthly cancelled | "Annual" / "Monthly" | "Ends Dec 3" | none |
 | Entitled, Lifetime | "Lifetime" | "Yours for good" | none |
 | Unknown (store unreachable) | the cached plan, or "Subscription" | "Can't check now" | none |
 
 NeverPaid and Lapsed never reach Settings (the router redirects them).
+
+Cancelled means StoreKit reports auto-renew off (Fawad, 2026-11-20). The sheet then says
+"ends <date>" or "Free week ends <date>.", drops the Active badge and the charge lines
+("Annual starts…", "Cancel before…", "Cancel any time…"), and offers Manage in the App
+Store instead of Cancel free week. When the renewal check fails, the wording claims
+neither: "Paid until Dec 3" / "Free until Nov 21".
 
 ### Plan shortcuts (one group, no header)
 
@@ -113,8 +121,8 @@ Both open one Appearance sheet holding the existing `ThemePreferenceControl` and
 
 ### About
 
-- **Rate Exhale**: Apple's review prompt; if iOS declines to show it, the App Store's
-  write-a-review page.
+- **Rate Exhale**: the App Store's write-a-review page; hidden until the App Store ID is
+  set (Fawad, 2026-11-20). Apple's prompt is kept for a later automatic moment.
 - **Send feedback**: Mail, to Fawad's feedback address, subject "Exhale feedback", body
   ending with the app version and iOS version. No Mail account: copy the address and
   say so with `showAppSnackBar`.
@@ -239,7 +247,7 @@ Lifetime-plus-renewing state for the walk.
 ## Calls made in the brainstorm (Fawad can overrule)
 
 - No "Soon" rows; no app icon picker.
-- Privacy and Terms open in Safari's in-app view; Rate uses Apple's review prompt.
+- Privacy and Terms open in Safari's in-app view; Rate opens write-a-review.
 - Restore lives in the Subscription sheet, not the main list.
 - Your day and Appearance rows open sheets with the existing controls.
 
@@ -250,10 +258,11 @@ Still open (none blocks the plan; each has a safe default in it):
 1. **"New day starts"**: make the reset hour editable here (new behaviour: logs between
    midnight and the new hour move to the other day) or leave it out. Planned without it.
 2. **Feedback address** for Send feedback.
-3. **Privacy policy and Terms URLs** (already open for the submission). They live as
-   constants in one place; until they are set, the two rows are left out.
-4. **Exhale's App Store ID** (App Store Connect, App Information), for Rate's fallback to
-   the write-a-review page.
+3. **Privacy policy URL** (already open for the submission). Links live in `AppLinks`,
+   shared with the paywall; Terms uses Apple's standard EULA (Fawad, 2026-11-20).
+   Privacy is left out until set.
+4. **Exhale's App Store ID** (App Store Connect, App Information); Rate is hidden until
+   it is set.
 
 Builder's calls made while writing (check while reading):
 

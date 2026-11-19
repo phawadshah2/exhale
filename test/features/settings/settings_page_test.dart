@@ -37,10 +37,17 @@ void main() {
   setUp(() => setUpTestDependencies(FixedClock(DateTime(2026, 10, 29, 9))));
   tearDown(InjectionContainer.reset);
 
-  final links = AboutLinks(
-    privacyPolicy: Uri.parse('https://example.com/privacy'),
-    terms: Uri.parse('https://example.com/terms'),
+  const links = AboutLinks(
+    privacyPolicy: 'https://example.com/privacy',
+    terms: 'https://example.com/terms',
     feedbackEmail: 'hello@example.com',
+    appStoreId: '123',
+  );
+  const noLinks = AboutLinks(
+    privacyPolicy: null,
+    terms: null,
+    feedbackEmail: null,
+    appStoreId: null,
   );
 
   Future<void> openSettings(
@@ -276,11 +283,22 @@ void main() {
   });
 
   testWidgets('about rows hidden without links', (tester) async {
-    await openSettings(tester);
-    expect(row(SettingsCopy.rate), findsOneWidget);
+    await openSettings(
+      tester,
+      overrides: [aboutLinksProvider.overrideWithValue(noLinks)],
+    );
+    expect(row(SettingsCopy.rate), findsNothing);
     expect(row(SettingsCopy.feedback), findsNothing);
     expect(row(SettingsCopy.privacy), findsNothing);
     expect(row(SettingsCopy.terms), findsNothing);
+    await tester.disposeApp();
+  });
+
+  testWidgets("Terms of use is the paywall's terms", (tester) async {
+    await openSettings(tester);
+    await tester.scrollAndTap(row(SettingsCopy.terms));
+    await tester.runAsync(pumpEventQueue);
+    expect(about().opened, [Uri.parse(AppLinks.terms)]);
     await tester.disposeApp();
   });
 
@@ -292,15 +310,21 @@ void main() {
     await tester.scrollAndTap(row(SettingsCopy.privacy));
     await tester.scrollAndTap(row(SettingsCopy.terms));
     await tester.runAsync(pumpEventQueue);
-    expect(about().opened, [links.privacyPolicy, links.terms]);
+    expect(about().opened, [
+      Uri.parse(links.privacyPolicy!),
+      Uri.parse(links.terms!),
+    ]);
     await tester.disposeApp();
   });
 
-  testWidgets('Rate asks for a review', (tester) async {
-    await openSettings(tester);
+  testWidgets('Rate opens write-a-review', (tester) async {
+    await openSettings(
+      tester,
+      overrides: [aboutLinksProvider.overrideWithValue(links)],
+    );
     await tester.scrollAndTap(row(SettingsCopy.rate));
     await tester.runAsync(pumpEventQueue);
-    expect(about().reviews, 1);
+    expect(about().reviews, ['123']);
     await tester.disposeApp();
   });
 
@@ -340,14 +364,14 @@ void main() {
     await tester.disposeApp();
   });
 
-  testWidgets('tiles stack at 200% on a small phone', (tester) async {
+  testWidgets('tiles stack at 200% on a regular phone', (tester) async {
     tester.platformDispatcher.textScaleFactorTestValue = 2;
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
     await seedHabit(
       PlanDraft(startDay: today, startLimit: 8, quitDay: today.addDays(56)),
     );
-    await tester.pumpAppPastSplash(width: 320, height: 2400);
-    // Home overflows at this size on its own; only Settings is checked here.
+    await tester.pumpAppPastSplash(width: 375, height: 2400);
+    // Home can overflow at 200% on its own; only Settings is checked here.
     tester.takeException();
     await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
@@ -361,6 +385,46 @@ void main() {
     final error = tester.takeException();
     await tester.disposeApp();
     expect(error, isNull);
+  });
+
+  testWidgets('tiles sit side by side at 150% without overflow', (
+    tester,
+  ) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await seedHabit(
+      PlanDraft(startDay: today, startLimit: 8, quitDay: today.addDays(56)),
+    );
+    await tester.pumpAppPastSplash(width: 375, height: 2400);
+    tester.takeException();
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
+
+    final tiles = find.byType(SettingsTile);
+    final firstTop = tester.getTopLeft(tiles.first).dy;
+    final lastTop = tester.getTopLeft(tiles.last).dy;
+    final error = tester.takeException();
+    await tester.disposeApp();
+    expect(firstTop, lastTop);
+    expect(error, isNull);
+  });
+
+  testWidgets('VoiceOver can tap each tile', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await openSettings(tester);
+    final plan = tester.getSemantics(find.byType(SettingsTile).first);
+    final subscription = tester.getSemantics(find.byType(SettingsTile).last);
+    semantics.dispose();
+    await tester.disposeApp();
+    expect(
+      plan,
+      isSemantics(
+        label: 'Smoking plan, quit December 24, 56 days to go',
+        isButton: true,
+        hasTapAction: true,
+      ),
+    );
+    expect(subscription, isSemantics(isButton: true, hasTapAction: true));
   });
 
   testWidgets('reduce transparency renders', (tester) async {

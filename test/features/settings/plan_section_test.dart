@@ -21,6 +21,7 @@ void main() {
   Future<void> openSettings(
     WidgetTester tester, {
     int? priceCents,
+    double width = 390,
     double height = 1600,
   }) async {
     await seedHabit(
@@ -32,7 +33,7 @@ void main() {
       habit: Habit.vaping,
       priceCents: priceCents,
     );
-    await tester.pumpAppPastSplash(height: height);
+    await tester.pumpAppPastSplash(width: width, height: height);
     await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
   }
@@ -73,6 +74,26 @@ void main() {
     );
     expect(find.byType(PriceCard).hitTestable(), findsOneWidget);
     await tester.disposeApp();
+  });
+
+  testWidgets('Price reaches the price card at 200% on a small phone', (
+    tester,
+  ) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await openSettings(tester, width: 375, height: 667);
+    // Home overflows at this size on its own; only Edit plan is checked here.
+    tester.takeException();
+    await tester.scrollAndTap(find.text('Price'));
+    await tester.pumpAndSettle();
+
+    final card = find.byType(PriceCard);
+    expect(card, findsOneWidget);
+    final top = tester.getTopLeft(card).dy;
+    final error = tester.takeException();
+    await tester.disposeApp();
+    expect(error, isNull);
+    expect(top, inInclusiveRange(0, 667 / 2));
   });
 
   testWidgets('Change habit opens change habit', (tester) async {

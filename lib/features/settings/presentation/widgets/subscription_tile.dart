@@ -22,6 +22,7 @@ class SubscriptionTile extends ConsumerWidget {
       cachedPlan: ref.watch(
         currentSettingsProvider.select((s) => s.accessPlan),
       ),
+      autoRenews: ref.watch(autoRenewsProvider),
       now: ref.watch(clockProvider).now(),
     ),
     onTap: () => unawaited(showSubscriptionSheet(context)),

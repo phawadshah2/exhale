@@ -1,20 +1,37 @@
-/// Addresses Settings' About section links to. A null link or address hides
-/// its row; a null [appStoreId] only drops Rate's fallback.
+/// Every address the app links to, for Settings and the paywall alike. A
+/// null link or address hides its row; set them before release (spec Open).
 abstract final class AppLinks {
-  /// Privacy policy, terms and the feedback address, filled when Fawad gives
-  /// them (spec Open).
-  static const about = AboutLinks();
+  /// Apple's standard EULA.
+  static const terms =
+      'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+  static const String? privacy = null;
+  static const String? feedbackEmail = null;
+
+  /// The App Store ID, for Rate's write-a-review page.
   static const String? appStoreId = null;
+
+  static const about = AboutLinks(
+    privacyPolicy: privacy,
+    terms: terms,
+    feedbackEmail: feedbackEmail,
+    appStoreId: appStoreId,
+  );
 }
 
 /// The About section's links, read through `aboutLinksProvider` so tests can
 /// supply their own.
 class AboutLinks {
-  const AboutLinks({this.privacyPolicy, this.terms, this.feedbackEmail});
+  const AboutLinks({
+    required this.privacyPolicy,
+    required this.terms,
+    required this.feedbackEmail,
+    required this.appStoreId,
+  });
 
-  final Uri? privacyPolicy;
-  final Uri? terms;
+  final String? privacyPolicy;
+  final String? terms;
   final String? feedbackEmail;
+  final String? appStoreId;
 }
 
 /// A `mailto:` for Send feedback, signed with the app and iOS versions.

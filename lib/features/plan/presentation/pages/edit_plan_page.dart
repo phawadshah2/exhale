@@ -127,6 +127,7 @@ class _EditPlanForm extends ConsumerWidget {
     }
 
     return SetupScaffold(
+      buildAll: focusPrice,
       footer: (bottomInset) => SetupFooter(
         label: form.planChanged || !form.priceChanged
             ? 'Shake on it again'

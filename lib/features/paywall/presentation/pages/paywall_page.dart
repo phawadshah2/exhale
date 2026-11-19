@@ -73,14 +73,23 @@ class PaywallPage extends ConsumerWidget {
 
   Future<void> _restore(BuildContext context, WidgetRef ref) async {
     if (ref.read(paywallControllerProvider).busy) return;
-    final entitled = await ref
+    final outcome = await ref
         .read(paywallControllerProvider.notifier)
         .restore();
     if (!context.mounted) return;
-    if (entitled) {
-      context.go(AppRoutes.home);
-    } else {
-      showAppSnackBar(context, message: PaywallCopy.noPurchases);
+    switch (outcome) {
+      case RestoreOutcome.restored:
+        context.go(AppRoutes.home);
+      case RestoreOutcome.nothingFound:
+        showAppSnackBar(context, message: PaywallCopy.noPurchases);
+      case RestoreOutcome.failed:
+        showAppSnackBar(
+          context,
+          message: PaywallCopy.cantReachStore,
+          tone: SnackTone.danger,
+        );
+      case null:
+        break;
     }
   }
 

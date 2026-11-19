@@ -3,7 +3,7 @@ import 'package:exhale/features/settings/domain/repositories/about_launcher.dart
 class FakeAboutLauncher implements AboutLauncher {
   final List<Uri> opened = [];
   final List<Uri> mails = [];
-  int reviews = 0;
+  final List<String> reviews = [];
 
   /// What [composeMail] returns.
   bool composeMailResult = true;
@@ -21,5 +21,5 @@ class FakeAboutLauncher implements AboutLauncher {
   }
 
   @override
-  Future<void> requestReview() async => reviews++;
+  Future<void> writeReview(String appStoreId) async => reviews.add(appStoreId);
 }

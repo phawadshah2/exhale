@@ -121,6 +121,11 @@ abstract final class PaywallCopy {
   static String aMonthPrice(String price) => '$price a month';
   static String oncePrice(String price) => '$price once';
   static String renewsOn(String date) => 'renews $date';
+  static String endsOn(String date) => 'ends $date';
+  static String paidUntil(String date) => 'paid until $date';
+  static String freeWeekEnds(String date) => 'Free week ends $date.';
+  static String freeUntil(String date) => 'Free until $date.';
+  static String planFrom(String plan, String date) => '$plan from $date.';
   static String cancelAnyTime(String plan, String date) =>
       'Cancel any time in the App Store. $plan stays open until $date, and '
       'your plan and logs stay on this iPhone either way.';

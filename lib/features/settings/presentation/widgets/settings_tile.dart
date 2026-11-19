@@ -27,7 +27,8 @@ class SettingsTile extends StatelessWidget {
     final line = summary.line;
     return Semantics(
       button: true,
-      label: [summary.eyebrow, summary.value, ?line].join(', '),
+      label: summary.semanticsLabel,
+      onTap: onTap,
       excludeSemantics: true,
       child: Card(
         clipBehavior: Clip.antiAlias,

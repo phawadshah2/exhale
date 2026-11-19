@@ -6,7 +6,6 @@ abstract interface class AboutLauncher {
   /// Opens Mail with [mailto]; false when nothing can send mail.
   Future<bool> composeMail(Uri mailto);
 
-  /// Apple's review prompt, or the App Store's review page when iOS won't
-  /// show the prompt.
-  Future<void> requestReview();
+  /// The App Store's write-a-review page for [appStoreId].
+  Future<void> writeReview(String appStoreId);
 }

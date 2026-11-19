@@ -14,6 +14,7 @@ void main() {
       inTrial: true,
     ),
     cachedPlan: null,
+    autoRenews: true,
     now: now,
   );
 
@@ -49,6 +50,7 @@ void main() {
           inTrial: false,
         ),
         cachedPlan: 'annual',
+        autoRenews: true,
         now: now,
       ),
       const TileSummary(
@@ -68,6 +70,7 @@ void main() {
           inTrial: false,
         ),
         cachedPlan: 'monthly',
+        autoRenews: true,
         now: now,
       ),
       const TileSummary(
@@ -76,6 +79,49 @@ void main() {
         line: 'Renews Dec 3',
       ),
     );
+  });
+
+  group('auto-renew', () {
+    TileSummary annual({required bool? autoRenews, bool inTrial = false}) =>
+        subscriptionTileSummary(
+          access: Entitled(
+            plan: PlanKind.annual,
+            expiresAt: DateTime(2026, 12, 3, 9),
+            inTrial: inTrial,
+          ),
+          cachedPlan: 'annual',
+          autoRenews: autoRenews,
+          now: now,
+        );
+
+    test('a cancelled plan says when it ends', () {
+      expect(
+        annual(autoRenews: false),
+        const TileSummary(eyebrow: 'Annual', value: 'Ends Dec 3'),
+      );
+    });
+
+    test('an unchecked renewal says Paid until', () {
+      expect(
+        annual(autoRenews: null),
+        const TileSummary(
+          eyebrow: 'Annual',
+          value: 'Active',
+          line: 'Paid until Dec 3',
+        ),
+      );
+    });
+
+    test('a cancelled free week says when it ends', () {
+      expect(
+        annual(autoRenews: false, inTrial: true).line,
+        'Free week ends Dec 3',
+      );
+    });
+
+    test('an unchecked free week says Free until', () {
+      expect(annual(autoRenews: null, inTrial: true).line, 'Free until Dec 3');
+    });
   });
 
   test('Lifetime is yours for good', () {
@@ -87,6 +133,7 @@ void main() {
           inTrial: false,
         ),
         cachedPlan: 'lifetime',
+        autoRenews: true,
         now: now,
       ),
       const TileSummary(eyebrow: 'Lifetime', value: 'Yours for good'),
@@ -98,6 +145,7 @@ void main() {
       subscriptionTileSummary(
         access: const AccessUnknown(),
         cachedPlan: 'monthly',
+        autoRenews: true,
         now: now,
       ),
       const TileSummary(eyebrow: 'Monthly', value: "Can't check now"),
@@ -109,6 +157,7 @@ void main() {
       subscriptionTileSummary(
         access: const AccessUnknown(),
         cachedPlan: null,
+        autoRenews: true,
         now: now,
       ),
       const TileSummary(eyebrow: 'Subscription', value: "Can't check now"),

@@ -16,6 +16,7 @@ import 'package:exhale/features/paywall/domain/entities/plan_kind.dart';
 import 'package:exhale/features/paywall/domain/entities/purchase_outcome.dart';
 import 'package:exhale/features/paywall/presentation/paywall_copy.dart';
 import 'package:exhale/features/paywall/presentation/providers/paywall_providers.dart';
+import 'package:exhale/features/settings/domain/subscription_tile_summary.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/settings/presentation/widgets/settings_row.dart';
 import 'package:flutter/cupertino.dart';
@@ -46,7 +47,11 @@ class _SubscriptionSheet extends ConsumerStatefulWidget {
 class _SubscriptionSheetState extends ConsumerState<_SubscriptionSheet> {
   bool _restoring = false;
 
-  bool get _busy => _restoring || ref.read(paywallControllerProvider).busy;
+  /// An App Store sheet (manage, redeem, refund) is open.
+  bool _presenting = false;
+
+  bool get _busy =>
+      _restoring || _presenting || ref.read(paywallControllerProvider).busy;
 
   void _storeFailed() => showAppSnackBar(
     context,
@@ -56,12 +61,19 @@ class _SubscriptionSheetState extends ConsumerState<_SubscriptionSheet> {
 
   Future<void> _call(Future<Result<Object?>> Function() action) async {
     if (_busy) return;
+    setState(() => _presenting = true);
     final result = await action();
-    if (mounted && result is FailureResult) _storeFailed();
+    if (!mounted) return;
+    setState(() => _presenting = false);
+    if (result is FailureResult) _storeFailed();
   }
 
-  void _manage() =>
-      unawaited(_call(ref.read(storeRepositoryProvider).manageSubscriptions));
+  /// Turning auto-renew off sends no store update, so ask again on return.
+  void _manage() => unawaited(
+    _call(ref.read(storeRepositoryProvider).manageSubscriptions).then((_) {
+      if (mounted) ref.invalidate(renewingSubscriptionProvider);
+    }),
+  );
 
   void _redeem() =>
       unawaited(_call(ref.read(storeRepositoryProvider).presentCodeRedemption));
@@ -100,18 +112,25 @@ class _SubscriptionSheetState extends ConsumerState<_SubscriptionSheet> {
   Future<void> _restore() async {
     if (_busy) return;
     setState(() => _restoring = true);
-    final entitled = await ref
+    final outcome = await ref
         .read(paywallControllerProvider.notifier)
         .restore();
     if (!mounted) return;
     setState(() => _restoring = false);
-    showAppSnackBar(
-      context,
-      message: entitled
-          ? PaywallCopy.purchasesRestored
-          : PaywallCopy.noPurchases,
-      tone: entitled ? SnackTone.success : SnackTone.info,
-    );
+    switch (outcome) {
+      case RestoreOutcome.restored:
+        showAppSnackBar(
+          context,
+          message: PaywallCopy.purchasesRestored,
+          tone: SnackTone.success,
+        );
+      case RestoreOutcome.nothingFound:
+        showAppSnackBar(context, message: PaywallCopy.noPurchases);
+      case RestoreOutcome.failed:
+        _storeFailed();
+      case null:
+        break;
+    }
   }
 
   @override
@@ -119,7 +138,9 @@ class _SubscriptionSheetState extends ConsumerState<_SubscriptionSheet> {
     final access = ref.watch(accessProvider);
     final busy =
         _restoring ||
+        _presenting ||
         ref.watch(paywallControllerProvider.select((s) => s.busy));
+    final autoRenews = ref.watch(autoRenewsProvider);
     final offers = ref.watch(offersProvider).value ?? const <Offer>[];
     String? price(PlanKind plan) {
       for (final offer in offers) {
@@ -176,9 +197,15 @@ class _SubscriptionSheetState extends ConsumerState<_SubscriptionSheet> {
         return [
           _TrialCard(
             left: left,
-            line: annualPrice == null
-                ? '${PaywallCopy.annual} from $date'
-                : PaywallCopy.trialStarts(date, annualPrice),
+            line: switch (autoRenews) {
+              false => PaywallCopy.freeWeekEnds(date),
+              null => PaywallCopy.freeUntil(date),
+              true when annualPrice == null => PaywallCopy.planFrom(
+                PaywallCopy.annual,
+                date,
+              ),
+              true => PaywallCopy.trialStarts(date, annualPrice!),
+            },
           ),
           SettingsGroup(
             header: PaywallCopy.afterFreeWeek,
@@ -198,12 +225,15 @@ class _SubscriptionSheetState extends ConsumerState<_SubscriptionSheet> {
             header: PaywallCopy.billing,
             iconRows: false,
             rows: [
-              action(PaywallCopy.cancelFreeWeek, _manage),
+              if (autoRenews == false)
+                action(PaywallCopy.manageInAppStore, _manage)
+              else
+                action(PaywallCopy.cancelFreeWeek, _manage),
               restore,
               redeem,
             ],
           ),
-          _FinePrint(PaywallCopy.cancelBefore(date)),
+          if (autoRenews != false) _FinePrint(PaywallCopy.cancelBefore(date)),
         ];
       }(),
       Entitled(:final plan, :final expiresAt) => () {
@@ -222,9 +252,14 @@ class _SubscriptionSheetState extends ConsumerState<_SubscriptionSheet> {
                 PaywallCopy.aYearPrice(ownPrice)
               else if (ownPrice != null)
                 PaywallCopy.aMonthPrice(ownPrice),
-              if (date != null) PaywallCopy.renewsOn(date),
+              if (date != null)
+                switch (autoRenews) {
+                  true => PaywallCopy.renewsOn(date),
+                  false => PaywallCopy.endsOn(date),
+                  null => PaywallCopy.paidUntil(date),
+                },
             ].join(' · '),
-            active: true,
+            active: autoRenews != false,
           ),
           SettingsGroup(
             header: PaywallCopy.changePlan,
@@ -252,7 +287,8 @@ class _SubscriptionSheetState extends ConsumerState<_SubscriptionSheet> {
               action(PaywallCopy.requestRefund, () => _refund(plan)),
             ],
           ),
-          if (date != null) _FinePrint(PaywallCopy.cancelAnyTime(name, date)),
+          if (date != null && autoRenews != false)
+            _FinePrint(PaywallCopy.cancelAnyTime(name, date)),
         ];
       }(),
       _ => () {
@@ -367,11 +403,7 @@ class _TrialCard extends StatelessWidget {
     final text = context.textTheme;
     final colors = context.colors;
     final used = ((_trialDays - left) / _trialDays).clamp(0.0, 1.0);
-    final badge = switch (left) {
-      <= 0 => 'Ends today',
-      1 => '1 day left',
-      _ => '$left days left',
-    };
+    final badge = trialDaysLeft(left);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),

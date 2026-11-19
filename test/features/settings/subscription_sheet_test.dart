@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:exhale/app/bootstrap.dart';
 import 'package:exhale/core/di/injection_container.dart';
+import 'package:exhale/core/domain/error/failure.dart';
 import 'package:exhale/core/theme/app_theme.dart';
 import 'package:exhale/features/paywall/data/fake/fake_store_repository.dart';
 import 'package:exhale/features/paywall/domain/entities/access.dart';
@@ -51,13 +52,17 @@ void main() {
     RenewingSubscription? renewing,
     bool offline = false,
     bool renewingFails = false,
+    bool autoRenew = true,
   }) async {
-    store = FakeStoreRepository(
-      access: access,
-      renewing: renewing,
-      offline: offline,
-      now: () => now,
-    )..renewingFails = renewingFails;
+    store =
+        FakeStoreRepository(
+            access: access,
+            renewing: renewing,
+            offline: offline,
+            now: () => now,
+          )
+          ..renewingFails = renewingFails
+          ..autoRenew = autoRenew;
     await setUpTestDependencies(FixedClock(now), store: store);
     tester.view
       ..physicalSize = const Size(390 * 3, 1600 * 3)
@@ -277,6 +282,115 @@ void main() {
     await openSheet(tester, annual);
     await tapRow(tester, PaywallCopy.redeemCode);
     expect(store.redeemCalls, 1);
+    await tester.disposeApp();
+  });
+
+  group('auto-renew', () {
+    testWidgets('a cancelled Annual says when it ends, not Active', (
+      tester,
+    ) async {
+      await openSheet(tester, annual, autoRenew: false);
+
+      expect(find.text(r'$34.99 a year · ends Nov 19'), findsOneWidget);
+      expect(find.text(PaywallCopy.active), findsNothing);
+      expect(
+        find.text(PaywallCopy.cancelAnyTime('Annual', 'Nov 19')),
+        findsNothing,
+      );
+      expect(row(PaywallCopy.manageInAppStore), findsOneWidget);
+      await tester.disposeApp();
+    });
+
+    testWidgets('an unchecked renewal says paid until', (tester) async {
+      await openSheet(tester, annual, renewingFails: true);
+
+      expect(find.text(r'$34.99 a year · paid until Nov 19'), findsOneWidget);
+      expect(find.text(PaywallCopy.active), findsOneWidget);
+      await tester.disposeApp();
+    });
+
+    testWidgets('a cancelled free week has no charge lines', (tester) async {
+      await openSheet(tester, trial, autoRenew: false);
+
+      expect(find.text(PaywallCopy.freeWeekEnds('Nov 21')), findsOneWidget);
+      expect(
+        find.text(PaywallCopy.trialStarts('Nov 21', r'$34.99')),
+        findsNothing,
+      );
+      expect(find.text(PaywallCopy.cancelBefore('Nov 21')), findsNothing);
+      expect(find.text(PaywallCopy.cancelFreeWeek), findsNothing);
+      expect(row(PaywallCopy.manageInAppStore), findsOneWidget);
+      await tester.disposeApp();
+    });
+
+    testWidgets('an unchecked free week says free until', (tester) async {
+      await openSheet(tester, trial, renewingFails: true);
+
+      expect(find.text(PaywallCopy.freeUntil('Nov 21')), findsOneWidget);
+      expect(
+        find.text(PaywallCopy.trialStarts('Nov 21', r'$34.99')),
+        findsNothing,
+      );
+      await tester.disposeApp();
+    });
+
+    testWidgets('the note goes once Cancel Annual returns', (tester) async {
+      await openSheet(
+        tester,
+        lifetime,
+        renewing: RenewingSubscription(
+          plan: PlanKind.annual,
+          renewsAt: DateTime(2026, 12, 3, 9),
+        ),
+      );
+
+      store.renewing = null;
+      await tapRow(tester, PaywallCopy.cancelPlan('Annual'));
+      await tester.runAsync(pumpEventQueue);
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('still renews'), findsNothing);
+      await tester.disposeApp();
+    });
+  });
+
+  testWidgets('a free week ending today says Ends today', (tester) async {
+    await openSheet(
+      tester,
+      Entitled(
+        plan: PlanKind.annual,
+        expiresAt: DateTime(2026, 11, 19, 22),
+        inTrial: true,
+      ),
+    );
+    expect(find.text('Ends today'), findsOneWidget);
+    await tester.disposeApp();
+  });
+
+  testWidgets('a failed restore says the store is unreachable', (tester) async {
+    await openSheet(tester, annual);
+    store.nextFailure = const StoreFailure();
+
+    await tapRow(tester, PaywallCopy.restorePurchases);
+
+    expect(find.text(PaywallCopy.cantReachStore), findsOneWidget);
+    expect(find.text(PaywallCopy.noPurchases), findsNothing);
+    await tester.disposeApp();
+  });
+
+  testWidgets('a double tap opens the App Store sheet once', (tester) async {
+    await openSheet(tester, annual);
+    final gate = store.sheetGate = Completer<void>();
+
+    await tapRow(tester, PaywallCopy.manageInAppStore);
+    await tester.tap(find.text(PaywallCopy.manageInAppStore));
+    await tester.runAsync(pumpEventQueue);
+    await tester.pump();
+
+    expect(store.manageCalls, 1);
+    gate.complete();
+    await tester.runAsync(pumpEventQueue);
+    await tester.pumpAndSettle();
     await tester.disposeApp();
   });
 

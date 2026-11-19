@@ -30,6 +30,13 @@ void main() {
     expect(on(start).line, '54 days to go');
   });
 
+  test('VoiceOver reads the quit date in full', () {
+    expect(
+      on(start).semanticsLabel,
+      'Vaping plan, quit January 12, 54 days to go',
+    );
+  });
+
   test('1 day to go', () {
     expect(on(LogicalDay(2027, 1, 11)).line, '1 day to go');
   });

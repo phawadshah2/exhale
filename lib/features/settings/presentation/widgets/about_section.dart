@@ -44,14 +44,16 @@ class AboutSection extends ConsumerWidget {
     final email = links.feedbackEmail;
     final privacy = links.privacyPolicy;
     final terms = links.terms;
+    final appStoreId = links.appStoreId;
     return SettingsGroup(
       header: SettingsCopy.about,
       rows: [
-        SettingsRow(
-          icon: AppIcons.star,
-          label: SettingsCopy.rate,
-          onTap: () => unawaited(launcher.requestReview()),
-        ),
+        if (appStoreId != null)
+          SettingsRow(
+            icon: AppIcons.star,
+            label: SettingsCopy.rate,
+            onTap: () => unawaited(launcher.writeReview(appStoreId)),
+          ),
         if (email != null)
           SettingsRow(
             icon: AppIcons.mail,
@@ -62,13 +64,13 @@ class AboutSection extends ConsumerWidget {
           SettingsRow(
             icon: AppIcons.privacy,
             label: SettingsCopy.privacy,
-            onTap: () => unawaited(launcher.openInApp(privacy)),
+            onTap: () => unawaited(launcher.openInApp(Uri.parse(privacy))),
           ),
         if (terms != null)
           SettingsRow(
             icon: AppIcons.document,
             label: SettingsCopy.terms,
-            onTap: () => unawaited(launcher.openInApp(terms)),
+            onTap: () => unawaited(launcher.openInApp(Uri.parse(terms))),
           ),
       ],
     );

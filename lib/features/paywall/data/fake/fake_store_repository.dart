@@ -74,14 +74,22 @@ class FakeStoreRepository implements StoreRepository {
   /// What a restore finds; null finds nothing.
   Access? restoreFinds;
 
-  /// A subscription still renewing (beside Lifetime, say).
+  /// A subscription still renewing (beside Lifetime, say). While null, an
+  /// Annual or Monthly [access] renews itself unless [autoRenew] is off.
   RenewingSubscription? renewing;
+
+  /// Whether the current Annual or Monthly subscription renews.
+  bool autoRenew = true;
 
   /// The renewal check fails.
   bool renewingFails = false;
 
   /// While set and not completed, a restore waits on it.
   Completer<void>? restoreGate;
+
+  /// While set and not completed, Apple's sheets (manage, redeem, refund)
+  /// stay open.
+  Completer<void>? sheetGate;
 
   /// What the refund sheet ends with.
   RefundOutcome refundOutcome = RefundOutcome.requested;
@@ -127,24 +135,35 @@ class FakeStoreRepository implements StoreRepository {
   @override
   Future<Result<void>> manageSubscriptions() async {
     manageCalls++;
+    if (sheetGate case final gate?) await gate.future;
     return offline ? _offline() : const Success(null);
   }
 
   @override
   Future<Result<void>> presentCodeRedemption() async {
     redeemCalls++;
+    if (sheetGate case final gate?) await gate.future;
     return offline ? _offline() : const Success(null);
   }
 
   @override
   Future<Result<RefundOutcome>> requestRefund(PlanKind plan) async {
     refundRequests.add(plan);
+    if (sheetGate case final gate?) await gate.future;
     return offline ? _offline() : Success(refundOutcome);
   }
 
   @override
-  Future<Result<RenewingSubscription?>> renewingSubscription() async =>
-      offline || renewingFails ? _offline() : Success(renewing);
+  Future<Result<RenewingSubscription?>> renewingSubscription() async {
+    if (offline || renewingFails) return _offline();
+    if (renewing case final renewing?) return Success(renewing);
+    return Success(switch (access) {
+      Entitled(:final plan, :final expiresAt?)
+          when autoRenew && plan != PlanKind.lifetime =>
+        RenewingSubscription(plan: plan, renewsAt: expiresAt),
+      _ => null,
+    });
+  }
 
   Failure? _takeFailure() {
     final failure = nextFailure;

@@ -14,6 +14,7 @@ import 'package:exhale/features/home/presentation/pages/home_page.dart';
 import 'package:exhale/features/home/presentation/providers/home_providers.dart';
 import 'package:exhale/features/paywall/domain/entities/access.dart';
 import 'package:exhale/features/paywall/domain/entities/plan_kind.dart';
+import 'package:exhale/features/paywall/domain/entities/purchase_outcome.dart';
 import 'package:exhale/features/paywall/presentation/paywall_copy.dart';
 import 'package:exhale/features/paywall/presentation/providers/paywall_providers.dart';
 import 'package:exhale/features/paywall/presentation/redeem_code.dart';
@@ -74,14 +75,23 @@ class _Sheet extends ConsumerWidget {
 
   Future<void> _restore(BuildContext context, WidgetRef ref) async {
     if (ref.read(paywallControllerProvider).busy) return;
-    final entitled = await ref
+    final outcome = await ref
         .read(paywallControllerProvider.notifier)
         .restore();
     if (!context.mounted) return;
-    if (entitled) {
-      context.go(AppRoutes.home);
-    } else {
-      showAppSnackBar(context, message: PaywallCopy.noPurchases);
+    switch (outcome) {
+      case RestoreOutcome.restored:
+        context.go(AppRoutes.home);
+      case RestoreOutcome.nothingFound:
+        showAppSnackBar(context, message: PaywallCopy.noPurchases);
+      case RestoreOutcome.failed:
+        showAppSnackBar(
+          context,
+          message: PaywallCopy.cantReachStore,
+          tone: SnackTone.danger,
+        );
+      case null:
+        break;
     }
   }
 
