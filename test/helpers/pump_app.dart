@@ -12,6 +12,7 @@ import 'package:exhale/features/paywall/domain/repositories/store_repository.dar
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/presence/domain/repositories/presence_repository.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
+import 'package:exhale/features/settings/domain/repositories/about_launcher.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +20,7 @@ import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import 'fake_about_launcher.dart';
 import 'fake_presence_repository.dart';
 import 'fixed_clock.dart';
 import 'test_database.dart';
@@ -46,12 +48,14 @@ Future<void> setUpTestDependencies(
   bool logHintSeen = true,
   StoreRepository? store,
   PresenceRepository? presence,
+  AboutLauncher? about,
 }) async {
   await InjectionContainer.setupDependencies(
     database: createTestDatabase(),
     clock: clock,
     store: store ?? FakeStoreRepository.entitled(),
     presence: presence ?? FakePresenceRepository(),
+    about: about ?? FakeAboutLauncher(),
   );
   if (!logHintSeen) return;
   final repository = sl<SettingsRepository>();

@@ -82,15 +82,21 @@ through an `AboutLauncher` built on `url_launcher` and `in_app_review`.
     when `isAvailable`, else `openStoreListing(appStoreId: …)` when `AppLinks.appStoreId` is set, else nothing.
   - `FakeAboutLauncher` records calls; `composeMailResult` controls the return.
 
-- [ ] **Step 1:** Ask Fawad to approve `fvm flutter pub add url_launcher in_app_review`.
+- [x] **Step 1:** Ask Fawad to approve `fvm flutter pub add url_launcher in_app_review`.
   Run it once approved.
-- [ ] **Step 2:** Tests: `subject is Exhale feedback`; `body ends with app and iOS
+- [x] **Step 2:** Tests: `subject is Exhale feedback`; `body ends with app and iOS
   versions`; `address is the to`.
-- [ ] **Step 3:** Run `fvm flutter test test/features/settings/domain/feedback_mail_test.dart`.
+- [x] **Step 3:** Run `fvm flutter test test/features/settings/domain/feedback_mail_test.dart`.
   Expected: FAIL.
-- [ ] **Step 4:** Implement; register `PluginAboutLauncher` in `settings_injection.dart`.
-- [ ] **Step 5:** Run. Expected: PASS.
-- [ ] **Step 6:** Commit: `feat(settings): about links and launcher`.
+- [x] **Step 4:** Implement; register `PluginAboutLauncher` in `settings_injection.dart`.
+- [x] **Step 5:** Run. Expected: PASS.
+- [x] **Step 6:** Commit: `feat(settings): about links and launcher`.
+
+As built: `AppLinks` and `feedbackMailUri` share `app_links.dart`; the query is encoded
+with `%20`, not `+` (mail apps read `+` literally). `setupDependencies` and
+`setUpTestDependencies` take `about:` (default `FakeAboutLauncher` in tests). Plugin
+errors read as false / no-op. `url_launcher` ^6.3.3, `in_app_review` ^2.0.12. Tests 3/3;
+Settings page 7/7 after the DI change.
 
 ### Task 2: Store additions, Dart side
 
