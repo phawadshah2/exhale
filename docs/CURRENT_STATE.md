@@ -7,7 +7,7 @@ Updated 2026-11-18 (Lock Screen presence milestone closed). Older logs: `docs/hi
 | Work | Status |
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
-| Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), not pushed |
+| Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), pushed, no PR yet |
 | Lock Screen presence (project 1 of 4) | Closed 2026-11-18 on `feat/lock-screen`, stacked on the timer branch, not pushed |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
@@ -36,7 +36,7 @@ Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen p
 
 ## Next action
 
-Fawad pushes `feat/timer-first-log`, then `feat/lock-screen`, and opens a PR for each
+Fawad opens a PR for `feat/timer-first-log` (already pushed), then pushes `feat/lock-screen` and opens its PR
 from a compare link (the second after the first merges). Then project 2, the Settings
 redesign: brainstorm, mockups for Fawad (he has seen none for Settings), spec, plan.
 
