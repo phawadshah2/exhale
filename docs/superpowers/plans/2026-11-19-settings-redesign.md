@@ -167,10 +167,17 @@ across the three files.
     `{"productId", "renewsAt"}` (`renewalDate` or the transaction's `expirationDate`,
     ISO 8601 UTC); else `nil`.
 
-- [ ] **Step 1:** Implement both methods.
-- [ ] **Step 2:** Ask Fawad to approve `fvm flutter build ios --debug --no-codesign`.
+- [x] **Step 1:** Implement both methods.
+- [x] **Step 2:** Ask Fawad to approve `fvm flutter build ios --debug --no-codesign`.
   Expected: `✓ Built`.
-- [ ] **Step 3:** Commit: `feat(ios): refund request and renewal status channel`.
+- [x] **Step 3:** Commit: `feat(ios): refund request and renewal status channel`.
+
+As built: added to Runner by hand in `project.pbxproj` (file reference, build file,
+group and Sources, next to `PresencePlugin.swift`). Calls run in `Task { @MainActor in }`
+as in `PresencePlugin`; `bad_args` when `productId` is missing; the refund sheet uses the
+foreground-active `UIWindowScene`, else the first. `renewsAt` from
+`ISO8601DateFormatter` (UTC, no fraction). Debug build `✓ Built` (60.8 s); not yet run
+against StoreKit (the milestone walk covers it).
 
 ### Task 4: Plan tile summary and plan shortcuts
 
