@@ -385,13 +385,18 @@ now open the Appearance sheet and tap the new switch. Found, not fixed: Home ove
 - Paywall: a "Redeem a code" text button under the plan buttons' fine print (top bar
   stays Back and Restore). Locked: a text button under Restore. Both disabled while busy.
 
-- [ ] **Step 1:** Tests: `paywall Redeem a code calls the store`; `locked Redeem a code
+- [x] **Step 1:** Tests: `paywall Redeem a code calls the store`; `locked Redeem a code
   calls the store`; `redeeming then a store change leaves the paywall` (fake emits an
   entitled change).
-- [ ] **Step 2:** Run both files with `--timeout 60s`. Expected: FAIL.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(paywall): redeem a code`.
+- [x] **Step 2:** Run both files with `--timeout 60s`. Expected: FAIL.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(paywall): redeem a code`.
+
+As built: on the paywall, "Redeem a code" is a link in the Terms row (now a `Wrap`), so
+the dock keeps one line and the button stays put. The shared `redeemCode` in
+`paywall/presentation/redeem_code.dart` shows `cantReachStore` on failure. Leaving on
+entitlement is the router's existing `accessRedirect`.
 
 ### Task 9: Milestone close
 

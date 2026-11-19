@@ -16,6 +16,7 @@ import 'package:exhale/features/paywall/domain/entities/access.dart';
 import 'package:exhale/features/paywall/domain/entities/plan_kind.dart';
 import 'package:exhale/features/paywall/presentation/paywall_copy.dart';
 import 'package:exhale/features/paywall/presentation/providers/paywall_providers.dart';
+import 'package:exhale/features/paywall/presentation/redeem_code.dart';
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
@@ -136,6 +137,15 @@ class _Sheet extends ConsumerWidget {
             textStyle: text.labelLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           child: const Text(PaywallCopy.restorePurchases),
+        ),
+        TextButton(
+          onPressed: busy ? null : () => unawaited(redeemCode(context, ref)),
+          style: TextButton.styleFrom(
+            minimumSize: const Size(44, 44),
+            foregroundColor: colors.onSurfaceVariant,
+            textStyle: text.labelLarge,
+          ),
+          child: const Text(PaywallCopy.redeemCode),
         ),
       ],
     );
