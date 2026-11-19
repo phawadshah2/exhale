@@ -253,12 +253,16 @@ whole prices drop the cents (`$12 a pod`). `settings_copy.dart` is left to Task 
   - Unknown: the cached plan's name or `Subscription` / `Can't check now` / null.
   Days are logical days (`LogicalDay.fromDate(expiresAt.toLocal())`).
 
-- [ ] **Step 1:** Tests: one per state above, plus `trial ending today says Ends today`
+- [x] **Step 1:** Tests: one per state above, plus `trial ending today says Ends today`
   and `a passed trial end still says Ends today`.
-- [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(settings): subscription tile summary`.
+- [x] **Step 2:** Run. Expected: FAIL.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(settings): subscription tile summary`.
+
+As built: the cached plan is read back by `PlanKind` name. Lapsed (plan name / `Ended`)
+and NeverPaid (`Subscription` / `Not active`) are covered for the exhaustive switch only;
+the router keeps both off Settings.
 
 ### Task 6: The Subscription sheet
 
