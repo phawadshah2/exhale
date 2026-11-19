@@ -10,6 +10,7 @@ import 'package:exhale/features/onboarding/presentation/pages/splash_page.dart';
 import 'package:exhale/features/paywall/data/fake/fake_store_repository.dart';
 import 'package:exhale/features/paywall/domain/repositories/store_repository.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
+import 'package:exhale/features/presence/domain/repositories/presence_repository.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import 'fake_presence_repository.dart';
 import 'fixed_clock.dart';
 import 'test_database.dart';
 
@@ -38,16 +40,18 @@ Future<int> seedHabit(
 /// Registers real dependencies on an in-memory database. The one-time "Hold +"
 /// hint is marked seen unless [logHintSeen] is false, so it does not cover
 /// the screen in tests that tap +. [store] defaults to a Lifetime purchase so
-/// the app opens past the paywall.
+/// the app opens past the paywall; [presence] to a [FakePresenceRepository].
 Future<void> setUpTestDependencies(
   FixedClock clock, {
   bool logHintSeen = true,
   StoreRepository? store,
+  PresenceRepository? presence,
 }) async {
   await InjectionContainer.setupDependencies(
     database: createTestDatabase(),
     clock: clock,
     store: store ?? FakeStoreRepository.entitled(),
+    presence: presence ?? FakePresenceRepository(),
   );
   if (!logHintSeen) return;
   final repository = sl<SettingsRepository>();

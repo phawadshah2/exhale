@@ -22,6 +22,7 @@ class AppSettings {
     this.accessState,
     this.accessPlan,
     this.accessUntil,
+    this.showLiveActivity = true,
   });
 
   static const String defaultCurrencySymbol = r'$';
@@ -52,6 +53,9 @@ class AppSettings {
   final String? accessPlan;
   final DateTime? accessUntil;
 
+  /// Show the countdown as a Live Activity on the Lock Screen and Island.
+  final bool showLiveActivity;
+
   DayBoundary get dayBoundary => DayBoundary(resetHour: dayResetHour);
 
   /// Null unless both times are set.
@@ -78,6 +82,7 @@ class AppSettings {
     String? Function()? accessState,
     String? Function()? accessPlan,
     DateTime? Function()? accessUntil,
+    bool? showLiveActivity,
   }) => AppSettings(
     userName: userName != null ? userName() : this.userName,
     dayResetHour: dayResetHour ?? this.dayResetHour,
@@ -94,6 +99,7 @@ class AppSettings {
     accessState: accessState != null ? accessState() : this.accessState,
     accessPlan: accessPlan != null ? accessPlan() : this.accessPlan,
     accessUntil: accessUntil != null ? accessUntil() : this.accessUntil,
+    showLiveActivity: showLiveActivity ?? this.showLiveActivity,
   );
 
   @override
@@ -112,7 +118,8 @@ class AppSettings {
       other.bedMinute == bedMinute &&
       other.accessState == accessState &&
       other.accessPlan == accessPlan &&
-      other.accessUntil == accessUntil;
+      other.accessUntil == accessUntil &&
+      other.showLiveActivity == showLiveActivity;
 
   @override
   int get hashCode => Object.hash(
@@ -130,5 +137,6 @@ class AppSettings {
     accessState,
     accessPlan,
     accessUntil,
+    showLiveActivity,
   );
 }

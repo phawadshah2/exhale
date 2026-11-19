@@ -1,3 +1,4 @@
+import 'package:exhale/app/router/app_routes.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/failure_message.dart';
@@ -134,7 +135,10 @@ class _LogsPageState extends ConsumerState<LogsPage> {
                     CircleIconButton(
                       tooltip: 'Back',
                       icon: AppIcons.back,
-                      onPressed: () => context.pop(),
+                      // A deep link opens Logs with nothing under it.
+                      onPressed: () => context.canPop()
+                          ? context.pop()
+                          : context.go(AppRoutes.home),
                     ),
                     CircleIconButton(
                       tooltip: 'Add a missed log',

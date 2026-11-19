@@ -1,0 +1,229 @@
+[
+  {
+    "name": "at wake with no logs, the day is split evenly",
+    "now": "2026-10-29T07:30:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 8,
+    "countToday": 0,
+    "logs": [],
+    "expect": {
+      "next": "2026-10-29T09:30:00",
+      "gap": 7200,
+      "pace": 7200,
+      "bed": "2026-10-29T23:30:00"
+    }
+  },
+  {
+    "name": "mid-day, the rest of the day is split over what is left",
+    "now": "2026-10-29T12:00:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 8,
+    "countToday": 2,
+    "logs": ["2026-10-29T11:00:00"],
+    "expect": {
+      "next": "2026-10-29T13:05:00",
+      "gap": 7500,
+      "pace": 7200,
+      "bed": "2026-10-29T23:30:00"
+    }
+  },
+  {
+    "name": "a log with time left carries it into the next gap",
+    "now": "2026-10-29T11:00:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 8,
+    "countToday": 2,
+    "logs": ["2026-10-29T09:30:00", "2026-10-29T11:00:00"],
+    "expect": {
+      "next": "2026-10-29T13:35:00",
+      "gap": 9300,
+      "pace": 7500,
+      "bed": "2026-10-29T23:30:00"
+    }
+  },
+  {
+    "name": "the first log of the day starts a fresh gap",
+    "now": "2026-10-29T09:00:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 8,
+    "countToday": 1,
+    "logs": ["2026-10-29T09:00:00"],
+    "expect": {
+      "next": "2026-10-29T11:04:17.142857",
+      "gap": 7457.142857,
+      "pace": 7457.142857,
+      "bed": "2026-10-29T23:30:00"
+    }
+  },
+  {
+    "name": "carried time stacks across several early logs",
+    "now": "2026-10-29T11:30:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 8,
+    "countToday": 3,
+    "logs": [
+      "2026-10-29T09:30:00",
+      "2026-10-29T11:00:00",
+      "2026-10-29T11:30:00"
+    ],
+    "expect": {
+      "next": "2026-10-29T15:59:00",
+      "gap": 16140,
+      "pace": 8640,
+      "bed": "2026-10-29T23:30:00"
+    }
+  },
+  {
+    "name": "the timer runs past bed and keeps counting there",
+    "now": "2026-10-29T23:30:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 3,
+    "countToday": 2,
+    "logs": ["2026-10-29T20:00:00", "2026-10-29T21:00:00"],
+    "expect": {
+      "next": "2026-10-30T06:40:00",
+      "gap": 34800,
+      "pace": 19200,
+      "bed": "2026-10-29T23:30:00"
+    }
+  },
+  {
+    "name": "before wake there is no guide",
+    "now": "2026-10-29T07:00:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 8,
+    "countToday": 0,
+    "logs": [],
+    "expect": null
+  },
+  {
+    "name": "a log before wake carries nothing",
+    "now": "2026-10-29T08:00:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 8,
+    "countToday": 1,
+    "logs": ["2026-10-29T06:00:00"],
+    "expect": {
+      "next": "2026-10-29T09:47:08.571428",
+      "gap": 8228.571428,
+      "pace": 7971.428571,
+      "bed": "2026-10-29T23:30:00"
+    }
+  },
+  {
+    "name": "at the limit there is no guide",
+    "now": "2026-10-29T12:00:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 8,
+    "countToday": 8,
+    "logs": [],
+    "expect": null
+  },
+  {
+    "name": "a limit of 0 has no guide",
+    "now": "2026-10-29T12:00:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 0,
+    "countToday": 0,
+    "logs": [],
+    "expect": null
+  },
+  {
+    "name": "a late start keeps the pace of the whole day",
+    "now": "2026-10-29T22:00:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 12,
+    "countToday": 0,
+    "logs": [],
+    "expect": {
+      "next": "2026-10-29T08:50:00",
+      "gap": 4800,
+      "pace": 4800,
+      "bed": "2026-10-29T23:30:00"
+    }
+  },
+  {
+    "name": "a wake before the reset hour starts at the reset",
+    "now": "2026-10-29T04:00:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 180,
+    "awakeMinutes": 1230,
+    "limit": 6,
+    "countToday": 0,
+    "logs": [],
+    "expect": {
+      "next": "2026-10-29T07:15:00",
+      "gap": 11700,
+      "pace": 11700,
+      "bed": "2026-10-29T23:30:00"
+    }
+  },
+  {
+    "name": "with a 4 AM reset, a 1:42 AM log belongs to the day before",
+    "now": "2026-10-30T02:01:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 960,
+    "limit": 8,
+    "countToday": 1,
+    "logs": ["2026-10-30T01:42:00"],
+    "expect": {
+      "next": "2026-10-30T03:42:00",
+      "gap": 7200,
+      "pace": 7200,
+      "bed": "2026-10-29T23:30:00"
+    }
+  },
+  {
+    "name": "a window running past midnight",
+    "now": "2026-10-29T23:00:00",
+    "day": "2026-10-29",
+    "resetHour": 4,
+    "wakeMinute": 450,
+    "awakeMinutes": 1050,
+    "limit": 8,
+    "countToday": 7,
+    "logs": ["2026-10-29T22:30:00"],
+    "expect": {
+      "next": "2026-10-30T01:00:00",
+      "gap": 9000,
+      "pace": 7875,
+      "bed": "2026-10-30T01:00:00"
+    }
+  }
+]

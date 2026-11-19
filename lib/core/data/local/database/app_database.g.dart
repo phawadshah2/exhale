@@ -1107,6 +1107,17 @@ class $HabitLogsTable extends HabitLogs
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _externalIdMeta = const VerificationMeta(
+    'externalId',
+  );
+  @override
+  late final GeneratedColumn<String> externalId = GeneratedColumn<String>(
+    'external_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -1126,6 +1137,7 @@ class $HabitLogsTable extends HabitLogs
     loggedAt,
     trigger,
     note,
+    externalId,
     createdAt,
   ];
   @override
@@ -1171,6 +1183,12 @@ class $HabitLogsTable extends HabitLogs
         note.isAcceptableOrUnknown(data['note']!, _noteMeta),
       );
     }
+    if (data.containsKey('external_id')) {
+      context.handle(
+        _externalIdMeta,
+        externalId.isAcceptableOrUnknown(data['external_id']!, _externalIdMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -1206,6 +1224,10 @@ class $HabitLogsTable extends HabitLogs
         DriftSqlType.string,
         data['${effectivePrefix}note'],
       ),
+      externalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}external_id'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -1227,6 +1249,10 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
   /// Trigger.name, or null when skipped.
   final String? trigger;
   final String? note;
+
+  /// Set on logs made outside the app (Log one), so draining its queue twice
+  /// never inserts one twice.
+  final String? externalId;
   final DateTime createdAt;
   const HabitLogRow({
     required this.id,
@@ -1234,6 +1260,7 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
     required this.loggedAt,
     this.trigger,
     this.note,
+    this.externalId,
     required this.createdAt,
   });
   @override
@@ -1248,6 +1275,9 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
     }
+    if (!nullToAbsent || externalId != null) {
+      map['external_id'] = Variable<String>(externalId);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -1261,6 +1291,9 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
           ? const Value.absent()
           : Value(trigger),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      externalId: externalId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(externalId),
       createdAt: Value(createdAt),
     );
   }
@@ -1276,6 +1309,7 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
       loggedAt: serializer.fromJson<DateTime>(json['loggedAt']),
       trigger: serializer.fromJson<String?>(json['trigger']),
       note: serializer.fromJson<String?>(json['note']),
+      externalId: serializer.fromJson<String?>(json['externalId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -1288,6 +1322,7 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
       'loggedAt': serializer.toJson<DateTime>(loggedAt),
       'trigger': serializer.toJson<String?>(trigger),
       'note': serializer.toJson<String?>(note),
+      'externalId': serializer.toJson<String?>(externalId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -1298,6 +1333,7 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
     DateTime? loggedAt,
     Value<String?> trigger = const Value.absent(),
     Value<String?> note = const Value.absent(),
+    Value<String?> externalId = const Value.absent(),
     DateTime? createdAt,
   }) => HabitLogRow(
     id: id ?? this.id,
@@ -1305,6 +1341,7 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
     loggedAt: loggedAt ?? this.loggedAt,
     trigger: trigger.present ? trigger.value : this.trigger,
     note: note.present ? note.value : this.note,
+    externalId: externalId.present ? externalId.value : this.externalId,
     createdAt: createdAt ?? this.createdAt,
   );
   HabitLogRow copyWithCompanion(HabitLogsCompanion data) {
@@ -1314,6 +1351,9 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
       loggedAt: data.loggedAt.present ? data.loggedAt.value : this.loggedAt,
       trigger: data.trigger.present ? data.trigger.value : this.trigger,
       note: data.note.present ? data.note.value : this.note,
+      externalId: data.externalId.present
+          ? data.externalId.value
+          : this.externalId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -1326,6 +1366,7 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
           ..write('loggedAt: $loggedAt, ')
           ..write('trigger: $trigger, ')
           ..write('note: $note, ')
+          ..write('externalId: $externalId, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -1333,7 +1374,7 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
 
   @override
   int get hashCode =>
-      Object.hash(id, habitId, loggedAt, trigger, note, createdAt);
+      Object.hash(id, habitId, loggedAt, trigger, note, externalId, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1343,6 +1384,7 @@ class HabitLogRow extends DataClass implements Insertable<HabitLogRow> {
           other.loggedAt == this.loggedAt &&
           other.trigger == this.trigger &&
           other.note == this.note &&
+          other.externalId == this.externalId &&
           other.createdAt == this.createdAt);
 }
 
@@ -1352,6 +1394,7 @@ class HabitLogsCompanion extends UpdateCompanion<HabitLogRow> {
   final Value<DateTime> loggedAt;
   final Value<String?> trigger;
   final Value<String?> note;
+  final Value<String?> externalId;
   final Value<DateTime> createdAt;
   const HabitLogsCompanion({
     this.id = const Value.absent(),
@@ -1359,6 +1402,7 @@ class HabitLogsCompanion extends UpdateCompanion<HabitLogRow> {
     this.loggedAt = const Value.absent(),
     this.trigger = const Value.absent(),
     this.note = const Value.absent(),
+    this.externalId = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   HabitLogsCompanion.insert({
@@ -1367,6 +1411,7 @@ class HabitLogsCompanion extends UpdateCompanion<HabitLogRow> {
     required DateTime loggedAt,
     this.trigger = const Value.absent(),
     this.note = const Value.absent(),
+    this.externalId = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : habitId = Value(habitId),
        loggedAt = Value(loggedAt);
@@ -1376,6 +1421,7 @@ class HabitLogsCompanion extends UpdateCompanion<HabitLogRow> {
     Expression<DateTime>? loggedAt,
     Expression<String>? trigger,
     Expression<String>? note,
+    Expression<String>? externalId,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -1384,6 +1430,7 @@ class HabitLogsCompanion extends UpdateCompanion<HabitLogRow> {
       if (loggedAt != null) 'logged_at': loggedAt,
       if (trigger != null) 'trigger': trigger,
       if (note != null) 'note': note,
+      if (externalId != null) 'external_id': externalId,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -1394,6 +1441,7 @@ class HabitLogsCompanion extends UpdateCompanion<HabitLogRow> {
     Value<DateTime>? loggedAt,
     Value<String?>? trigger,
     Value<String?>? note,
+    Value<String?>? externalId,
     Value<DateTime>? createdAt,
   }) {
     return HabitLogsCompanion(
@@ -1402,6 +1450,7 @@ class HabitLogsCompanion extends UpdateCompanion<HabitLogRow> {
       loggedAt: loggedAt ?? this.loggedAt,
       trigger: trigger ?? this.trigger,
       note: note ?? this.note,
+      externalId: externalId ?? this.externalId,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -1424,6 +1473,9 @@ class HabitLogsCompanion extends UpdateCompanion<HabitLogRow> {
     if (note.present) {
       map['note'] = Variable<String>(note.value);
     }
+    if (externalId.present) {
+      map['external_id'] = Variable<String>(externalId.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -1438,6 +1490,7 @@ class HabitLogsCompanion extends UpdateCompanion<HabitLogRow> {
           ..write('loggedAt: $loggedAt, ')
           ..write('trigger: $trigger, ')
           ..write('note: $note, ')
+          ..write('externalId: $externalId, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -1631,6 +1684,21 @@ class $SettingsTable extends Settings
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _showLiveActivityMeta = const VerificationMeta(
+    'showLiveActivity',
+  );
+  @override
+  late final GeneratedColumn<bool> showLiveActivity = GeneratedColumn<bool>(
+    'show_live_activity',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("show_live_activity" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1648,6 +1716,7 @@ class $SettingsTable extends Settings
     accessState,
     accessPlan,
     accessUntil,
+    showLiveActivity,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1775,6 +1844,15 @@ class $SettingsTable extends Settings
         ),
       );
     }
+    if (data.containsKey('show_live_activity')) {
+      context.handle(
+        _showLiveActivityMeta,
+        showLiveActivity.isAcceptableOrUnknown(
+          data['show_live_activity']!,
+          _showLiveActivityMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1844,6 +1922,10 @@ class $SettingsTable extends Settings
         DriftSqlType.dateTime,
         data['${effectivePrefix}access_until'],
       ),
+      showLiveActivity: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}show_live_activity'],
+      )!,
     );
   }
 
@@ -1877,6 +1959,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
   final String? accessState;
   final String? accessPlan;
   final DateTime? accessUntil;
+  final bool showLiveActivity;
   const SettingsRow({
     required this.id,
     this.userName,
@@ -1893,6 +1976,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     this.accessState,
     this.accessPlan,
     this.accessUntil,
+    required this.showLiveActivity,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1924,6 +2008,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     if (!nullToAbsent || accessUntil != null) {
       map['access_until'] = Variable<DateTime>(accessUntil);
     }
+    map['show_live_activity'] = Variable<bool>(showLiveActivity);
     return map;
   }
 
@@ -1956,6 +2041,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       accessUntil: accessUntil == null && nullToAbsent
           ? const Value.absent()
           : Value(accessUntil),
+      showLiveActivity: Value(showLiveActivity),
     );
   }
 
@@ -1982,6 +2068,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       accessState: serializer.fromJson<String?>(json['accessState']),
       accessPlan: serializer.fromJson<String?>(json['accessPlan']),
       accessUntil: serializer.fromJson<DateTime?>(json['accessUntil']),
+      showLiveActivity: serializer.fromJson<bool>(json['showLiveActivity']),
     );
   }
   @override
@@ -2003,6 +2090,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       'accessState': serializer.toJson<String?>(accessState),
       'accessPlan': serializer.toJson<String?>(accessPlan),
       'accessUntil': serializer.toJson<DateTime?>(accessUntil),
+      'showLiveActivity': serializer.toJson<bool>(showLiveActivity),
     };
   }
 
@@ -2022,6 +2110,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     Value<String?> accessState = const Value.absent(),
     Value<String?> accessPlan = const Value.absent(),
     Value<DateTime?> accessUntil = const Value.absent(),
+    bool? showLiveActivity,
   }) => SettingsRow(
     id: id ?? this.id,
     userName: userName.present ? userName.value : this.userName,
@@ -2039,6 +2128,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     accessState: accessState.present ? accessState.value : this.accessState,
     accessPlan: accessPlan.present ? accessPlan.value : this.accessPlan,
     accessUntil: accessUntil.present ? accessUntil.value : this.accessUntil,
+    showLiveActivity: showLiveActivity ?? this.showLiveActivity,
   );
   SettingsRow copyWithCompanion(SettingsCompanion data) {
     return SettingsRow(
@@ -2079,6 +2169,9 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       accessUntil: data.accessUntil.present
           ? data.accessUntil.value
           : this.accessUntil,
+      showLiveActivity: data.showLiveActivity.present
+          ? data.showLiveActivity.value
+          : this.showLiveActivity,
     );
   }
 
@@ -2099,7 +2192,8 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           ..write('bedMinute: $bedMinute, ')
           ..write('accessState: $accessState, ')
           ..write('accessPlan: $accessPlan, ')
-          ..write('accessUntil: $accessUntil')
+          ..write('accessUntil: $accessUntil, ')
+          ..write('showLiveActivity: $showLiveActivity')
           ..write(')'))
         .toString();
   }
@@ -2121,6 +2215,7 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     accessState,
     accessPlan,
     accessUntil,
+    showLiveActivity,
   );
   @override
   bool operator ==(Object other) =>
@@ -2140,7 +2235,8 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           other.bedMinute == this.bedMinute &&
           other.accessState == this.accessState &&
           other.accessPlan == this.accessPlan &&
-          other.accessUntil == this.accessUntil);
+          other.accessUntil == this.accessUntil &&
+          other.showLiveActivity == this.showLiveActivity);
 }
 
 class SettingsCompanion extends UpdateCompanion<SettingsRow> {
@@ -2159,6 +2255,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
   final Value<String?> accessState;
   final Value<String?> accessPlan;
   final Value<DateTime?> accessUntil;
+  final Value<bool> showLiveActivity;
   const SettingsCompanion({
     this.id = const Value.absent(),
     this.userName = const Value.absent(),
@@ -2175,6 +2272,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.accessState = const Value.absent(),
     this.accessPlan = const Value.absent(),
     this.accessUntil = const Value.absent(),
+    this.showLiveActivity = const Value.absent(),
   });
   SettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -2192,6 +2290,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.accessState = const Value.absent(),
     this.accessPlan = const Value.absent(),
     this.accessUntil = const Value.absent(),
+    this.showLiveActivity = const Value.absent(),
   });
   static Insertable<SettingsRow> custom({
     Expression<int>? id,
@@ -2209,6 +2308,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Expression<String>? accessState,
     Expression<String>? accessPlan,
     Expression<DateTime>? accessUntil,
+    Expression<bool>? showLiveActivity,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2227,6 +2327,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       if (accessState != null) 'access_state': accessState,
       if (accessPlan != null) 'access_plan': accessPlan,
       if (accessUntil != null) 'access_until': accessUntil,
+      if (showLiveActivity != null) 'show_live_activity': showLiveActivity,
     });
   }
 
@@ -2246,6 +2347,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     Value<String?>? accessState,
     Value<String?>? accessPlan,
     Value<DateTime?>? accessUntil,
+    Value<bool>? showLiveActivity,
   }) {
     return SettingsCompanion(
       id: id ?? this.id,
@@ -2264,6 +2366,7 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
       accessState: accessState ?? this.accessState,
       accessPlan: accessPlan ?? this.accessPlan,
       accessUntil: accessUntil ?? this.accessUntil,
+      showLiveActivity: showLiveActivity ?? this.showLiveActivity,
     );
   }
 
@@ -2317,6 +2420,9 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
     if (accessUntil.present) {
       map['access_until'] = Variable<DateTime>(accessUntil.value);
     }
+    if (showLiveActivity.present) {
+      map['show_live_activity'] = Variable<bool>(showLiveActivity.value);
+    }
     return map;
   }
 
@@ -2337,7 +2443,8 @@ class SettingsCompanion extends UpdateCompanion<SettingsRow> {
           ..write('bedMinute: $bedMinute, ')
           ..write('accessState: $accessState, ')
           ..write('accessPlan: $accessPlan, ')
-          ..write('accessUntil: $accessUntil')
+          ..write('accessUntil: $accessUntil, ')
+          ..write('showLiveActivity: $showLiveActivity')
           ..write(')'))
         .toString();
   }
@@ -3454,6 +3561,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_habit_logs_habit_id_logged_at',
     'CREATE INDEX idx_habit_logs_habit_id_logged_at ON habit_logs (habit_id, logged_at)',
   );
+  late final Index idxHabitLogsExternalId = Index(
+    'idx_habit_logs_external_id',
+    'CREATE UNIQUE INDEX idx_habit_logs_external_id ON habit_logs (external_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3468,6 +3579,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     stageChecks,
     idxHabitLogsLoggedAt,
     idxHabitLogsHabitIdLoggedAt,
+    idxHabitLogsExternalId,
   ];
 }
 
@@ -4593,6 +4705,7 @@ typedef $$HabitLogsTableCreateCompanionBuilder = HabitLogsCompanion Function({
   required DateTime loggedAt,
   Value<String?> trigger,
   Value<String?> note,
+  Value<String?> externalId,
   Value<DateTime> createdAt,
 });
 typedef $$HabitLogsTableUpdateCompanionBuilder = HabitLogsCompanion Function({
@@ -4601,6 +4714,7 @@ typedef $$HabitLogsTableUpdateCompanionBuilder = HabitLogsCompanion Function({
   Value<DateTime> loggedAt,
   Value<String?> trigger,
   Value<String?> note,
+  Value<String?> externalId,
   Value<DateTime> createdAt,
 });
 
@@ -4652,6 +4766,11 @@ class $$HabitLogsTableFilterComposer
 
   ColumnFilters<String> get note => $composableBuilder(
     column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get externalId => $composableBuilder(
+    column: $table.externalId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4713,6 +4832,11 @@ class $$HabitLogsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get externalId => $composableBuilder(
+    column: $table.externalId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -4762,6 +4886,11 @@ class $$HabitLogsTableAnnotationComposer
 
   GeneratedColumn<String> get note =>
       $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<String> get externalId => $composableBuilder(
+    column: $table.externalId,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -4823,6 +4952,7 @@ class $$HabitLogsTableTableManager
                 Value<DateTime> loggedAt = const Value.absent(),
                 Value<String?> trigger = const Value.absent(),
                 Value<String?> note = const Value.absent(),
+                Value<String?> externalId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => HabitLogsCompanion(
                 id: id,
@@ -4830,6 +4960,7 @@ class $$HabitLogsTableTableManager
                 loggedAt: loggedAt,
                 trigger: trigger,
                 note: note,
+                externalId: externalId,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -4839,6 +4970,7 @@ class $$HabitLogsTableTableManager
                 required DateTime loggedAt,
                 Value<String?> trigger = const Value.absent(),
                 Value<String?> note = const Value.absent(),
+                Value<String?> externalId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => HabitLogsCompanion.insert(
                 id: id,
@@ -4846,6 +4978,7 @@ class $$HabitLogsTableTableManager
                 loggedAt: loggedAt,
                 trigger: trigger,
                 note: note,
+                externalId: externalId,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0
@@ -4929,6 +5062,7 @@ typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
   Value<String?> accessState,
   Value<String?> accessPlan,
   Value<DateTime?> accessUntil,
+  Value<bool> showLiveActivity,
 });
 typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<int> id,
@@ -4946,6 +5080,7 @@ typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<String?> accessState,
   Value<String?> accessPlan,
   Value<DateTime?> accessUntil,
+  Value<bool> showLiveActivity,
 });
 
 class $$SettingsTableFilterComposer
@@ -5029,6 +5164,11 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<DateTime> get accessUntil => $composableBuilder(
     column: $table.accessUntil,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get showLiveActivity => $composableBuilder(
+    column: $table.showLiveActivity,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -5116,6 +5256,11 @@ class $$SettingsTableOrderingComposer
     column: $table.accessUntil,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get showLiveActivity => $composableBuilder(
+    column: $table.showLiveActivity,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableAnnotationComposer
@@ -5193,6 +5338,11 @@ class $$SettingsTableAnnotationComposer
     column: $table.accessUntil,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get showLiveActivity => $composableBuilder(
+    column: $table.showLiveActivity,
+    builder: (column) => column,
+  );
 }
 
 class $$SettingsTableTableManager
@@ -5241,6 +5391,7 @@ class $$SettingsTableTableManager
                 Value<String?> accessState = const Value.absent(),
                 Value<String?> accessPlan = const Value.absent(),
                 Value<DateTime?> accessUntil = const Value.absent(),
+                Value<bool> showLiveActivity = const Value.absent(),
               }) => SettingsCompanion(
                 id: id,
                 userName: userName,
@@ -5257,6 +5408,7 @@ class $$SettingsTableTableManager
                 accessState: accessState,
                 accessPlan: accessPlan,
                 accessUntil: accessUntil,
+                showLiveActivity: showLiveActivity,
               ),
           createCompanionCallback:
               ({
@@ -5275,6 +5427,7 @@ class $$SettingsTableTableManager
                 Value<String?> accessState = const Value.absent(),
                 Value<String?> accessPlan = const Value.absent(),
                 Value<DateTime?> accessUntil = const Value.absent(),
+                Value<bool> showLiveActivity = const Value.absent(),
               }) => SettingsCompanion.insert(
                 id: id,
                 userName: userName,
@@ -5291,6 +5444,7 @@ class $$SettingsTableTableManager
                 accessState: accessState,
                 accessPlan: accessPlan,
                 accessUntil: accessUntil,
+                showLiveActivity: showLiveActivity,
               ),
           withReferenceMapper: (p0) => p0
               .map(

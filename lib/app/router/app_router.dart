@@ -33,11 +33,14 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: AppRoutes.splash,
     observers: [shellRouteObserver],
     refreshListenable: gate,
-    redirect: (context, state) => accessRedirect(
-      state.uri.path,
-      ref.read(accessProvider),
-      hasHabit: ref.read(activeHabitsProvider).value?.isNotEmpty ?? false,
-    ),
+    // A deep link becomes its route, which the next pass checks for access.
+    redirect: (context, state) =>
+        deepLinkRoute(state.uri) ??
+        accessRedirect(
+          state.uri.path,
+          ref.read(accessProvider),
+          hasHabit: ref.read(activeHabitsProvider).value?.isNotEmpty ?? false,
+        ),
     routes: [
       GoRoute(
         path: AppRoutes.splash,

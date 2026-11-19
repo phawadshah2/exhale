@@ -15,6 +15,9 @@ import UIKit
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "NativeUiPlugin") {
       NativeUiPlugin.register(with: registrar)
     }
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "PresencePlugin") {
+      PresencePlugin.register(with: registrar)
+    }
   }
 }
 

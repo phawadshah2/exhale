@@ -25,21 +25,14 @@ final ProviderFamily<NextLogTimer?, int> nextLogTimerProvider = Provider
       final logs = ref
           .watch(logsForDayProvider((habitId: habitId, day: today)))
           .value;
-      // The countdown waits for the day's first log.
-      if (progress == null || logs == null || logs.isEmpty) return null;
-
-      final times = [for (final log in logs) log.loggedAt];
-      final guide = PaceGuide.compute(
+      if (progress == null || logs == null) return null;
+      return NextLogTimer.at(
         now: now,
         day: today,
         boundary: boundary,
         window: window,
         limit: progress.limit,
+        logs: [for (final log in logs) log.loggedAt],
         countToday: progress.count,
-        lastLogToday: times.lastOrNull,
-        earlierLogsToday: times.isEmpty
-            ? const []
-            : times.sublist(0, times.length - 1),
       );
-      return guide == null ? null : NextLogTimer(guide: guide, now: now);
     });

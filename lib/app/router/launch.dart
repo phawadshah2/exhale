@@ -48,6 +48,17 @@ String? accessRedirect(
   };
 }
 
+/// The route for a link from a widget or the Live Activity: `exhale://logs/week`
+/// opens Logs on this week, any other `exhale://` link opens Home. Null when
+/// [uri] is not such a link.
+String? deepLinkRoute(Uri uri) {
+  if (uri.scheme != 'exhale') return null;
+  return switch ((uri.host, uri.path)) {
+    ('logs', '/week') => AppRoutes.logs,
+    _ => AppRoutes.home,
+  };
+}
+
 bool _isInApp(String location) =>
     location == AppRoutes.home ||
     location == AppRoutes.settings ||

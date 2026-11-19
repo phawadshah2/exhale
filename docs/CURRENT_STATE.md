@@ -1,69 +1,65 @@
 # Current state
 
-Updated 2026-11-14 (paywall milestone closed). Earlier: `docs/history/` (latest
-`2026-11-13_paywall_build_state.md`: P1 to P11 and App Store Connect details).
+Updated 2026-11-18 (Lock Screen presence milestone closed). Older logs: `docs/history/`.
 
 ## Where we are
 
-| Milestone | Status |
+| Work | Status |
 |---|---|
-| M1 to M3, M5 release candidate | Done, merged to `main` (51e0bc6) |
-| M6, M7 (plan, logs, stages), polish rounds | Done on `feat/plan-and-stages`, not merged |
-| Onboarding redesign 2 (chat) | Done on `feat/onboarding-chat-prototype`, not merged |
-| Paywall | Done on `feat/paywall`: reviewed, full suite, walked (2026-11-14) |
+| M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
+| Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), pushed, no PR yet |
+| Lock Screen presence (project 1 of 4) | Closed 2026-11-18 on `feat/lock-screen`, stacked on the timer branch, not pushed |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
-Launch still needs: Export/Import, iCloud sync (CloudKit), Stay at zero
-(`docs/decisions/2026-11-10-monetization-and-sync.md`).
+Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
+(done), 2 Settings redesign, 3 notifications (careful wording), 4 breathing exercise
+(likely the new tab). Launch still needs Export/Import, iCloud sync, Stay at zero.
 
-## Paywall close-out (2026-11-14)
+## Lock Screen presence (closed)
 
-- Review: Review focus 1 to 5 hold. Fixed: startup caches a known access and retries an
-  unknown one; the locked sheet scrolls at large text; Settings' Subscription date wraps
-  at large text.
-- Changed with Fawad on the walk: every paywall state flows from the top (spare height
-  above the button); the button sits where the chat, plan and welcome put theirs (links
-  in the fine print's slot, 44 pt targets into the inset); no-price "What you get" has
-  plain lines ("Go from 12 a day to 0", "Extra time when it gets hard", "Your data stays
-  private"); the headline is 28 pt. Spec §10 and `design/10._paywall/NoPrice.html`.
-- Checks: full suite 1435, 1434 passed (the failure fixed in `2db4e19`); after the last
-  layout commits, paywall and app tests 166 passed. Format and analyze clean.
-- Walked on 440 × 956: all states but Reduce Transparency (no simctl switch) and the
-  iPhone SE (its iOS 18 run hung before building).
-
-## Repo
-
-- Stacked: `main` ⊂ `feat/plan-and-stages` (96 commits) ⊂ `feat/onboarding-chat-prototype`
-  (+29) ⊂ `feat/paywall` (+28, last `bf7ed68`). Pushed (checked 2026-11-14 against the
-  local remote refs): `feat/paywall` and `feat/onboarding-chat-prototype` match origin;
-  `feat/plan-and-stages` is 1 ahead (`0b621fd`, docs only, already inside the onboarding
-  branch on origin). Untracked on purpose: `design/all-designs.html`,
-  `design/figma-import/`.
-- Read to continue: this file, `CLAUDE.md` (Status, Git). Nothing else is needed for the
-  merge.
-- `stash@{0}` (splash hack) unused this session.
+- Spec `docs/superpowers/specs/2026-11-14-lock-screen-presence-design.md`; plan
+  `docs/superpowers/plans/2026-11-14-lock-screen-presence.md` (as-built notes under each
+  task); designs `design/11._lock_screen_presence/`.
+- Built: App Group queue + snapshot, Swift `PaceGuide` port, widgets 1 to 5 and the Lock
+  Screen trio, Log one (Siri, Shortcuts, Action Button, iOS 18 controls, widget and Island
+  +), the countdown Live Activity and Island, the Settings switch (temporary row; its
+  place comes with the Settings redesign, Fawad 2026-11-18).
+- Review: Review Focus 1 to 5 hold. Minor, not fixed: opening the app re-picks the
+  activity's lines (Dart doesn't know Swift's pair); two Swift Log ones in a row both
+  avoid the snapshot's `lastPair`, not the pair just shown; `removeFromQueue` reloads
+  widgets milliseconds before the new snapshot (could show one fewer briefly).
+- Checks: full suite 1510/1510 (before the walk fixes); Home 272/272 after them; format,
+  analyze clean; XCTests `** TEST SUCCEEDED **`.
+- Walk on Fawad's iPhone: all passed after two fixes (`3385ed8` Island margins,
+  `c413a8f` Home ring opens the day's logs at or over the limit). Lapsed walk passed on
+  a debug build: `FAKE_STORE` is ignored in release builds.
 
 ## Next action
 
-Push `feat/plan-and-stages` (1 commit), then merge the three into `main` in order
-(plan-and-stages, then onboarding-chat-prototype, then paywall), each through a PR from a
-compare link once the previous one is merged; Fawad pushes or asks for the commands. Then the real iPhone pass, including a sandbox purchase,
-restore and expiry.
+Fawad opens a PR for `feat/timer-first-log` (already pushed), then pushes `feat/lock-screen` and opens its PR
+from a compare link (the second after the first merges). Then project 2, the Settings
+redesign: brainstorm, mockups for Fawad (he has seen none for Settings), spec, plan.
+
+## Repo
+
+- `feat/export-import` (2 docs commits, `6b22bf4` and `4ae7705`, not on `main`) holds a
+  newer copy of this file and of CLAUDE.md's Status; reconcile when either merges.
+  Export/Import itself is not started.
+- Untracked on purpose: `design/all-designs.html`, `design/figma-import/`.
+- `stash@{0}` (splash hack) for simulator walks only.
 
 ## Open
 
-- For Fawad: privacy policy URL (`LegalLinks.privacy`, the link hides while null); Terms
-  link in the App Store description; check the `.storekit` in Xcode (Edit Scheme →
-  Options); before submission: group display name, review screenshots, Family Sharing,
-  App Privacy.
-- Review notes, not fixed: a sandbox Annual reads as a trial (period under 8 days);
-  Lifetime over a live Annual hides Manage; a refunded subscription's "ended on" uses its
-  expiry; a resubmitted first run saves only the plan.
-- Found in passing: the splash overflows at 200% text on 375 × 667.
-- Smallest iPhone: on 375 × 667 the paywall button sits 22 pt above the other pages'
-  (no bottom inset for the links to reach into).
-- Payment reminders spec (day 5) is needed in the same release.
-- Earlier walk items: Reduce Transparency, 200%, a priced drink in Edit plan; chat spec
-  items waiting on Fawad (answer-fixing rule, tagline drafts, Other habit and price
-  fields, the day's answer bubble); iPhone review list (Home taps, "Add a price" scroll,
-  Edit plan spacing, status bar glass).
+- For Fawad: privacy policy URL; Terms link; `.storekit` check; submission items (group
+  display name, review screenshots, Family Sharing, App Privacy); review the 53 draft
+  `encouragementLines`.
+- Paywall follow-ups (Fawad, 2026-11-14): show something when a purchase succeeds;
+  Settings' Restore purchases has no loading state and shows even when entitled.
+- Paywall review notes not fixed: sandbox Annual reads as a trial; Lifetime over Annual
+  hides Manage; refunded "ended on" uses expiry; a resubmitted first run saves only the plan.
+- Splash overflows at 200% on 375 × 667; paywall button 22 pt high there.
+- Payment reminders spec (day 5) needed in the same release.
+- Presence: extension version 1.0 vs app 0.1.0 (Xcode warns; match before release).
+- Earlier walk items: Reduce Transparency, 200%, priced drink in Edit plan; chat spec,
+  iPhone review list. The iPhone 17 simulator drops injected taps (2026-11-18): walk on
+  the iPhone instead.
