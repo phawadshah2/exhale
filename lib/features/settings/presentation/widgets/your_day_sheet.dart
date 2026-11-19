@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:exhale/core/domain/result/result.dart';
-import 'package:exhale/core/presentation/app_icons.dart';
 import 'package:exhale/core/presentation/failure_message.dart';
-import 'package:exhale/core/presentation/formatting/app_format.dart';
 import 'package:exhale/core/theme/app_spacing.dart';
 import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/app_sheet.dart';
@@ -97,28 +95,6 @@ class _YourDaySheetState extends ConsumerState<_YourDaySheet> {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// The Settings row for the wake and bed times.
-class YourDayTile extends ConsumerWidget {
-  const YourDayTile({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final window = ref.watch(currentSettingsProvider).dayWindow;
-    return ListTile(
-      leading: Icon(AppIcons.bedtime, color: context.colors.primary),
-      title: const Text('Your day'),
-      subtitle: Text(
-        window == null
-            ? 'Not set'
-            : '${AppFormat.minuteOfDay(window.wakeMinute)} – '
-                  '${AppFormat.minuteOfDay(window.bedMinute)}',
-      ),
-      trailing: const Icon(AppIcons.chevronRight),
-      onTap: () => unawaited(showYourDaySheet(context)),
     );
   }
 }

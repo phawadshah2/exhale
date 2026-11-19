@@ -3,8 +3,10 @@ import 'dart:ui' show PlatformDispatcher;
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/day_boundary.dart';
+import 'package:exhale/features/settings/domain/entities/app_links.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
+import 'package:exhale/features/settings/domain/repositories/about_launcher.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:exhale/features/settings/domain/usecases/save_settings.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final deviceRegionProvider = Provider<String?>(
   (ref) => PlatformDispatcher.instance.locale.countryCode,
 );
+
+final aboutLauncherProvider = Provider<AboutLauncher>(
+  (ref) => sl<AboutLauncher>(),
+);
+
+final aboutLinksProvider = Provider<AboutLinks>((ref) => AppLinks.about);
 
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => sl<SettingsRepository>(),

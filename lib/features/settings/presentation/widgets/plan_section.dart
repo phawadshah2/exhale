@@ -9,6 +9,7 @@ import 'package:exhale/features/habit/presentation/providers/habit_providers.dar
 import 'package:exhale/features/plan/presentation/providers/plan_providers.dart';
 import 'package:exhale/features/settings/domain/plan_tile_summary.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
+import 'package:exhale/features/settings/presentation/settings_copy.dart';
 import 'package:exhale/features/settings/presentation/widgets/settings_row.dart';
 import 'package:exhale/features/settings/presentation/widgets/settings_tile.dart';
 import 'package:exhale/features/tracking/presentation/providers/tracking_providers.dart';
@@ -55,14 +56,14 @@ class PlanShortcuts extends ConsumerWidget {
       rows: [
         SettingsRow(
           icon: AppIcons.trendDown,
-          label: 'Edit plan',
+          label: SettingsCopy.editPlan,
           value: history == null ? null : '${history.limitOn(today)} today',
           onTap: () => unawaited(context.push(AppRoutes.editPlanFor(habit.id))),
         ),
         if (habit.habit.tracksCost)
           SettingsRow(
             icon: AppIcons.savings,
-            label: 'Price',
+            label: SettingsCopy.price,
             value: _price(habit, symbol),
             onTap: () => unawaited(
               context.push(AppRoutes.editPlanFor(habit.id, focusPrice: true)),
@@ -70,7 +71,7 @@ class PlanShortcuts extends ConsumerWidget {
           ),
         SettingsRow(
           icon: habit.habit.kind.icon,
-          label: 'Change habit',
+          label: SettingsCopy.changeHabit,
           onTap: () =>
               unawaited(context.push(AppRoutes.changeHabitFor(habit.id))),
         ),
@@ -81,7 +82,7 @@ class PlanShortcuts extends ConsumerWidget {
   /// "$12 a pod", or "Not set".
   static String _price(TrackedHabit habit, String symbol) {
     final cents = habit.priceCents;
-    if (cents == null) return 'Not set';
+    if (cents == null) return SettingsCopy.notSet;
     final money = AppFormat.money(
       cents,
       symbol: symbol,

@@ -349,17 +349,28 @@ iPhone (Task 9) that snackbars show above the open sheet.
   `showAppSnackBar(SettingsCopy.addressCopied)` (`'Address copied. No Mail account on
   this iPhone.'`).
 
-- [ ] **Step 1:** Tests (update the file; keep the Your day and Lock Screen cases):
+- [x] **Step 1:** Tests (update the file; keep the Your day and Lock Screen cases):
   `sections in order`; `the subscription tile opens the sheet`; `Awake opens Your day`;
   `Appearance rows open one sheet with theme and accent`; `ask what set it off is
   stored`; `the Lock Screen switch is stored`; `about rows hidden without links`;
   `Rate asks for a review`; `feedback without Mail copies the address`; `footer shows
   the version`; `no Restore on the main list`; `tiles stack at 200% on a small phone`;
   `reduce transparency renders` (existing helper).
-- [ ] **Step 2:** Run with `--timeout 60s`. Expected: FAIL.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(settings): the redesigned Settings page`.
+- [x] **Step 2:** Run with `--timeout 60s`. Expected: FAIL.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(settings): the redesigned Settings page`.
+
+As built: `AppLinks.about` holds the About links as one `AboutLinks` value, read through
+`aboutLinksProvider` (tests override it); `aboutLauncherProvider` wraps `sl`. The page builds
+the Logging, Lock Screen and Appearance rows itself; `trigger_prompt_tile.dart` and
+`YourDayTile` are gone. Switch rows toggle on the switch, not the label (iOS Settings
+does the same). New `AppIcons`: star, mail, privacy, document, palette. Feedback reads
+the version from `PackageInfo` (not `appVersionProvider.future`, which can hang unwatched)
+and iOS's from `Platform.operatingSystemVersion`. Extra tests: `about links open in the
+app`, `feedback opens Mail to the address`. `app_test` and the Home accessibility test
+now open the Appearance sheet and tap the new switch. Found, not fixed: Home overflows by
+8.6 pt at 320 pt wide with 200% text; the stacking test discards it.
 
 ### Task 8: Redeem a code on the paywall and the locked screen
 
