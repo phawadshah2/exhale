@@ -7,6 +7,7 @@ import 'package:exhale/features/paywall/domain/entities/access.dart';
 import 'package:exhale/features/paywall/domain/entities/offer.dart';
 import 'package:exhale/features/paywall/domain/entities/plan_kind.dart';
 import 'package:exhale/features/paywall/domain/entities/purchase_outcome.dart';
+import 'package:exhale/features/paywall/domain/entities/renewing_subscription.dart';
 import 'package:exhale/features/paywall/domain/repositories/store_repository.dart';
 import 'package:exhale/features/paywall/domain/services/access_cache.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
@@ -88,6 +89,19 @@ final FutureProvider<List<Offer>> offersProvider =
             Success(:final value) => value,
             FailureResult() => throw const OffersUnavailable(),
           },
+      retry: (_, _) => null,
+    );
+
+/// An Annual or Monthly subscription still set to renew; null when there is
+/// none or the store could not say.
+final FutureProvider<RenewingSubscription?> renewingSubscriptionProvider =
+    FutureProvider.autoDispose<RenewingSubscription?>(
+      (ref) async => switch (await ref
+          .watch(storeRepositoryProvider)
+          .renewingSubscription()) {
+        Success(:final value) => value,
+        FailureResult() => null,
+      },
       retry: (_, _) => null,
     );
 

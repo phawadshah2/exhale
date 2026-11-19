@@ -77,6 +77,12 @@ class FakeStoreRepository implements StoreRepository {
   /// A subscription still renewing (beside Lifetime, say).
   RenewingSubscription? renewing;
 
+  /// The renewal check fails.
+  bool renewingFails = false;
+
+  /// While set and not completed, a restore waits on it.
+  Completer<void>? restoreGate;
+
   /// What the refund sheet ends with.
   RefundOutcome refundOutcome = RefundOutcome.requested;
 
@@ -111,6 +117,7 @@ class FakeStoreRepository implements StoreRepository {
   @override
   Future<Result<void>> restore() async {
     restoreCalls++;
+    if (restoreGate case final gate?) await gate.future;
     if (_takeFailure() case final failure?) return FailureResult(failure);
     if (offline) return _offline();
     if (restoreFinds case final found?) access = found;
@@ -137,7 +144,7 @@ class FakeStoreRepository implements StoreRepository {
 
   @override
   Future<Result<RenewingSubscription?>> renewingSubscription() async =>
-      offline ? _offline() : Success(renewing);
+      offline || renewingFails ? _offline() : Success(renewing);
 
   Failure? _takeFailure() {
     final failure = nextFailure;

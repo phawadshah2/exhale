@@ -5,10 +5,10 @@ import 'package:exhale/core/theme/theme_context_extension.dart';
 import 'package:exhale/core/widgets/scroll_reveal.dart';
 import 'package:exhale/core/widgets/section_card.dart';
 import 'package:exhale/core/widgets/status_bar_glass.dart';
-import 'package:exhale/features/paywall/presentation/widgets/subscription_card.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
 import 'package:exhale/features/settings/presentation/widgets/accent_picker.dart';
 import 'package:exhale/features/settings/presentation/widgets/plan_section.dart';
+import 'package:exhale/features/settings/presentation/widgets/subscription_tile.dart';
 import 'package:exhale/features/settings/presentation/widgets/theme_preference_control.dart';
 import 'package:exhale/features/settings/presentation/widgets/trigger_prompt_tile.dart';
 import 'package:exhale/features/settings/presentation/widgets/your_day_sheet.dart';
@@ -37,8 +37,10 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-            // Task 7 places these beside the subscription tile.
+            // Task 7 sets the two tiles side by side.
             const PlanTile(),
+            const SizedBox(height: AppSpacing.md),
+            const SubscriptionTile(),
             const SizedBox(height: AppSpacing.md),
             const PlanShortcuts(),
             const SizedBox(height: AppSpacing.md),
@@ -53,8 +55,6 @@ class SettingsPage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: AppSpacing.md),
-            const ScrollReveal(index: 2, child: SubscriptionCard()),
             const SizedBox(height: AppSpacing.md),
             const ScrollReveal(
               index: 3,

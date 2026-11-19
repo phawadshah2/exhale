@@ -302,17 +302,27 @@ the router keeps both off Settings.
   Go Lifetime: `select(PlanKind.lifetime)` then `buy()`; on `purchased` a success snackbar
   `lifetimeBought`. Restore: spinner in its row while `busy`, then today's snackbars.
 
-- [ ] **Step 1:** Tests with `FakeStoreRepository`: `annual shows change plan and
+- [x] **Step 1:** Tests with `FakeStoreRepository`: `annual shows change plan and
   billing`; `monthly offers Pay yearly`; `trial shows days left and Cancel free week`;
   `trial has no refund row`; `lifetime has no change plan`; `lifetime with a renewing
   Annual shows the note and Cancel Annual`; `a failed renewal check shows no note`;
   `unknown offers only Restore and Redeem`; `restore shows a spinner while busy`;
   `actions are disabled while busy`; `Go Lifetime buys Lifetime and says so`;
   `Redeem a code calls the store`; `Request a refund passes the current plan`.
-- [ ] **Step 2:** Run with `--timeout 60s`. Expected: FAIL.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(settings): the Subscription sheet`.
+- [x] **Step 2:** Run with `--timeout 60s`. Expected: FAIL.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(settings): the Subscription sheet`.
+
+As built: `SettingsRow` gained an optional icon, `enabled` (dimmed, ignores taps) and
+`chevron`; `SettingsGroup` gained `iconRows` for the sheet's icon-less rows. A temporary
+`SubscriptionTile` (`subscription_tile.dart`) replaces the deleted card on Settings until
+Task 7 sets it beside the plan tile. Extra copy: `freeWeek`, `exhalePlan`,
+`aYearPrice`, `aMonthPrice`, `oncePrice`, `renewsOn`; the old card's `paidUntil`,
+`freeUntil`, `manageSubscription` and `subscriptionTitle` are gone. Store calls that fail
+show `cantReachStore`. `FakeStoreRepository` gained `renewingFails` and `restoreGate`. The
+sheet tests run in a small host app, so the unknown state is reachable. Check on the
+iPhone (Task 9) that snackbars show above the open sheet.
 
 ### Task 7: The Settings page
 

@@ -97,10 +97,40 @@ abstract final class PaywallCopy {
   static const seeOffers = 'See offers';
   static const restorePurchases = 'Restore purchases';
 
-  static const subscriptionTitle = 'Subscription';
-  static String paidUntil(String date) => 'Paid until $date';
-  static String freeUntil(String date) => 'Free until $date';
   static const yoursForGood = 'Yours for good';
-  static const manageSubscription = 'Manage subscription';
   static const purchasesRestored = 'Purchases restored';
+
+  static const subscriptionSheetTitle = 'Subscription';
+  static const changePlan = 'Change plan';
+  static const payMonthly = 'Pay monthly';
+  static const payYearly = 'Pay yearly';
+  static const payMonthlyInstead = 'Pay monthly instead';
+  static const goLifetime = 'Go Lifetime';
+  static const billing = 'Billing';
+  static const afterFreeWeek = 'After your free week';
+  static const manageInAppStore = 'Manage in the App Store';
+  static const cancelFreeWeek = 'Cancel free week';
+  static const redeemCode = 'Redeem a code';
+  static const requestRefund = 'Request a refund';
+  static const active = 'Active';
+  static const lifetimeTitle = 'Exhale Lifetime';
+  static const cantReachStore = "Can't reach the App Store right now.";
+  static const freeWeek = 'Free week';
+  static String exhalePlan(String plan) => 'Exhale $plan';
+  static String aYearPrice(String price) => '$price a year';
+  static String aMonthPrice(String price) => '$price a month';
+  static String oncePrice(String price) => '$price once';
+  static String renewsOn(String date) => 'renews $date';
+  static String cancelAnyTime(String plan, String date) =>
+      'Cancel any time in the App Store. $plan stays open until $date, and '
+      'your plan and logs stay on this iPhone either way.';
+  static String trialStarts(String date, String price) =>
+      'Annual starts $date at $price a year.';
+  static String cancelBefore(String date) =>
+      "Cancel before $date and you won't be charged.";
+  static String stillRenews(String plan, String date) =>
+      '$plan still renews on $date. Lifetime already covers you, so cancel '
+      '$plan to avoid being charged again.';
+  static String cancelPlan(String plan) => 'Cancel $plan';
+  static const lifetimeBought = 'Lifetime is yours.';
 }

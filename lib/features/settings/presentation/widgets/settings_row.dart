@@ -7,33 +7,41 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// One Settings row: an icon in a soft tile, a label, then a value and
-/// chevron (when [onTap] is set), a switch (when [onSwitch] is set) or
-/// [trailing].
+/// One Settings row: an optional icon in a soft tile, a label, then a value
+/// and chevron (when [onTap] is set), a switch (when [onSwitch] is set) or
+/// [trailing]. A row that is not [enabled] is dimmed and ignores taps.
 class SettingsRow extends StatelessWidget {
   const SettingsRow({
-    required this.icon,
     required this.label,
+    this.icon,
     this.value,
     this.onTap,
     this.switchValue,
     this.onSwitch,
     this.trailing,
+    this.enabled = true,
+    this.chevron = true,
     super.key,
   });
 
-  final IconData icon;
+  final IconData? icon;
   final String label;
   final String? value;
   final VoidCallback? onTap;
   final bool? switchValue;
   final ValueChanged<bool>? onSwitch;
   final Widget? trailing;
+  final bool enabled;
+
+  /// False for a row that acts in place (Restore) rather than opening
+  /// something.
+  final bool chevron;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final text = context.textTheme;
+    final icon = this.icon;
     final onSwitch = this.onSwitch;
     final value = this.value;
     final row = ConstrainedBox(
@@ -46,7 +54,7 @@ class SettingsRow extends StatelessWidget {
         child: Row(
           spacing: AppSpacing.gutterSm,
           children: [
-            SettingsIconTile(icon: icon),
+            if (icon != null) SettingsIconTile(icon: icon),
             Expanded(child: Text(label, style: text.bodyLarge)),
             if (value != null)
               Flexible(
@@ -68,7 +76,7 @@ class SettingsRow extends StatelessWidget {
                   onSwitch(on);
                 },
               )
-            else if (onTap != null)
+            else if (onTap != null && chevron)
               Icon(
                 AppIcons.chevronRight,
                 size: 16,
@@ -84,8 +92,16 @@ class SettingsRow extends StatelessWidget {
       );
     }
     if (onTap == null) return row;
+    if (!enabled) {
+      return Semantics(
+        button: true,
+        enabled: false,
+        child: Opacity(opacity: 0.45, child: row),
+      );
+    }
     return Semantics(
       button: true,
+      enabled: true,
       child: InkWell(onTap: onTap, child: row),
     );
   }
@@ -121,12 +137,19 @@ class SettingsIconTile extends StatelessWidget {
   }
 }
 
-/// Rows in one card, with an optional small header above it.
+/// Rows in one card, with an optional small header above it. Dividers
+/// start past the icon unless the rows have none ([iconRows] false).
 class SettingsGroup extends StatelessWidget {
-  const SettingsGroup({required this.rows, this.header, super.key});
+  const SettingsGroup({
+    required this.rows,
+    this.header,
+    this.iconRows = true,
+    super.key,
+  });
 
   final String? header;
   final List<Widget> rows;
+  final bool iconRows;
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +185,9 @@ class SettingsGroup extends StatelessWidget {
                   Divider(
                     height: 1,
                     thickness: 1,
-                    indent: AppSpacing.md + 28 + AppSpacing.gutterSm,
+                    indent: iconRows
+                        ? AppSpacing.md + 28 + AppSpacing.gutterSm
+                        : AppSpacing.md,
                     color: colors.outlineVariant,
                   ),
                 row,
