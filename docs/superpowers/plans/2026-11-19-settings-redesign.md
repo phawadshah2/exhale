@@ -131,14 +131,22 @@ Settings page 7/7 after the DI change.
     the two sheet calls. `debug_store.dart` gains `FAKE_STORE=trial`, `monthly` and
     `lifetimeRenewing` (Lifetime with Annual renewing in 20 days).
 
-- [ ] **Step 1:** Tests: `presentCodeRedemption calls the gateway`; `requestRefund passes
+- [x] **Step 1:** Tests: `presentCodeRedemption calls the gateway`; `requestRefund passes
   the plan's product id`; `requestRefund maps cancelled`; `renewingSubscription maps
   productId and renewsAt`; `renewingSubscription null when none`; `a channel error is a
   StoreFailure`; debug store: `lifetimeRenewing is Lifetime with Annual renewing`.
-- [ ] **Step 2:** Run both test files. Expected: FAIL.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run. Expected: PASS.
-- [ ] **Step 5:** Commit: `feat(paywall): code redemption, refunds and renewal status`.
+- [x] **Step 2:** Run both test files. Expected: FAIL.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run. Expected: PASS.
+- [x] **Step 5:** Commit: `feat(paywall): code redemption, refunds and renewal status`.
+
+As built: `RefundOutcome` lives in `renewing_subscription.dart`. `StoreChannel`
+(`exhale/store`) is injected into `PluginStoreKitGateway` as an optional positional
+argument; code redemption uses `InAppPurchaseStoreKitPlatformAddition`. An answer naming
+Lifetime, an unknown product or a bad date reads as no renewing subscription; an unknown
+refund answer is a `StoreFailure`. Only `renewingSubscription` is timed (no sheet). Added
+`test/features/paywall/store_channel_test.dart` (method names and arguments). Tests 41/41
+across the three files.
 
 ### Task 3: Store additions, Swift side
 

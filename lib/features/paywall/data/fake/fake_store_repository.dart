@@ -6,6 +6,7 @@ import 'package:exhale/features/paywall/domain/entities/access.dart';
 import 'package:exhale/features/paywall/domain/entities/offer.dart';
 import 'package:exhale/features/paywall/domain/entities/plan_kind.dart';
 import 'package:exhale/features/paywall/domain/entities/purchase_outcome.dart';
+import 'package:exhale/features/paywall/domain/entities/renewing_subscription.dart';
 import 'package:exhale/features/paywall/domain/repositories/store_repository.dart';
 
 /// A store held in memory, for tests and debug walks.
@@ -14,6 +15,7 @@ class FakeStoreRepository implements StoreRepository {
     this.access = const NeverPaid(),
     List<Offer>? offers,
     this.offline = false,
+    this.renewing,
     DateTime Function()? now,
   }) : offers = offers ?? defaultOffers,
        _now = now ?? DateTime.now;
@@ -72,9 +74,17 @@ class FakeStoreRepository implements StoreRepository {
   /// What a restore finds; null finds nothing.
   Access? restoreFinds;
 
+  /// A subscription still renewing (beside Lifetime, say).
+  RenewingSubscription? renewing;
+
+  /// What the refund sheet ends with.
+  RefundOutcome refundOutcome = RefundOutcome.requested;
+
   int purchaseCalls = 0;
   int restoreCalls = 0;
   int manageCalls = 0;
+  int redeemCalls = 0;
+  final List<PlanKind> refundRequests = [];
 
   void emitChange() => _changes.add(null);
 
@@ -112,6 +122,22 @@ class FakeStoreRepository implements StoreRepository {
     manageCalls++;
     return offline ? _offline() : const Success(null);
   }
+
+  @override
+  Future<Result<void>> presentCodeRedemption() async {
+    redeemCalls++;
+    return offline ? _offline() : const Success(null);
+  }
+
+  @override
+  Future<Result<RefundOutcome>> requestRefund(PlanKind plan) async {
+    refundRequests.add(plan);
+    return offline ? _offline() : Success(refundOutcome);
+  }
+
+  @override
+  Future<Result<RenewingSubscription?>> renewingSubscription() async =>
+      offline ? _offline() : Success(renewing);
 
   Failure? _takeFailure() {
     final failure = nextFailure;

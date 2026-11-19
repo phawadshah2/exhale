@@ -39,8 +39,8 @@ Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen p
 Settings redesign (project 2) on `feat/settings-redesign`, stacked on `feat/lock-screen`:
 spec `docs/superpowers/specs/2026-11-19-settings-redesign-design.md`, plan
 `docs/superpowers/plans/2026-11-19-settings-redesign.md` (9 tasks), design
-`design/12._settings/`. Task 1 done; next Task 2 (store additions, Dart side) with
-`execute-plan`. Spec Open: "New day
+`design/12._settings/`. Tasks 1 and 2 done; next Task 3 (Swift `exhale/store`, ends
+with a build that needs Fawad's OK) with `execute-plan`. Spec Open: "New day
 starts", feedback address, legal URLs, App Store ID. Fawad merges the timer PR, then Lock
 Screen (both pushed).
 

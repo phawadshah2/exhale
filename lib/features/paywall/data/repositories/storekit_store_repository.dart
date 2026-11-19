@@ -7,6 +7,7 @@ import 'package:exhale/features/paywall/domain/entities/access.dart';
 import 'package:exhale/features/paywall/domain/entities/offer.dart';
 import 'package:exhale/features/paywall/domain/entities/plan_kind.dart';
 import 'package:exhale/features/paywall/domain/entities/purchase_outcome.dart';
+import 'package:exhale/features/paywall/domain/entities/renewing_subscription.dart';
 import 'package:exhale/features/paywall/domain/entities/store_transaction.dart';
 import 'package:exhale/features/paywall/domain/repositories/store_repository.dart';
 import 'package:exhale/features/paywall/domain/services/access_resolver.dart';
@@ -73,6 +74,35 @@ class StoreKitStoreRepository implements StoreRepository {
     await _gateway.showManageSubscriptions();
     return const Success(null);
   });
+
+  @override
+  Future<Result<void>> presentCodeRedemption() => _guard(() async {
+    await _gateway.presentCodeRedemptionSheet();
+    return const Success(null);
+  });
+
+  @override
+  Future<Result<RefundOutcome>> requestRefund(PlanKind plan) =>
+      _guard(() async {
+        return switch (await _gateway.requestRefund(plan.productId)) {
+          'requested' => const Success(RefundOutcome.requested),
+          'cancelled' => const Success(RefundOutcome.cancelled),
+          _ => _failure(),
+        };
+      });
+
+  @override
+  Future<Result<RenewingSubscription?>> renewingSubscription() =>
+      _guard(() async {
+        final answer = await _gateway.renewingSubscription();
+        if (answer == null) return const Success(null);
+        final plan = PlanKind.ofProductId(answer['productId'] as String? ?? '');
+        final renewsAt = DateTime.tryParse(answer['renewsAt'] as String? ?? '');
+        if (plan == null || plan == PlanKind.lifetime || renewsAt == null) {
+          return const Success(null);
+        }
+        return Success(RenewingSubscription(plan: plan, renewsAt: renewsAt));
+      }, timed: true);
 
   @override
   late final Stream<void> changes = _gateway.updates.asyncMap((_) async {
