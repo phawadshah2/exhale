@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exhale: Settings</title>
+<style>body{margin:0;padding:24px 16px 48px;background:#e9edf2;font-family:-apple-system,system-ui,sans-serif;color:#161C25}h2{text-align:center;margin:0 0 4px}.subtitle{text-align:center;color:#5b6573;margin:0 auto 8px;max-width:900px;line-height:1.4}.letter{display:none}.option{display:block}</style></head><body>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  .wrap{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;align-items:flex-start;margin-top:8px}
+  .col{width:316px}
+  .col .option{display:block;padding:10px}
+  .ph{--bg:#F4F7FA;--card:#fff;--fg:#161C25;--mut:#5B6573;--faint:#8A94A2;--line:#E4E9EF;--inner:#F1F4F7;--em:#111418;--onem:#F4F7FA;--ok:#10B981;--amber:#F59E0B;
+    width:290px;height:630px;margin:0 auto;border-radius:44px;background:var(--bg);color:var(--fg);box-shadow:0 0 0 9px #111418,0 16px 36px rgba(0,0,0,.28);position:relative;overflow:hidden;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:13px}
+  .scr{position:absolute;inset:0;overflow-y:auto;padding:10px 16px 96px;box-sizing:border-box;scrollbar-width:none}
+  .scr::-webkit-scrollbar{display:none}
+  .sb{display:flex;justify-content:space-between;font-size:11px;font-weight:600;padding:4px 10px 6px}
+  .h1{font-family:Manrope,sans-serif;font-size:28px;font-weight:700;letter-spacing:-.02em;margin:8px 2px 12px}
+  .kc{background:var(--card);border-radius:24px;overflow:hidden}
+  .pad{padding:16px}
+  .gap{height:12px}
+  .lab{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:16px 6px 6px}
+  .ttl{font-family:Manrope,sans-serif;font-size:16px;font-weight:600;padding:14px 16px 2px}
+  .row{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 14px;border-top:1px solid var(--line);font-size:13px}
+  .row.f{border-top:0}
+  .row .l{flex:1}
+  .row .v{color:var(--mut);font-size:12.5px}
+  .row .c{color:#B6BEC8;width:10px;height:10px}
+  .ico{width:18px;height:18px;color:var(--em);flex:none}
+  .tile{width:28px;height:28px;border-radius:9px;background:var(--inner);display:flex;align-items:center;justify-content:center;flex:none}
+  .tile .ico{width:16px;height:16px}
+  .sw{width:40px;height:24px;border-radius:12px;background:var(--em);position:relative;flex:none}
+  .sw:after{content:"";position:absolute;right:2px;top:2px;width:20px;height:20px;border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .soon{font-size:10px;font-weight:600;color:var(--mut);background:var(--inner);border-radius:99px;padding:3px 8px}
+  .seg{display:flex;background:var(--inner);border-radius:99px;padding:3px;margin:4px 14px 10px}
+  .seg span{flex:1;text-align:center;padding:6px 0;border-radius:99px;font-size:11.5px;font-weight:600;color:var(--mut)}
+  .seg .on{background:var(--card);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .dots{display:flex;gap:10px;padding:2px 14px 14px}
+  .dot{width:26px;height:26px;border-radius:13px}
+  .dot.on{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--em)}
+  .btn{display:block;text-align:center;background:var(--em);color:var(--onem);border-radius:99px;padding:11px;font-weight:700;font-size:13px}
+  .btn.ghost{background:var(--inner);color:var(--fg)}
+  .eyebrow{font-size:11px;font-weight:600;color:var(--mut)}
+  .big{font-family:Manrope,sans-serif;font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+  .num{font-family:Manrope,sans-serif;font-weight:700;font-variant-numeric:tabular-nums}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0}
+  .stat{background:var(--inner);border-radius:16px;padding:8px 10px}
+  .stat .k{font-size:10px;color:var(--mut)}
+  .stat .n{font-size:16px}
+  .bar{height:6px;border-radius:3px;background:var(--inner);overflow:hidden;margin:10px 0 4px}
+  .bar i{display:block;height:100%;background:var(--em);border-radius:3px}
+  .small{font-size:11px;color:var(--mut)}
+  .badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;border-radius:99px;padding:3px 8px}
+  .tabs{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:4px;padding:5px;border-radius:99px;background:rgba(255,255,255,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 8px 24px rgba(0,0,0,.12),inset 0 0 0 1px rgba(255,255,255,.6)}
+  .tabs span{display:flex;align-items:center;gap:5px;padding:8px 14px;border-radius:99px;font-size:11.5px;font-weight:600;color:var(--mut)}
+  .tabs .on{background:rgba(17,20,24,.08);color:var(--fg)}
+  .tabs .ico{width:15px;height:15px;color:inherit}
+  .foot{text-align:center;font-size:11px;color:var(--faint);margin-top:14px}
+  .cap h3{margin:12px 0 4px}
+  .cap p{margin:0;font-size:13.5px;line-height:1.45}
+  .notes{max-width:900px;margin:26px auto 0;font-size:14px;line-height:1.55}
+</style>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-chev" viewBox="0 0 10 10"><path d="M3 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 9h11a3 3 0 1 0-3-3M3 15h15a3 3 0 1 1-3 3M3 12h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3.5 12.5V4.5a1 1 0 0 1 1-1h8l8 8-9 9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-steps" viewBox="0 0 24 24"><path d="M3 5h5v5h5v5h5v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-q" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-paint" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18.5a4.5 4.5 0 0 1-.5-9 6 6 0 0 1 11.4 1.6A3.8 3.8 0 0 1 17.5 18.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5M5 14v4.5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 14v4.5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7.5 3v6c0 4.5-3.2 7.9-7.5 9-4.3-1.1-7.5-4.5-7.5-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6.5 3.5h7l4 4v13h-11zM13.5 3.5v4h4M9 12h6M9 15.5h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path d="M4 8l4 4 4-6 4 6 4-4-1.5 10h-13z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8.5a1 1 0 0 1-1 1h-4.5V15h-5v5.5H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M5.5 18.5l1.8-1.8M16.7 7.3l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<style>
+  .dim{position:absolute;inset:0;background:rgba(17,20,24,.28)}
+  .sheet{position:absolute;left:6px;right:6px;bottom:6px;max-height:84%;overflow-y:auto;scrollbar-width:none;background:rgba(255,255,255,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:34px;padding:8px 14px 16px;box-shadow:0 -8px 30px rgba(0,0,0,.16);box-sizing:border-box}
+  .sheet::-webkit-scrollbar{display:none}
+  .grab{width:36px;height:5px;border-radius:3px;background:#C9D0D8;margin:0 auto 10px}
+  .sh-t{display:flex;align-items:center;justify-content:space-between;margin:0 2px 10px}
+  .sh-t b{font-family:Manrope,sans-serif;font-size:17px}
+  .x{width:28px;height:28px;border-radius:14px;background:var(--inner);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--mut)}
+  .grp{background:#fff;border-radius:18px;overflow:hidden;margin-top:8px}
+  .grp .row{padding:0 12px}
+  .price{font-size:12px;color:var(--mut);text-align:right;line-height:1.25}
+  .price b{display:block;color:var(--fg);font-size:12.5px}
+  .fine{font-size:10.5px;color:var(--mut);line-height:1.4;margin:10px 4px 0}
+  .warn{background:#FFF6E6;border-radius:16px;padding:10px 12px;margin-top:8px;font-size:11.5px;line-height:1.4;color:#6B4300}
+  .warn b{color:#472A00}
+  .pill{display:inline-block;margin-top:8px;background:#111418;color:#fff;border-radius:99px;padding:7px 12px;font-weight:700;font-size:11.5px}
+  .red{color:#C23A3A}
+  .spin{width:14px;height:14px;border-radius:7px;border:2px solid #D8DEE6;border-top-color:#111418}
+</style>
+
+<h2>Take 3, with the subscription options (v2: Redeem a code)</h2>
+<p class="subtitle">Tapping the Subscription tile opens a glass sheet (<code>showAppSheet</code>). Its options depend on what the person has. Prices are the paywall's: Annual $34.99, Monthly $7.99, Lifetime $59.99.</p>
+
+<div class="wrap">
+
+<!-- Settings top -->
+<div class="col"><div class="option" data-choice="settings" onclick="toggleSelect(this)">
+<div class="letter">1</div>
+<div class="ph"><div class="scr">
+  <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+  <div class="h1">Settings</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="kc pad" style="padding:14px">
+      <div class="tile" style="background:var(--em)"><svg class="ico" style="color:#fff"><use href="#i-wind"/></svg></div>
+      <div class="eyebrow" style="margin-top:12px">Vaping plan</div>
+      <div class="num" style="font-size:18px;line-height:1.2">Jan 12</div>
+      <div class="small">54 days to go</div>
+    </div>
+    <div class="kc pad" style="padding:14px;box-shadow:0 0 0 2px #111418">
+      <div class="tile"><svg class="ico"><use href="#i-crown"/></svg></div>
+      <div class="eyebrow" style="margin-top:12px">Annual</div>
+      <div class="num" style="font-size:18px;line-height:1.2">Active</div>
+      <div class="small">Renews Dec 3</div>
+    </div>
+  </div>
+  <div class="gap"></div>
+  <div class="kc">
+    <div class="row f"><div class="tile"><svg class="ico"><use href="#i-steps"/></svg></div><span class="l">Edit plan</span><span class="v">8 today</span><svg class="c"><use href="#i-chev"/></svg></div>
+    <div class="row"><div class="tile"><svg class="ico"><use href="#i-tag"/></svg></div><span class="l">Price</span><span class="v">$12 a pod</span><svg class="c"><use href="#i-chev"/></svg></div>
+    <div class="row"><div class="tile"><svg class="ico"><use href="#i-wind"/></svg></div><span class="l">Change habit</span><svg class="c"><use href="#i-chev"/></svg></div>
+  </div>
+  <div class="lab">Your day</div>
+  <div class="kc">
+    <div class="row f"><div class="tile"><svg class="ico"><use href="#i-moon"/></svg></div><span class="l">New day starts</span><span class="v">4 AM</span><svg class="c"><use href="#i-chev"/></svg></div>
+    <div class="row"><div class="tile"><svg class="ico"><use href="#i-sun"/></svg></div><span class="l">Awake</span><span class="v">7 AM – 11 PM</span><svg class="c"><use href="#i-chev"/></svg></div>
+  </div>
+  <div class="lab">Your data</div>
+  <div class="kc">
+    <div class="row f"><div class="tile"><svg class="ico"><use href="#i-cloud"/></svg></div><span class="l">iCloud sync</span><span class="soon">Soon</span></div>
+    <div class="row"><div class="tile"><svg class="ico"><use href="#i-up"/></svg></div><span class="l">Export</span><span class="soon">Soon</span></div>
+    <div class="row"><div class="tile"><svg class="ico"><use href="#i-down"/></svg></div><span class="l">Import</span><span class="soon">Soon</span></div>
+  </div>
+  <div class="small" style="margin:14px 6px 0;line-height:1.5"><b>Tile in other states</b><br>Free week · <b>2 days left</b> · Annual from Nov 21<br>Monthly · <b>Active</b> · Renews Dec 3<br>Lifetime · <b>Yours for good</b><br>Can't reach the App Store · <b>Annual</b> · Checked Nov 18</div>
+</div>
+<div class="tabs"><span><svg class="ico"><use href="#i-home"/></svg>Home</span><span class="on"><svg class="ico"><use href="#i-gear"/></svg>Settings</span></div>
+</div></div>
+<div class="cap"><h3>1. Settings (take 3)</h3><p>The Subscription tile opens the sheet. Restore purchases moves from Your data into the sheet.</p></div>
+</div>
+
+<!-- Annual sheet -->
+<div class="col"><div class="option" data-choice="annual" onclick="toggleSelect(this)">
+<div class="letter">2</div>
+<div class="ph"><div class="scr" style="filter:blur(2px)">
+  <div class="sb"><span>9:41</span><span>●●● ▮</span></div><div class="h1">Settings</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="kc" style="height:118px"></div><div class="kc" style="height:118px"></div></div>
+</div><div class="dim"></div>
+<div class="sheet">
+  <div class="grab"></div>
+  <div class="sh-t"><b>Subscription</b><span class="x">✕</span></div>
+  <div class="grp" style="padding:14px">
+    <div style="display:flex;gap:10px;align-items:center"><div class="tile" style="background:var(--em)"><svg class="ico" style="color:#fff"><use href="#i-crown"/></svg></div>
+    <div style="flex:1"><div style="font-weight:700">Exhale Annual</div><div class="small">$34.99 a year · renews Dec 3</div></div>
+    <span class="badge" style="background:#E7F8F1;color:#0B7A55">Active</span></div>
+  </div>
+  <div class="lab" style="margin-top:12px">Change plan</div>
+  <div class="grp">
+    <div class="row f"><span class="l">Pay monthly</span><span class="price"><b>$7.99</b>a month</span><svg class="c"><use href="#i-chev"/></svg></div>
+    <div class="row"><span class="l">Go Lifetime</span><span class="price"><b>$59.99</b>once</span><svg class="c"><use href="#i-chev"/></svg></div>
+  </div>
+  <div class="lab" style="margin-top:12px">Billing</div>
+  <div class="grp">
+    <div class="row f"><span class="l">Manage in the App Store</span><svg class="c"><use href="#i-chev"/></svg></div>
+    <div class="row"><span class="l">Restore purchases</span></div>
+    <div class="row"><span class="l">Redeem a code</span><svg class="c"><use href="#i-chev"/></svg></div>
+    <div class="row"><span class="l">Request a refund</span><svg class="c"><use href="#i-chev"/></svg></div>
+  </div>
+  <div class="fine">Cancel any time in the App Store. Annual stays open until Dec 3, and your plan and logs stay on this iPhone either way.</div>
+</div>
+</div></div>
+<div class="cap"><h3>2. Annual or Monthly</h3><p>Switching between Annual and Monthly opens Apple's own screen, which handles the change. Go Lifetime buys straight away. Manage in the App Store covers cancelling and the payment method. Request a refund opens Apple's refund sheet.</p></div>
+</div>
+
+<!-- Trial sheet -->
+<div class="col"><div class="option" data-choice="trial" onclick="toggleSelect(this)">
+<div class="letter">3</div>
+<div class="ph"><div class="scr" style="filter:blur(2px)">
+  <div class="sb"><span>9:41</span><span>●●● ▮</span></div><div class="h1">Settings</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="kc" style="height:118px"></div><div class="kc" style="height:118px"></div></div>
+</div><div class="dim"></div>
+<div class="sheet">
+  <div class="grab"></div>
+  <div class="sh-t"><b>Subscription</b><span class="x">✕</span></div>
+  <div class="grp" style="padding:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700">Free week</div><span class="badge" style="background:var(--inner);color:var(--fg)">2 days left</span></div>
+    <div class="bar"><i style="width:71%"></i></div>
+    <div class="small">Annual starts Nov 21 at $34.99 a year.</div>
+  </div>
+  <div class="lab" style="margin-top:12px">After your free week</div>
+  <div class="grp">
+    <div class="row f"><span class="l">Pay monthly instead</span><span class="price"><b>$7.99</b>a month</span><svg class="c"><use href="#i-chev"/></svg></div>
+    <div class="row"><span class="l">Go Lifetime</span><span class="price"><b>$59.99</b>once</span><svg class="c"><use href="#i-chev"/></svg></div>
+  </div>
+  <div class="lab" style="margin-top:12px">Billing</div>
+  <div class="grp">
+    <div class="row f"><span class="l">Cancel free week</span><svg class="c"><use href="#i-chev"/></svg></div>
+    <div class="row"><span class="l">Restore purchases</span><div class="spin"></div></div>
+    <div class="row"><span class="l">Redeem a code</span><svg class="c"><use href="#i-chev"/></svg></div>
+  </div>
+  <div class="fine">Cancel before Nov 21 and you won't be charged. Cancelling opens the App Store. Restore shows a spinner while it checks.</div>
+</div>
+</div></div>
+<div class="cap"><h3>3. Free week</h3><p>This is the state where people most need it. The sheet says plainly when the charge starts and how to stop it. "Cancel free week" opens the same App Store screen, with a name that says what it does.</p></div>
+</div>
+
+<!-- Lifetime sheet -->
+<div class="col"><div class="option" data-choice="lifetime" onclick="toggleSelect(this)">
+<div class="letter">4</div>
+<div class="ph"><div class="scr" style="filter:blur(2px)">
+  <div class="sb"><span>9:41</span><span>●●● ▮</span></div><div class="h1">Settings</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="kc" style="height:118px"></div><div class="kc" style="height:118px"></div></div>
+</div><div class="dim"></div>
+<div class="sheet">
+  <div class="grab"></div>
+  <div class="sh-t"><b>Subscription</b><span class="x">✕</span></div>
+  <div class="grp" style="padding:14px">
+    <div style="display:flex;gap:10px;align-items:center"><div class="tile" style="background:var(--em)"><svg class="ico" style="color:#fff"><use href="#i-crown"/></svg></div>
+    <div style="flex:1"><div style="font-weight:700">Exhale Lifetime</div><div class="small">Yours for good</div></div></div>
+  </div>
+  <div class="warn"><b>Annual still renews on Dec 3.</b> Lifetime already covers you, so cancel Annual to avoid being charged again.<br><span class="pill">Cancel Annual</span></div>
+  <div class="grp" style="margin-top:12px">
+    <div class="row f"><span class="l">Restore purchases</span></div>
+    <div class="row"><span class="l">Redeem a code</span><svg class="c"><use href="#i-chev"/></svg></div>
+    <div class="row"><span class="l">Request a refund</span><svg class="c"><use href="#i-chev"/></svg></div>
+  </div>
+  <div class="fine">The amber note only shows while an Annual or Monthly subscription is still renewing next to Lifetime. Without it, the sheet is just the card and these two rows.</div>
+</div>
+</div></div>
+<div class="cap"><h3>4. Lifetime</h3><p>No plan changes. This also fixes the review note "Lifetime over Annual hides Manage": if a subscription is still renewing, the sheet says so and offers to cancel it.</p></div>
+</div>
+
+</div>
+
+<div class="notes">
+<b>What's new in code:</b> "Request a refund" (StoreKit 2's refund sheet) needs one new store method, and so does the "still renewing" check behind the Lifetime note. Everything else uses what <code>StoreRepository</code> already has: <code>manageSubscriptions</code>, <code>purchase</code> and <code>restore</code>. "Redeem a code" opens Apple's own code sheet (no new store logic, one call). It also belongs on the paywall and the locked screen, since a friend with a code meets the paywall before they ever see Settings.<br>
+<b>Lapsed:</b> no change. The locked screen still covers the app, and its Restore stays there.
+</div>
+
+</body></html>
