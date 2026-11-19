@@ -67,7 +67,7 @@ a big value and a small line. Each tile is one button with one semantic label.
 |---|---|---|---|
 | Plan with a quit date | "<Habit> plan" | quit date ("Jan 12") | "54 days to go" / "1 day to go" |
 | Quit day reached or passed | "<Habit> plan" | "Quit day" | the date |
-| Open-ended plan (no quit date) | "<Habit> plan" | today's limit ("8 today") | "No quit date" |
+| Plan starts later | "<Habit> plan" | quit date | "Starts Nov 20" |
 
 **Subscription tile** opens the Subscription sheet. It reads `accessProvider`.
 
@@ -88,10 +88,11 @@ NeverPaid and Lapsed never reach Settings (the router redirects them).
 
 ### Your day
 
-- **New day starts**, value "4 AM".
-- **Awake**, value "7 AM – 11 PM" or "Not set".
+- **Awake**, value "7 AM – 11 PM" or "Not set", opens the existing Your day sheet
+  (`your_day_sheet.dart`).
 
-Both open the existing Your day sheet (`your_day_sheet.dart`).
+(Corrected 2026-11-19 while planning: the reset hour has no editor anywhere today, so a
+"New day starts" row would be a new feature. It waits for Fawad's call; see Open.)
 
 ### Logging
 
@@ -244,11 +245,15 @@ Lifetime-plus-renewing state for the walk.
 
 ## Open
 
-To settle before the plan:
+Still open (none blocks the plan; each has a safe default in it):
 
-1. **Feedback address** for Send feedback.
-2. **Privacy policy and Terms URLs** (already open for the submission). They live as
+1. **"New day starts"**: make the reset hour editable here (new behaviour: logs between
+   midnight and the new hour move to the other day) or leave it out. Planned without it.
+2. **Feedback address** for Send feedback.
+3. **Privacy policy and Terms URLs** (already open for the submission). They live as
    constants in one place; until they are set, the two rows are left out.
+4. **Exhale's App Store ID** (App Store Connect, App Information), for Rate's fallback to
+   the write-a-review page.
 
 Builder's calls made while writing (check while reading):
 
