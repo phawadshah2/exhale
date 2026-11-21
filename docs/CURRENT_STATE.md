@@ -7,9 +7,9 @@ Updated 2026-11-21 (Settings redesign closed). Older logs: `docs/history/`.
 | Work | Status |
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
-| Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), pushed, no PR yet |
-| Lock Screen presence (project 1 of 4) | Closed 2026-11-18 on `feat/lock-screen`, stacked on the timer branch, pushed, no PR yet; closing notes in `docs/history/2026-11-18_lock_screen_presence_state.md` |
-| Settings redesign (project 2 of 4) | Closed 2026-11-21 on `feat/settings-redesign`, stacked on Lock Screen, not pushed |
+| Timer starts at the first log; tap opens today's logs | Merged to `main` (PR 38) |
+| Lock Screen presence (project 1 of 4) | Merged to `main` (PR 39); closing notes in `docs/history/2026-11-18_lock_screen_presence_state.md` |
+| Settings redesign (project 2 of 4) | Closed 2026-11-21 on `feat/settings-redesign`, pushed, PR to open |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
@@ -20,7 +20,7 @@ Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen p
 
 - Spec `docs/superpowers/specs/2026-11-19-settings-redesign-design.md`; plan
   `docs/superpowers/plans/2026-11-19-settings-redesign.md`; design `design/12._settings/`.
-- On `feat/settings-redesign`, stacked on `feat/lock-screen`, not pushed.
+- On `feat/settings-redesign` (15 commits over `main`), pushed.
 - Review: 11 findings fixed (`1717d10`). Full suite 1587/1587 before the walk fixes;
   Settings and core widget tests 124/124 after them; format, analyze clean.
 - iPhone walk (Fawad, 2026-11-21): entitled, trial, monthly, lifetimeRenewing, offline
@@ -34,8 +34,7 @@ Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen p
 
 ## Next action
 
-Fawad pushes `feat/settings-redesign` and merges in order: timer PR, Lock Screen, then
-Settings. Then project 3, notifications (careful wording): brainstorm a spec first. It
+Fawad opens and merges the Settings PR (`main...feat/settings-redesign`). Then project 3, notifications (careful wording): brainstorm a spec first. It
 folds in the payment reminder (day 5) and the Lifetime-with-a-renewing-plan reminders.
 
 ## Repo
