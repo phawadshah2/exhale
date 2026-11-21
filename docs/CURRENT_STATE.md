@@ -1,6 +1,6 @@
 # Current state
 
-Updated 2026-11-21 (Settings redesign closed). Older logs: `docs/history/`.
+Updated 2026-11-21 (Settings redesign closed and pushed; handoff). Older logs: `docs/history/`.
 
 ## Where we are
 
@@ -20,9 +20,11 @@ Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen p
 
 - Spec `docs/superpowers/specs/2026-11-19-settings-redesign-design.md`; plan
   `docs/superpowers/plans/2026-11-19-settings-redesign.md`; design `design/12._settings/`.
-- On `feat/settings-redesign` (15 commits over `main`), pushed.
+- On `feat/settings-redesign` (16 commits over `main`, tip `366af0d`), pushed
+  2026-11-21; no PR yet.
 - Review: 11 findings fixed (`1717d10`). Full suite 1587/1587 before the walk fixes;
-  Settings and core widget tests 124/124 after them; format, analyze clean.
+  Settings and core widget tests 124/124 after them; format, analyze clean. Full suite
+  not rerun after `9d4c0f4` (small UI fix; CI's "Analyze & test" covers it).
 - iPhone walk (Fawad, 2026-11-21): entitled, trial, monthly, lifetimeRenewing, offline
   and the sandbox (Restore, Manage, Redeem, Refund) all pass after `9d4c0f4` (values at
   the row edge, the Subscription sheet fits its content, no line under the status bar
@@ -34,8 +36,13 @@ Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen p
 
 ## Next action
 
-Fawad opens and merges the Settings PR (`main...feat/settings-redesign`). Then project 3, notifications (careful wording): brainstorm a spec first. It
-folds in the payment reminder (day 5) and the Lifetime-with-a-renewing-plan reminders.
+Fawad opens the Settings PR from
+`https://github.com/phawadshah2/exhale/compare/main...feat/settings-redesign?expand=1` and
+merges it once "Analyze & test" passes. Then project 3, notifications (careful wording):
+`git checkout main`, `git pull`, branch `feat/notifications`, brainstorm a spec first. It
+folds in the payment reminder (day 5) and the Lifetime-with-a-renewing-plan reminders
+(alerts and notifications until cancelled; never auto-open Apple's cancel screen). Read
+first: this file's Open list and `docs/decisions/2026-11-10-monetization-and-sync.md`.
 
 ## Repo
 
