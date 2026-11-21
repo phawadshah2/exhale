@@ -65,6 +65,7 @@ class _StatusBarGlassState extends State<StatusBarGlass> {
                     blur: 20,
                     opacity: 0.3,
                     shadow: false,
+                    edge: false,
                     color: colors.brightness == Brightness.dark
                         ? colors.surface
                         : null,

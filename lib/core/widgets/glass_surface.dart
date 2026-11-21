@@ -27,6 +27,7 @@ class GlassSurface extends StatelessWidget {
     this.color,
     this.shadow = true,
     this.opacity,
+    this.edge = true,
     super.key,
   });
 
@@ -44,18 +45,23 @@ class GlassSurface extends StatelessWidget {
   /// light.
   final double? opacity;
 
+  /// Draws the hairline edge. Off for strips that should blend in.
+  final bool edge;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final isDark = colors.brightness == Brightness.dark;
     final glass = GlassMode.of(context);
 
-    final hairline = BorderSide(
-      color: isDark
-          ? Colors.white.withValues(alpha: 0.09)
-          : Colors.black.withValues(alpha: 0.07),
-      width: 0.6,
-    );
+    final hairline = !edge
+        ? BorderSide.none
+        : BorderSide(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.09)
+                : Colors.black.withValues(alpha: 0.07),
+            width: 0.6,
+          );
     final ShapeBorder shape = radius == null
         ? StadiumBorder(side: hairline)
         : RoundedRectangleBorder(

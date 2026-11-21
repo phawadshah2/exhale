@@ -4,6 +4,7 @@ import 'package:exhale/app/bootstrap.dart';
 import 'package:exhale/core/di/injection_container.dart';
 import 'package:exhale/core/domain/error/failure.dart';
 import 'package:exhale/core/theme/app_theme.dart';
+import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/features/paywall/data/fake/fake_store_repository.dart';
 import 'package:exhale/features/paywall/domain/entities/access.dart';
 import 'package:exhale/features/paywall/domain/entities/plan_kind.dart';
@@ -180,6 +181,15 @@ void main() {
     expect(row(PaywallCopy.redeemCode), findsOneWidget);
     expect(row(PaywallCopy.requestRefund), findsOneWidget);
     expect(find.textContaining('still renews'), findsNothing);
+    await tester.disposeApp();
+  });
+
+  testWidgets('the sheet is only as tall as its content', (tester) async {
+    await openSheet(tester, lifetime);
+
+    final sheet = tester.getRect(find.byType(AppSheetFrame));
+    final lastRow = tester.getRect(row(PaywallCopy.requestRefund));
+    expect(sheet.bottom - lastRow.bottom, lessThan(80));
     await tester.disposeApp();
   });
 

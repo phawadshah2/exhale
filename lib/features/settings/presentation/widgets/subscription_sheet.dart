@@ -25,20 +25,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// The Subscription sheet: what the user has and what they can do with it.
-Future<void> showSubscriptionSheet(BuildContext context) =>
-    showAppDraggableSheet<void>(
-      context,
-      initialSize: 0.8,
-      builder: (context, controller) =>
-          _SubscriptionSheet(controller: controller),
-    );
+Future<void> showSubscriptionSheet(BuildContext context) => showAppSheet<void>(
+  context,
+  builder: (context) => const _SubscriptionSheet(),
+);
 
 const _trialDays = 7;
 
 class _SubscriptionSheet extends ConsumerStatefulWidget {
-  const _SubscriptionSheet({required this.controller});
-
-  final ScrollController controller;
+  const _SubscriptionSheet();
 
   @override
   ConsumerState<_SubscriptionSheet> createState() => _SubscriptionSheetState();
@@ -309,7 +304,7 @@ class _SubscriptionSheetState extends ConsumerState<_SubscriptionSheet> {
     };
 
     return ListView(
-      controller: widget.controller,
+      shrinkWrap: true,
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
         0,

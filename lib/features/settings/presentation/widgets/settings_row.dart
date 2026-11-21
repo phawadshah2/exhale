@@ -57,7 +57,7 @@ class SettingsRow extends StatelessWidget {
             if (icon != null) SettingsIconTile(icon: icon),
             Expanded(child: Text(label, style: text.bodyLarge)),
             if (value != null)
-              Flexible(
+              Expanded(
                 child: Text(
                   value,
                   textAlign: TextAlign.end,
