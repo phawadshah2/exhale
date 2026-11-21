@@ -404,9 +404,15 @@ entitlement is the router's existing `accessRedirect`.
   fix findings.
 - [x] **Step 2:** Full suite: `fvm flutter test --reporter failures-only
   --file-reporter json:build/test-report.json`; report totals per task's files.
-- [ ] **Step 3:** Walk on Fawad's iPhone (debug, `fvm flutter run`) with
+- [x] **Step 3:** Walk on Fawad's iPhone (debug, `fvm flutter run`) with
   `FAKE_STORE=entitled`, `trial`, `monthly`, `lifetimeRenewing`, `offline`: light and
   dark, Reduce Transparency, 200%, VoiceOver on the tiles. Then sandbox: Restore, Manage,
   Redeem a code sheet, refund sheet.
-- [ ] **Step 4:** Update `docs/CURRENT_STATE.md` and `design/12._settings/README.md`;
+- [x] **Step 4:** Update `docs/CURRENT_STATE.md` and `design/12._settings/README.md`;
   commit `docs: close the Settings redesign milestone`.
+
+As built (2026-11-21): the walk found three issues, fixed in `9d4c0f4`: row values sat
+mid-row (label and value now share the row, value at the trailing edge); the
+Subscription sheet used a draggable sheet at 80% (now `showAppSheet`, sized to its
+content); the status bar glass drew a hairline (`GlassSurface.edge: false`). Redeem and
+Refund do nothing under `FAKE_STORE`; they passed in the sandbox.

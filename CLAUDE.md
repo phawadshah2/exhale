@@ -16,8 +16,8 @@ Progress and the single next action live in `docs/CURRENT_STATE.md`. Read it fir
 it when a task or milestone finishes. Older session logs are in `docs/history/`.
 
 - Unmerged, in order: `feat/timer-first-log`, then `feat/lock-screen` (Lock Screen
-  presence, stacked on it, milestone closed 2026-11-18). Next: push and merge them, then
-  the Settings redesign.
+  presence, closed 2026-11-18), then `feat/settings-redesign` (closed 2026-11-21, not
+  pushed), each stacked on the one before. Next: merge them, then notifications.
 - `FAKE_STORE` only works in debug builds; a lapsed or never-paid walk on the iPhone
   needs `fvm flutter run` (debug) attached.
 - Specs: `docs/superpowers/specs/` (one per plan). Designs: `design/` (each folder has a
