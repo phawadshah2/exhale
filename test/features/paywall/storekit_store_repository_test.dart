@@ -8,6 +8,7 @@ import 'package:exhale/features/paywall/domain/entities/access.dart';
 import 'package:exhale/features/paywall/domain/entities/offer.dart';
 import 'package:exhale/features/paywall/domain/entities/plan_kind.dart';
 import 'package:exhale/features/paywall/domain/entities/purchase_outcome.dart';
+import 'package:exhale/features/paywall/domain/entities/renewing_subscription.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -59,6 +60,10 @@ class _FakeGateway implements StoreKitGateway {
   final List<String> purchased = [];
   int syncCalls = 0;
   int manageCalls = 0;
+  int redeemCalls = 0;
+  final List<String> refunds = [];
+  String refundAnswer = 'requested';
+  Map<String, Object?>? renewing;
   Exception? error;
   Completer<void>? hang;
   final StreamController<void> updateController = StreamController.broadcast();
@@ -108,6 +113,21 @@ class _FakeGateway implements StoreKitGateway {
     manageCalls++;
     return _answer(null);
   }
+
+  @override
+  Future<void> presentCodeRedemptionSheet() {
+    redeemCalls++;
+    return _answer(null);
+  }
+
+  @override
+  Future<String> requestRefund(String productId) {
+    refunds.add(productId);
+    return _answer(refundAnswer);
+  }
+
+  @override
+  Future<Map<String, Object?>?> renewingSubscription() => _answer(renewing);
 
   @override
   Stream<void> get updates => updateController.stream;
@@ -411,6 +431,63 @@ void main() {
       await pumpEventQueue();
 
       expect(emitted, 1);
+    });
+  });
+
+  group('codes, refunds and renewal', () {
+    test('presentCodeRedemption calls the gateway', () async {
+      expect(await repository.presentCodeRedemption(), isA<Success<void>>());
+      expect(gateway.redeemCalls, 1);
+    });
+
+    test("requestRefund passes the plan's product id", () async {
+      expect(
+        _value(await repository.requestRefund(PlanKind.lifetime)),
+        RefundOutcome.requested,
+      );
+      expect(gateway.refunds, [PlanKind.lifetime.productId]);
+    });
+
+    test('requestRefund maps cancelled', () async {
+      gateway.refundAnswer = 'cancelled';
+
+      expect(
+        _value(await repository.requestRefund(PlanKind.annual)),
+        RefundOutcome.cancelled,
+      );
+    });
+
+    test('renewingSubscription maps productId and renewsAt', () async {
+      gateway.renewing = {
+        'productId': PlanKind.annual.productId,
+        'renewsAt': '2026-12-03T09:00:00.000Z',
+      };
+
+      expect(
+        _value(await repository.renewingSubscription()),
+        RenewingSubscription(
+          plan: PlanKind.annual,
+          renewsAt: DateTime.utc(2026, 12, 3, 9),
+        ),
+      );
+    });
+
+    test('renewingSubscription null when none', () async {
+      expect(_value(await repository.renewingSubscription()), isNull);
+    });
+
+    test('a channel error is a StoreFailure', () async {
+      gateway.error = PlatformException(code: 'no_transaction');
+
+      _expectStoreFailure(await repository.requestRefund(PlanKind.annual));
+      _expectStoreFailure(await repository.renewingSubscription());
+      _expectStoreFailure(await repository.presentCodeRedemption());
+    });
+
+    test('no renewal answer in time is a store failure', () async {
+      gateway.hang = Completer();
+
+      _expectStoreFailure(await quick.renewingSubscription());
     });
   });
 }

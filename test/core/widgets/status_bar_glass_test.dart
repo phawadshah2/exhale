@@ -1,3 +1,4 @@
+import 'package:exhale/core/widgets/glass_surface.dart';
 import 'package:exhale/core/widgets/status_bar_glass.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -48,6 +49,23 @@ void main() {
     );
     expect(tester.getSize(strip.first).height, 44);
     expect(find.byType(IgnorePointer), findsWidgets);
+  });
+
+  testWidgets('the strip has no edge line', (tester) async {
+    await pump(tester);
+    final decorations = tester
+        .widgetList<DecoratedBox>(
+          find.descendant(
+            of: find.byType(GlassSurface),
+            matching: find.byType(DecoratedBox),
+          ),
+        )
+        .map((box) => box.decoration)
+        .whereType<ShapeDecoration>();
+    expect(decorations, isNotEmpty);
+    for (final decoration in decorations) {
+      expect((decoration.shape as OutlinedBorder).side, BorderSide.none);
+    }
   });
 
   testWidgets('draws nothing without a status bar', (tester) async {

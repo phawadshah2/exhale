@@ -84,8 +84,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.editPlan,
-        builder: (context, state) =>
-            EditPlanPage(habitId: int.parse(state.pathParameters['habitId']!)),
+        builder: (context, state) => EditPlanPage(
+          habitId: int.parse(state.pathParameters['habitId']!),
+          focusPrice: state.uri.queryParameters['focus'] == 'price',
+        ),
       ),
       GoRoute(
         path: AppRoutes.planDetails,

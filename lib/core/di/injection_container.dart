@@ -9,6 +9,7 @@ import 'package:exhale/features/paywall/paywall_injection.dart';
 import 'package:exhale/features/plan/plan_injection.dart';
 import 'package:exhale/features/presence/domain/repositories/presence_repository.dart';
 import 'package:exhale/features/presence/presence_injection.dart';
+import 'package:exhale/features/settings/domain/repositories/about_launcher.dart';
 import 'package:exhale/features/settings/settings_injection.dart';
 import 'package:exhale/features/tracking/tracking_injection.dart';
 import 'package:flutter/foundation.dart';
@@ -19,7 +20,7 @@ import 'package:get_it/get_it.dart';
 final GetIt sl = GetIt.instance;
 
 abstract final class InjectionContainer {
-  /// [database], [clock], [store] and [presence] are overridable for
+  /// [database], [clock], [store], [presence] and [about] are overridable for
   /// tests. A debug build takes its store from `--dart-define=FAKE_STORE=…`
   /// when given.
   static Future<void> setupDependencies({
@@ -27,6 +28,7 @@ abstract final class InjectionContainer {
     Clock clock = const Clock(),
     StoreRepository? store,
     PresenceRepository? presence,
+    AboutLauncher? about,
   }) async {
     sl
       ..registerLazySingleton<AppDatabase>(
@@ -40,7 +42,7 @@ abstract final class InjectionContainer {
     initHabitDependencies(sl);
     initPlanDependencies(sl);
     initTrackingDependencies(sl);
-    initSettingsDependencies(sl);
+    initSettingsDependencies(sl, about);
     initPaywallDependencies(
       sl,
       store ??

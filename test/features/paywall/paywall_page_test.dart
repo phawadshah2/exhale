@@ -357,6 +357,44 @@ void main() {
     });
   });
 
+  group('redeem', () {
+    testWidgets('paywall Redeem a code calls the store', (tester) async {
+      await seed();
+      await open(tester);
+
+      await tester.tap(find.text(PaywallCopy.redeemCode));
+      await settle(tester);
+
+      expect(store.redeemCalls, 1);
+      expect(find.byKey(PaywallPage.pageKey), findsOneWidget);
+
+      await tester.disposeApp();
+    });
+
+    testWidgets('redeeming then a store change leaves the paywall', (
+      tester,
+    ) async {
+      await seed();
+      await open(tester);
+
+      await tester.tap(find.text(PaywallCopy.redeemCode));
+      await settle(tester);
+      store
+        ..access = const Entitled(
+          plan: PlanKind.lifetime,
+          expiresAt: null,
+          inTrial: false,
+        )
+        ..emitChange();
+      await settle(tester);
+
+      expect(find.byKey(PaywallPage.pageKey), findsNothing);
+      expect(find.byType(HomePage), findsOneWidget);
+
+      await tester.disposeApp();
+    });
+  });
+
   testWidgets('no back chevron when the gate opens it', (tester) async {
     await seed();
     await open(tester);

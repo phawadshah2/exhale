@@ -15,9 +15,8 @@ plan; don't ask him to re-explain them. Read the linked docs when a task touches
 Progress and the single next action live in `docs/CURRENT_STATE.md`. Read it first; update
 it when a task or milestone finishes. Older session logs are in `docs/history/`.
 
-- Unmerged, in order: `feat/timer-first-log`, then `feat/lock-screen` (Lock Screen
-  presence, stacked on it, milestone closed 2026-11-18). Next: push and merge them, then
-  the Settings redesign.
+- Timer and Lock Screen presence are merged (PRs 38, 39). `feat/settings-redesign`
+  (closed 2026-11-21) is pushed, its PR open. Next: merge it, then notifications.
 - `FAKE_STORE` only works in debug builds; a lapsed or never-paid walk on the iPhone
   needs `fvm flutter run` (debug) attached.
 - Specs: `docs/superpowers/specs/` (one per plan). Designs: `design/` (each folder has a

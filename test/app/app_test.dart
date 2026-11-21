@@ -3,12 +3,16 @@ import 'package:exhale/core/domain/result/result.dart';
 import 'package:exhale/core/domain/time/logical_day.dart';
 import 'package:exhale/core/theme/app_palette.dart';
 import 'package:exhale/core/theme/app_theme.dart';
+import 'package:exhale/core/widgets/app_sheet.dart';
 import 'package:exhale/features/habit/domain/entities/habit.dart';
 import 'package:exhale/features/plan/domain/entities/plan_draft.dart';
 import 'package:exhale/features/settings/domain/entities/app_settings.dart';
 import 'package:exhale/features/settings/domain/entities/theme_preference.dart';
 import 'package:exhale/features/settings/domain/repositories/settings_repository.dart';
 import 'package:exhale/features/settings/presentation/pages/settings_page.dart';
+import 'package:exhale/features/settings/presentation/settings_copy.dart';
+import 'package:exhale/features/settings/presentation/widgets/settings_row.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -101,7 +105,14 @@ void main() {
 
     await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Light'));
+    await tester.scrollAndTap(find.text(SettingsCopy.theme));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AppSheetFrame),
+        matching: find.text('Light'),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final context = tester.element(find.byType(SettingsPage));
@@ -129,7 +140,12 @@ void main() {
 
     await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Ask for a trigger'));
+    await tester.scrollAndTap(
+      find.descendant(
+        of: find.widgetWithText(SettingsRow, SettingsCopy.askTrigger),
+        matching: find.byType(CupertinoSwitch),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final stored = await sl<SettingsRepository>().get();
@@ -156,6 +172,8 @@ void main() {
     await tester.pumpAppPastSplash(height: 2400);
 
     await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
+    await tester.scrollAndTap(find.text(SettingsCopy.accent));
     await tester.pumpAndSettle();
     await tester.tap(find.bySemanticsLabel('Ocean accent'));
     await tester.pumpAndSettle();
@@ -186,6 +204,8 @@ void main() {
     await tester.pumpAppPastSplash(height: 2400);
 
     await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
+    await tester.scrollAndTap(find.text(SettingsCopy.accent));
     await tester.pumpAndSettle();
     await tester.tap(find.bySemanticsLabel('Ocean accent'));
     await tester.pumpAndSettle();

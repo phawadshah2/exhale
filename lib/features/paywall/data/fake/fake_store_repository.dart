@@ -6,6 +6,7 @@ import 'package:exhale/features/paywall/domain/entities/access.dart';
 import 'package:exhale/features/paywall/domain/entities/offer.dart';
 import 'package:exhale/features/paywall/domain/entities/plan_kind.dart';
 import 'package:exhale/features/paywall/domain/entities/purchase_outcome.dart';
+import 'package:exhale/features/paywall/domain/entities/renewing_subscription.dart';
 import 'package:exhale/features/paywall/domain/repositories/store_repository.dart';
 
 /// A store held in memory, for tests and debug walks.
@@ -14,6 +15,7 @@ class FakeStoreRepository implements StoreRepository {
     this.access = const NeverPaid(),
     List<Offer>? offers,
     this.offline = false,
+    this.renewing,
     DateTime Function()? now,
   }) : offers = offers ?? defaultOffers,
        _now = now ?? DateTime.now;
@@ -72,9 +74,31 @@ class FakeStoreRepository implements StoreRepository {
   /// What a restore finds; null finds nothing.
   Access? restoreFinds;
 
+  /// A subscription still renewing (beside Lifetime, say). While null, an
+  /// Annual or Monthly [access] renews itself unless [autoRenew] is off.
+  RenewingSubscription? renewing;
+
+  /// Whether the current Annual or Monthly subscription renews.
+  bool autoRenew = true;
+
+  /// The renewal check fails.
+  bool renewingFails = false;
+
+  /// While set and not completed, a restore waits on it.
+  Completer<void>? restoreGate;
+
+  /// While set and not completed, Apple's sheets (manage, redeem, refund)
+  /// stay open.
+  Completer<void>? sheetGate;
+
+  /// What the refund sheet ends with.
+  RefundOutcome refundOutcome = RefundOutcome.requested;
+
   int purchaseCalls = 0;
   int restoreCalls = 0;
   int manageCalls = 0;
+  int redeemCalls = 0;
+  final List<PlanKind> refundRequests = [];
 
   void emitChange() => _changes.add(null);
 
@@ -101,6 +125,7 @@ class FakeStoreRepository implements StoreRepository {
   @override
   Future<Result<void>> restore() async {
     restoreCalls++;
+    if (restoreGate case final gate?) await gate.future;
     if (_takeFailure() case final failure?) return FailureResult(failure);
     if (offline) return _offline();
     if (restoreFinds case final found?) access = found;
@@ -110,7 +135,34 @@ class FakeStoreRepository implements StoreRepository {
   @override
   Future<Result<void>> manageSubscriptions() async {
     manageCalls++;
+    if (sheetGate case final gate?) await gate.future;
     return offline ? _offline() : const Success(null);
+  }
+
+  @override
+  Future<Result<void>> presentCodeRedemption() async {
+    redeemCalls++;
+    if (sheetGate case final gate?) await gate.future;
+    return offline ? _offline() : const Success(null);
+  }
+
+  @override
+  Future<Result<RefundOutcome>> requestRefund(PlanKind plan) async {
+    refundRequests.add(plan);
+    if (sheetGate case final gate?) await gate.future;
+    return offline ? _offline() : Success(refundOutcome);
+  }
+
+  @override
+  Future<Result<RenewingSubscription?>> renewingSubscription() async {
+    if (offline || renewingFails) return _offline();
+    if (renewing case final renewing?) return Success(renewing);
+    return Success(switch (access) {
+      Entitled(:final plan, :final expiresAt?)
+          when autoRenew && plan != PlanKind.lifetime =>
+        RenewingSubscription(plan: plan, renewsAt: expiresAt),
+      _ => null,
+    });
   }
 
   Failure? _takeFailure() {

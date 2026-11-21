@@ -15,11 +15,16 @@ class SetupScaffold extends StatefulWidget {
   const SetupScaffold({
     required this.children,
     required this.footer,
+    this.buildAll = false,
     super.key,
   });
 
   final List<Widget> children;
   final Widget Function(double bottomInset) footer;
+
+  /// Builds every child up front, so one far down can scroll itself into
+  /// view when the page opens.
+  final bool buildAll;
 
   @override
   State<SetupScaffold> createState() => _SetupScaffoldState();
@@ -48,6 +53,9 @@ class _SetupScaffoldState extends State<SetupScaffold> {
             onTap: () => FocusScope.of(context).unfocus(),
             child: StatusBarGlass(
               child: ListView(
+                scrollCacheExtent: widget.buildAll
+                    ? const ScrollCacheExtent.pixels(100000)
+                    : null,
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: AppSpacing.page.copyWith(

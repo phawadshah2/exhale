@@ -251,6 +251,19 @@ void main() {
     await tester.disposeApp();
   });
 
+  testWidgets('locked Redeem a code calls the store', (tester) async {
+    await seed();
+    await open(tester);
+
+    await tester.tap(find.text(PaywallCopy.redeemCode));
+    await settle(tester);
+
+    expect(store.redeemCalls, 1);
+    expect(find.byKey(LockedPage.pageKey), findsOneWidget);
+
+    await tester.disposeApp();
+  });
+
   testWidgets('blurred with glass on', (tester) async {
     await seed();
     await open(tester);

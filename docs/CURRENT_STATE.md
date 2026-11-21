@@ -1,44 +1,41 @@
 # Current state
 
-Updated 2026-11-18 (Lock Screen presence milestone closed). Older logs: `docs/history/`.
+Updated 2026-11-21 (Settings redesign closed). Older logs: `docs/history/`.
 
 ## Where we are
 
 | Work | Status |
 |---|---|
 | M1 to M7, chat onboarding, paywall | Merged to `main` (`1fff6cb`, PRs 35 to 37) |
-| Timer starts at the first log; tap opens today's logs | Done on `feat/timer-first-log` (3 commits), pushed, no PR yet |
-| Lock Screen presence (project 1 of 4) | Closed 2026-11-18 on `feat/lock-screen`, stacked on the timer branch, not pushed |
+| Timer starts at the first log; tap opens today's logs | Merged to `main` (PR 38) |
+| Lock Screen presence (project 1 of 4) | Merged to `main` (PR 39); closing notes in `docs/history/2026-11-18_lock_screen_presence_state.md` |
+| Settings redesign (project 2 of 4) | Closed 2026-11-21 on `feat/settings-redesign`, pushed, PR to open |
 | M4 Multiple habits | Parked on `feat/multi-habit` |
 
 Before the real iPhone pass, Fawad wants (2026-11-14), in order: 1 Lock Screen presence
-(done), 2 Settings redesign, 3 notifications (careful wording), 4 breathing exercise
+(done), 2 Settings redesign (done), 3 notifications (careful wording), 4 breathing exercise
 (likely the new tab). Launch still needs Export/Import, iCloud sync, Stay at zero.
 
-## Lock Screen presence (closed)
+## Settings redesign (closed 2026-11-21)
 
-- Spec `docs/superpowers/specs/2026-11-14-lock-screen-presence-design.md`; plan
-  `docs/superpowers/plans/2026-11-14-lock-screen-presence.md` (as-built notes under each
-  task); designs `design/11._lock_screen_presence/`.
-- Built: App Group queue + snapshot, Swift `PaceGuide` port, widgets 1 to 5 and the Lock
-  Screen trio, Log one (Siri, Shortcuts, Action Button, iOS 18 controls, widget and Island
-  +), the countdown Live Activity and Island, the Settings switch (temporary row; its
-  place comes with the Settings redesign, Fawad 2026-11-18).
-- Review: Review Focus 1 to 5 hold. Minor, not fixed: opening the app re-picks the
-  activity's lines (Dart doesn't know Swift's pair); two Swift Log ones in a row both
-  avoid the snapshot's `lastPair`, not the pair just shown; `removeFromQueue` reloads
-  widgets milliseconds before the new snapshot (could show one fewer briefly).
-- Checks: full suite 1510/1510 (before the walk fixes); Home 272/272 after them; format,
-  analyze clean; XCTests `** TEST SUCCEEDED **`.
-- Walk on Fawad's iPhone: all passed after two fixes (`3385ed8` Island margins,
-  `c413a8f` Home ring opens the day's logs at or over the limit). Lapsed walk passed on
-  a debug build: `FAKE_STORE` is ignored in release builds.
+- Spec `docs/superpowers/specs/2026-11-19-settings-redesign-design.md`; plan
+  `docs/superpowers/plans/2026-11-19-settings-redesign.md`; design `design/12._settings/`.
+- On `feat/settings-redesign` (15 commits over `main`), pushed.
+- Review: 11 findings fixed (`1717d10`). Full suite 1587/1587 before the walk fixes;
+  Settings and core widget tests 124/124 after them; format, analyze clean.
+- iPhone walk (Fawad, 2026-11-21): entitled, trial, monthly, lifetimeRenewing, offline
+  and the sandbox (Restore, Manage, Redeem, Refund) all pass after `9d4c0f4` (values at
+  the row edge, the Subscription sheet fits its content, no line under the status bar
+  glass). Light and dark seen; Reduce Transparency, 200% and VoiceOver not reported on
+  the device (widget tests cover 200% and VoiceOver).
+- Known, not fixed: the renewal state refreshes only when the sheet reopens or after
+  Manage, not on app resume. Spec Open: "New day starts", feedback address, Privacy URL,
+  App Store ID (Rate, Send feedback and Privacy stay hidden until set).
 
 ## Next action
 
-Fawad opens a PR for `feat/timer-first-log` (already pushed), then pushes `feat/lock-screen` and opens its PR
-from a compare link (the second after the first merges). Then project 2, the Settings
-redesign: brainstorm, mockups for Fawad (he has seen none for Settings), spec, plan.
+Fawad opens and merges the Settings PR (`main...feat/settings-redesign`). Then project 3, notifications (careful wording): brainstorm a spec first. It
+folds in the payment reminder (day 5) and the Lifetime-with-a-renewing-plan reminders.
 
 ## Repo
 
@@ -50,15 +47,16 @@ redesign: brainstorm, mockups for Fawad (he has seen none for Settings), spec, p
 
 ## Open
 
-- For Fawad: privacy policy URL; Terms link; `.storekit` check; submission items (group
+- For Fawad: privacy policy URL; `.storekit` check; submission items (group
   display name, review screenshots, Family Sharing, App Privacy); review the 53 draft
   `encouragementLines`.
-- Paywall follow-ups (Fawad, 2026-11-14): show something when a purchase succeeds;
-  Settings' Restore purchases has no loading state and shows even when entitled.
-- Paywall review notes not fixed: sandbox Annual reads as a trial; Lifetime over Annual
-  hides Manage; refunded "ended on" uses expiry; a resubmitted first run saves only the plan.
+- Paywall follow-up (Fawad, 2026-11-14): show something when a purchase succeeds on the
+  paywall. (Restore's loading state and its place were fixed by the Settings redesign.)
+- Paywall review notes not fixed: sandbox Annual reads as a trial; refunded "ended on" uses expiry; a resubmitted first run saves only the plan.
 - Splash overflows at 200% on 375 × 667; paywall button 22 pt high there.
 - Payment reminders spec (day 5) needed in the same release.
+- Lifetime with Annual or Monthly still renewing (Fawad, 2026-11-21): don't auto-open
+  Apple's cancel screen; remind with in-app alerts and notifications until it is cancelled.
 - Presence: extension version 1.0 vs app 0.1.0 (Xcode warns; match before release).
 - Earlier walk items: Reduce Transparency, 200%, priced drink in Edit plan; chat spec,
   iPhone review list. The iPhone 17 simulator drops injected taps (2026-11-18): walk on

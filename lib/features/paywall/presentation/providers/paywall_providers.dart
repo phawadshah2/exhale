@@ -7,6 +7,7 @@ import 'package:exhale/features/paywall/domain/entities/access.dart';
 import 'package:exhale/features/paywall/domain/entities/offer.dart';
 import 'package:exhale/features/paywall/domain/entities/plan_kind.dart';
 import 'package:exhale/features/paywall/domain/entities/purchase_outcome.dart';
+import 'package:exhale/features/paywall/domain/entities/renewing_subscription.dart';
 import 'package:exhale/features/paywall/domain/repositories/store_repository.dart';
 import 'package:exhale/features/paywall/domain/services/access_cache.dart';
 import 'package:exhale/features/settings/presentation/providers/settings_providers.dart';
@@ -79,6 +80,11 @@ class OffersUnavailable implements Exception {
   const OffersUnavailable();
 }
 
+/// The store could not say what renews.
+class RenewalUnknown implements Exception {
+  const RenewalUnknown();
+}
+
 /// Annual, Monthly and Lifetime; fails with [OffersUnavailable]. No automatic
 /// retry: the paywall's "Try again" invalidates it.
 final FutureProvider<List<Offer>> offersProvider =
@@ -90,6 +96,27 @@ final FutureProvider<List<Offer>> offersProvider =
           },
       retry: (_, _) => null,
     );
+
+/// An Annual or Monthly subscription still set to renew; null when there is
+/// none, [RenewalUnknown] when the store could not say.
+final FutureProvider<RenewingSubscription?> renewingSubscriptionProvider =
+    FutureProvider.autoDispose<RenewingSubscription?>(
+      (ref) async => switch (await ref
+          .watch(storeRepositoryProvider)
+          .renewingSubscription()) {
+        Success(:final value) => value,
+        FailureResult() => throw const RenewalUnknown(),
+      },
+      retry: (_, _) => null,
+    );
+
+/// Whether the Annual or Monthly subscription renews; null until the store
+/// says, or when it cannot.
+final Provider<bool?> autoRenewsProvider = Provider.autoDispose<bool?>((ref) {
+  final renewing = ref.watch(renewingSubscriptionProvider);
+  if (renewing.hasError || !renewing.hasValue) return null;
+  return renewing.value != null;
+});
 
 @immutable
 class PaywallState {
@@ -153,16 +180,19 @@ class PaywallController extends Notifier<PaywallState> {
 
   /// Restores purchases and re-checks access; true when it is now entitled,
   /// false when the store could not restore.
-  Future<bool> restore() async {
-    if (state.busy) return false;
+  /// Null when a purchase or restore is already running.
+  Future<RestoreOutcome?> restore() async {
+    if (state.busy) return null;
     state = state.copyWith(busy: true);
     final link = ref.keepAlive();
     try {
       if (await ref.read(storeRepositoryProvider).restore() is! Success) {
-        return false;
+        return RestoreOutcome.failed;
       }
       await ref.read(accessProvider.notifier).refresh();
-      return ref.read(accessProvider) is Entitled;
+      return ref.read(accessProvider) is Entitled
+          ? RestoreOutcome.restored
+          : RestoreOutcome.nothingFound;
     } finally {
       state = state.copyWith(busy: false);
       link.close();

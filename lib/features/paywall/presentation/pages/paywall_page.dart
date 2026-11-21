@@ -17,6 +17,7 @@ import 'package:exhale/features/paywall/domain/services/spend_comparison.dart';
 import 'package:exhale/features/paywall/presentation/paywall_content.dart';
 import 'package:exhale/features/paywall/presentation/paywall_copy.dart';
 import 'package:exhale/features/paywall/presentation/providers/paywall_providers.dart';
+import 'package:exhale/features/paywall/presentation/redeem_code.dart';
 import 'package:exhale/features/paywall/presentation/widgets/legal_links.dart';
 import 'package:exhale/features/paywall/presentation/widgets/paywall_steps.dart';
 import 'package:exhale/features/paywall/presentation/widgets/plan_card.dart';
@@ -72,14 +73,23 @@ class PaywallPage extends ConsumerWidget {
 
   Future<void> _restore(BuildContext context, WidgetRef ref) async {
     if (ref.read(paywallControllerProvider).busy) return;
-    final entitled = await ref
+    final outcome = await ref
         .read(paywallControllerProvider.notifier)
         .restore();
     if (!context.mounted) return;
-    if (entitled) {
-      context.go(AppRoutes.home);
-    } else {
-      showAppSnackBar(context, message: PaywallCopy.noPurchases);
+    switch (outcome) {
+      case RestoreOutcome.restored:
+        context.go(AppRoutes.home);
+      case RestoreOutcome.nothingFound:
+        showAppSnackBar(context, message: PaywallCopy.noPurchases);
+      case RestoreOutcome.failed:
+        showAppSnackBar(
+          context,
+          message: PaywallCopy.cantReachStore,
+          tone: SnackTone.danger,
+        );
+      case null:
+        break;
     }
   }
 
@@ -149,7 +159,10 @@ class PaywallPage extends ConsumerWidget {
                   isBusy: state.busy,
                   onPressed: canBuy ? () => _buy(context, ref) : null,
                 ),
-                below: const LegalLinksRow(),
+                below: LegalLinksRow(
+                  onRedeem: () => unawaited(redeemCode(context, ref)),
+                  redeemEnabled: !state.busy,
+                ),
                 belowIsLinks: true,
                 body: LayoutBuilder(
                   builder: (context, constraints) => _Body(

@@ -159,7 +159,7 @@ void main() {
           await tester.pumpAppPastSplash(height: height);
           await tester.tap(find.byTooltip('Settings'));
           await tester.pumpAndSettle();
-          expect(find.text('Appearance'), findsOneWidget);
+          expect(find.text('APPEARANCE'), findsOneWidget);
           await expectGuidelines(tester, handle);
         });
 

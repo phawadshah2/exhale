@@ -46,6 +46,11 @@ abstract final class AppIcons {
   static const IconData person = CupertinoIcons.person_fill;
   static const IconData appearance = CupertinoIcons.circle_lefthalf_fill;
   static const IconData glass = CupertinoIcons.drop;
+  static const IconData star = CupertinoIcons.star;
+  static const IconData mail = CupertinoIcons.envelope;
+  static const IconData privacy = CupertinoIcons.hand_raised;
+  static const IconData document = CupertinoIcons.doc_text;
+  static const IconData palette = CupertinoIcons.paintbrush;
 
   // Habits
   static const IconData smoking = Icons.smoking_rooms_rounded;
